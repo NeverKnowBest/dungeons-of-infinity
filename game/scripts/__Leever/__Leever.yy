@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Leever",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Leever",
+  "parent":{
+    "name":"Leever",
+    "path":"folders/Objects/Characters/Enemies/Leever.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

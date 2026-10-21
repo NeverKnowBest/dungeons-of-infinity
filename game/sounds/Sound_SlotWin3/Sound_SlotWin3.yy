@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Sound_SlotWin3",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":2.129396,
+  "exportDir":"",
+  "name":"Sound_SlotWin3",
+  "parent":{
+    "name":"Mothula",
+    "path":"folders/Objects/DungeonObjs/Arcade/Games/Slots/Mothula.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"Sound_SlotWin3.wav",
+  "volume":1.0,
+}

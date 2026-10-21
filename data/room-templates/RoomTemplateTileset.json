@@ -1,0 +1,1423 @@
+{ "columns":0,
+ "grid":
+    {
+     "height":1,
+     "orientation":"orthogonal",
+     "width":1
+    },
+ "margin":0,
+ "name":"Room Template Objects",
+ "objectalignment":"topleft",
+ "spacing":0,
+ "tilecount":233,
+ "tiledversion":"1.10.1",
+ "tileheight":104,
+ "tiles":[
+        {
+         "id":0,
+         "image":"Tiled Objects\/DoorB.png",
+         "imageheight":24,
+         "imagewidth":32
+        }, 
+        {
+         "id":1,
+         "image":"Tiled Objects\/DoorL.png",
+         "imageheight":32,
+         "imagewidth":24
+        }, 
+        {
+         "id":2,
+         "image":"Tiled Objects\/DoorR.png",
+         "imageheight":32,
+         "imagewidth":24
+        }, 
+        {
+         "id":3,
+         "image":"Tiled Objects\/DoorT.png",
+         "imageheight":24,
+         "imagewidth":32
+        }, 
+        {
+         "id":4,
+         "image":"Tiled Objects\/StairsB.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":7,
+         "image":"Tiled Objects\/StairsT.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":8,
+         "image":"Tiled Objects\/WallCornerBL.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":9,
+         "image":"Tiled Objects\/WallCornerBR.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":10,
+         "image":"Tiled Objects\/WallCornerTL.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":11,
+         "image":"Tiled Objects\/WallCornerTR.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":12,
+         "image":"Tiled Objects\/WallInnerBL.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":13,
+         "image":"Tiled Objects\/WallInnerBR.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":14,
+         "image":"Tiled Objects\/WallInnerTL.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":15,
+         "image":"Tiled Objects\/WallInnerTR.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":16,
+         "image":"Tiled Objects\/WallLowerCornerBL.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":17,
+         "image":"Tiled Objects\/WallLowerCornerBR.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":18,
+         "image":"Tiled Objects\/WallLowerCornerTL.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":19,
+         "image":"Tiled Objects\/WallLowerCornerTR.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":20,
+         "image":"Tiled Objects\/WallLowerInnerBL.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":21,
+         "image":"Tiled Objects\/WallLowerInnerBR.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":22,
+         "image":"Tiled Objects\/WallLowerInnerTL.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":23,
+         "image":"Tiled Objects\/WallLowerInnerTR.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":24,
+         "image":"Tiled Objects\/WallLowerSideB.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":25,
+         "image":"Tiled Objects\/WallLowerSideL.png",
+         "imageheight":8,
+         "imagewidth":24
+        }, 
+        {
+         "id":26,
+         "image":"Tiled Objects\/WallLowerSideR.png",
+         "imageheight":8,
+         "imagewidth":24
+        }, 
+        {
+         "id":27,
+         "image":"Tiled Objects\/WallLowerSideT.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":28,
+         "image":"Tiled Objects\/WallSideB.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":29,
+         "image":"Tiled Objects\/WallSideL.png",
+         "imageheight":8,
+         "imagewidth":24
+        }, 
+        {
+         "id":30,
+         "image":"Tiled Objects\/WallSideR.png",
+         "imageheight":8,
+         "imagewidth":24
+        }, 
+        {
+         "id":31,
+         "image":"Tiled Objects\/WallSideT.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":32,
+         "image":"Tiled Objects\/Railling.png",
+         "imageheight":8,
+         "imagewidth":8,
+         "type":"Rail"
+        }, 
+        {
+         "id":33,
+         "image":"Tiled Objects\/Pot.png",
+         "imageheight":16,
+         "imagewidth":16,
+         "type":"Pot"
+        }, 
+        {
+         "id":34,
+         "image":"Tiled Objects\/Treasure.png",
+         "imageheight":16,
+         "imagewidth":16,
+         "type":"Treasure"
+        }, 
+        {
+         "id":35,
+         "image":"Tiled Objects\/Crystal.png",
+         "imageheight":16,
+         "imagewidth":16,
+         "type":"Crystal"
+        }, 
+        {
+         "id":36,
+         "image":"Tiled Objects\/Pot or Treasure.png",
+         "imageheight":16,
+         "imagewidth":16,
+         "type":"Pot_Treasure"
+        }, 
+        {
+         "id":40,
+         "image":"Tiled Objects\/Monument.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":41,
+         "image":"Tiled Objects\/Altar.png",
+         "imageheight":64,
+         "imagewidth":64,
+         "type":"Altar"
+        }, 
+        {
+         "id":42,
+         "image":"Tiled Objects\/Block.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":43,
+         "image":"Tiled Objects\/SpikeBlock.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":44,
+         "image":"Tiled Objects\/SpikeFloor.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":45,
+         "image":"Tiled Objects\/Hole.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":46,
+         "image":"Tiled Objects\/IceFloor.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":47,
+         "image":"Tiled Objects\/MovingFloor_Down.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":48,
+         "image":"Tiled Objects\/MovingFloor_Left.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":49,
+         "image":"Tiled Objects\/MovingFloor_Right.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":50,
+         "image":"Tiled Objects\/MovingFloor_Up.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":59,
+         "image":"Tiled Objects\/Decor_Column.png",
+         "imageheight":32,
+         "imagewidth":16
+        }, 
+        {
+         "id":81,
+         "image":"Tiled Objects\/Railling_Large.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":82,
+         "image":"Tiled Objects\/Kinstone.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":83,
+         "image":"Tiled Objects\/Jail.png",
+         "imageheight":40,
+         "imagewidth":64
+        }, 
+        {
+         "id":84,
+         "image":"Tiled Objects\/Shop.png",
+         "imageheight":64,
+         "imagewidth":64
+        }, 
+        {
+         "id":85,
+         "image":"Tiled Objects\/Rupee_05.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":86,
+         "image":"Tiled Objects\/Rupee_10.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":87,
+         "image":"Tiled Objects\/Rupee_20.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":88,
+         "image":"Tiled Objects\/TreasureLarge.png",
+         "imageheight":24,
+         "imagewidth":32
+        }, 
+        {
+         "id":91,
+         "image":"Tiled Objects\/Fairy.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":92,
+         "image":"Tiled Objects\/Water.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":93,
+         "image":"Tiled Objects\/House.png",
+         "imageheight":88,
+         "imagewidth":96
+        }, 
+        {
+         "id":95,
+         "image":"Tiled Objects\/Bridge.png",
+         "imageheight":64,
+         "imagewidth":88
+        }, 
+        {
+         "id":96,
+         "image":"Tiled Objects\/Waterfall.png",
+         "imageheight":48,
+         "imagewidth":16
+        }, 
+        {
+         "id":98,
+         "image":"Tiled Objects\/Path1.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":99,
+         "image":"Tiled Objects\/Path2.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":100,
+         "image":"Tiled Objects\/PathTrim.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":108,
+         "image":"Tiled Objects\/Path3.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":109,
+         "image":"Tiled Objects\/Path4.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":110,
+         "image":"Tiled Objects\/Path5.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":111,
+         "image":"Tiled Objects\/Path6.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":112,
+         "image":"Tiled Objects\/Path7.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":113,
+         "image":"Tiled Objects\/Path8.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":114,
+         "image":"Tiled Objects\/Path9.png",
+         "imageheight":8,
+         "imagewidth":16
+        }, 
+        {
+         "id":115,
+         "image":"Tiled Objects\/Path10.png",
+         "imageheight":8,
+         "imagewidth":16
+        }, 
+        {
+         "id":116,
+         "image":"Tiled Objects\/Dirt.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":117,
+         "image":"Tiled Objects\/Dirt_Edge1.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":118,
+         "image":"Tiled Objects\/Dirt_Edge2.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":119,
+         "image":"Tiled Objects\/Dirt_Edge3.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":134,
+         "image":"Tiled Objects\/Tree1.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":135,
+         "image":"Tiled Objects\/Tree2.png",
+         "imageheight":32,
+         "imagewidth":24
+        }, 
+        {
+         "id":136,
+         "image":"Tiled Objects\/Tree3.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":137,
+         "image":"Tiled Objects\/Tree4.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":138,
+         "image":"Tiled Objects\/Statue.png",
+         "imageheight":48,
+         "imagewidth":32
+        }, 
+        {
+         "id":139,
+         "image":"Tiled Objects\/Pillar.png",
+         "imageheight":32,
+         "imagewidth":16
+        }, 
+        {
+         "id":142,
+         "image":"Tiled Objects\/BirdStatue.png",
+         "imageheight":56,
+         "imagewidth":32
+        }, 
+        {
+         "id":147,
+         "image":"Tiled Objects\/Bench.png",
+         "imageheight":16,
+         "imagewidth":32
+        }, 
+        {
+         "id":148,
+         "image":"Tiled Objects\/WaterTrough1.png",
+         "imageheight":24,
+         "imagewidth":32
+        }, 
+        {
+         "id":149,
+         "image":"Tiled Objects\/WaterTrough2.png",
+         "imageheight":24,
+         "imagewidth":24
+        }, 
+        {
+         "id":150,
+         "image":"Tiled Objects\/VillageEntranceSign.png",
+         "imageheight":24,
+         "imagewidth":48
+        }, 
+        {
+         "id":151,
+         "image":"Tiled Objects\/VillageFortWall.png",
+         "imageheight":40,
+         "imagewidth":8
+        }, 
+        {
+         "id":152,
+         "image":"Tiled Objects\/Tombstone.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":153,
+         "image":"Tiled Objects\/CemetaryWall.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":154,
+         "image":"Tiled Objects\/Gate.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":155,
+         "image":"Tiled Objects\/RuinWall.png",
+         "imageheight":16,
+         "imagewidth":32
+        }, 
+        {
+         "id":156,
+         "image":"Tiled Objects\/MedallionPlatform.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":157,
+         "image":"Tiled Objects\/Table1.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":158,
+         "image":"Tiled Objects\/Table2.png",
+         "imageheight":32,
+         "imagewidth":24
+        }, 
+        {
+         "id":159,
+         "image":"Tiled Objects\/Stove1.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":160,
+         "image":"Tiled Objects\/Stove2.png",
+         "imageheight":24,
+         "imagewidth":48
+        }, 
+        {
+         "id":161,
+         "image":"Tiled Objects\/Bed1.png",
+         "imageheight":48,
+         "imagewidth":32
+        }, 
+        {
+         "id":162,
+         "image":"Tiled Objects\/Bed2.png",
+         "imageheight":40,
+         "imagewidth":32
+        }, 
+        {
+         "id":163,
+         "image":"Tiled Objects\/Cabinet1.png",
+         "imageheight":40,
+         "imagewidth":48
+        }, 
+        {
+         "id":164,
+         "image":"Tiled Objects\/Cabinet2.png",
+         "imageheight":40,
+         "imagewidth":32
+        }, 
+        {
+         "id":165,
+         "image":"Tiled Objects\/Cabinet3.png",
+         "imageheight":40,
+         "imagewidth":24
+        }, 
+        {
+         "id":166,
+         "image":"Tiled Objects\/Shelves.png",
+         "imageheight":32,
+         "imagewidth":48
+        }, 
+        {
+         "id":167,
+         "image":"Tiled Objects\/Furniture1.png",
+         "imageheight":24,
+         "imagewidth":32
+        }, 
+        {
+         "id":168,
+         "image":"Tiled Objects\/Furniture2.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":169,
+         "image":"Tiled Objects\/LibraryShelves.png",
+         "imageheight":32,
+         "imagewidth":48
+        }, 
+        {
+         "id":170,
+         "image":"Tiled Objects\/FloorTrim.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":171,
+         "image":"Tiled Objects\/Bar_B.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":172,
+         "image":"Tiled Objects\/Bar_Hor.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":173,
+         "image":"Tiled Objects\/Bar_L.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":174,
+         "image":"Tiled Objects\/Bar_R.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":175,
+         "image":"Tiled Objects\/Bar_T.png",
+         "imageheight":8,
+         "imagewidth":16
+        }, 
+        {
+         "id":176,
+         "image":"Tiled Objects\/Bar_Ver.png",
+         "imageheight":8,
+         "imagewidth":16
+        }, 
+        {
+         "id":177,
+         "image":"Tiled Objects\/Bar_Corner_BL.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":178,
+         "image":"Tiled Objects\/Bar_Corner_BR.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":179,
+         "image":"Tiled Objects\/Bar_Corner_TL.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":180,
+         "image":"Tiled Objects\/Bar_Corner_TR.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":181,
+         "image":"Tiled Objects\/Arcade.png",
+         "imageheight":40,
+         "imagewidth":22
+        }, 
+        {
+         "id":182,
+         "image":"Tiled Objects\/BlacksmithIron.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":184,
+         "image":"Tiled Objects\/BlacksmithTools.png",
+         "imageheight":24,
+         "imagewidth":48
+        }, 
+        {
+         "id":185,
+         "image":"Tiled Objects\/Keg.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":186,
+         "image":"Tiled Objects\/Seat.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":187,
+         "image":"Tiled Objects\/Crate.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":188,
+         "image":"Tiled Objects\/Painting.png",
+         "imageheight":16,
+         "imagewidth":32
+        }, 
+        {
+         "id":189,
+         "image":"Tiled Objects\/Rug.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":190,
+         "image":"Tiled Objects\/Garbage.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":191,
+         "image":"Tiled Objects\/CashRegister.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":192,
+         "image":"Tiled Objects\/Bowl.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":193,
+         "image":"Tiled Objects\/Food.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":194,
+         "image":"Tiled Objects\/Bottle1.png",
+         "imageheight":16,
+         "imagewidth":8
+        }, 
+        {
+         "id":195,
+         "image":"Tiled Objects\/Bottle2.png",
+         "imageheight":16,
+         "imagewidth":8
+        }, 
+        {
+         "id":196,
+         "image":"Tiled Objects\/Hedge_BL.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":197,
+         "image":"Tiled Objects\/Hedge_BR.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":198,
+         "image":"Tiled Objects\/Hedge_End_B.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":199,
+         "image":"Tiled Objects\/Hedge_End_L.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":200,
+         "image":"Tiled Objects\/Hedge_End_R.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":201,
+         "image":"Tiled Objects\/Hedge_End_T.png",
+         "imageheight":8,
+         "imagewidth":16
+        }, 
+        {
+         "id":202,
+         "image":"Tiled Objects\/Hedge_Hor.png",
+         "imageheight":24,
+         "imagewidth":8
+        }, 
+        {
+         "id":203,
+         "image":"Tiled Objects\/Hedge_TL.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":204,
+         "image":"Tiled Objects\/Hedge_TR.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":205,
+         "image":"Tiled Objects\/Hedge_Ver.png",
+         "imageheight":8,
+         "imagewidth":16
+        }, 
+        {
+         "id":207,
+         "image":"Tiled Objects\/PillarLarge.png",
+         "imageheight":56,
+         "imagewidth":96
+        }, 
+        {
+         "id":208,
+         "image":"Tiled Objects\/NPC.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":209,
+         "image":"Tiled Objects\/FenceHor.png",
+         "imageheight":16,
+         "imagewidth":40
+        }, 
+        {
+         "id":210,
+         "image":"Tiled Objects\/FenceVer.png",
+         "imageheight":48,
+         "imagewidth":8
+        }, 
+        {
+         "id":211,
+         "image":"Tiled Objects\/Sand.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":212,
+         "image":"Tiled Objects\/AnimalBones.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":213,
+         "image":"Tiled Objects\/Temple.png",
+         "imageheight":80,
+         "imagewidth":80
+        }, 
+        {
+         "id":214,
+         "image":"Tiled Objects\/VillageRiverDrain.png",
+         "imageheight":16,
+         "imagewidth":32
+        }, 
+        {
+         "id":215,
+         "image":"Tiled Objects\/Sign.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":216,
+         "image":"Tiled Objects\/PoolTable.png",
+         "imageheight":43,
+         "imagewidth":30
+        }, 
+        {
+         "id":217,
+         "image":"Tiled Objects\/RollingSpikesV.png",
+         "imageheight":16,
+         "imagewidth":64
+        }, 
+        {
+         "id":218,
+         "image":"Tiled Objects\/RollingSpikesH.png",
+         "imageheight":64,
+         "imagewidth":16
+        }, 
+        {
+         "id":219,
+         "image":"Tiled Objects\/GuruBar.png",
+         "imageheight":16,
+         "imagewidth":128
+        }, 
+        {
+         "id":220,
+         "image":"Tiled Objects\/Chicken.png",
+         "imageheight":17,
+         "imagewidth":15
+        }, 
+        {
+         "id":221,
+         "image":"Tiled Objects\/Book.png",
+         "imageheight":16,
+         "imagewidth":14
+        }, 
+        {
+         "id":222,
+         "image":"Tiled Objects\/Decor_MuralB.png",
+         "imageheight":24,
+         "imagewidth":32
+        }, 
+        {
+         "id":223,
+         "image":"Tiled Objects\/Decor_MuralL.png",
+         "imageheight":32,
+         "imagewidth":24
+        }, 
+        {
+         "id":224,
+         "image":"Tiled Objects\/Decor_MuralR.png",
+         "imageheight":32,
+         "imagewidth":24
+        }, 
+        {
+         "id":225,
+         "image":"Tiled Objects\/Decor_MuralT.png",
+         "imageheight":24,
+         "imagewidth":32
+        }, 
+        {
+         "id":227,
+         "image":"Tiled Objects\/Tree_Large_Bottom.png",
+         "imageheight":40,
+         "imagewidth":48
+        }, 
+        {
+         "id":228,
+         "image":"Tiled Objects\/Tree_Large_Left.png",
+         "imageheight":56,
+         "imagewidth":8
+        }, 
+        {
+         "id":229,
+         "image":"Tiled Objects\/Tree_Large_Right.png",
+         "imageheight":56,
+         "imagewidth":8
+        }, 
+        {
+         "id":230,
+         "image":"Tiled Objects\/Tree_Large_Top.png",
+         "imageheight":40,
+         "imagewidth":48
+        }, 
+        {
+         "id":231,
+         "image":"Tiled Objects\/CastleWallH.png",
+         "imageheight":56,
+         "imagewidth":8
+        }, 
+        {
+         "id":232,
+         "image":"Tiled Objects\/CastleWallV.png",
+         "imageheight":104,
+         "imagewidth":32
+        }, 
+        {
+         "id":233,
+         "image":"Tiled Objects\/CastleWallShadow.png",
+         "imageheight":16,
+         "imagewidth":8
+        }, 
+        {
+         "id":234,
+         "image":"Tiled Objects\/CastleWallFloor.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":235,
+         "image":"Tiled Objects\/CastleWallDoor.png",
+         "imageheight":24,
+         "imagewidth":32
+        }, 
+        {
+         "id":236,
+         "image":"Tiled Objects\/Bush.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":237,
+         "image":"Tiled Objects\/Carpet_H.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":238,
+         "image":"Tiled Objects\/Carpet_V.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":239,
+         "image":"Tiled Objects\/Carpet_TL.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":240,
+         "image":"Tiled Objects\/Carpet_TR.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":241,
+         "image":"Tiled Objects\/Carpet_BL.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":242,
+         "image":"Tiled Objects\/Carpet_BR.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":243,
+         "image":"Tiled Objects\/Carpet_TLR.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":244,
+         "image":"Tiled Objects\/Carpet_BLR.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":245,
+         "image":"Tiled Objects\/Carpet_TBL.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":246,
+         "image":"Tiled Objects\/Carpet_TBR.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":247,
+         "image":"Tiled Objects\/Carpet_TBLR.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":248,
+         "image":"Tiled Objects\/Carpet_Full.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":249,
+         "image":"Tiled Objects\/TMNT_Couch1.png",
+         "imageheight":40,
+         "imagewidth":24
+        }, 
+        {
+         "id":250,
+         "image":"Tiled Objects\/TMNT_Couch2.png",
+         "imageheight":24,
+         "imagewidth":40
+        }, 
+        {
+         "id":251,
+         "image":"Tiled Objects\/TMNT_ElectricalPanel.png",
+         "imageheight":32,
+         "imagewidth":16
+        }, 
+        {
+         "id":252,
+         "image":"Tiled Objects\/TMNT_FootSoldierFloor.png",
+         "imageheight":40,
+         "imagewidth":32
+        }, 
+        {
+         "id":253,
+         "image":"Tiled Objects\/TMNT_Lamp.png",
+         "imageheight":32,
+         "imagewidth":16
+        }, 
+        {
+         "id":254,
+         "image":"Tiled Objects\/TMNT_Mutagen.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":255,
+         "image":"Tiled Objects\/TMNT_Sewer.png",
+         "imageheight":48,
+         "imagewidth":48
+        }, 
+        {
+         "id":256,
+         "image":"Tiled Objects\/TMNT_Sword.png",
+         "imageheight":8,
+         "imagewidth":32
+        }, 
+        {
+         "id":257,
+         "image":"Tiled Objects\/TMNT_TV.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":259,
+         "image":"Tiled Objects\/TMNT_Pizza.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":261,
+         "image":"Tiled Objects\/Gem Pond.png",
+         "imageheight":64,
+         "imagewidth":64
+        }, 
+        {
+         "id":264,
+         "image":"Tiled Objects\/Torch.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":265,
+         "image":"Tiled Objects\/Gem.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":266,
+         "image":"Tiled Objects\/WallBlock.png",
+         "imageheight":80,
+         "imagewidth":80
+        }, 
+        {
+         "id":267,
+         "image":"Tiled Objects\/Shadow.png",
+         "imageheight":8,
+         "imagewidth":8
+        }, 
+        {
+         "id":268,
+         "image":"Tiled Objects\/Column_B.png",
+         "imageheight":32,
+         "imagewidth":16
+        }, 
+        {
+         "id":269,
+         "image":"Tiled Objects\/Column_L.png",
+         "imageheight":16,
+         "imagewidth":32
+        }, 
+        {
+         "id":270,
+         "image":"Tiled Objects\/Column_R.png",
+         "imageheight":16,
+         "imagewidth":32
+        }, 
+        {
+         "id":271,
+         "image":"Tiled Objects\/Column_T.png",
+         "imageheight":32,
+         "imagewidth":16
+        }, 
+        {
+         "id":272,
+         "image":"Tiled Objects\/Mine_CoalPit.png",
+         "imageheight":38,
+         "imagewidth":32
+        }, 
+        {
+         "id":273,
+         "image":"Tiled Objects\/Mine_Track_H.png",
+         "imageheight":16,
+         "imagewidth":8
+        }, 
+        {
+         "id":274,
+         "image":"Tiled Objects\/Mine_Track_V.png",
+         "imageheight":8,
+         "imagewidth":16
+        }, 
+        {
+         "id":275,
+         "image":"Tiled Objects\/Mine_Track_BL.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":276,
+         "image":"Tiled Objects\/Mine_Track_BR.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":277,
+         "image":"Tiled Objects\/Mine_Track_TL.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":278,
+         "image":"Tiled Objects\/Mine_Track_TR.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":279,
+         "image":"Tiled Objects\/Mine_Cart.png",
+         "imageheight":20,
+         "imagewidth":16
+        }, 
+        {
+         "id":280,
+         "image":"Tiled Objects\/Mine_Coal.png",
+         "imageheight":24,
+         "imagewidth":16
+        }, 
+        {
+         "id":293,
+         "image":"Tiled Objects\/Mine_Lava.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":294,
+         "image":"Tiled Objects\/Mine_DwarfWorker.png",
+         "imageheight":17,
+         "imagewidth":27
+        }, 
+        {
+         "id":295,
+         "image":"Tiled Objects\/Mine_GemRock.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":296,
+         "image":"Tiled Objects\/Mine_GemWall.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":297,
+         "image":"Tiled Objects\/StoreSign.png",
+         "imageheight":24,
+         "imagewidth":32
+        }, 
+        {
+         "id":298,
+         "image":"Tiled Objects\/Mine_Mushrooms.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":299,
+         "image":"Tiled Objects\/Mine_DrawBridgeH.png",
+         "imageheight":32,
+         "imagewidth":8
+        }, 
+        {
+         "id":300,
+         "image":"Tiled Objects\/Mine_DrawBridgeV.png",
+         "imageheight":8,
+         "imagewidth":32
+        }, 
+        {
+         "id":301,
+         "image":"Tiled Objects\/WallPitSideB.png",
+         "imageheight":15,
+         "imagewidth":8
+        }, 
+        {
+         "id":302,
+         "image":"Tiled Objects\/WallPitSideL.png",
+         "imageheight":8,
+         "imagewidth":15
+        }, 
+        {
+         "id":303,
+         "image":"Tiled Objects\/WallPitSideR.png",
+         "imageheight":8,
+         "imagewidth":15
+        }, 
+        {
+         "id":304,
+         "image":"Tiled Objects\/WallPitSideT.png",
+         "imageheight":15,
+         "imagewidth":8
+        }, 
+        {
+         "id":305,
+         "image":"Tiled Objects\/WallPitCornerBL.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":306,
+         "image":"Tiled Objects\/WallPitCornerBR.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":307,
+         "image":"Tiled Objects\/WallPitCornerTL.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":308,
+         "image":"Tiled Objects\/WallPitCornerTR.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":309,
+         "image":"Tiled Objects\/WallPitInnerBL.png",
+         "imageheight":15,
+         "imagewidth":15
+        }, 
+        {
+         "id":310,
+         "image":"Tiled Objects\/WallPitInnerBR.png",
+         "imageheight":15,
+         "imagewidth":15
+        }, 
+        {
+         "id":311,
+         "image":"Tiled Objects\/WallPitInnerTL.png",
+         "imageheight":15,
+         "imagewidth":15
+        }, 
+        {
+         "id":312,
+         "image":"Tiled Objects\/WallPitInnerTR.png",
+         "imageheight":15,
+         "imagewidth":15
+        }, 
+        {
+         "id":313,
+         "image":"Tiled Objects\/Fairy Pond.png",
+         "imageheight":64,
+         "imagewidth":64
+        }, 
+        {
+         "id":314,
+         "image":"Tiled Objects\/Warp.png",
+         "imageheight":16,
+         "imagewidth":16
+        }, 
+        {
+         "id":315,
+         "image":"Tiled Objects\/Camp.png",
+         "imageheight":32,
+         "imagewidth":32
+        }, 
+        {
+         "id":316,
+         "image":"Tiled Objects\/Frogs.png",
+         "imageheight":15,
+         "imagewidth":72
+        }],
+ "tilewidth":128,
+ "type":"tileset",
+ "version":"1.10"
+}

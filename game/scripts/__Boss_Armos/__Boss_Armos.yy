@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Boss_Armos",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Boss_Armos",
+  "parent":{
+    "name":"Armos",
+    "path":"folders/Objects/Characters/Bosses/Armos.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Soldiers",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Soldiers",
+  "parent":{
+    "name":"Soldier",
+    "path":"folders/Objects/Characters/Enemies/Soldier.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

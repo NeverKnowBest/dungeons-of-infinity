@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Sword",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Sword",
+  "parent":{
+    "name":"Sword",
+    "path":"folders/Objects/Characters/Link/Sword.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

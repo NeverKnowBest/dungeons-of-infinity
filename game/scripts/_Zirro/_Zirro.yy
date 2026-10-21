@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Zirro",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Zirro",
+  "parent":{
+    "name":"Zirro",
+    "path":"folders/Objects/Characters/Enemies/Zirro.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

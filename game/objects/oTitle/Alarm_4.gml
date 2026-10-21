@@ -1,0 +1,1 @@
+audio_play_sound(Sound_KinstoneConnect, 1, false);

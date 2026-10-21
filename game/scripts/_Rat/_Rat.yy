@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Rat",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Rat",
+  "parent":{
+    "name":"Rat",
+    "path":"folders/Objects/Characters/Enemies/Rat.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

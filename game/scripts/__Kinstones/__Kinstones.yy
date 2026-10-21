@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Kinstones",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Kinstones",
+  "parent":{
+    "name":"Kinstone",
+    "path":"folders/Objects/Items/Stackable/Kinstone.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

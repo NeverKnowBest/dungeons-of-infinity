@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Zora",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Zora",
+  "parent":{
+    "name":"Zora",
+    "path":"folders/Objects/Characters/Zora.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

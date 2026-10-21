@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Sound_ClawMachine_GotItem",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.6,
+  "exportDir":"",
+  "name":"Sound_ClawMachine_GotItem",
+  "parent":{
+    "name":"Claw",
+    "path":"folders/Objects/DungeonObjs/Arcade/PopMachines/Claw.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"Sound_ClawMachine_GotItem.wav",
+  "volume":1.0,
+}

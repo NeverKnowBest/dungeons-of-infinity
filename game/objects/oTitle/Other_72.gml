@@ -1,0 +1,1 @@
+if(audio_group_is_loaded(audiogroup_Music)) audio_play_sound(Music_Title, 1, false);

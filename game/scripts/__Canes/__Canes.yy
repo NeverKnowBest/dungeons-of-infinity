@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Canes",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Canes",
+  "parent":{
+    "name":"Canes",
+    "path":"folders/Objects/Items/Charge/Canes.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

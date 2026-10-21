@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Poe",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Poe",
+  "parent":{
+    "name":"Poe",
+    "path":"folders/Objects/Characters/Enemies/Poe.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

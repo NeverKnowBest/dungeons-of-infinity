@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Gems",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Gems",
+  "parent":{
+    "name":"Gem",
+    "path":"folders/Objects/Items/Stackable/Gem.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

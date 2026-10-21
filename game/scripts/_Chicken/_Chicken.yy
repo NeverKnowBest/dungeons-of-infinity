@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Chicken",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Chicken",
+  "parent":{
+    "name":"Chicken",
+    "path":"folders/Objects/Characters/Enemies/Chicken.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

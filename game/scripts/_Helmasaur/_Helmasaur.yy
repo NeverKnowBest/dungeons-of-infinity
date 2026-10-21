@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Helmasaur",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Helmasaur",
+  "parent":{
+    "name":"Helmasaur",
+    "path":"folders/Objects/Characters/Enemies/Helmasaur.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Dungeon_Draw_Stairs",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Dungeon_Draw_Stairs",
+  "parent":{
+    "name":"Draw",
+    "path":"folders/Scripts/Dungeon/Draw.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

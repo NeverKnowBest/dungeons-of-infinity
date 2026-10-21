@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sndZerberk_MiniArcade_Hit1",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.197959,
+  "exportDir":"",
+  "name":"sndZerberk_MiniArcade_Hit1",
+  "parent":{
+    "name":"Assets",
+    "path":"folders/Objects/DungeonObjs/Arcade/Games/Zerberk/Assets/MiniArcade/Game/Assets.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sndZerberk_MiniArcade_Hit1",
+  "volume":0.6,
+}

@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Music_Castle_Intro",
+  "audioGroupId":{
+    "name":"audiogroup_Music",
+    "path":"audiogroups/audiogroup_Music",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":6.697619,
+  "exportDir":"",
+  "name":"Music_Castle_Intro",
+  "parent":{
+    "name":"Music",
+    "path":"folders/Sounds/Music.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":22050,
+  "soundFile":"Music_Castle_Intro.wav",
+  "volume":0.8,
+}

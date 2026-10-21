@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Coupons",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Coupons",
+  "parent":{
+    "name":"Coupon",
+    "path":"folders/Objects/Items/Stackable/Coupon.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

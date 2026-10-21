@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Pitfall_Sound_Treasure",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.343333,
+  "exportDir":"",
+  "name":"Pitfall_Sound_Treasure",
+  "parent":{
+    "name":"Sounds",
+    "path":"folders/Objects/DungeonObjs/Arcade/Games/Pitfall/Assets/Sounds.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"Pitfall_Sound_Treasure.wav",
+  "volume":0.7,
+}

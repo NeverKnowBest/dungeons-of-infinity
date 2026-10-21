@@ -1,0 +1,2 @@
+if(global.Paused) ObjPause();
+

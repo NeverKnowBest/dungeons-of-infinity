@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Gibdo",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Gibdo",
+  "parent":{
+    "name":"Gibdo",
+    "path":"folders/Objects/Characters/Enemies/Gibdo.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

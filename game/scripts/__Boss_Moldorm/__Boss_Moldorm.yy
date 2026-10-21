@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Boss_Moldorm",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Boss_Moldorm",
+  "parent":{
+    "name":"Moldorm",
+    "path":"folders/Objects/Characters/Bosses/Moldorm.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

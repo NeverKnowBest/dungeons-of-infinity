@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Curtains",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Curtains",
+  "parent":{
+    "name":"Curtains",
+    "path":"folders/Objects/DungeonObjs/Curtains.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

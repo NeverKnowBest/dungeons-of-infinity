@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Pots",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Pots",
+  "parent":{
+    "name":"Pot",
+    "path":"folders/Objects/DungeonObjs/PickupObjs/Pot.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

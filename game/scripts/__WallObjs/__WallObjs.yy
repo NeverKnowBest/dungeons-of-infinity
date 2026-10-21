@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__WallObjs",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__WallObjs",
+  "parent":{
+    "name":"WallObjs",
+    "path":"folders/Objects/DungeonObjs/WallObjs.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

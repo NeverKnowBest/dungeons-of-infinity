@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Rods",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Rods",
+  "parent":{
+    "name":"Rods",
+    "path":"folders/Objects/Items/Charge/Rods.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Food",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Food",
+  "parent":{
+    "name":"Food",
+    "path":"folders/Objects/Items/Stackable/Food.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

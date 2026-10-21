@@ -1,0 +1,2 @@
+PixelRender_Normal();
+

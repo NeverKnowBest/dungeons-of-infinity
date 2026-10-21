@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sndZerberk_MiniArcade_Laser",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":1,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.14161,
+  "exportDir":"",
+  "name":"sndZerberk_MiniArcade_Laser",
+  "parent":{
+    "name":"Assets",
+    "path":"folders/Objects/DungeonObjs/Arcade/Games/Zerberk/Assets/MiniArcade/Game/Assets.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sndZerberk_MiniArcade_Laser.wav",
+  "volume":0.8,
+}

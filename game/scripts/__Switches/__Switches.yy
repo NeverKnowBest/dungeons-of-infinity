@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Switches",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Switches",
+  "parent":{
+    "name":"Switches",
+    "path":"folders/Objects/DungeonObjs/Switches.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

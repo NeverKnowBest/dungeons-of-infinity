@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Goriya",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Goriya",
+  "parent":{
+    "name":"Goriya",
+    "path":"folders/Objects/Characters/Enemies/Goriya.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Boss_Aghanim",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Boss_Aghanim",
+  "parent":{
+    "name":"Aghanim",
+    "path":"folders/Objects/Characters/Bosses/Aghanim.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

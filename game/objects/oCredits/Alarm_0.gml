@@ -1,0 +1,1 @@
+Music = audio_play_sound(Music_ZeldaTheme, 1, false);

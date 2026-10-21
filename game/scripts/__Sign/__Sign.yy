@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Sign",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Sign",
+  "parent":{
+    "name":"Sign",
+    "path":"folders/Objects/DungeonObjs/Sign.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

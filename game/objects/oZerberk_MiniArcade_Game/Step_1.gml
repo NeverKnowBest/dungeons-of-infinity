@@ -1,0 +1,1 @@
+if(!surface_exists(GameSurface)) GameSurface = surface_create(GameW, GameH);		

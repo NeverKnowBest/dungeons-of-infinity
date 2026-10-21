@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"xzip_exists",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"xzip_exists",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/XGASOFT/Xzip/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

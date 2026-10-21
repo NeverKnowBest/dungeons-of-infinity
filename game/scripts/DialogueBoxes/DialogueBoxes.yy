@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"DialogueBoxes",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"DialogueBoxes",
+  "parent":{
+    "name":"DialogueBox",
+    "path":"folders/Objects/HUD/DialogueBox.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

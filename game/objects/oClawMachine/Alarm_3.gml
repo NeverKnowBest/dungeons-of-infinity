@@ -1,0 +1,1 @@
+State = ClawMachineState.GameOver;

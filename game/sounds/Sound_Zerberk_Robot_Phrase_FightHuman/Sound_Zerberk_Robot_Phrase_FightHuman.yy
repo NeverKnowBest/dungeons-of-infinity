@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Sound_Zerberk_Robot_Phrase_FightHuman",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.853061,
+  "exportDir":"",
+  "name":"Sound_Zerberk_Robot_Phrase_FightHuman",
+  "parent":{
+    "name":"Sounds",
+    "path":"folders/Objects/DungeonObjs/Arcade/Games/Zerberk/Assets/Sounds.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"Sound_Zerberk_Robot_Phrase_FightHuman.wav",
+  "volume":0.7,
+}

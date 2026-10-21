@@ -1,0 +1,18 @@
+{
+  "$GMPath":"",
+  "%Name":"LanmolaPath3",
+  "closed":false,
+  "kind":0,
+  "name":"LanmolaPath3",
+  "parent":{
+    "name":"Paths",
+    "path":"folders/Objects/Characters/Bosses/Lanmola/Paths.yy",
+  },
+  "points":[
+    {"speed":100.0,"x":1.3109436,"y":81.96004,},
+    {"speed":100.0,"x":162.18549,"y":-97.413,},
+  ],
+  "precision":4,
+  "resourceType":"GMPath",
+  "resourceVersion":"2.0",
+}

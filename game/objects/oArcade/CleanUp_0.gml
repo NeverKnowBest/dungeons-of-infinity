@@ -1,0 +1,1 @@
+Lighting_DestroyLight(MiniScreen_LightID);

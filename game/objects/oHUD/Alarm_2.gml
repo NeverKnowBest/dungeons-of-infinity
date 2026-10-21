@@ -1,0 +1,2 @@
+/// @description Magic animation delay
+

@@ -1,0 +1,1 @@
+if(!surface_exists(GameSurface) && RoomW != 0 && RoomH != 0) GameSurface = surface_create(RoomW, RoomH);		

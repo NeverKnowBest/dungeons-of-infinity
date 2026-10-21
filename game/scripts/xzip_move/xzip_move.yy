@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"xzip_move",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"xzip_move",
+  "parent":{
+    "name":"Advanced",
+    "path":"folders/XGASOFT/Xzip/Scripts/Advanced.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

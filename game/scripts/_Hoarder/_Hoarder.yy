@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Hoarder",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Hoarder",
+  "parent":{
+    "name":"Hoarder",
+    "path":"folders/Objects/Characters/Enemies/Hoarder.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

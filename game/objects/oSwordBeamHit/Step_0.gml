@@ -1,0 +1,1 @@
+Lighting_UpdateLight_Radius(RoomIndex, LightIndex, LightStartStrength - ((image_index / image_number) * 0.75));

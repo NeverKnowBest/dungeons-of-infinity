@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Sound_Arcade_InsertCoin",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.822336,
+  "exportDir":"",
+  "name":"Sound_Arcade_InsertCoin",
+  "parent":{
+    "name":"Arcade",
+    "path":"folders/Objects/DungeonObjs/Arcade.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"Sound_Arcade_InsertCoin.wav",
+  "volume":0.7,
+}

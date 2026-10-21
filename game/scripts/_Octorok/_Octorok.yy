@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Octorok",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Octorok",
+  "parent":{
+    "name":"Octorok",
+    "path":"folders/Objects/Characters/Enemies/Octorok.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Treasures",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Treasures",
+  "parent":{
+    "name":"Treasure",
+    "path":"folders/Objects/Items/NoStack/Treasure.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"xzip_delete",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"xzip_delete",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/XGASOFT/Xzip/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

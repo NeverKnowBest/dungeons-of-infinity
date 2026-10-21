@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Zol",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Zol",
+  "parent":{
+    "name":"Zol",
+    "path":"folders/Objects/Characters/Enemies/Zol.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Skeleton",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Skeleton",
+  "parent":{
+    "name":"Skeleton",
+    "path":"folders/Objects/Characters/Enemies/Skeleton.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

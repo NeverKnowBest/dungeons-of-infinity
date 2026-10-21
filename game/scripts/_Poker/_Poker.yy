@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Poker",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Poker",
+  "parent":{
+    "name":"Poker",
+    "path":"folders/Objects/DungeonObjs/Arcade/Games/Slots/Poker.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

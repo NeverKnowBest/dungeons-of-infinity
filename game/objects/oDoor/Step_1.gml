@@ -1,0 +1,1 @@
+if(instance_exists(WallInst)) WallInst.BlockItems = true;

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Pendants",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Pendants",
+  "parent":{
+    "name":"Pendant",
+    "path":"folders/Objects/Items/Boolean/Pendant.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

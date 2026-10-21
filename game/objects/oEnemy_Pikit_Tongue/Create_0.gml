@@ -1,0 +1,19 @@
+LastImageSpeed = image_speed;
+StartX = x;
+StartY = y;
+OffsetX = 0;
+OffsetY = 0;
+Dist = 0;
+MaxDist = 30;
+GrabDist = 20;
+Angle = 0;
+Inc = 6;
+IncDelay = 4;//60;
+Dir = 1; //1 = extending, -1 = retracting
+ParentInst = noone;
+State = 0;
+KnockBackColorFrame = 0;
+ItemGrabbed = false;
+ItemInst = noone;
+Hit = false;
+alarm[0] = IncDelay;

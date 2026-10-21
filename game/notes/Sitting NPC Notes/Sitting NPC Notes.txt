@@ -1,0 +1,4 @@
+Some NPCs have their canvas extended, this is so the walls can allign nicely with the grid. 
+Sprites should be a multiple of 16 wide and multiple of 8 tall
+Base of NPC bodies should touch the bottom of the sprite.
+Mask should be 16x16 and positioned at the base centered

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__LinkSprites",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__LinkSprites",
+  "parent":{
+    "name":"Sprites",
+    "path":"folders/Objects/Characters/Link/Sprites.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

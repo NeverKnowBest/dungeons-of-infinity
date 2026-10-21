@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Arrows",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Arrows",
+  "parent":{
+    "name":"Arrows",
+    "path":"folders/Objects/Items/Stackable/Arrows.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

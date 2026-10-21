@@ -1,0 +1,1 @@
+if(global.Paused && Action == "Spawn" && alarm[0] > 0) alarm[0]++;

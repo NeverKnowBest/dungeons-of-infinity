@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Zerberk",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Zerberk",
+  "parent":{
+    "name":"Zerberk",
+    "path":"folders/Objects/DungeonObjs/Arcade/Games/Zerberk.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

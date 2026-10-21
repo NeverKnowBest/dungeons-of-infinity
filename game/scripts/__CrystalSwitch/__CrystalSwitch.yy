@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__CrystalSwitch",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__CrystalSwitch",
+  "parent":{
+    "name":"CrystalSwitch",
+    "path":"folders/Objects/DungeonObjs/Switches/CrystalSwitch.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

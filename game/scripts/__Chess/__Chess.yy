@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Chess",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Chess",
+  "parent":{
+    "name":"ChessPlayer",
+    "path":"folders/Objects/Characters/NPCs/Villagers/Inside/Library/ChessPlayer.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

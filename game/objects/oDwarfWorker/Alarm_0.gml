@@ -1,0 +1,1 @@
+ObjSetImageSpeed(1);

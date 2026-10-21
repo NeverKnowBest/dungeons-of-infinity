@@ -1,2 +1,46 @@
-# Auto detect text files and perform LF normalization
+# Normalize line endings for text files
 * text=auto
+
+# GameMaker source: keep diffs readable
+*.gml   text diff
+*.yy    text
+*.yyp   text
+*.resource_order text
+*.fsh   text
+*.vsh   text
+*.au3   text
+
+# Generated / single-line JSON data blobs (huge, not diffable)
+game/datafiles/data/data_* filter=lfs diff=lfs merge=lfs -text
+data/sample-saves/data_*   filter=lfs diff=lfs merge=lfs -text
+game/datafiles/polyglot.bin filter=lfs diff=lfs merge=lfs -text
+
+# Audio
+*.wav  filter=lfs diff=lfs merge=lfs -text
+*.ogg  filter=lfs diff=lfs merge=lfs -text
+*.mp3  filter=lfs diff=lfs merge=lfs -text
+
+# Art sources and large images (game sprite PNGs stay in regular git)
+*.aseprite filter=lfs diff=lfs merge=lfs -text
+*.ase      filter=lfs diff=lfs merge=lfs -text
+*.psd      filter=lfs diff=lfs merge=lfs -text
+*.jpg      filter=lfs diff=lfs merge=lfs -text
+*.jpeg     filter=lfs diff=lfs merge=lfs -text
+*.gif      filter=lfs diff=lfs merge=lfs -text
+*.webp     filter=lfs diff=lfs merge=lfs -text
+*.bmp      filter=lfs diff=lfs merge=lfs -text
+*.avi      filter=lfs diff=lfs merge=lfs -text
+*.mp4      filter=lfs diff=lfs merge=lfs -text
+
+# Documents
+*.pdf   filter=lfs diff=lfs merge=lfs -text
+*.docx  filter=lfs diff=lfs merge=lfs -text
+*.xlsx  filter=lfs diff=lfs merge=lfs -text
+*.mhtml filter=lfs diff=lfs merge=lfs -text
+
+# Native binaries used by GameMaker extensions
+*.dll   filter=lfs diff=lfs merge=lfs -text
+*.dylib filter=lfs diff=lfs merge=lfs -text
+*.so    filter=lfs diff=lfs merge=lfs -text
+*.zip   filter=lfs diff=lfs merge=lfs -text
+*.bin   filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__PopMachines",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__PopMachines",
+  "parent":{
+    "name":"PopMachines",
+    "path":"folders/Objects/DungeonObjs/Arcade/PopMachines.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Prisoners",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Prisoners",
+  "parent":{
+    "name":"Prisoners",
+    "path":"folders/Objects/Characters/NPCs/Prisoners.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

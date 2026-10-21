@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"DungeonFunctions",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"DungeonFunctions",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

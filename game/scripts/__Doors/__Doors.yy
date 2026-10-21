@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Doors",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Doors",
+  "parent":{
+    "name":"Doors",
+    "path":"folders/Objects/DungeonObjs/Doors.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

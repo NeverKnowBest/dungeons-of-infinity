@@ -1,0 +1,10 @@
+Dir = 1;
+vx = 0;
+vy = 0;
+Speed = 1;
+Shooting = false;
+Dead = false;
+LaserV = 4;
+MiniArcade = false;
+MiniAracdeInst = noone;
+MiniArcadeCheck = true;

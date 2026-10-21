@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Warp",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Warp",
+  "parent":{
+    "name":"Warp",
+    "path":"folders/Objects/DungeonObjs/Warp.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

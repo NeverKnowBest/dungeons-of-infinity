@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"MsgBox_Create",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"MsgBox_Create",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

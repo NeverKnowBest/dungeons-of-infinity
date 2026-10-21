@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Bow",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Bow",
+  "parent":{
+    "name":"Bow",
+    "path":"folders/Objects/Items/Upgradeable/Bow.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

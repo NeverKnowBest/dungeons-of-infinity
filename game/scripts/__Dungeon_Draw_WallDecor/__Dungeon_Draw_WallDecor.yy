@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Dungeon_Draw_WallDecor",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Dungeon_Draw_WallDecor",
+  "parent":{
+    "name":"Decor",
+    "path":"folders/Scripts/Dungeon/Draw/Decor.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

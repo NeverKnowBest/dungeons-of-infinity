@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Buzz",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Buzz",
+  "parent":{
+    "name":"Buzz",
+    "path":"folders/Objects/Characters/Enemies/Buzz.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

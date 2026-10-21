@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Beamos",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Beamos",
+  "parent":{
+    "name":"Beamos",
+    "path":"folders/Objects/Characters/Enemies/Beamos.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Dungeon_Draw_Jails",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Dungeon_Draw_Jails",
+  "parent":{
+    "name":"Draw",
+    "path":"folders/Scripts/Dungeon/Draw.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

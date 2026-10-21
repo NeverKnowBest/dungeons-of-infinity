@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Rings",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Rings",
+  "parent":{
+    "name":"Ring",
+    "path":"folders/Objects/Items/Boolean/Ring.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

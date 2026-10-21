@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Crab",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Crab",
+  "parent":{
+    "name":"Crab",
+    "path":"folders/Objects/Characters/Enemies/Crab.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

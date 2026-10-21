@@ -1,0 +1,1 @@
+audio_play_sound(Sound_Beamos_Shoot, 1, false);

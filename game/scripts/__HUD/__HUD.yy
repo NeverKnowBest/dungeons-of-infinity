@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__HUD",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__HUD",
+  "parent":{
+    "name":"HUD",
+    "path":"folders/Objects/HUD.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

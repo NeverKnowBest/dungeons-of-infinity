@@ -1,0 +1,1 @@
+DefeatMusic = audio_play_sound(Music_Boss_Defeated, 1, false);

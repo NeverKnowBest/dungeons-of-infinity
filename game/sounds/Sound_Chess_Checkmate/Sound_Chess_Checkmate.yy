@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Sound_Chess_Checkmate",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.675215,
+  "exportDir":"",
+  "name":"Sound_Chess_Checkmate",
+  "parent":{
+    "name":"Sounds",
+    "path":"folders/Objects/Characters/NPCs/Villagers/Inside/Library/ChessPlayer/Sounds.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"Sound_Chess_Checkmate.wav",
+  "volume":1.0,
+}

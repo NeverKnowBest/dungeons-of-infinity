@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Keese",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Keese",
+  "parent":{
+    "name":"Keese",
+    "path":"folders/Objects/Characters/Enemies/Keese.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

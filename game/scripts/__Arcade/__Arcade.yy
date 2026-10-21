@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Arcade",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Arcade",
+  "parent":{
+    "name":"Arcade",
+    "path":"folders/Objects/DungeonObjs/Arcade.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

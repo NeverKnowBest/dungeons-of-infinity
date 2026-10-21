@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"xzip_get_readonly",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"xzip_get_readonly",
+  "parent":{
+    "name":"Properties",
+    "path":"folders/XGASOFT/Xzip/Scripts/Properties.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

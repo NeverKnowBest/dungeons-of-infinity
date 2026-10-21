@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Boss_Lanmola",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Boss_Lanmola",
+  "parent":{
+    "name":"Lanmola",
+    "path":"folders/Objects/Characters/Bosses/Lanmola.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Fairy",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Fairy",
+  "parent":{
+    "name":"Fairy",
+    "path":"folders/Objects/Items/Pickups/Fairy.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

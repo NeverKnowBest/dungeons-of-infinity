@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Link",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Link",
+  "parent":{
+    "name":"Link",
+    "path":"folders/Objects/Characters/Link.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

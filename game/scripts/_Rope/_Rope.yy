@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Rope",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Rope",
+  "parent":{
+    "name":"Rope",
+    "path":"folders/Objects/Characters/Enemies/Rope.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

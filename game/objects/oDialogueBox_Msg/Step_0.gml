@@ -1,0 +1,2 @@
+
+if(!instance_exists(global.DB_Inst)) instance_destroy(id);

@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Sound_Chess_Notify",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.180979,
+  "exportDir":"",
+  "name":"Sound_Chess_Notify",
+  "parent":{
+    "name":"Sounds",
+    "path":"folders/Objects/Characters/NPCs/Villagers/Inside/Library/ChessPlayer/Sounds.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"Sound_Chess_Notify.wav",
+  "volume":1.0,
+}

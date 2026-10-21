@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Cursed",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Cursed",
+  "parent":{
+    "name":"Cursed",
+    "path":"folders/Objects/DungeonObjs/Cursed.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

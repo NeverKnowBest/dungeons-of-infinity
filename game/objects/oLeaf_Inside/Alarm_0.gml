@@ -1,0 +1,1 @@
+AlwaysRotate = true;

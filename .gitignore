@@ -1,0 +1,26 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / local settings
+.vscode/
+
+# GameMaker build output and caches
+*.yyz
+*.yyp.bak
+*.win
+*.exe
+**/tmp/
+editors/dungeon-editor/Dungeon Editor/
+editors/template-editor/Template Editor/
+
+# ROMs and emulator-related files
+*.sfc
+*.smc
+*.srm
+*.ips
+
+# Large archives
+*.7z
+*.rar

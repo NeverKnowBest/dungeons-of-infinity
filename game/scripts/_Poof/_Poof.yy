@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Poof",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Poof",
+  "parent":{
+    "name":"Poof",
+    "path":"folders/Objects/Visuals/Effects/Poof.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

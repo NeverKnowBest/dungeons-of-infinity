@@ -1,0 +1,1 @@
+audio_play_sound(Sound_Zerberk_Robot_Destroy, 0.7, false);

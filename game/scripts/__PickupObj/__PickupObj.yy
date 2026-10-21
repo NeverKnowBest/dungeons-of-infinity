@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__PickupObj",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__PickupObj",
+  "parent":{
+    "name":"PickupObjs",
+    "path":"folders/Objects/DungeonObjs/PickupObjs.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

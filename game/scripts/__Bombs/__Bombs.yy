@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Bombs",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Bombs",
+  "parent":{
+    "name":"Bomb",
+    "path":"folders/Objects/DungeonObjs/PickupObjs/Bomb.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

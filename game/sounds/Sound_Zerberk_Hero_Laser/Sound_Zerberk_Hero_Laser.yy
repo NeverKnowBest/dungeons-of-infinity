@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Sound_Zerberk_Hero_Laser",
+  "audioGroupId":{
+    "name":"audiogroup_SFX",
+    "path":"audiogroups/audiogroup_SFX",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.70263,
+  "exportDir":"",
+  "name":"Sound_Zerberk_Hero_Laser",
+  "parent":{
+    "name":"Sounds",
+    "path":"folders/Objects/DungeonObjs/Arcade/Games/Zerberk/Assets/Sounds.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"Sound_Zerberk_Hero_Laser.wav",
+  "volume":0.4,
+}

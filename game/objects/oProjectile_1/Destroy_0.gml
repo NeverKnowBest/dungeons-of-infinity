@@ -1,0 +1,1 @@
+if(LightIndex != -1) Lighting_DestroyLight(LightIndex);

@@ -1,0 +1,30 @@
+You can replace any of the 9 starting characters with custom sprite sheets. You can find examples of plenty of characters to choose from in the Skins folder. Simply copy-paste the sprite sheet you want to replace into one of the corresponding folders. It will then replace the default character in the slot. 
+
+Here are the default characters and what directory numbers they correspond to:
+
+(1)Link		(2)Girl		(3)Monkey
+
+(4)Frog		(5)Fox		(6)Penguin
+
+(7)Rabbit	(8)Wolf		(9)Mouse
+
+
+Notes:
+
+Put only 1 sheet per folder, the game will only read the first file it sees.
+
+The sprite sheet has to be the same size and format as the example template. File can be named what you want. Only PNG images will work. 
+
+To reset a character back to the default skin, you can delete the file from the corresponding folder. 
+
+Custom characters won't have their tunic colors changed when upgrading tunics, maybe in the future it can be done.
+
+You can use the template file if you want to try to draw your own.
+
+There's no stopping you from put any PNG you want, the game won't check and may crash if it's not in the correct size and format.
+
+There's no guarantee your custom sprites will look good or behave correctly in the game if they aren't drawn right. Make sure all the heads and poses look similar to Link's template.
+
+Special thanks to the ALTTP Randomizer Community for designing these sprites, you can find them at https://alttpr.com
+
+You can find support at our Discord community: https://discord.gg/doi

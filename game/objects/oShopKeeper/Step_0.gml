@@ -1,0 +1,1 @@
+if(!SoldOut && ShopInst.ItemsSold == ShopInst.Slots && oLink.State != LinkState.HoldingItem) SoldOut = true;

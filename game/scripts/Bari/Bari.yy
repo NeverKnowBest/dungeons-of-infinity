@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Bari",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Bari",
+  "parent":{
+    "name":"Bari",
+    "path":"folders/Objects/Characters/Enemies/Bari.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

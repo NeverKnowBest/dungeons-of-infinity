@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Orbs",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Orbs",
+  "parent":{
+    "name":"Orbs",
+    "path":"folders/Objects/Items/Stackable/Orbs.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

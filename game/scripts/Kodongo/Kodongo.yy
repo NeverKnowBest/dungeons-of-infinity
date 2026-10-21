@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Kodongo",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Kodongo",
+  "parent":{
+    "name":"Kodongo",
+    "path":"folders/Objects/Characters/Enemies/Kodongo.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

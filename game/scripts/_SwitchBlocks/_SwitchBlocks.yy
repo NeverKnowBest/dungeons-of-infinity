@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_SwitchBlocks",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_SwitchBlocks",
+  "parent":{
+    "name":"SwitchBlocks",
+    "path":"folders/Objects/DungeonObjs/SwitchBlocks.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__MothulaSlot",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__MothulaSlot",
+  "parent":{
+    "name":"Mothula",
+    "path":"folders/Objects/DungeonObjs/Arcade/Games/Slots/Mothula.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

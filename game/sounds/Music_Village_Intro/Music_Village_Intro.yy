@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Music_Village_Intro",
+  "audioGroupId":{
+    "name":"audiogroup_Music",
+    "path":"audiogroups/audiogroup_Music",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.51873,
+  "exportDir":"",
+  "name":"Music_Village_Intro",
+  "parent":{
+    "name":"Music",
+    "path":"folders/Sounds/Music.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":22050,
+  "soundFile":"Music_Village_Intro.wav",
+  "volume":0.6,
+}

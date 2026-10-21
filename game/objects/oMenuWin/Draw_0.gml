@@ -1,0 +1,1 @@
+draw_sprite_stretched(sprite_index, 0, x, y, W, H);

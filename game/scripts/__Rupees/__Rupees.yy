@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Rupees",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Rupees",
+  "parent":{
+    "name":"Rupee",
+    "path":"folders/Objects/Items/Pickups/Rupee.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

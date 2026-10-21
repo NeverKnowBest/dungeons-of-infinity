@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"EyeGore",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"EyeGore",
+  "parent":{
+    "name":"Eyegore",
+    "path":"folders/Objects/Characters/Enemies/Eyegore.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

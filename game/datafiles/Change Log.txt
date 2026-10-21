@@ -1,0 +1,382 @@
+Change Log:
+
+Version 1.2.1:
+
+Changes:
+-Tweaks and balancing
+
+Bug Fixes:
+-Fixed rare occurrence of doors leading to nowhere.
+-Fixed bug with dead explorers where they could be carrying items that are not allowed.
+-Fixed bug with pikits where they could grab your items while you were falling
+
+Version 1.2.0:
+
+Changes:
+-Brand new SNES-style manual designed by Calico Stonewolf
+-New inventory system which includes a dedicated compartment for the items you hold and wear. The main compartment now has unlockable slots instead of bag upgrades. You start with 5 slots unlocked and can unlock up to 5 more, giving you a maximum of 10 slots. You unlock slots by finding or buying inventory slot upgrades, which would now be as common and cheap as a heart container.
+-2 new bags, including the food bag which adds 3 dedicated slots for food, and also the pendant bag which adds 3 dedicated slots for pendants.
+-Added the sword spin attack upgrade for level 3 sword and higher, pot breaking was bumped down to level 2 sword.
+-Added sword poke ability
+-Added several new variable challenge options, and a new wallmaster challenge
+-Added a new slot machine to the village pub
+-Added a new claw machine to the village arcade. sprite credit: Errors
+-Added a 10th orange topaz gem, added more items to the gem combos, and changed around a lot of gem combos. Gem sprites credit: MotorDuck
+-New Christmas decor sprites only on Christmas day, sprite credit: MotorDuck
+-New direction and menu remapping options for the keyboard
+-Added back button to cancel out of menus (Action button on gamepad, Esc on keyboard)
+-Reduced the download size by 50%
+-Added a new prisoner to the jails level, sprite credit: Derekfcc
+-Added a CanSkipTitle option in the options.ini file to be able to skip the title sequence
+-Rods now do 2 damage on bosses instead of 1, and now have different max charges depending on their value.
+-Fairy orbs now contain only 1 fairy most of the time, but can sometimes have 2 or more.
+-Wishstones now go in the treasure bag
+-You can now drop the candle in case you want an extra challenge
+-You can now get the hookshot and boomerang from large chests and the wishing pond
+-New Master key sprite, sprite credits: Letterbomb
+-Added new character skins
+-Various other tweaks, fixes, and balancing
+
+Bug Fixes:
+-Fixed bug with enemies pausing when using the moon pearl
+-Fixed Zora not giving you the spread bow upgrade
+-Fixed glitch with arrows appearing at the wrong place for a frame
+-Fixed bug with key mapping
+-Fixed layer issue with wall lamps
+-Fixed bug where you could pickup objs from the wrong floor level
+-Fixed crash when picking up a stopwatch and hitting a guru bar at the same time
+-Fixed rare crash when hitting Baris and getting shocked
+-Fixed imperfections in dungeon paths where in rare cases locked doors could be skipped and you can still reach the end
+-Fixed Link's in-water sprite being red in Aghanim's fortress level fairy rooms
+-Fixed glitch with item in-water sprite showing when Link is standing in water and also holding that item
+-Fixed exploit with tree man where if you drop your magic bag before exchanging it, he'll still give you the medallion.
+-Fixed bug where you wouldn't fall if pushed outside the room's edges at Agahnim's boss fight.
+-Fixed Medusas and cannons still shooting at you when they are frozen or stoned.
+-Fixed rare bug where red Armos would jump and never come back down causing a soft lock.
+-Fixed rare bug when defeating a boss and holding up the crystal, the game would stay locked holding the crystal.
+-Fixed glitch with lightning still flashing during the death sequence if you died in the forest before entering the castle.
+-Fixed crash with treeman where you could run off screen before his dialogue appeared if activated from the water below
+
+=================================================================
+
+Version 1.1.6:
+
+Changes:
+-Added a different gold-colored treasure design for treasures that hold keys. This way curses are not forced on you when you're trying to progress. It makes regular chests optional now. The key chests would never be cursed.
+-Spikes are now animated, credit to Derekfcc for providing a more fluid animation than the original asset.
+
+Bug Fixes:
+-Fixed bug where Zora was giving you rupees for upgradeable item gem combos when you owned a bow.
+-Fixed coupon bug where it was only spawning grey ones.
+-Fixed bug where you can buy an item you already own from a shop
+-Fixed bug with jail key locks being in the wrong place letting you bypass the lock
+-Possible fix where stackable items were disappearing when adding them to the inventory. It was rare and I couldn't replicate it, but I did find code that would have caused these items to disappear under the right conditions. Added safety measures that would prevent these conditions from affecting the inventory.
+-Fixed glitch with cape and star where is would drain all your magic if you decloak at the same frame you pick up the star.
+-Fixed bug where if you opened a window right at the end of hitting a crystal switch, the enemies would unpause while the window was active.
+-Fixed out of bound crashes and falling through floors when you're not in a room, this is for those who like to hack the game by going outside rooms.
+-Fixed treasures that were added to the inventory using hacks, they were crashing when opening them.
+-Fixed bug with Moldorm, on rare occasions you wouldn't be able to hit him anymore and could get stuck without being able to defeat him.
+-Fixed glitch exploit with Pikits when taking potions from you, it would create a duplicate so you could generate infinite potions.
+
+=================================================================
+
+Version 1.1.5:
+
+Changes:
+-Added a new spread bow upgrade. It shoots 3 arrows for the cost of 1 arrow. Not available in treasures or Zora's pond.
+-Added new coupon items. Equip them to apply discounts at shops. See their info for discount details.
+-A few changes to the cape: it was way too powerful and made the game way too easy if you had stacks of potions, allowing you to bypass level after level easily. The cape now drains every 30 frames instead of 40, and cost 1 magic to activate it.
+-Potions no longer stack, made it way too easy when you had stacks of magic for the cape and rings.
+-Changed starting bonus items, you can now pick a +1 inventory slot, replaced the apples for that. And orbs now give you 10 instead of 8.
+-Added the option to add custom palettes for your characters, see the characters folder for instructions.
+-Magic powder now turns rats into 1 heart.
+-Bomb shop in mine town now offers the ring of bombs.
+-Shortened the mine town treasure maze and updated the treasure map. Also added some more bonus stuff in there.
+-Changed gem sprites. Credit: MotorDuck
+-Magic powder now uses 3 magic instead of 1, and medallion now uses 1/4 magic instead of 1/2
+-Added game version to the save files, it will now show you an error message and prevent you from playing older save files on newer game versions instead of possibly crashing. You can disable this by setting the SaveVersionCheck variable to 0 in the options.ini file.
+-Added an AltTabPause option in the options.ini file which allows you to disable the game pausing the music and activating the menu. Useful for certain streamers.
+-Added a StairPause option in options.ini, when set to 1 (default) it will pause the enemies when climbing stairs in a room, which is how it behaved in ALTTP.
+-Added new shopkeepers
+-Added new custom characters
+
+Bug Fixes:
+-Fixed a bug introduced from version 1.1.4 that allowed multiple moon pearls to spawn in the village treasure shop.
+-Fixed bug which allowed you to activate empty slots in the inventory by doing rapid combinations of button presses, which allowed you to equip or use empty slots, causing the game to crash.
+-Fixed issues with magic powder where changing flying enemies into rats caused the rat to be on wrong layer so was able to pass through walls, also fixed it crashing the game when used on bosses.
+-Fixed glitch with stairs where link can bounce back into them from bombs or enemies and appear on the wrong layer.
+-Fixed glitch with bombs not blowing up walls if pausing when bomb would go off.
+-Rocks now get destroyed when last Lanmola gets destroyed. They were still able to hit you causing unfair damage/deaths.
+-Fixed bug where a room can have an unreachable area, although no keys would have been in there.
+-Fixed rare glitch with overlapping pots on certain wall types
+-Fixed glitch with dead explorers when spawning curses, you could still activate the explorer dialogue while the curse animation was happening.
+-Fixed glitch when Link bounces off enemy and opening the inventory at the right time, he would continue moving back indefinitely after inv was closed until hit again.
+-Fixed glitch when getting the letter at the same time you're being hit, it would cause you to pickup the letter which isn't supposed to happen, and would crash the game if you tried to throw it.
+
+=================================================================
+
+Version 1.1.4:
+
+Changes:
+-Added new pendant designs, credits: Errors
+-Some Gem combos that give pendants have been shifted around.
+-Swapped the gem combos for the lamp and cape. Lamp is now Sapphire(Blue) and Citrine(Yellow), Cape is now Sapphire(Blue) and Ruby(Red). Makes more sense based on the value of these items, and their sprite colors.
+-Now if you throw in gems that would give you an item that you already own and can’t be duplicated, or an upgradable item you already have at maximum level, or certain challenges are enabled that would restrict an item, then rupees will be given instead. The amount of rupees will be based on the values of the gems.
+-You can now hit bosses with any rod. They all do 1 damage, they don't transform, just inflict damage. They can really help with swordless quest now.
+-Bows are now a bit easier to find if playing swordless.
+-Health drain curse now stops when reaching 2 health. Drain delay was changed to 7 secs instead of 10 secs because of this.
+-Lamp has only 1 upgrade instead of 2 now. Made the candle shine a bit brighter, and the lamp now shines brighter than before.
+-Changed the 2nd secret treasure room in the mining town maze, instead of more gems it's something better now.
+-Made it so maps and compasses can't be spawned from treasures if more than 60% of the level has already been explored.
+-Cape can only spawn from gold kinstones instead of red kinstones now.
+-Made wizzrobes take a bit less time to spawn and a bit less time to stay invisible, making defeating them take less time.
+-Fixed glitch with Agahnim during the gravity ball sequence, Link wouldn't get hurt by the spike blocks.
+-Filtered the included sprite pack with only those we have permission to use. Also included a credits list for a lot of them.
+-New King's key sprite, credits: Void42
+-Moon pearl now changes color depending on the state of the colored blocks.
+-Cape drains a tiny bit faster now.
+-Added a few more community-drawn character sprite sheets in the sprite pack.
+
+Bug Fixes:
+-Fixed sprite glitch with Poe enemy, which was introduced after giving him a light. Gave ghost Poe in the catacombs a light also since on his sprite he's carrying a light as well, also improved their lighting a bit to make it look nicer.
+-Fixed glitch with loose keys sometimes appearing 1 pixel off from being on the correct floor level, making you have to go up or down to collect it.
+-Fixed cape where it would stay on after you defeat a boss. It now decloaks you the second any boss is destroyed.
+-Fixed vulnerability with save file corruption where it could get corrupted if something happens during a save process like power outage or unexpected event. It now saves to a temp file first, and if the save was successful, it renames the temp file to the Users files.
+-Fixed bug where picking up chicken from inside house's doorway would cause Link to clip into the walls and sometimes crash
+-Fixed clipping glitch with outside castle wall door and bombs.
+-Fixed glitch when strafing into a wall backwards, it would activate the push animation.
+-Fixed glitch with Beamos statues able to hit you while you're falling into a pit causing extra damage.
+-Improved warp destinations by giving them a larger safe-space buffer. Sometimes you would warp and enemies would be too close when you arrived.
+-Fixed boss crystal falling even when paused.
+-Fixed arithmetic bug with treasures and shops, if you got a bunch of rupees from a bought treasure and quickly bought another item while those rupees were still being added, the purchase would interrupt the rupees being added with the purchase amount being deducted causing you to lose rupees.
+-Fixed rare bug where Zora would toss you nothing.
+-Fixed bugs with Pikit. If he grabbed and item and was still holding it with its tongue during room transition, the item would  get stuck floating in the air and became un-get-able when coming back in the room. He now just ingests it and you can retrieve it if you destroy it when returning. That's another thing that would happen, if he took an item and swallowed it, and if you left the room, when returning he wouldn't have that item anymore. This has been fixed, he will still have the item in his belly when returning from another room.
+-Fixed graphical glitches for the Slarok enemies.
+
+=================================================================
+
+Version 1.1.3:
+
+Changes:
+-Updated the core input library, which includes fixes and more gamepad support.
+-Red Armos now can't be hit using arrows. There were complications with him, and after lot's of trial and error to try and improve him, it was easier to just block arrows for the red one. You will need to use bombs if you're doing swordless quest. Also increased his jump speed by a small amount, not much. Felt he was too slow since the last time I slowed him down.
+-Replaced the rod sprites, credit: Errors
+-Made signs non-breakable, people were accidently grabbing them before reading them.
+-Made cape magic drain a tiny bit faster, from 50 frames per drain down to 45 frames. Seemed it was too slow when watching people use it.
+-Added a gold kinstone monument to mine town level
+-Added light to the Poe ghosts that hold a lantern.
+-Replaced Kinstone fusing sounds, credit: castle
+-Added a ton more custom character skins
+-Added sound to the cannon.
+-Updated credits with more special thanks with mention to the Discord server. Also added feature where pressing down speeds up the credit scroll. 
+
+Bug fixes:
+-Fixed crash with items found in dead guy or treasure not having a valid index, which would cause the game to crash. I suspect this was only happening to people who were hacking the game because it was determined that items wouldn't have invalid indexes if playing normally. The new safety check prevents a crash by making the dead guy or treasure have nothing inside, a message would pop up indicating this.
+-Fixed game crashing if closing the inventory at the precise frame an info dialogue box was also being closed.
+-Fixed bug with Leevers (sand creatures) spawning under link while he's in a doorway.
+-Fixed bomb glitch where they sometimes wouldn't blow up.
+-Fixed pendant of revival glitch still working even if you have the Pendant Don't Work Curse.
+-Fixed new rod of stone bug introduced in 1.1.2 where enemies would come back to life when hit.
+-Fixed floor switch and added a 2nd frame to show it was pressed.
+-Fixed bug where if you inspected a shop item or opened the inventory/map at the exact frame you were hit by a bomb, it would still trigger the dialogue box/inv/map while you're dead/hit causing glitches.
+-Increased buffer around wall enemies like Medusas, cannon, and Beamos to prevent there being spikes close to them possibly making them impassible without taking a hit.
+-Fixed master sword beam's corner sprite edge appearing in the top-right corner of the screen for a frame.
+-Fixed bonus item not resetting itself if saving then continuing then dying and restarting level. Same thing with the swordless mode, it wasn't saving properly.
+-Fixed another bug with pots spawning over monuments. It was a separate bug but related to the first one. That should be the last of them.
+-Fixed rare glitchy treasure chest that moved when you open it. It was caused by it's initial position not being an integer value, so the static tiles that replaced it after opening clamped to the nearest tile map grid position.
+-Fixed layer issue with certain projectiles like hookshot, arrows, rod beams, etc that were on the wrong layer if you shot them from underneath a walkway.
+-Fixed transform rods not working if enemies are frozen
+-Usually if you stand on a map or compass if your inventory is full, it'll reveal the map attributes those normally show, but it was also revealing them when you were swinging your sword over them which shouldn't happen. Fixed the sword glitch.
+-Fixed glitch when cursed with the 'hearts do damage' curse and you pick up a heart that kills you, it would cause glitches with the death sequence where you could still walk around.
+-Fixed spelling mistakes
+
+=================================================================
+
+Version 1.1.2:
+
+Changes:
+-Changed the cape behavior, it now decloaks you if you equip any other item
+-Added the ability to reveal vines using arrows, and with your candle/lamp by walking up to them and pressing the action button.
+-Increased chance of finding kinstone monuments by a bit.
+
+-Bug Fixes:
+-Fixed exploit with final boss where you can access the inventory at the right frame and able to drop items to use during the fight.
+-Fixed glitches with stopwatch and improved certain things.
+-Fixed incorrect sprite frame in Link's walk cycle while holding an item. This affected some of people's custom sprites.
+-Fixed sand leevers glitching out in rooms with stairs where they were starting on the upper floor-level, and spawning back on the lower floor-level where Link was, but their internal level was still upper causing link not to be able to hit them. I just removed leevers from rooms that had stairs.
+-Fixed glitch with next level map being shown for 1 frame if you descended with map and/or compass
+-Fixed treasure platforms sometimes causing items to drop next to edges if opening a treasure close to the edge and inv was full. Treasures now always have a larger gap between the edges and treasures.
+-For the hackers who found a way to add the star to the inventory, it now won't glitch out when using a warp while star is active. Normally stars are only found on the ground, can't be added to inventory, and wouldn't spawn if there's a warp in the room. Stars cancel when exiting rooms so there would usually be no way to go through a warp while star is active so I never bothered to check this. Note: if hacking the game's variables, it's very possible you may break the game. Also please don't submit bug reports if you hack the game and it breaks.
+-Fixed issues with cape and warps. I couldn't find the bug where after arriving from warp the magic would stop draining, it worked fine for me on all tests. So I decided that when using a warp, you just uncloak automatically. This would prevent any rare bugs.
+-Fixed bug where you can "use" a bomb or gem while holding a bush, then it would pick up the bomb but the bush would stay in there. I made you absolutely cannot use an item from the inventory that you would pick up if you're already holding any other item.
+-Fixed bug where if you warped into a room that had a secret door, the pendant of secrets wouldn't alert you, only if you left the room and came back.
+-Fixed decor like bones covering up spikes, making certain patches hard to see.
+-Improved the issues with pots and switches being unreachable if spikes were in the way. Now spikes won't generate in a room if it has a key, or pots with door switch, or any switch in general. You may still encounter pots unreachable because of the spikes, but now they wouldn't contain anything that's needed to pass the level/room. They would be there if you can use the cape, or don't mind taking a hit to see what's inside. The problem was difficult to solve, so this was an easier solutions. 
+-Fixed rare glitch where pots could spawn over monuments.
+-Fixed spelling mistake (lens)
+-Other minor fixes
+
+=================================================================
+
+Version 1.1.1:
+
+-Patch version to fix game-breaking pot/chicken glitch where you weren't able to throw them back down.
+-While I was at it, fixed spelling mistakes ("shenanigans", "pecs")
+
+=================================================================
+
+Version 1.1.0:
+
+Changes:
+
+-Added option to replace the 9 character skins with custom ones. See data\characters folder for more information/instructions on how to load custom skins.
+-Made the stopwatch freeze the enemies instead of turning them into stone, much more satisfying shattering a bunch of frozen enemies instead. Stopwatch is now blue.
+-Minor item balancing
+
+Bug Fixes:
+
+-Fixed exploit where you could drop/pickup stuff in between doors and it would clip you out, allowing you to access places you aren't supposed to. Now there's several checks that see if you're colliding with a door partially, fully, and if you're facing the door. All these checks make it so you can't glitch out the game like this. Now you can't throw an item into a door, even if standing outside of it, but you can still throw one from a door if you're facing the room, making it still possible to shelter yourself and throw orbs and such out the door towards enemies. You can still drop an item while in the door and pickup items, it just won't allow you to throw it depending where you're facing as mentioned above. 
+-Fixed other door issues, like when picking up/using items while in a house doors it would glitch out, or if facing perpendicular in a door way you can lose your item if dropping it/throwing it.
+-Fixed buggy Treasure bag that would gobble up people's gems.
+-Added safety measures to make sure the user file is read properly. Some users files got corrupt, or the system had permission issues causing the file not to be read and crashing. If there's an issue now, it prompts the user and creates a new file now instead of crashing. 
+-Added safety measures when reading arcade highscores and crashing because of possible corrupt or unreadable user file, same issue as above. If there's issues reading/writing the highscores, default values will be used when playing, or not saved when ending.
+-Fixed glitch with cape when warping, it would still use up magic during the warp and if you ran out during the warp, you would stay invisible unable to decloak until you reached the next level.
+-Fixed and improved several situations which can cause unavoidable damage from moving spike blocks and rolling spikes. They may still exist, but would be much more rare if they ever did.
+-Fixed a rare case where a treasure altar was completely in the way of a switch block, making it impossible to pass though.
+-Fixed rare bug where spike block would be covering part of a warp, making it impossible to use it.
+-Fixed glitch with pendant of direction and HUD turning off map or compass icon if standing on one when inventory was full, they should always be visible if you own that pendant.
+-Fixed bug where if you used the medallion from the inventory, you can still walk around during the fireworks
+-Fixed exploit with the King, if you said no to exchanging the medallion for the key, then dropped the medallion, then when king asked you again and you said yes, he would give you the key even though the medallion wasn't in your inventory, allowing you to keep the medallion.
+-Fixed rare crash with music engine
+-Added fix to low-health sound still playing after defeating Agahnim
+-Fixed minor inaccuracy with Link's pickup-up animation
+-Fixed bug where if you rename your user name to "" (blank/nothing), it would erase your user. Now you can't name or rename your user with a blank name, it won't let you proceed, unless you hit cancel or type a real name.
+
+=================================================================
+
+Version 1.0.9:
+
+Changes:
+
+-The Gem bag is now the Treasure bag and can hold your gems and kinstones together. There's now only 6 slots because of space restraints when the lvl 1 inv bonus slot will be added as a starting bonus item.
+-Made the red Armos boss a little easier, his jump takes a few more frames to complete making it a bit easier to avoid.
+-Updated most of the food sprites with touched up versions, which mostly looks identical, just better color selections and textures in some, art credit: Glasus
+
+Bug Fixes:
+
+-Fixed crash on Agahnim level where if you owned the pendant of direction and opened the map screen, it would crash.
+-Fixed rare bug where if you were to open your inventory screen while Armos bosses were exploding and dying, it could sometimes glitch out causing the red one to appear earlier, and after they all died, the game wouldn't continue with the crystal, making you stuck.
+-Fixed bug where if you were holding an item and grabbed the falling crystal after a boss fight, it would glitch out.
+-Fixed glitch when taking an item into Agahnim's chamber and he did you-know-what, you wouldn't be able to run until you fell into a pit and spawned back.
+-Shifted Agahnim's sequence a bit making it harder for him to warp into his own bombs. It's still possible to hit him 2 times by timing 2 throws properly, but more difficult now, which would be a bonus hit for the player.
+-Fixed exploit with magic cape when owning the pendant of magic, you could keep generating magic while spamming the cape on and off.
+-Other minor fixes
+
+=================================================================
+
+Version 1.0.8:
+
+Changes:
+-(Spoiler) Made hidden treasure reveals from moving blocks a little more common. This doesn't mean that bonus/hidden treasures are now more common, it means that if a room is going to generate a hidden treasure, and those beige blocks have also been generated, there's now a higher chance that the switch type it chooses to reveal that treasure will be a push block. They were too rare before. They can still be a bit rare, but less rare now.
+
+Bug Fixes:
+-Fixed soft-lock problems where on rare occasions, hidden crystal switches or warps needing a switch to reveal them would not have that switch generated. So when people couldn't find that crystal switch needed, it was there, just hidden with no switch generated. I decided to make crystal switches, warps, and keys in treasures visible at all times, so that should eliminate any soft lock. I would like to put back the hidden aspect another time once I can figure out what the issue was. Bonus treasures can still be hidden needing a switch, but that's less important if the switch doesn't get generated, you would never know about that treasure and could still finish the level.
+-Fixed lighting engine option glitch. See last version for explanation on lighting engine option. The start level lightning was switching it back on again when you had set it to off.
+-Fixed bug when warping from a lower floor to an upper floor, if falling into a hole in that same warp destination room, you would respawn under the floor.
+-Fixed bug when getting hit the moment you open a treasure, you end up able to move around while the treasure is animating and everything is paused.
+-Fixed bug when picking up a dropped item while transitioning through a door, it might have caused a dialogue box to appear while the room was transitioning causing issues or cashing.
+-Added a possible fix for a rare case of soft-lock relating to enemies holding keys where the game thinks an enemy with a key was generated, but none were. The solution would make it way way less likely, even impossible. Still have to find the root cause though, but this should help or even prevent it entirely.
+
+=================================================================
+
+Version 1.0.7:
+
+Changes:
+-Added Frogbert at the start of the game, the tip-giving frog. He gives advice for new players. art credit: Errors
+-Magic powder can now turn anti-fairies (bubbles) into fairies
+-Replaced kinstone and pop sprites, added 2 new pop cans. art credit: Glasus
+-Added a Lighting option in the options.ini file so people who experience slowdowns in dark rooms can turn off lighting entirely. This wouldn't be recommended since the dark plays a large role in the game's fun and atmosphere, but no lighting is better than poor performance. If lighting is disabled, lamps wouldn't spawn since they would be pointless.
+-Increased price of cape a little since the last update made it more powerful. Also made it drain magic a tiny bit faster.
+
+Bug Fixes:
+-Fixed being able to transform Lanmola boss into a rat with magic powder causing the boss battle to be unbeatable.
+-Fixed bug with curse health drain where it would crash if you're transitioning rooms and you die while that happens
+-Fixed bug with kinstones fusing, if you tried to interact with kinstone just before it disappeared, it would pop up another dialogue box causing bugs and crashes
+-Fixed exploit with you bringing an item into Agahnim's chamber.
+-Numpad keyboard mapping is now working
+-Other minor fixes
+
+=================================================================
+
+Version 1.0.6:
+
+Changes:
+-Push blocks are no longer used to reveal important items needed to finish the level. They can still reveal hidden treasures though so they're optional to check for.
+-Made Agahnim a bit easier: his projectiles do less damage, he takes 2 less hits to defeat, he spawns 1 more bomb per turn giving you an extra weapon opportunity. Enabling tougher enemies challenge increases his difficulty if you still want the tougher challenge.
+-You can now hit shock-enemies when using the cape without needing the Dragon sword making the cape more useful.
+-Enemies that follow you no longer appear in rooms with stairs since they can easily outrun you to the base of the stairs making it difficult or impossible to pass.
+
+Bug Fixes:
+-When using the cape and getting electrocuted, the game input would stop working. Fixed.
+
+=================================================================
+
+Version 1.0.5:
+
+Bug Fixes:
+-Fixed large exploit with rod charger. If you equipped your rod and placed it in the slot, then equipped something else and proceeded to charge, it would charge that newly equipped item, adding a large amount of them to your inventory. So now, if you equip something else, the rod won't be inserted anymore. Only when a rod is equipped should it show up in the slot and allowed to be charged from your magic meter using the action button.
+
+=================================================================
+
+Version 1.0.4:
+
+Changes:
+-Added analogue gamepad support. Note: Make sure to remap your controller so your profile saves the new internal analogue bindings, otherwise it won't work. If you're using the default controls, just select 'default' in the remapping menu and it'll reset it. Or delete your user and create a new one.
+
+-Added options in the options.ini file: 
+
+	[Controls]
+	AnalogueThreshold: 0-1, minimum threshold for directional (thumbstick) axes. Tweak to adjust sensitivity. default is 0.4
+
+	[Preferences]
+	Gore: 1=shows blood, gore, and dead bodies in the game, 0 doesn't. Dry non-human bones will still appear
+
+-Inventory bag will now always appear in the village's treasure store, if it's allowed (not allowed if doing small inventory challenge, or you have max inventory, etc).
+
+Bug Fixes:
+-Fixed Master Sword beam sound still playing while paused
+-Fixed Agahnim's name
+-Other minor fixes
+
+=================================================================
+
+Version 1.0.3:
+
+Changes:
+-Increased treasure generation and item drops from enemies a bit
+-Increased probability of rupees being higher amounts by a bit
+-Increased Link's starting candle brightness by a bit
+
+Bug Fixes:
+-Chess player in village froze for someone, decided to remove him for now as it relies on an external exe for the engine (sf.exe, found in data folder (stockfish engine)). Running an external exe can be volatile without proper error checking, since there may be permission issues with Windows causing the game not to be able to communicate with/run it, so instead of risking crashing someone's game, I removed him. He may come back in a later patch.
+-Fixed rare crash with king after he gives you the key.
+-Fixed another chicken bug when trying to pick it up while it's frozen or turned to stone. I just disabled any pickup if chicken is transformed.
+
+=================================================================
+
+Version 1.0.2:
+
+Bug Fixes:
+-Compilation corruption in Version 1.0.1 exe introduced bad code where the inventory screen did not close after using the info menu option. Thanks to ZSRoach.
+
+=================================================================
+
+Version 1.0.1:
+
+Changes:
+-Added a section in the manual about lighting torches. Unlike the original game, you don't need to equip the lamp, you can walk up to any of them and press the Action button.
+-Added IvyIvee's name to the credits (designed the witch sprites)
+
+Bug Fixes:
+-Fixed crash where if you light a chicken on fire, then pick it up, the game crashes if you're holding it after he's done burning
+-Fixed bug in the castle jail level where on some rare occasion, a treasure or pot can appear behind a locked jail cell holding a prisoner, and if the key was inside there, you would be soft-locked.

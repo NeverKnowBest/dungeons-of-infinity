@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Hinox",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Hinox",
+  "parent":{
+    "name":"Hinox",
+    "path":"folders/Objects/Characters/Enemies/Hinox.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

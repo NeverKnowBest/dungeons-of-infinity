@@ -1,0 +1,3 @@
+if(!CanPause) exit;
+
+PauseObj

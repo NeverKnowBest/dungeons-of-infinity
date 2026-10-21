@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"Music_ZeldaTheme",
+  "audioGroupId":{
+    "name":"audiogroup_Music",
+    "path":"audiogroups/audiogroup_Music",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":2,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":84.0,
+  "exportDir":"",
+  "name":"Music_ZeldaTheme",
+  "parent":{
+    "name":"Music",
+    "path":"folders/Sounds/Music.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":22050,
+  "soundFile":"Music_ZeldaTheme.wav",
+  "volume":0.8,
+}

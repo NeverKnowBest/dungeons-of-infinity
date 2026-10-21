@@ -1,0 +1,417 @@
+//Output folder: C:\Users\justi\AppData\Local\Zelda
+
+
+*******Bugs*******
+
+--Possible bug: arrows take more hits when at level 0 attack
+
+--Test cape and sword on bouncy enemies
+
+--Verify curse shop prices are the highest 
+
+
+********Improvements*********
+
+--Make fireballs different damage depending of enemy
+
+-Add more info to end screen like challenges and bonus items
+
+
+I'm first trying out Swordless mode. I'm noticing that doors don't open if enemies are set to ice (rod of ice and ice orb), but they would if set on fire (rod of fire and fire orb). How difficult would it be to make frozen enemies not count towards "active" enemies?
+And this might be nitpicky, but how about making the coloured switches toggleable just by pressing A next to them, like vines?
+
+
+Pendant of Magic:       65-170 →  80-200
+Pendant of Health:      65-170 →  80-200
+Pendant of Protection:  65-170 →  80-200
+Pendant of Revival:     80-200 → 100-250
+Pendant of Secrets:    125-300 → 100-250
+Pendant of Immunity:    80-200 → 100-250
+Antidote Potion:        50-100 →  40-80
+Spread Bow:            125-350 → 100-300
+Boomerang:             125-350 → 100-300
+Hookshot:              125-350 → 100-300
+
+ 
+Issue: Pendant of Protection trivialises Hinox and Zirro (immune to bomb damage)
+Solution: Instead of full immunity, make it deal 50% damage.
+Issue: Dragon Sword (shock-proof) happens too early, Red Bari and Buzz Blob become trivial since player is likely to have it when they show up.
+Solution: Swap Blood Sword and Dragon Sword in the sword progression, so that Red Bari appears when the player doesn't necessarily have Dragon Sword. Furthermore, Blood Sword becomes available earlier, but traps should have 6HP so that they don't die in 1 hit (generally, they would take 1-3 hits due to Blood Sword being strong) 
+Issue: Glove and tunic upgrades aren't as significant as shield and sword upgrades, since they don't have added effects of their own.
+Solution1: Tunics should have additional protective effects (halve damage when health beeping, halve damage from falling, grant more invincibility frames after being hit)
+Solution2: Gloves should increase the base damage of thrown objects (2 base, so 3 → 4 → 5)
+Issue: Enemies with 10 HP (index 9) are unaffected by "Tougher enemies" because index 10 has the same health values.
+Solution: Create a new damage index between 9 and 10:
+        ----------Base enemies--------- ----Bosses----
+Index   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15  16 
+HP      1  2  3  4  5  6  7  8  9 10 12  8 10 14 18 24 999
+*Armos uses index 11 (12 with Tougher enemies) - see Enemy rebalancing
+*Lanmola uses index 13 (14 with Tougher enemies)
+*Moldorm uses index 14 (15 with Tougher enemies)
+Issue: Hover and Kyameron (water-bound enemies) are often confined to small puddles, which makes them very ineffective.
+Solution: Depending on how rooms and enemies are generated, either:
+If enemies are decided before room aspect, guarantee that rooms that contain Hover and Kyameron are completely flooded
+If room aspect is decided before enemies, make completely flooded rooms appear more often, and ensure that Hover and/or Kyameron appear only in those.
+
+
+Soldier (Stalfos): HP 4 → 5, Damage 0.75 → 1
+
+Eyegore: Adjust arrow vulnerability to deal 6 damage instead of 4, currently they always take 2 arrow hits, regardless of attack level.
+
+Skullrope: HP 2 → 3, replace Rope in B5
+Bari (Red): Replace Buzz Blob in B11
+Chasupa: Replace Keese in B8
+
+Armos Knight: HP 10 → 8, Bombs deal 2 damage each (most players exploit Armos's bomb weakness anyway...) lowering their health pool makes them take ~42 sword hits total, which I think is more reasonable than than a whopping ~54 hits.
+
+--Add Leo
+
+--Add buffs for tunics and gloves
+
+--Make spread bow shoot slower (1/sec)
+
+--Pendant of protection (reduce amount of damage from bombs instead of no damage)
+
+--Add cooldown to master sword beam after destroyed (0.5 sec)
+	
+--Add thunder sounds to intro
+
+--Menu to pick your wish for wishing pond
+
+-Custom music folders
+
+--add more curses:
+	-Bats
+
+--Move blood sword down to after long sword, and Dragon sword before master sword
+
+--Blood sword should take like 3-4 hits to destroy wall enemies
+
+--Make kinstones not show crack after fuse
+
+--https://gist.github.com/nkrapivin/9237d82357bd90c7195a23e40c1166db
+
+--ensure all items can activate the crystal switch
+
+--With health drain curse, make sound when it drains
+
+--Multi-colored kinstones
+
+--Item/enemy/item/gems encyclopedia
+
+--Inventory sorting
+
+--red and green flames at the entrance and exit
+
+--limit curses if you get one
+
+--Firebars should be away from doors a little more
+
+--Rolling spikes can be right by the doors rolling over you as you enter
+
+--add option for diagonal movement correction
+
+--Android version
+
+--Lanmolas hitboxes extend too far and can hit Link. Maybe regluar size that does damage to Link, and larger one that extends for hits
+
+--Don't spawn fireballs/wall enemies when hungry guy is in the room
+
+
+
+
+
+==Input settings that will need to be changed for every update
+
+
+=====external data======
+//Whether to use Input's own SDL2 database to remap gamepads, overriding the old and crusty
+//database that GameMaker uses internally. Setting this to <false> will cause Input to use
+//GameMaker's native database and, as a result, gamepad mapping data will be less accurate
+#macro INPUT_SDL2_REMAPPING  true
+
+//Whether to allow external SDL2 database loading from environment variable %SDL_GAMECONTROLLERCONFIG%
+//This is useful for compatibility with external gamepad mapping software
+#macro INPUT_SDL2_ALLOW_EXTERNAL  true
+
+//Whether to allow use of SDL2's extended bindings, accessed using the extended gp_* constants
+//Setting this macro to <true> will enable the use of:
+//   gp_guide
+//   gp_misc1
+//   gp_touchpad
+//   gp_paddle1
+//   gp_paddle2
+//   gp_paddle3
+//   gp_paddle4
+#macro INPUT_SDL2_ALLOW_EXTENDED  false
+
+//Whether to allow identified non-gamepad joystick devices including wheels, flightsticks, throttles
+#macro INPUT_SDL2_ALLOW_NONGAMEPAD_JOYSTICKS  false
+
+//The following macros hold the names of various source files that Input uses to hold gamepad data
+#macro INPUT_SDL2_DATABASE_PATH    (GAMEDIR_DATA_CONTROLLERS + "sdl2.txt")                //Path to the SDL2 database to read gamepad remapping definitions from
+#macro INPUT_CONTROLLER_TYPE_PATH  (GAMEDIR_DATA_CONTROLLERS + "controllertypes.csv")     //Path to the controller type database to read gamepad types from
+#macro INPUT_BLACKLIST_PATH        (GAMEDIR_DATA_CONTROLLERS + "controllerblacklist.csv") //Path to the controller blacklist database to read from
+
+
+======gamepads=====
+add this line: global.Gamepad_AnalogueThreshold = 0.4;
+
+======Multiplayer=====
+#macro INPUT_MAX_PLAYERS  1
+
+=============__input_config_general:
+//PC platforms: Windows, MacOS, Linux, Steam Deck, HTML5 or OperaGX
+#macro INPUT_PC_KEYBOARD          true
+#macro INPUT_PC_MOUSE             false
+#macro INPUT_PC_GAMEPAD           true
+
+#macro INPUT_WINDOWS_TOUCH        false  //Partially supported
+#macro INPUT_WINDOWS_VIBRATION    false   //Partially supported (XInput and Steam)
+
+//Mobile platforms: Android, iOS, iPadOS, tvOS, HTML5 or OperaGX
+#macro INPUT_MOBILE_GAMEPAD       true
+#macro INPUT_MOBILE_MOUSE         false  //Maps touchscreen to mouse
+
+#macro INPUT_MOBILE_WEB_KEYBOARD  false  //Partially supported
+#macro INPUT_ANDROID_KEYBOARD     false  //Partially supported
+
+//Switch console platform
+#macro INPUT_SWITCH_KEYBOARD      false  //Partially supported over USB
+#macro INPUT_SWITCH_MOUSE         false  //Maps touchscreen to mouse
+#macro INPUT_SWITCH_TOUCH         false  //Supported for handheld touchscreen
+#macro INPUT_SWITCH_VIBRATION     false   //Legacy support (simulated with HD Rumble)
+
+//PlayStation 4 and PlayStation 5 console platforms
+#macro INPUT_PS_MOUSE             false  //Partially supported (first player touchpad)
+#macro INPUT_PS4_VIBRATION        false
+#macro INPUT_PS5_VIBRATION        false   //Legacy support (simulated with PS5 haptics)
+
+//Xbox One and Xbox Series console platforms
+#macro INPUT_XBOX_VIBRATION       false
+
+
+
+//Whether to allow input while game window is out of focus on desktop platforms
+#macro INPUT_ALLOW_OUT_OF_FOCUS  false
+
+//Default setting for whether the debug overlay blocks input
+#macro INPUT_DEFAULT_DEBUG_OVERLAY_BLOCKS_INPUT  false
+
+//Set to true to use milliseconds instead of frames throughout the library
+#macro INPUT_TIMER_MILLISECONDS  false
+
+//Whether to allow using Steamworks extension when available
+//This feature requires the Steamworks extension: https://github.com/YoYoGames/GMEXT-Steamworks
+#macro INPUT_ALLOW_STEAMWORKS  false
+
+//Time (in milliseconds) to wait for a new binding before automatically cancelling the binding scan
+#macro INPUT_BINDING_SCAN_TIMEOUT  10000
+
+//What source mode to start the game in
+#macro INPUT_STARTING_SOURCE_MODE  INPUT_SOURCE_MODE.HOTSWAP
+
+
+
+=============__input_config_profiles_and_default_bindings:
+function __input_config_verbs()
+{
+    return {
+		
+	    keyboard:
+	    {
+	        up:    input_binding_key(vk_up),
+	        down:  input_binding_key(vk_down),
+	        left:  input_binding_key(vk_left),
+	        right: input_binding_key(vk_right),
+        
+	        sword:  input_binding_key(vk_control),
+	        action:  input_binding_key(vk_alt),
+	        item:  input_binding_key(ord("Z")),		
+			map:     input_binding_key(ord("M")),
+		
+			strafe:  input_binding_key(vk_shift),
+		
+			inventory: input_binding_key(vk_enter),
+        
+			menu_access: input_binding_key(vk_escape),
+		
+			menu_input: [input_binding_key(vk_enter), input_binding_key(vk_control)],
+
+			hud: input_binding_key(vk_f1),
+		
+	    },
+ 
+	     gamepad:
+	    {
+
+	        up:    [input_binding_gamepad_axis(gp_axislv, true),  input_binding_gamepad_button(gp_padu)],
+	        down:  [input_binding_gamepad_axis(gp_axislv, false), input_binding_gamepad_button(gp_padd)],
+	        left:  [input_binding_gamepad_axis(gp_axislh, true),  input_binding_gamepad_button(gp_padl)],
+	        right: [input_binding_gamepad_axis(gp_axislh, false), input_binding_gamepad_button(gp_padr)],
+		
+	        //up:    input_binding_gamepad_button(gp_padu),
+	        //down:  input_binding_gamepad_button(gp_padd),
+	        //left:  input_binding_gamepad_button(gp_padl),
+	        //right: input_binding_gamepad_button(gp_padr),
+        
+	        sword:  input_binding_gamepad_button(gp_face1),
+	        action:  input_binding_gamepad_button(gp_face2),
+	        item:  input_binding_gamepad_button(gp_face3),		
+			map:     input_binding_gamepad_button(gp_face4),
+		
+			strafe:  input_binding_gamepad_button(gp_shoulderrb),
+		
+			inventory: input_binding_gamepad_button(gp_start),
+        
+			menu_access: input_binding_gamepad_button(gp_select),
+		
+			menu_input: [input_binding_gamepad_button(gp_start), input_binding_gamepad_button(gp_face1)],
+		
+			hud: input_binding_gamepad_button(gp_stickr),
+
+	    }
+		
+    };
+}
+
+====Profiles====
+//Sets the preferred behaviour for input_binding_get() when a player has no profile set
+//This typically happens when hotswapping and the player hasn't pressed any buttons/keys/etc. yet
+//
+//Three options are available:
+//  0 = Always return an empty binding if the player has no profile set
+//  1 = Prefer INPUT_AUTO_PROFILE_FOR_KEYBOARD for bindings if on desktop OSs, and use gamepad bindings otherwise
+//  2 = Prefer INPUT_AUTO_PROFILE_FOR_GAMEPAD for bindings
+//  3 = Prefer INPUT_AUTO_PROFILE_FOR_KEYBOARD for bindings if on a desktop OS and no gamepad is connected, otherwise use INPUT_AUTO_PROFILE_FOR_GAMEPAD
+#macro INPUT_FALLBACK_PROFILE_BEHAVIOR  1
+
+//Names of the default profiles to use when automatically assigning profiles based on the source that a
+//player is currently using. Default profiles for sources that you don't intend to use in your game do
+//not need to be defined
+#macro INPUT_AUTO_PROFILE_FOR_KEYBOARD     "keyboard"
+#macro INPUT_AUTO_PROFILE_FOR_MOUSE        "mouse"
+#macro INPUT_AUTO_PROFILE_FOR_GAMEPAD      "gamepad"
+#macro INPUT_AUTO_PROFILE_FOR_TOUCH        "touch"
+#macro INPUT_AUTO_PROFILE_FOR_MIXED        "mixed"
+#macro INPUT_AUTO_PROFILE_FOR_MULTIDEVICE  "multidevice"
+
+//Toggles whether INPUT_KEYBOARD and INPUT_MOUSE should be considered a single source at all times
+//For most PC games you'll want to tie the keyboard and mouse together but occasionally having them
+//separated out is useful
+#macro INPUT_ASSIGN_KEYBOARD_AND_MOUSE_TOGETHER  true
+
+//Whether to allow default profiles (see below) to contain different verbs. Normally every profile
+//should contain a reference to every verb, but for complex games this is inconvenient
+#macro INPUT_ALLOW_ASSYMMETRIC_DEFAULT_PROFILES  true
+================================
+
+
+==Verb behavior===
+//Maximum number of alternate bindings per verb per profile
+#macro INPUT_MAX_ALTERNATE_BINDINGS  2
+
+//Whether to tolerate incorrect number of alternate bindings when importing
+//This should typically be left as <false> to detect errors and such
+//
+//Set to <true> if you've changed the number of alternate bindings between builds and don't want
+//to see error messages. Please note that we don't recommend this - you should instead reset player
+//bindings in this situation - but the option is there if you need it
+#macro INPUT_FLEXIBLE_ALTERNATE_BINDING_IMPORT  false
+
+//Default time before input_check_repeat() returns <true>
+//(Whether this is in frames or milliseconds is controlled by INPUT_TIMER_MILLISECONDS)
+#macro INPUT_REPEAT_DEFAULT_DELAY  10
+
+//Default time between a verb being activated and the first time input_check_repeat() returns <true>
+//(Whether this is in frames or milliseconds is controlled by INPUT_TIMER_MILLISECONDS)
+#macro INPUT_REPEAT_DEFAULT_PREDELAY  30
+
+//Time before input_check_long() returns <true>
+//(Whether this is in frames or milliseconds is controlled by INPUT_TIMER_MILLISECONDS)
+#macro INPUT_LONG_DELAY  10
+
+//Delay between key presses for it to register as a double press
+//(Whether this is in frames or milliseconds is controlled by INPUT_TIMER_MILLISECONDS)
+#macro INPUT_DOUBLE_DELAY  12
+
+//Number of frames over which a thumbstick must move, from the minimum to maximum thresholds, to trigger a quick tap
+//Lower values require the player to move a thumbstick faster to trigger a quick tap
+// N.B. This value is always in frames, regardless of what INPUT_TIMER_MILLISECONDS is set to
+#macro INPUT_QUICK_BUFFER  3
+
+//Default time limit between the first and last key press for chord activation
+//(Whether this is in frames or milliseconds is controlled by INPUT_TIMER_MILLISECONDS)
+#macro INPUT_CHORD_DEFAULT_TIME  4
+
+//The default value for "mostRecent" parameters for opposing checkers
+//This value is used when the "mostRecent" parameter is not specified
+#macro INPUT_DEFAULT_OPPOSING_MOST_RECENT  false
+
+//The default value for "mostRecent" parameters for 2D checkers
+//This value is used when the "mostRecent" parameter is not specified
+#macro INPUT_DEFAULT_2D_MOST_RECENT  false
+
+//Whether to clamp 2D input to a maximum distance of 1 unit
+//This affects input_x(), input_y(), input_xy(), input_direction(), and input_distance()
+#macro INPUT_2D_CLAMP  true
+
+//The amount of bias for 2D checkers to prefer straight lines along the x- and y-axes
+//This makes it easier for the player to input exactly horizontal and exactly vertical movement
+//Value should be from 0 to 1. Higher values make the biasing behaviour stronger
+#macro INPUT_2D_XY_AXIS_BIAS  0.0
+
+//Whether the axis bias (see above) should be 8-directional
+//If set to <false>, 2D checkers will only lock to north/east/south/west directions
+#macro INPUT_2D_XY_AXIS_BIAS_DIAGONALS  false
+
+
+=====Keyboard======
+//Whether to allow (problematic) keyboard input on Android platform
+#macro INPUT_ANDROID_KEYBOARD_ALLOWED  false
+
+//Whether to allow keyboard input on Switch platform
+#macro INPUT_SWITCH_KEYBOARD_ALLOWED  false
+
+//Whether to merge control keys, for example Left Shift and Right Shift upon user rebind
+#macro INPUT_MERGE_CONTROL_KEYS  true
+
+//The following macro controls default key filtering behaviour on platforms supporting keyboard
+//Expected values are:
+//  0 = Don't ignore any keys
+//  1 = Ignore select nonfunctional keys:
+//      - Alt/Options (Mac)
+//      - Windows/Command (Mac)
+//      - Hard/soft Back on Android
+//      - PrintSc on iOS/tvOS
+//      - Caps lock in browser on Apple platforms
+//      - F10 in browser on Apple platforms
+//      - F11 in browser on other platforms
+//      - Vendor-reserved (0xFF)
+//  2 = Ignore all above keys, and reserved and/or system keys:
+//      - Num lock & Scroll lock
+//      - IME keys
+//      - Browser keys
+//      - Media keys
+//You can modify this list at any time by calling input_ignore_key_add() or input_ignore_key_remove()
+//This setting only affects Input and will not filter these keys from native GameMaker functions
+#macro INPUT_IGNORE_RESERVED_KEYS_LEVEL  0
+
+=======Icons======
+//Special case: When a non-binding value is being evaluated
+//              This should only happen if Input is given an invalid input argument
+input_icon_not_a_binding("invalid");
+
+//Special case: When an empty binding is being evaluated
+input_icon_empty("");
+
+//Special case: When a touch binding (virtual button) is being evaluated
+input_icon_touch("Virtual button");
+
+
+
+//Optional remapping for keyboard and mouse
+//This is useful for turning keyboard keys into sprite icons to match other assets, or for returning formatted strings (e.g. for use with Scribble)
+//Any keyboard key label not in this struct will simply fall through and return the key name
+input_icons_keyboard_and_mouse()
+//Put extra .add() commands here to add icons to keyboard and mouse

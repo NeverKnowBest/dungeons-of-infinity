@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Gurubar",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Gurubar",
+  "parent":{
+    "name":"Guru",
+    "path":"folders/Objects/Characters/Enemies/Guru.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

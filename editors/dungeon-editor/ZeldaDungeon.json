@@ -1,0 +1,415 @@
+[
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 152,
+      "y": 2816,
+      "Sections": 185,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 6,
+            "location": "Bottom",
+            "x": 112,
+            "y": 216,
+            "level": "Upper",
+            "status": 6
+         },
+         {
+            "LocationIndex": 9,
+            "location": "Left",
+            "x": 16,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 12,
+            "location": "Top",
+            "x": 112,
+            "y": 16,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1536,
+      "id": 243,
+      "Crystals": [
+         {
+            "Section": 14,
+            "x": 1712,
+            "y": 2892
+         }
+      ],
+      "KeyInRoom": 0,
+      "name": ""
+   },
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 151,
+      "y": 2816,
+      "Sections": 186,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 3,
+            "location": "Right",
+            "x": 216,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 9,
+            "location": "Left",
+            "x": 16,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 12,
+            "location": "Top",
+            "x": 112,
+            "y": 16,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1280,
+      "id": 244,
+      "Crystals": [
+         {
+            "Section": 0,
+            "x": 1424,
+            "y": 2908
+         },
+         {
+            "Section": 4,
+            "x": 1336,
+            "y": 2940
+         }
+      ],
+      "KeyInRoom": 0,
+      "name": ""
+   },
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 149,
+      "y": 2304,
+      "Sections": 187,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 3,
+            "location": "Right",
+            "x": 216,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 6,
+            "location": "Bottom",
+            "x": 112,
+            "y": 216,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 9,
+            "location": "Left",
+            "x": 16,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1536,
+      "id": 245,
+      "Crystals": [],
+      "KeyInRoom": 0,
+      "name": ""
+   },
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 43,
+      "y": 2304,
+      "Sections": 188,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 3,
+            "location": "Right",
+            "x": 216,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 6,
+            "location": "Bottom",
+            "x": 112,
+            "y": 216,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1280,
+      "id": 246,
+      "Crystals": [],
+      "KeyInRoom": 0,
+      "name": ""
+   },
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 46,
+      "y": 2304,
+      "Sections": 189,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 6,
+            "location": "Bottom",
+            "x": 112,
+            "y": 216,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 9,
+            "location": "Left",
+            "x": 16,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1792,
+      "id": 247,
+      "Crystals": [],
+      "KeyInRoom": 0,
+      "name": ""
+   },
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 48,
+      "y": 2560,
+      "Sections": 190,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 9,
+            "location": "Left",
+            "x": 16,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 12,
+            "location": "Top",
+            "x": 112,
+            "y": 16,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1792,
+      "id": 248,
+      "Crystals": [],
+      "KeyInRoom": 0,
+      "name": ""
+   },
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 77,
+      "y": 2816,
+      "Sections": 191,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 3,
+            "location": "Right",
+            "x": 216,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1024,
+      "id": 249,
+      "Crystals": [],
+      "KeyInRoom": 0,
+      "name": ""
+   },
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 77,
+      "y": 2560,
+      "Sections": 192,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 3,
+            "location": "Right",
+            "x": 216,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1024,
+      "id": 250,
+      "Crystals": [],
+      "KeyInRoom": 0,
+      "name": ""
+   },
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 112,
+      "y": 2560,
+      "Sections": 193,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 3,
+            "location": "Right",
+            "x": 216,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 6,
+            "location": "Bottom",
+            "x": 112,
+            "y": 216,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 9,
+            "location": "Left",
+            "x": 16,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 12,
+            "location": "Top",
+            "x": 112,
+            "y": 16,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1280,
+      "id": 251,
+      "Crystals": [
+         {
+            "Section": 17,
+            "x": 1360,
+            "y": 2656
+         }
+      ],
+      "KeyInRoom": 0,
+      "name": ""
+   },
+   {
+      "height": 256,
+      "rotation": 0,
+      "MasterKeyInRoom": 0,
+      "gid": 112,
+      "y": 2560,
+      "Sections": 194,
+      "visible": 1,
+      "width": 256,
+      "Doors": [
+         {
+            "LocationIndex": 3,
+            "location": "Right",
+            "x": 216,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 6,
+            "location": "Bottom",
+            "x": 112,
+            "y": 216,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 9,
+            "location": "Left",
+            "x": 16,
+            "y": 112,
+            "level": "Upper",
+            "status": 0
+         },
+         {
+            "LocationIndex": 12,
+            "location": "Top",
+            "x": 112,
+            "y": 16,
+            "level": "Upper",
+            "status": 0
+         }
+      ],
+      "RoomSize": "1x1",
+      "type": "",
+      "x": 1536,
+      "id": 252,
+      "Crystals": [],
+      "KeyInRoom": 0,
+      "name": ""
+   }
+]

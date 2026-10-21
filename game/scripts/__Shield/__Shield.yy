@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Shield",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Shield",
+  "parent":{
+    "name":"Shield",
+    "path":"folders/Objects/Characters/Link/Shield.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

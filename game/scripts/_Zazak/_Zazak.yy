@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"_Zazak",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"_Zazak",
+  "parent":{
+    "name":"Zazak",
+    "path":"folders/Objects/Characters/Enemies/Zazak.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
