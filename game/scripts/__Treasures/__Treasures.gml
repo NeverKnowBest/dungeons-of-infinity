@@ -1,11 +1,13 @@
+// Feather disable GM2064
 
 
 function Treasure_Create(_RoomIndex, _x, _y, Contents, AddWall, Floor = true, _InSection = false, _From = ItemFrom.Treasure, _ContentsFrom = ItemFrom.Treasure){
 	
 	var FloorLevelStr = GetFloorLevelString(_x, _y);
 	var FloorLevelID = GetFloorLevelID(FloorLevelStr);
-	if(Floor) var Layer = "ObjsFloor_" + FloorLevelStr;
-	else var Layer = "Objs_" + FloorLevelStr;
+	var Layer;
+	if(Floor) Layer = "ObjsFloor_" + FloorLevelStr;
+	else Layer = "Objs_" + FloorLevelStr;
 	var TreasureInst = instance_create_layer(_x + 8, _y + 16, Layer , oItem_Treasure, {From : _From, ContentsFrom : _ContentsFrom});
 	
 	TreasureInst.ContentsObj = Contents;
@@ -41,17 +43,18 @@ function Treasure_Create(_RoomIndex, _x, _y, Contents, AddWall, Floor = true, _I
 
 function Treasure_Open(Inst){
 	
+	var _DoCurse;
 	switch(global.ChallengeOptions[ChallengeOption.Curses]){
 		default: //0 and 1
-			var _DoCurse = Prob(Chance_Curse) && !FromAnyKinstone(Inst.ContentsFrom) && global.Level.Index != DungeonLevel.Castle && global.Level.Index != DungeonLevel.Village && global.Level.Index != DungeonLevel.Mines;
+			_DoCurse = Prob(Chance_Curse) && !FromAnyKinstone(Inst.ContentsFrom) && global.Level.Index != DungeonLevel.Castle && global.Level.Index != DungeonLevel.Village && global.Level.Index != DungeonLevel.Mines;
 			break;
 		
 		case 2: 
-			var _DoCurse = Prob(Chance_Curse) && !FromAnyKinstone(Inst.ContentsFrom);
+			_DoCurse = Prob(Chance_Curse) && !FromAnyKinstone(Inst.ContentsFrom);
 			break;
 		
 		case 3:
-			var _DoCurse = Prob(Chance_Curse);
+			_DoCurse = Prob(Chance_Curse);
 			break;			
 	}
 

@@ -30,25 +30,20 @@ function Bombs_PickAmount(_From){
 		case ItemFrom.EnemySmall:
 		case ItemFrom.Pot:
 			return choose(1,1,1,1,1,2);
-			break;
 			
 		case ItemFrom.EnemyMedium:
 			return choose(1, 1, 1, 2);
-			break;
 			
 		case ItemFrom.EnemyLarge:
 			return choose(1, 1, 2, 3);
-			break;
 			
 		case ItemFrom.Treasure:
 		case ItemFrom.KinstoneGreen:
 			return choose(3,3,4,5,6,8);
-			break;
 		
 		case ItemFrom.Shop:
 		case ItemFrom.WeaponStore:
 			return choose(3,4,5,6,8,10);
-			break;		
 							
 	}	
 	

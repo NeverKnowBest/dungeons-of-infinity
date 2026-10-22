@@ -1,3 +1,4 @@
+// Feather disable GM2064
 enum SpecialDungeonObj{
 	None,
 	Key,
@@ -148,6 +149,7 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 		global.SpawnedMonument = SpawnMonuments(_RoomIndex, false, Room.UnusedZone);
 	}	
 	
+	var _ObjType;
 	switch(Room.SpecialObject){
 		
 		case SpecialDungeonObj.Key:
@@ -275,11 +277,11 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 						
 						switch(Room.SpecialObject){
 							case SpecialDungeonObj.Crystal:
-								var _ObjType = Switch_HiddenObjType.Crystal;
+								_ObjType = Switch_HiddenObjType.Crystal;
 								break;
 							
 							case SpecialDungeonObj.Warp:
-								var _ObjType = Switch_HiddenObjType.Warp;
+								_ObjType = Switch_HiddenObjType.Warp;
 								break;
 							
 						}
@@ -525,9 +527,9 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 	//Destroy any rolling spikes, moving spikes, or guru bars in single rooms with only 1 door when no other enemies have been generated
 	if(!global.SpawnedEnemies){
 		if(Room.SizeIndex == RoomSize._1x1 && Room.DoorCount == 1){
-			var _DestroyRollingSpikes = true;
-			var _DestroyGuruBars = true;
-			var _DestroyMovingSpikeBlocks = true;
+			_DestroyRollingSpikes = true;
+			_DestroyGuruBars = true;
+			_DestroyMovingSpikeBlocks = true;
 		}
 	}
 	
@@ -869,6 +871,7 @@ function SpawnSpikes(_RoomIndex){
 	}
 	
 	var SpikesInTemplate = array_length(Room.Template.Spikes);	
+	var TMID;
 	if(SpikesInTemplate == 0) return false
 
 
@@ -881,7 +884,7 @@ function SpawnSpikes(_RoomIndex){
 		var SpikeY2 = SpikeY + Spike.height - 1;
 		var SpikeTileW = Spike.width / 8;
 		var SpikeTileH = Spike.height / 8;
-		var TMID = GetFloorLevelTMID("Tiles_Floor", SpikeX, SpikeY);
+		TMID = GetFloorLevelTMID("Tiles_Floor", SpikeX, SpikeY);
 		var SpikeIsInSection = InSectionArea(_RoomIndex, SpikeX, SpikeY, Room.Section_ID, true);
 		
 		if(!ObstacleSpikes){
@@ -890,7 +893,7 @@ function SpawnSpikes(_RoomIndex){
 			
 			//check if on top of path carpets
 			if(global.SpawnedCarpets){
-				var TMID = GetFloorLevelTMID("Tiles_Floor", SpikeX, SpikeY);
+				TMID = GetFloorLevelTMID("Tiles_Floor", SpikeX, SpikeY);
 				if(CornersOnCarpet(TMID, SpikeX, SpikeY, SpikeX2, SpikeY2) > 0) continue;
 			}
 
@@ -958,6 +961,7 @@ function SpawnMonuments(_RoomIndex, InSection, UnusedZone, _ItemClass = -1, Forc
 	var SpawnedMonumentPositionsX = array_create(0);
 	var SpawnedMonumentPositionsY = array_create(0);
 			
+	var ObjAllowed, Pot1X, Pot2X;
 	for(var MonumentIndex = 0; MonumentIndex < Monuments; MonumentIndex++){
 
 		var Monument = MonumentsArray[MonumentsList[| MonumentIndex]];
@@ -1025,12 +1029,12 @@ function SpawnMonuments(_RoomIndex, InSection, UnusedZone, _ItemClass = -1, Forc
 		
 		if(SpawnArrowTarget){
 			
-			var ObjAllowed = false;
+			ObjAllowed = false;
 			
 		}else{
 			
 			//Bottom
-			var ObjAllowed = true;
+			ObjAllowed = true;
 			if(collision_rectangle(MonumentX, MonumentY2 + 1, MonumentX2, MonumentY2 + 32, oWall, false, true)){
 				ObjAllowed = false;
 			}
@@ -1164,11 +1168,11 @@ function SpawnMonuments(_RoomIndex, InSection, UnusedZone, _ItemClass = -1, Forc
 				}else if(BonusPots){				
 					
 					if(Prob(0.5)){ //switch up pot location since if switch, first one created will have the switch
-						var Pot1X = MonumentX;
-						var Pot2X = MonumentX + 16;
+						Pot1X = MonumentX;
+						Pot2X = MonumentX + 16;
 					}else{
-						var Pot1X = MonumentX + 16;
-						var Pot2X = MonumentX;						
+						Pot1X = MonumentX + 16;
+						Pot2X = MonumentX;						
 					}
 						
 					var PotsY = MonumentY2 + 1;
@@ -1246,8 +1250,9 @@ function SpawnAltar(_RoomIndex, InSection, UnusedZone, TreasureContents){
 	ClearTileBlock(global.TMID_Water_Lower, AltarX, AltarY, AltarTileW, AltarTileH);
 	
 	//Draw floor
-	for(var _y = 0; _y < AltarTileH; _y++){
-		for(var _x = 0; _x < AltarTileW; _x++){
+	var _x, _y;
+	for(_y = 0; _y < AltarTileH; _y++){
+		for(_x = 0; _x < AltarTileW; _x++){
 			var FloorX = AltarX + (_x * 8);
 			var FloorY = AltarY + (_y * 8);
 			DrawTileBlock(FloorTMID, FloorX, FloorY, 111, LevelTilesY + 2, 1, 1);							
@@ -1270,19 +1275,20 @@ function SpawnAltar(_RoomIndex, InSection, UnusedZone, TreasureContents){
 	WallInst.BlockItems = false;
 	
 	//Draw L/R sides
+	var SideXR;
 	for(_y = 0; _y < AltarTileH - 2; _y++){
 
-			var SideXR = AltarX + AltarW - 8;
+			SideXR = AltarX + AltarW - 8;
 			var SideY = AltarY + 8 + (_y * 8);
 			
 			DrawTileBlock(WallTMID, AltarX, SideY, 110, LevelTilesY + 2, 1, 1);
 			DrawTileBlock(WallTMID, SideXR, SideY, 112, LevelTilesY + 2, 1, 1);
 						
 	}
-	var WallInst = WallObj_Create("Objs_" + FloorLevelStr, AltarX, AltarY, 1, AltarTileH);
+	WallInst = WallObj_Create("Objs_" + FloorLevelStr, AltarX, AltarY, 1, AltarTileH);
 	WallInst.BlockProjectiles = false;
 	WallInst.BlockItems = false;
-	var WallInst = WallObj_Create("Objs_" + FloorLevelStr, SideXR, AltarY, 1, AltarTileH);
+	WallInst = WallObj_Create("Objs_" + FloorLevelStr, SideXR, AltarY, 1, AltarTileH);
 	WallInst.BlockProjectiles = false;
 	WallInst.BlockItems = false;
 	
@@ -1290,8 +1296,8 @@ function SpawnAltar(_RoomIndex, InSection, UnusedZone, TreasureContents){
 	var StairsW = AltarTileW - 6;
 	var StairsX = AltarX + (4 * (AltarTileW - StairsW));
 	var StairsY = AltarY + AltarH - 16;
-	for(var _y = 0; _y < 2; _y++){
-		for(var _x = 0; _x < StairsW; _x++){
+	for(_y = 0; _y < 2; _y++){
+		for(_x = 0; _x < StairsW; _x++){
 			var SX = StairsX + (_x * 8);
 			var SY = StairsY + (_y * 8);
 			DrawTileBlock(FloorTMID, SX, SY, 111, LevelTilesY, 1, 1);
@@ -1313,24 +1319,24 @@ function SpawnAltar(_RoomIndex, InSection, UnusedZone, TreasureContents){
 	DrawTileBlock(WallTMID, StairsX + (StairsW * 8), StairsY, 110, LevelTilesY, 1, 1); //TR
 	DrawTileBlock(WallTMID, StairsX - 8, StairsY + 8, 112, LevelTilesY + 3, 1, 1); //BL
 	DrawTileBlock(WallTMID, StairsX + (StairsW * 8), StairsY + 8, 110, LevelTilesY + 3, 1, 1); //TR
-	var WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX - 8, StairsY, 1, 2);
+	WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX - 8, StairsY, 1, 2);
 	WallInst.BlockProjectiles = false;
 	WallInst.BlockItems = false;
-	var WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX + (StairsW * 8), StairsY, 1, 2);
+	WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX + (StairsW * 8), StairsY, 1, 2);
 	WallInst.BlockProjectiles = false;
 	WallInst.BlockItems = false;
 	
 	//Draw Bottom Sides
 	var SideLen = (AltarTileW - StairsW - 4) / 2;
 		
-	for(var _x = 0; _x < SideLen; _x++){
+	for(_x = 0; _x < SideLen; _x++){
 		DrawTileBlock(WallTMID, AltarX + 8 + (_x * 8), StairsY + 8, 111, LevelTilesY + 3, 1, 1); 
 		DrawTileBlock(WallTMID, StairsX + (StairsW * 8) + 8 + (_x * 8), StairsY + 8, 111, LevelTilesY + 3, 1, 1); 
 	}
-	var WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX - 16, StairsY + 8, 2, 1);
+	WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX - 16, StairsY + 8, 2, 1);
 	WallInst.BlockProjectiles = false;
 	WallInst.BlockItems = false;
-	var WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX + (StairsW * 8), StairsY + 8, 2, 1);
+	WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX + (StairsW * 8), StairsY + 8, 2, 1);
 	WallInst.BlockProjectiles = false;
 	WallInst.BlockItems = false;
 	
@@ -1598,11 +1604,11 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 	var _RoomSizeFactor = 1;
 	switch(Room.TemplateClass){
 		case RoomTemplateClass.Main_Lower:
-			var _RoomSizeFactor = 0.7;
+			_RoomSizeFactor = 0.7;
 			break;
 			
 		case RoomTemplateClass.Stairs:
-			var _RoomSizeFactor = 0.5;
+			_RoomSizeFactor = 0.5;
 			break;
 
 	}
@@ -1636,9 +1642,10 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 	//list of all possible enemies
 	var EnemyList = ds_list_create();
 	
+	var EnemyTypes;
 	for(var Pass = 0; Pass < 2; Pass++){
 		
-		var EnemyTypes = 0;
+		EnemyTypes = 0;
 		
 		for(var _ObjIndex = 0; _ObjIndex < array_length(global.EnemyData); _ObjIndex++){
 		
@@ -1765,15 +1772,16 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 	
 	if(EnemyTrap) TotalPackPoints = ceil(TotalPackPoints * 1.2);
 	
+	var EnemyIndex, WallCollisionInst, DistToWall, DistToDoor, _ItemHolding;
 	while(TotalPackPoints > 0 && ds_list_size(EnemyChoiceList) > 0){
 
 		var PackPoints = 0;
 		if(WallTypeEnemy != -1){
-			var EnemyIndex = WallTypeEnemy;
+			EnemyIndex = WallTypeEnemy;
 			
 		}else{
 			ds_list_shuffle(EnemyChoiceList);
-			var EnemyIndex = EnemyChoiceList[| 0];
+			EnemyIndex = EnemyChoiceList[| 0];
 			PackPoints = global.EnemyData[EnemyIndex].PackPoints;
 			
 			switch(EnemyIndex){
@@ -1877,7 +1885,7 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 				if(UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, _UsedSpaceType, EnemyIsInSection)) continue;
 			}
 
-			var _ItemHolding = -1;
+			_ItemHolding = -1;
 			var CanHoldSpecialItem = global.EnemyData[EnemyIndex].SpecialItem == 0 ? false : true;
 			var CanHoldBonusItem = global.EnemyData[EnemyIndex].Item == 0 ? false : true;
 		
@@ -1900,9 +1908,9 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 			if(CheckForObjs){
 				
 				with(EnemyInst){
-					var WallCollisionInst = ObjCollision(x, y, oWall, FloorLevel);
-					var DistToWall = distance_to_object(oWall); 
-					var DistToDoor = distance_to_object(oDoor);
+					WallCollisionInst = ObjCollision(x, y, oWall, FloorLevel);
+					DistToWall = distance_to_object(oWall); 
+					DistToDoor = distance_to_object(oDoor);
 				}
 
 				if(WallCollisionInst == noone && DistToWall >= MinDistFromWall && DistToDoor >= 32){ 
@@ -1999,31 +2007,32 @@ function SpawnRollingSpikes(_RoomIndex){
 	
 	var PathWallList = ds_list_create();
 	
+	var tries, _PathAreaX1, _PathAreaY1, _PathAreaX2, _PathAreaY2, RollingSpikeX, RollingSpikeY, RollingSpike, RollingSpikeIsInSection;
 	for(var RollingSpikeIndex = 0; RollingSpikeIndex < RollingSpikesInTemplate; RollingSpikeIndex++){
 		
-		var RollingSpike = RollingSpikeArray[RollingSpikeList[| RollingSpikeIndex]];
+		RollingSpike = RollingSpikeArray[RollingSpikeList[| RollingSpikeIndex]];
 
-		var RollingSpikeX = Room.x + RollingSpike.x;
-		var RollingSpikeY = Room.y + RollingSpike.y;
+		RollingSpikeX = Room.x + RollingSpike.x;
+		RollingSpikeY = Room.y + RollingSpike.y;
 		
-		var RollingSpikeIsInSection = InSectionArea(_RoomIndex, RollingSpikeX, RollingSpikeY, Room.Section_ID, true);
+		RollingSpikeIsInSection = InSectionArea(_RoomIndex, RollingSpikeX, RollingSpikeY, Room.Section_ID, true);
 		
 		//determine path area
 		switch(RollingSpike.gid){
 			case TemplateObjGID.RollingSpikesH:	
 				
 				//determine full path and add that space to UsedSpaceArea
-				var _PathAreaX1 = RollingSpikeX;
-				var _PathAreaY1 = RollingSpikeY;
-				var _PathAreaX2 = _PathAreaX1 + 15;
-				var _PathAreaY2 = _PathAreaY1 + RollingSpike.height - 1;		
+				_PathAreaX1 = RollingSpikeX;
+				_PathAreaY1 = RollingSpikeY;
+				_PathAreaX2 = _PathAreaX1 + 15;
+				_PathAreaY2 = _PathAreaY1 + RollingSpike.height - 1;		
 				
-				var tries = 60;
+				tries = 60;
 				while(--tries > 0){
 					if(collision_rectangle_list(_PathAreaX1 - 8, _PathAreaY1, _PathAreaX1, _PathAreaY2, oWall, false, true, PathWallList, false) > 0) break;
 					_PathAreaX1 -= 8;
 				}
-				var tries = 60;
+				tries = 60;
 				while(--tries > 0){
 					if(collision_rectangle_list(_PathAreaX2, _PathAreaY1, _PathAreaX2 + 8, _PathAreaY2, oWall, false, true, PathWallList, false) > 0) break;
 					_PathAreaX2 += 8;
@@ -2034,17 +2043,17 @@ function SpawnRollingSpikes(_RoomIndex){
 			case TemplateObjGID.RollingSpikesV:	
 
 				//determine full path and add that space to UsedSpaceArea
-				var _PathAreaX1 = RollingSpikeX;
-				var _PathAreaY1 = RollingSpikeY;
-				var _PathAreaX2 = _PathAreaX1 + RollingSpike.width - 1;
-				var _PathAreaY2 = _PathAreaY1 + 15;	
+				_PathAreaX1 = RollingSpikeX;
+				_PathAreaY1 = RollingSpikeY;
+				_PathAreaX2 = _PathAreaX1 + RollingSpike.width - 1;
+				_PathAreaY2 = _PathAreaY1 + 15;	
 				
-				var tries = 60;
+				tries = 60;
 				while(--tries > 0){
 					if(collision_rectangle_list(_PathAreaX1, _PathAreaY1 - 8, _PathAreaX2, _PathAreaY1, oWall, false, true, PathWallList, false) > 0) break;
 					_PathAreaY1 -= 8;
 				}
-				var tries = 60;
+				tries = 60;
 				while(--tries > 0){
 					if(collision_rectangle_list(_PathAreaX1, _PathAreaY2, _PathAreaX2, _PathAreaY2 + 8, oWall, false, true, PathWallList, false) > 0) break;
 					_PathAreaY2 += 8;
@@ -2247,13 +2256,14 @@ function SpawnPots(_RoomIndex, InSection, _ItemClass){
 	var Pots_Min = (Room.SizeIndex == RoomSize._1x1 ? 1 : 2);
 	var Pots_Max = (Room.SizeIndex == RoomSize._1x1 ? 3 : 4);
 	
+	var SpawnedPot;
 	for(var ListIndex = 0; ListIndex < irandom_range(Pots_Min, Pots_Max); ListIndex++){
 		
 		
 		switch(_ItemClass){
 			
 			case ItemClass.Key:
-				var SpawnedPot = SpawnObj(_RoomIndex, SpecialObj.Pot, InSection, -1, _ItemClass);
+				SpawnedPot = SpawnObj(_RoomIndex, SpecialObj.Pot, InSection, -1, _ItemClass);
 				if(SpawnedPot){
 					_ItemClass = -1;
 				}
@@ -2261,14 +2271,14 @@ function SpawnPots(_RoomIndex, InSection, _ItemClass){
 				
 			case -1: //any item
 				var _InSection = FlipCoin_Bool();
-				var SpawnedPot = SpawnObj(_RoomIndex, SpecialObj.Pot, _InSection, -1, RandomItem);	
+				SpawnedPot = SpawnObj(_RoomIndex, SpecialObj.Pot, _InSection, -1, RandomItem);	
 				if(!SpawnedPot){ //if pot wasn't spawned, try other section
-					var SpawnedPot = SpawnObj(_RoomIndex, SpecialObj.Pot, !_InSection, -1, RandomItem);
+					SpawnedPot = SpawnObj(_RoomIndex, SpecialObj.Pot, !_InSection, -1, RandomItem);
 				}
 				break;
 				
 			case -2: //floor switch, so make sure pot is spawned in section without an item
-				var SpawnedPot = SpawnObj(_RoomIndex, SpecialObj.Pot, InSection, -1, -1);	
+				SpawnedPot = SpawnObj(_RoomIndex, SpecialObj.Pot, InSection, -1, -1);	
 				break;
 		}
 
@@ -2294,6 +2304,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 		ds_list_shuffle(_TemplateTypeOrder);
 	}
 	
+	var HiddenInstPointX, HiddenInstPointY, SpawnItem, ObjX, _PosX, _PosY, TreasureItems, FloorLevelStr, _TorchLit, ObjInst;
 	for(var _TemplateTypeIndex = 0; _TemplateTypeIndex < _TemplateTypes; _TemplateTypeIndex++){
 		
 		var _TemplateType = global.SpecialObjTemplateType[SpecialObjType][_TemplateTypeOrder[| _TemplateTypeIndex]];
@@ -2351,7 +2362,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 			ObjH = xywhList[| 3];
 			ds_list_destroy(xywhList);
 			
-			var ObjX = ObjX1;
+			ObjX = ObjX1;
 			var ObjY = ObjY1;		
 			var ObjX2 = ObjX1 + ObjW - 1;
 			var ObjY2 = ObjY1 + ObjH - 1;
@@ -2370,7 +2381,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					
 			if(CheckDoorsLeft || CheckDoorsRight || CheckDoorsUp || CheckDoorsDown) continue;						
 			
-			var SpawnItem = false;
+			SpawnItem = false;
 			
 			var _UsedSpaceX1 = ObjX1;
 			var _UsedSpaceY1 = ObjY1;
@@ -2388,12 +2399,12 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 						//set the centre point for distance check, different obj indexes have different mask coordinates
 						switch(Room.Switch.HiddenObjInst.object_index){
 							default:
-								var HiddenInstPointX = Room.Switch.HiddenObjInst.x;
-								var HiddenInstPointY = Room.Switch.HiddenObjInst.y - 8;
+								HiddenInstPointX = Room.Switch.HiddenObjInst.x;
+								HiddenInstPointY = Room.Switch.HiddenObjInst.y - 8;
 								break;
 							case oWarp:
-								var HiddenInstPointX = Room.Switch.HiddenObjInst.x + 8;
-								var HiddenInstPointY = Room.Switch.HiddenObjInst.y + 8;
+								HiddenInstPointX = Room.Switch.HiddenObjInst.x + 8;
+								HiddenInstPointY = Room.Switch.HiddenObjInst.y + 8;
 								break;								
 						}
 						if(point_distance(ObjX + (ObjW / 2), ObjY + (ObjH / 2), HiddenInstPointX, HiddenInstPointY) < 48){
@@ -2401,7 +2412,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 						}						
 					}
 					
-					var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection); 
+					SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection); 
 							
 					break;
 				
@@ -2409,7 +2420,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					
 					_UsedSpaceY2 += 16;
 					
-					var TreasureItems = 1;
+					TreasureItems = 1;
 					if(_TemplateType == "PotTreasures"){
 						
 						//If there's a switch being added, this is the treasure being created.
@@ -2419,12 +2430,12 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 
 						while(TreasureItems > 0){
 							var ItemsW = TreasureItems * 16;
-							var ObjX = ObjX1 + ((ObjW - ItemsW) / 2);
+							ObjX = ObjX1 + ((ObjW - ItemsW) / 2);
 							_UsedSpaceX1 = ObjX - 16;
 							_UsedSpaceX2 = ObjX + ItemsW + 15;
 							
 							
-							var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
+							SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
 							if(SpawnItem)
 								break;
 							else
@@ -2439,11 +2450,11 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 							_UsedSpaceY1 = ObjY1 - 16;
 							_UsedSpaceX2 = ObjX2 + 16;
 							_UsedSpaceY2 = ObjY2 + 16;
-							var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
+							SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
 						}else{
 							_UsedSpaceX1 -= 16;
 							_UsedSpaceX2 += 16;
-							var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection) && !collision_rectangle(_UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, oWall, false, true);
+							SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection) && !collision_rectangle(_UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, oWall, false, true);
 						}						
 						
 					}
@@ -2451,7 +2462,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 				
 				case SpecialObj.Torch:
 					
-					var _TorchLit = false;
+					_TorchLit = false;
 					
 					//make sure torches aren't too close to other torches
 					var _TorchOk = true;
@@ -2478,7 +2489,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 							_UsedSpaceY2 = ObjY2 + 16;
 						}
 						
-						var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);						
+						SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);						
 					}
 					break;
 					
@@ -2488,7 +2499,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					_UsedSpaceY1 = ObjY1 - 16;
 					_UsedSpaceX2 = ObjX2 + 16;
 					_UsedSpaceY2 = ObjY2 + 16;
-					var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
+					SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
 					break;
 
 				case SpecialObj.Star:				
@@ -2496,7 +2507,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					_UsedSpaceY1 = ObjY1 - 16;
 					_UsedSpaceX2 = ObjX2 + 16;
 					_UsedSpaceY2 = ObjY2 + 16;
-					var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.IgnoreEnemy, _ObjInSection);
+					SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.IgnoreEnemy, _ObjInSection);
 					break;
 
 				case SpecialObj.WarpDest:
@@ -2504,7 +2515,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					_UsedSpaceY1 = ObjY1 - 24;
 					_UsedSpaceX2 = ObjX2 + 24;
 					_UsedSpaceY2 = ObjY2 + 24;
-					var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);					
+					SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);					
 					break;
 					
 				case SpecialObj.DeadGuy:
@@ -2516,7 +2527,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					if(collision_rectangle(ObjX1, ObjY2, ObjX2, ObjY2 + 32, oWall, false, true)) break;
 					
 					//HeartGuy would be sitting in the middle of the PotTreasure Combo
-					var ObjX = ObjX1 + (ObjW / 2) - 8; //ObjW is the width of the PotTreasure
+					ObjX = ObjX1 + (ObjW / 2) - 8; //ObjW is the width of the PotTreasure
 					ObjW = 26;
 						
 					_UsedSpaceX1 = ObjX;
@@ -2524,7 +2535,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					_UsedSpaceX2 = ObjX + ObjW - 1;
 					_UsedSpaceY2 = ObjY2 + 16;
 					
-					var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
+					SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
 					
 					break;
 					
@@ -2533,7 +2544,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					if(collision_rectangle(ObjX1, ObjY2, ObjX2, ObjY2 + 32, oWall, false, true)) break;
 
 					//HeartGuy would be sitting in the middle of the PotTreasure Combo
-					var ObjX = ObjX1 + (ObjW / 2) - 8; //ObjW is the width of the PotTreasure
+					ObjX = ObjX1 + (ObjW / 2) - 8; //ObjW is the width of the PotTreasure
 					ObjW = 16; //Set it to the new ObjW of 16, width of HeartGuy
 						
 					_UsedSpaceX1 = ObjX;
@@ -2541,7 +2552,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					_UsedSpaceX2 = ObjX + ObjW - 1;
 					_UsedSpaceY2 = ObjY2 + 16;
 					
-					var SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
+					SpawnItem = !UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, _ObjInSection);
 					break;
 
 			}
@@ -2550,7 +2561,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 			if(SpawnItem){
 				
 				var FloorLevel = GetFloorLevelID(ObjX, ObjY)
-				var FloorLevelStr = GetFloorLevelString(FloorLevel);
+				FloorLevelStr = GetFloorLevelString(FloorLevel);
 				
 				var _UsedSpaceType = UsedSpaceType.Obj;
 				
@@ -2616,18 +2627,18 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 									case "R":
 									case "D":
 									case "Full":
-										var _PosX = ObjX + (_PotX * 16);
-										var _PosY = ObjY + (_PotY * 16);
+										_PosX = ObjX + (_PotX * 16);
+										_PosY = ObjY + (_PotY * 16);
 										break;
 										
 									case "L":
 									case "U":
-										var _PosX = ObjX + ObjW - 16 - (_PotX * 16);
-										var _PosY = ObjY + ObjH - 16 - (_PotY * 16);
+										_PosX = ObjX + ObjW - 16 - (_PotX * 16);
+										_PosY = ObjY + ObjH - 16 - (_PotY * 16);
 										break;
 								}
 								
-								var ObjInst = Pot_Create(_RoomIndex, _PosX, _PosY, _ObjContents, InSection);	
+								ObjInst = Pot_Create(_RoomIndex, _PosX, _PosY, _ObjContents, InSection);	
 								
 								ObjContents = RandomItem;								
 								
@@ -2661,16 +2672,16 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 							SpawnTreasureRow(_RoomIndex, ObjX, ObjY, InSection, ObjContents, TreasureItems);
 						}else{
 							if(_LooseKey){
-								var FloorLevelStr = GetFloorLevelString(ObjX, ObjY);
+								FloorLevelStr = GetFloorLevelString(ObjX, ObjY);
 								instance_create_layer(ObjX + 8, ObjY + 16, "Objs_" + FloorLevelStr, oItem_Key);
 							}else{
-								var ObjInst = Treasure_Create(_RoomIndex, ObjX, ObjY, ObjContents, true, ,InSection);
+								ObjInst = Treasure_Create(_RoomIndex, ObjX, ObjY, ObjContents, true, ,InSection);
 							}
 						}
 						break;
 								
 					case SpecialObj.Crystal:
-						var ObjInst = Crystal_Create(_RoomIndex, ObjX, ObjY);
+						ObjInst = Crystal_Create(_RoomIndex, ObjX, ObjY);
 						break;
 					
 					case SpecialObj.HeartGuy:
@@ -2699,7 +2710,7 @@ function SpawnObj(_RoomIndex, SpecialObjType, InSection, UnusedZone, ObjContents
 					
 					case SpecialObj.Warp:
 
-						var ObjInst = Warp_Create(_RoomIndex, ObjX, ObjY, FloorLevel);
+						ObjInst = Warp_Create(_RoomIndex, ObjX, ObjY, FloorLevel);
 						break;
 						
 					case SpecialObj.WarpDest:
@@ -2772,6 +2783,7 @@ function SpawnTreasureRow(_RoomIndex, X, Y, InSection, MainItemClass, Items){
 	PotContents1 = Probs_RandomItemClass_Pot(true);
 	PotContents2 = Probs_RandomItemClass_Pot(true);
 	
+	var TreasureInst;
 	for(var StrIndex = 0; StrIndex < Items; StrIndex++){
 		var ItemCode = string_copy(Pattern, StrIndex + 1, 1);
 		var ItemX = X + (StrIndex * 16);
@@ -2782,11 +2794,11 @@ function SpawnTreasureRow(_RoomIndex, X, Y, InSection, MainItemClass, Items){
 		switch(ItemCode){
 				
 			case "*": //Main treasure
-				var TreasureInst = Treasure_Create(_RoomIndex, ItemX, Y, MainItemClass, true, , InSection);
+				TreasureInst = Treasure_Create(_RoomIndex, ItemX, Y, MainItemClass, true, , InSection);
 				break;
 
 			case "t": //bonus treasure
-				var TreasureInst = Treasure_Create(_RoomIndex, ItemX, Y, RandomItem, true, , InSection);
+				TreasureInst = Treasure_Create(_RoomIndex, ItemX, Y, RandomItem, true, , InSection);
 				break;
 				
 			case "p": //pot 1
@@ -2834,18 +2846,19 @@ function SpawnKinstone(_RoomIndex, UnusedZone){
 
 	var _RodCharger = !global.Level.RodCharger ? Prob(Chance_SpawnRodCharger) : false;
 	
+	var KinstoneOK, KinstoneX, KinstoneY, Kinstone, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, KinstoneInSection;
 	for(var KinstoneIndex = 0; KinstoneIndex < ds_list_size(KinstoneIndexList); KinstoneIndex++){
 		
-		var KinstoneOK = true;
+		KinstoneOK = true;
 		
-		var Kinstone = KinstoneArray[KinstoneIndexList[| KinstoneIndex]];
+		Kinstone = KinstoneArray[KinstoneIndexList[| KinstoneIndex]];
 		
-		var KinstoneX = Room.x + Kinstone.x;
-		var KinstoneY = Room.y + Kinstone.y;
+		KinstoneX = Room.x + Kinstone.x;
+		KinstoneY = Room.y + Kinstone.y;
 		var KinstoneX2 = KinstoneX + 31;
 		var KinstoneY2 = KinstoneY + 31;
 		
-		var KinstoneInSection = InSectionArea(_RoomIndex, KinstoneX, KinstoneY, Room.Section_ID, true);
+		KinstoneInSection = InSectionArea(_RoomIndex, KinstoneX, KinstoneY, Room.Section_ID, true);
 		
 		//Apply transformations if any
 		var xywhList = ds_list_create();
@@ -2897,10 +2910,10 @@ function SpawnKinstone(_RoomIndex, UnusedZone){
 			continue;
 		}
 			
-		var _UsedSpaceX1 = KinstoneX - 16;
-		var _UsedSpaceY1 = KinstoneY - 16;
-		var _UsedSpaceX2 = KinstoneX2 + 16;
-		var _UsedSpaceY2 = KinstoneY2 + (_RodCharger ? 16 : 32); //extra space for the treasures below, no need ofr that space if it's a rod charger
+		_UsedSpaceX1 = KinstoneX - 16;
+		_UsedSpaceY1 = KinstoneY - 16;
+		_UsedSpaceX2 = KinstoneX2 + 16;
+		_UsedSpaceY2 = KinstoneY2 + (_RodCharger ? 16 : 32); //extra space for the treasures below, no need ofr that space if it's a rod charger
 		
 		if(UsedSpaceConflict(_RoomIndex, _UsedSpaceX1, _UsedSpaceY1, _UsedSpaceX2, _UsedSpaceY2, UsedSpaceType.Obj, KinstoneInSection)){
 			KinstoneOK = false;
@@ -2912,6 +2925,7 @@ function SpawnKinstone(_RoomIndex, UnusedZone){
 	}
 		
 
+	var inst;
 	if(KinstoneOK){
 					
 		//Apply transformations if any
@@ -2938,11 +2952,11 @@ function SpawnKinstone(_RoomIndex, UnusedZone){
 		WallInst.BlockLink = false;
 		
 		if(_RodCharger){
-			var inst = instance_create_layer(KinstoneX + 16, KinstoneY + 14, "ObjsHigher_" + FloorLevelStr, oRodCharger, {RoomIndex : _RoomIndex});
+			inst = instance_create_layer(KinstoneX + 16, KinstoneY + 14, "ObjsHigher_" + FloorLevelStr, oRodCharger, {RoomIndex : _RoomIndex});
 			SignCreate(KinstoneX + 16, KinstoneY + 32, global.RodChargerSignText, true);
 			global.Level.RodCharger = true;
 		}else{
-			var inst = instance_create_layer(KinstoneX + 16, KinstoneY + 14, "ObjsHigher_" + FloorLevelStr, oItem_Kinstone_Main, {Index : Kinstone_PickIndex(), RoomIndex : _RoomIndex});
+			inst = instance_create_layer(KinstoneX + 16, KinstoneY + 14, "ObjsHigher_" + FloorLevelStr, oItem_Kinstone_Main, {Index : Kinstone_PickIndex(), RoomIndex : _RoomIndex});
 			SignCreate(KinstoneX + 16, KinstoneY + 32, global.KinstoneSignText, true);
 		}
 
@@ -2977,6 +2991,7 @@ function SpawnJail(_RoomIndex, UnusedZoneIndex){
 	var JailIndexList = ds_list_create_sequence_shuffled(0, Jails - 1);
 	
 	var JailOK = false;
+	var DoorCount;
 	for(var JailIndex = 0; JailIndex < Jails; JailIndex++){
 		
 		//if(Prob(0.65)) continue;
@@ -3020,9 +3035,9 @@ function SpawnJail(_RoomIndex, UnusedZoneIndex){
 			var _x1 = Room.x + 16;
 			var _y1 = Room.y + 16;
 			var _x2 = _x1 + Room.width - 17;
-			var DoorCount = collision_rectangle_list(_x1, _y1, _x2, JailY, oDoor, false, true, DoorList, false);
+			DoorCount = collision_rectangle_list(_x1, _y1, _x2, JailY, oDoor, false, true, DoorList, false);
 		}else{
-			var DoorCount = collision_rectangle_list(JailX, Room.y + 16, JailX2, JailY, oDoor, false, true, DoorList, false);
+			DoorCount = collision_rectangle_list(JailX, Room.y + 16, JailX2, JailY, oDoor, false, true, DoorList, false);
 		}
 		
 		if(DoorCount == 1 && Room.Section_ID == 0){ //only allow locked jails with key block that have only 1 door above. Otherwise it might block the path to other doors
@@ -3085,6 +3100,7 @@ function PlatformVerify(_RoomIndex, InSection, UnusedZone, MaxTileW = 14){
 			
 	var AltarValid = false;
 	
+	var Collisions, AltarX2, AltarX1, Option_StickLeft, Option_StickRight, AltarY2, AltarY1, AltarInSection;
 	for(var AltarListIndex = 0; AltarListIndex < AltarsInTemplate; AltarListIndex++){
 		
 		var AltarIndex = AltarsList[| AltarListIndex];
@@ -3092,10 +3108,10 @@ function PlatformVerify(_RoomIndex, InSection, UnusedZone, MaxTileW = 14){
 
 		if(Altar[$ "rotation"] != 0) continue;
 		
-		var AltarValid = false;
+		AltarValid = false;
 		
-		var AltarX1 = Room.x + Altar.x;
-		var AltarY1 = Room.y + Altar.y;
+		AltarX1 = Room.x + Altar.x;
+		AltarY1 = Room.y + Altar.y;
 		var AltarW = Altar.width;
 		var AltarH = Altar.height;
 		
@@ -3109,21 +3125,21 @@ function PlatformVerify(_RoomIndex, InSection, UnusedZone, MaxTileW = 14){
 		ds_list_destroy(xywhList);
 			
 			
-		var AltarX2 = AltarX1 + AltarW - 1;
-		var AltarY2 = AltarY1 + AltarH - 1;
+		AltarX2 = AltarX1 + AltarW - 1;
+		AltarY2 = AltarY1 + AltarH - 1;
 		
-		var AltarInSection = InSectionArea(_RoomIndex, AltarX1, AltarY1, Room.Section_ID, true);
+		AltarInSection = InSectionArea(_RoomIndex, AltarX1, AltarY1, Room.Section_ID, true);
 		if( (!InSection && AltarInSection) || (InSection && !AltarInSection) ) continue;
 
 
 		if(InUnusedZone(_RoomIndex, UnusedZone, Altar) == ObjInUnusedZone.Outside) continue;
 
 
-		var Option_StickLeft = true;
-		var Option_StickRight = true;
+		Option_StickLeft = true;
+		Option_StickRight = true;
 		
 		var DoorCollisionList = ds_list_create();
-		var Collisions = collision_rectangle_list(AltarX1 - 24, AltarY1, AltarX2 + 24, AltarY2, oDoor, false, true, DoorCollisionList, false);
+		Collisions = collision_rectangle_list(AltarX1 - 24, AltarY1, AltarX2 + 24, AltarY2, oDoor, false, true, DoorCollisionList, false);
 		
 		//Check Left and Right side doors first, shift the altar if collisions
 		for(var DoorIndex = 0; DoorIndex < Collisions; DoorIndex++){
@@ -3156,7 +3172,7 @@ function PlatformVerify(_RoomIndex, InSection, UnusedZone, MaxTileW = 14){
 		while(CheckDoorCollisions){
 			
 			ds_list_clear(DoorCollisionList);
-			var Collisions = collision_rectangle_list(AltarX1, AltarY1 - 24, AltarX2, AltarY2, oDoor, false, true, DoorCollisionList, false);
+			Collisions = collision_rectangle_list(AltarX1, AltarY1 - 24, AltarX2, AltarY2, oDoor, false, true, DoorCollisionList, false);
 			CheckDoorCollisions = false;
 			
 			for(var DoorIndex = 0; DoorIndex < Collisions; DoorIndex++){
@@ -3227,12 +3243,13 @@ function PlatformVerify(_RoomIndex, InSection, UnusedZone, MaxTileW = 14){
 	var NewAltarTileW = min(MaxTileW, irandom_range(4, AltarTileW / 2) * 2); //this creates widths that are multiples of 2, starting at 8 tiles wide
 	var NewAltarW = NewAltarTileW * 8;
 	
+	var AltarX;
 	if(Option_StickLeft && !Option_StickRight)
-		var AltarX = AltarX1;	
+		AltarX = AltarX1;	
 	else if(Option_StickRight && !Option_StickLeft)
-		var AltarX = AltarX2 - NewAltarW + 1;
+		AltarX = AltarX2 - NewAltarW + 1;
 	else
-		var AltarX = AltarX1 + ((AltarW - NewAltarW) / 2);
+		AltarX = AltarX1 + ((AltarW - NewAltarW) / 2);
 	
 	AltarW = NewAltarW;	
 	var AltarH = AltarY2 - AltarY1 + 1;

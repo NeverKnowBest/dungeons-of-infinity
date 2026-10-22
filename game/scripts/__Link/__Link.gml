@@ -1,3 +1,4 @@
+// Feather disable GM2064
 enum LinkState{
 	Idle,
 	Standing,
@@ -493,6 +494,7 @@ function UpdateState(NewState, var1 = undefined){
 	if(instance_exists(oRod_Cane)) instance_destroy(oRod_Cane);
 	if(instance_exists(oHookshot)) instance_destroy(oHookshot);
 	
+	var PowderInst, _FloorLevelStr, SwordInst;
 	switch(State){
 		
 		case LinkState.Standing:
@@ -509,8 +511,8 @@ function UpdateState(NewState, var1 = undefined){
 		
 		case LinkState.Sword:
 			
-			var _FloorLevelStr = GetFloorLevelString(FloorLevel);
-			var SwordInst = instance_create_layer(x, y, "Objs_" + _FloorLevelStr, oSword);
+			_FloorLevelStr = GetFloorLevelString(FloorLevel);
+			SwordInst = instance_create_layer(x, y, "Objs_" + _FloorLevelStr, oSword);
 			SwordInst.FloorLevel = FloorLevel;
 			audio_play_sound(global.SwordSound[global.Inventory.ItemData[ItemClass.Sword].Index], 1, false);
 			
@@ -564,19 +566,19 @@ function UpdateState(NewState, var1 = undefined){
 			var FloorLevelStr = GetFloorLevelString(FloorLevel);
 			switch(Facing){
 				case LEFT: 
-					var PowderInst = instance_create_layer(x - 12, y - 6, "ObjsHigher_" + FloorLevelStr, oPowder);
+					PowderInst = instance_create_layer(x - 12, y - 6, "ObjsHigher_" + FloorLevelStr, oPowder);
 					PowderInst.sprite_index = sPowder_Left;
 					break;
 				case RIGHT: 
-					var PowderInst = instance_create_layer(x + 12, y - 6, "ObjsHigher_" + FloorLevelStr, oPowder); 
+					PowderInst = instance_create_layer(x + 12, y - 6, "ObjsHigher_" + FloorLevelStr, oPowder); 
 					PowderInst.sprite_index = sPowder_Right;
 					break;
 				case UP: 
-					var PowderInst = instance_create_layer(x, y - 29, "ObjsHigher_" + FloorLevelStr, oPowder); 
+					PowderInst = instance_create_layer(x, y - 29, "ObjsHigher_" + FloorLevelStr, oPowder); 
 					PowderInst.sprite_index = sPowder_Up;
 					break;
 				case DOWN: 
-					var PowderInst = instance_create_layer(x, y + 2, "ObjsHigher_" + FloorLevelStr, oPowder); 
+					PowderInst = instance_create_layer(x, y + 2, "ObjsHigher_" + FloorLevelStr, oPowder); 
 					PowderInst.sprite_index = sPowder_Down;
 					break;
 			}
@@ -586,8 +588,8 @@ function UpdateState(NewState, var1 = undefined){
 
 			
 		case LinkState.Star:
-			var _FloorLevelStr = GetFloorLevelString(FloorLevel);
-			var SwordInst = instance_create_layer(x, y, "Objs_" + _FloorLevelStr, oSword);
+			_FloorLevelStr = GetFloorLevelString(FloorLevel);
+			SwordInst = instance_create_layer(x, y, "Objs_" + _FloorLevelStr, oSword);
 			SwordInst.FloorLevel = FloorLevel;
 			if(ItemHolding != noone){
 				LinkThrow();
@@ -964,6 +966,7 @@ function Facing_Check(){
 function CheckMoveAssist(){
 	
 	MoveAssistDir = NONE;
+	var WallInst, _Walls;
 	if(MoveAssist){ 
 		
 		MoveAssist = false;
@@ -983,8 +986,8 @@ function CheckMoveAssist(){
 					
 					//make sure to check collisions on all posible walls at point, and only pass the ones that are on the correct floor level
 					//===============Put this in seperate function, it is repeated 4 times==============================
-					var WallInst = noone;
-					var _Walls = instance_position_list(x, Position1[i], oWall, _WallList, false);					
+					WallInst = noone;
+					_Walls = instance_position_list(x, Position1[i], oWall, _WallList, false);					
 					for(var _WallIndex = 0; _WallIndex < _Walls; _WallIndex++){
 						
 						if(_WallList[| _WallIndex].FloorLevel == FloorLevel || _WallList[| _WallIndex].FloorLevel == UPPERLOWER){
@@ -1002,8 +1005,8 @@ function CheckMoveAssist(){
 							//WallInst = ObjCollision_Position(Position2[j], Position1[i], oWall, FloorLevel);
 							
 							ds_list_clear(_WallList);
-							var WallInst = noone;
-							var _Walls = instance_position_list(Position2[j], Position1[i], oWall, _WallList, false);				
+							WallInst = noone;
+							_Walls = instance_position_list(Position2[j], Position1[i], oWall, _WallList, false);				
 							for(var _WallIndex = 0; _WallIndex < _Walls; _WallIndex++){
 						
 								if(_WallList[| _WallIndex].FloorLevel == FloorLevel || _WallList[| _WallIndex].FloorLevel == UPPERLOWER){
@@ -1043,8 +1046,8 @@ function CheckMoveAssist(){
 					//var WallInst = ObjCollision_Position(Position1[i], y - 6, oWall, FloorLevel);
 					
 					ds_list_clear(_WallList);
-					var WallInst = noone;
-					var _Walls = instance_position_list(Position1[i], y - 6, oWall, _WallList, false);				
+					WallInst = noone;
+					_Walls = instance_position_list(Position1[i], y - 6, oWall, _WallList, false);				
 					for(var _WallIndex = 0; _WallIndex < _Walls; _WallIndex++){
 						
 						if(_WallList[| _WallIndex].FloorLevel == FloorLevel || _WallList[| _WallIndex].FloorLevel == UPPERLOWER){
@@ -1061,8 +1064,8 @@ function CheckMoveAssist(){
 							//WallInst = ObjCollision_Position(Position1[i], Position2[j], oWall, FloorLevel);
 
 							ds_list_clear(_WallList);
-							var WallInst = noone;
-							var _Walls = instance_position_list(Position1[i], Position2[j], oWall, _WallList, false);				
+							WallInst = noone;
+							_Walls = instance_position_list(Position1[i], Position2[j], oWall, _WallList, false);				
 							for(var _WallIndex = 0; _WallIndex < _Walls; _WallIndex++){
 						
 								if(_WallList[| _WallIndex].FloorLevel == FloorLevel || _WallList[| _WallIndex].FloorLevel == UPPERLOWER){
@@ -1455,49 +1458,50 @@ function CheckHoles(){
 	
 	var HoleEdgeID = FloorLevel = UPPER ? _TileUpper : _TileLower;
 		
+	var FallDir, FallPointX, FallPointY;
 	switch(HoleEdgeID){
 		case global.HoleTileID_TL: 
 		case global.HoleTileID_ITL:
-			var FallDir = 315;
-			var FallPointX = 8; var FallPointY = 8;
+			FallDir = 315;
+			FallPointX = 8; FallPointY = 8;
 			break;
 
 		case global.HoleTileID_TM:
-			var FallDir = 270;
-			var FallPointX = 0; var FallPointY = 8;
+			FallDir = 270;
+			FallPointX = 0; FallPointY = 8;
 			break;
 
 		case global.HoleTileID_TR:
 		case global.HoleTileID_ITR:
-			var FallDir = 225;
-			var FallPointX = -8; var FallPointY = 8;
+			FallDir = 225;
+			FallPointX = -8; FallPointY = 8;
 			break;
 
 		case global.HoleTileID_ML:
-			var FallDir = 0;
-			var FallPointX = 8; var FallPointY = 0;
+			FallDir = 0;
+			FallPointX = 8; FallPointY = 0;
 			break;
 
 		case global.HoleTileID_MR:
-			var FallDir = 180;
-			var FallPointX = -8; var FallPointY = 0;
+			FallDir = 180;
+			FallPointX = -8; FallPointY = 0;
 			break;
 
 		case global.HoleTileID_BL:
 		case global.HoleTileID_IBL:
-			var FallDir = 45;
-			var FallPointX = 8; var FallPointY = -8;
+			FallDir = 45;
+			FallPointX = 8; FallPointY = -8;
 			break;
 
 		case global.HoleTileID_BM:
-			var FallDir = 90;
-			var FallPointX = 0; var FallPointY = -8;
+			FallDir = 90;
+			FallPointX = 0; FallPointY = -8;
 			break;
 
 		case global.HoleTileID_BR:
 		case global.HoleTileID_IBR:
-			var FallDir = 135;
-			var FallPointX = -8; var FallPointY = -8;
+			FallDir = 135;
+			FallPointX = -8; FallPointY = -8;
 			break;
 
 		
@@ -1563,7 +1567,7 @@ function Interact(){
 	}	
 
 	//Treasure Large
-	var TreasureInst = instance_position(x, bbox_top - 3, oTreasureLarge); 
+	TreasureInst = instance_position(x, bbox_top - 3, oTreasureLarge); 
 	if(TreasureInst != noone && Facing == UP && TreasureInst.visible && TreasureInst.image_index == 0){
 		UpdateState(LinkState.TreasureOpening);
 		TreasureLarge_Open(TreasureInst);
@@ -1663,11 +1667,12 @@ function Interact(){
 	}
 
 	
+	var Inst;
 	switch(Facing){
-		case LEFT: var Inst = instance_place(bbox_left, y, oPickupObj); break
-		case RIGHT: var Inst = instance_place(bbox_right, y, oPickupObj); break
-		case UP: var Inst = instance_place(x, bbox_top + 9, oPickupObj); break
-		case DOWN: var Inst = instance_place(x, bbox_bottom + 2, oPickupObj); break
+		case LEFT: Inst = instance_place(bbox_left, y, oPickupObj); break
+		case RIGHT: Inst = instance_place(bbox_right, y, oPickupObj); break
+		case UP: Inst = instance_place(x, bbox_top + 9, oPickupObj); break
+		case DOWN: Inst = instance_place(x, bbox_bottom + 2, oPickupObj); break
 	}
 	if(Inst != noone){
 		
@@ -1702,12 +1707,12 @@ function Interact(){
 	//Light Torch
 	if(global.Inventory.ItemData[ItemClass.Lamp].Index > -1 && !instance_exists(oLampFlame)){
 		
-		var Inst = noone;
+		Inst = noone;
 		switch(Facing){
-			case LEFT: var Inst = instance_place(bbox_left, y, oTorch); break;
-			case RIGHT: var Inst = instance_place(bbox_right, y, oTorch); break;
-			case UP: var Inst = instance_place(x, bbox_top + 9, oTorch); break;
-			case DOWN: var Inst = instance_place(x, bbox_bottom + 2, oTorch); break;
+			case LEFT: Inst = instance_place(bbox_left, y, oTorch); break;
+			case RIGHT: Inst = instance_place(bbox_right, y, oTorch); break;
+			case UP: Inst = instance_place(x, bbox_top + 9, oTorch); break;
+			case DOWN: Inst = instance_place(x, bbox_bottom + 2, oTorch); break;
 		}
 		if(Inst != noone){
 			if(!Inst.Lit){
@@ -1720,11 +1725,12 @@ function Interact(){
 		
 
 	//Dead/Hungry Guy
+	var DeadGuyInst;
 	switch(Facing){
-		case LEFT: var DeadGuyInst = instance_position(bbox_left - 5, y - 6, oDeadHungryGuy); break
-		case RIGHT: var DeadGuyInst = instance_position(bbox_right + 5, y - 6, oDeadHungryGuy); break
-		case UP: var DeadGuyInst = instance_position(x, bbox_top - 3, oDeadHungryGuy); break;
-		case DOWN: var DeadGuyInst = instance_position(x, bbox_bottom + 3, oDeadHungryGuy); break
+		case LEFT: DeadGuyInst = instance_position(bbox_left - 5, y - 6, oDeadHungryGuy); break
+		case RIGHT: DeadGuyInst = instance_position(bbox_right + 5, y - 6, oDeadHungryGuy); break
+		case UP: DeadGuyInst = instance_position(x, bbox_top - 3, oDeadHungryGuy); break;
+		case DOWN: DeadGuyInst = instance_position(x, bbox_bottom + 3, oDeadHungryGuy); break
 	}
 	if(DeadGuyInst != noone){
 		DeadGuyInst.DB_Init = true;
@@ -1732,11 +1738,12 @@ function Interact(){
 	}
 
 	//HeartGuy
+	var HeartGuyInst;
 	switch(Facing){
-		case LEFT: var HeartGuyInst = instance_position(bbox_left - 5, y - 6, oHeartGuy); break
-		case RIGHT: var HeartGuyInst = instance_position(bbox_right + 5, y - 6, oHeartGuy); break
-		case UP: var HeartGuyInst = instance_position(x, bbox_top - 3, oHeartGuy); break;
-		case DOWN: var HeartGuyInst = instance_position(x, bbox_bottom + 3, oHeartGuy); break
+		case LEFT: HeartGuyInst = instance_position(bbox_left - 5, y - 6, oHeartGuy); break
+		case RIGHT: HeartGuyInst = instance_position(bbox_right + 5, y - 6, oHeartGuy); break
+		case UP: HeartGuyInst = instance_position(x, bbox_top - 3, oHeartGuy); break;
+		case DOWN: HeartGuyInst = instance_position(x, bbox_bottom + 3, oHeartGuy); break
 	}
 	if(HeartGuyInst != noone){
 		HeartGuyInst.DB_Init = true;
@@ -1744,11 +1751,12 @@ function Interact(){
 	}
 	
 	//NPC		
+	var NPCInst;
 	switch(Facing){
-		case LEFT: var NPCInst = instance_position(bbox_left - 5, y - 6, oNPC); break
-		case RIGHT: var NPCInst = instance_position(bbox_right + 5, y - 6, oNPC); break
-		case UP: var NPCInst = instance_position(x, bbox_top - 5, oNPC); break;
-		case DOWN: var NPCInst = instance_position(x, bbox_bottom + 5, oNPC); break
+		case LEFT: NPCInst = instance_position(bbox_left - 5, y - 6, oNPC); break
+		case RIGHT: NPCInst = instance_position(bbox_right + 5, y - 6, oNPC); break
+		case UP: NPCInst = instance_position(x, bbox_top - 5, oNPC); break;
+		case DOWN: NPCInst = instance_position(x, bbox_bottom + 5, oNPC); break
 	}
 
 	if(NPCInst != noone){
@@ -1757,12 +1765,12 @@ function Interact(){
 	}
 
 	//curtain
-	var Inst = noone;
+	Inst = noone;
 	switch(Facing){
-		case LEFT: var Inst = instance_place(bbox_left, y, oCurtain); break;
-		case RIGHT: var Inst = instance_place(bbox_right, y, oCurtain); break;
-		case UP: var Inst = instance_place(x, bbox_top + 9, oCurtain); break;
-		case DOWN: var Inst = instance_place(x, bbox_bottom + 2, oCurtain); break;
+		case LEFT: Inst = instance_place(bbox_left, y, oCurtain); break;
+		case RIGHT: Inst = instance_place(bbox_right, y, oCurtain); break;
+		case UP: Inst = instance_place(x, bbox_top + 9, oCurtain); break;
+		case DOWN: Inst = instance_place(x, bbox_bottom + 2, oCurtain); break;
 	}
 	if(Inst != noone){
 		if(!Inst.Revealed && Inst.FloorLevel == FloorLevel && Door_LocationToDir(Inst.Location) == Facing){
@@ -1789,10 +1797,10 @@ function Interact(){
 		}
 			
 		switch(Facing){
-			case LEFT: var Inst = instance_place(bbox_left, y, oEnemy_Chicken); break
-			case RIGHT: var Inst = instance_place(bbox_right, y, oEnemy_Chicken); break
-			case UP: var Inst = instance_place(x, bbox_top - 5, oEnemy_Chicken); break
-			case DOWN: var Inst = instance_place(x, bbox_bottom + 2, oEnemy_Chicken); break
+			case LEFT: Inst = instance_place(bbox_left, y, oEnemy_Chicken); break
+			case RIGHT: Inst = instance_place(bbox_right, y, oEnemy_Chicken); break
+			case UP: Inst = instance_place(x, bbox_top - 5, oEnemy_Chicken); break
+			case DOWN: Inst = instance_place(x, bbox_bottom + 2, oEnemy_Chicken); break
 		}
 		if(Inst != noone){
 			if(Inst.State != EnemyState.OnFire && Inst.State != EnemyState.Stone && Inst.State != EnemyState.Frozen && !oLink.InDoor && !oLink.InDoor_House){
@@ -1831,7 +1839,7 @@ function Interact(){
 		
 		//Frogs
 		if(Facing == UP){
-			var Inst = instance_place(x, bbox_top - 5, oSimonFrogs);
+			Inst = instance_place(x, bbox_top - 5, oSimonFrogs);
 			if(Inst != noone){
 				if(!Inst.PlayNote){
 					Inst.Index = floor((x - Inst.x) / 18);				
@@ -1954,7 +1962,7 @@ function CheckEnemies(){
 	var Inst = noone;
 	
 	with(HitBox){
-		var Inst = instance_place(x, y, oEnemy);
+		Inst = instance_place(x, y, oEnemy);
 	}
 	if(Inst != noone){
 		if(EnemyCanHurtLink(Inst)){
@@ -1994,13 +2002,14 @@ function CheckEnemies(){
 		
 
 	with(HitBox){
-		var Inst = instance_place(x, y, oSoldierWeapon);
+		Inst = instance_place(x, y, oSoldierWeapon);
 	}
+	var _Dir;
 	if(Inst != noone){
 		
 		if(Inst.FloorLevel == FloorLevel && (Inst.CanHurtLinkWhenSoldierHurt || EnemyCanHurtLink(Inst.SoldierInst))){
 			switch(Inst.object_index){
-				default: var _Dir = point_direction(Inst.x, Inst.y, x, y); break;
+				default: _Dir = point_direction(Inst.x, Inst.y, x, y); break;
 				case oSoldierWeapon_Mace: _Dir = AngleCheck(Inst.SpinAngle + 90); break;
 			}
 			LinkHit(_Dir, 1.25, 12, Inst.SoldierInst.Attack);
@@ -2009,7 +2018,7 @@ function CheckEnemies(){
 	}
 				
 
-	var Inst = instance_place(x, y, oProjectile);
+	Inst = instance_place(x, y, oProjectile);
 	if(Inst != noone){
 		if(Inst.Enemy && Inst.FloorLevel == FloorLevel){
 			

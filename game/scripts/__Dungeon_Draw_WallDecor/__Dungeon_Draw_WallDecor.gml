@@ -1,3 +1,4 @@
+// Feather disable GM2064
 
 function Dungeon_Draw_WallDecor(_RoomIndex){
 	
@@ -31,6 +32,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 	WallData[0] = array_create(0);
 	WallData[1] = array_create(0);
 	
+	var Wall;
 	for(var _FloorLevel = 0; _FloorLevel < 2; _FloorLevel++){
 		
 		if(Walls[_FloorLevel] == 0) continue;
@@ -39,7 +41,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 
 			if(GetPropertyValue(WallArray[_FloorLevel][WallIndex].properties, "NoDecor") != -1) continue;
 			
-			var Wall = WallArray[_FloorLevel][WallIndex];
+			Wall = WallArray[_FloorLevel][WallIndex];
 			var WallX = Room.x + Wall.x;
 			var WallY = Room.y + Wall.y;
 			var GID = Wall.gid;
@@ -65,7 +67,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 				var WallDataIndex = array_length(WallData[_FloorLevel]);
 				array_insert(WallData[_FloorLevel], WallDataIndex, StructCopy(WallArray[_FloorLevel][WallIndex]));
 			
-				var Wall = WallData[_FloorLevel][WallDataIndex];
+				Wall = WallData[_FloorLevel][WallDataIndex];
 				//replace x/y of the struct data with real world data x/y
 				Wall.x = WallX;
 				Wall.y = WallY;
@@ -91,6 +93,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 	var _CurtainType = LevelCurtainType(global.Level.Index);
 	
 	//check all created doors to see if they overlap the walls, and set those positions in the WallData to false;
+	var PosX, PosY, _CurtainInst, Segment;
 	with(oDoor){
 
 		//if door is not in Room, go to next
@@ -99,7 +102,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 		//for each door, check each WallData to see if any of the doors overlap. 
 		for(var WallDataIndex = 0; WallDataIndex < other.WallDataCount[FloorLevel]; WallDataIndex++){
 			
-			var Wall = other.WallData[FloorLevel][WallDataIndex];
+			Wall = other.WallData[FloorLevel][WallDataIndex];
 			var WallTileW = array_length(Wall.WallSegments);
 			var GID_T = (Wall.gid == TemplateObjGID.WallSideT || Wall.gid == TemplateObjGID.WallLowerSideT);
 			var GID_B = (Wall.gid == TemplateObjGID.WallSideB || Wall.gid == TemplateObjGID.WallLowerSideB);
@@ -122,14 +125,14 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 				ToSpecialRoom = (global.Level.DungeonTemplate.Rooms[ConnectedRoomIndex].SpecialObj == SpecialDungeonObj.SpecialRoom);
 			}
 			if((Prob(Chance_Decor_CurtainOverDoor) || (ToSpecialRoom && Prob(Chance_Decor_CurtainOverDoorSecret)))){
-				var PosX = x;
-				var PosY = y;
+				PosX = x;
+				PosY = y;
 				var DoorLocation = Location;
 				switch(Location){
 					case "Bottom": PosY -= 8; break;
 					case "Right":  PosX -= 8; break;			
 				}
-				var _CurtainInst = instance_create_layer(PosX, PosY, "ObjsDoors_Upper", oCurtain, {Location : DoorLocation, DoorInst : id});
+				_CurtainInst = instance_create_layer(PosX, PosY, "ObjsDoors_Upper", oCurtain, {Location : DoorLocation, DoorInst : id});
 			}
 		}
 		
@@ -138,13 +141,14 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 	}
 
 	//check each segment for each wall for obj collisions like walls, wall lights, etc
+	var SegPosX, SegPosY;
 	for(var _FloorLevel = 0; _FloorLevel < 2; _FloorLevel++){
 		
 		var _TMID = (_FloorLevel == 0 ? global.TMID_Floor_Lower : global.TMID_Floor_Upper);
 		
 		for(var WallDataIndex = 0; WallDataIndex < WallDataCount[_FloorLevel]; WallDataIndex++){
 			
-			var Wall = WallData[_FloorLevel][WallDataIndex];
+			Wall = WallData[_FloorLevel][WallDataIndex];
 			var WallX = Wall.x;
 			var WallY = Wall.y;
 			var WallW = Wall.width;
@@ -156,7 +160,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 			
 				switch(Wall.gid){
 					case TemplateObjGID.WallSideT:
-						var SegPosX = WallX + (SegIndex * 8);
+						SegPosX = WallX + (SegIndex * 8);
 						if( collision_rectangle(SegPosX, WallY, SegPosX + 7, WallY + 24, oWallLight, false, true) != noone ||
 						    collision_rectangle(SegPosX, WallY, SegPosX + 7, WallY + 24, oCurtain, false, true) != noone||
 							collision_rectangle(SegPosX, WallY, SegPosX + 7, WallY + 24, oDoor, false, true) != noone) {
@@ -180,7 +184,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 						break;
 					
 					case TemplateObjGID.WallSideB:
-						var SegPosX = WallX + (SegIndex * 8);
+						SegPosX = WallX + (SegIndex * 8);
 						if(collision_rectangle(SegPosX, WallY, SegPosX + 7, WallY + 24, oWallLight, false, true) != noone||
 						   collision_rectangle(SegPosX, WallY, SegPosX + 7, WallY + 24, oCurtain, false, true) != noone||
 						   collision_rectangle(SegPosX, WallY, SegPosX + 7, WallY + 24, oDoor, false, true) != noone){
@@ -197,7 +201,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 						break;
 					
 					case TemplateObjGID.WallSideL:
-						var SegPosY = WallY + (SegIndex * 8);
+						SegPosY = WallY + (SegIndex * 8);
 						if(collision_rectangle(WallX, SegPosY, WallX + 24, SegPosY + 7, oWallLight, false, true) != noone ||
 						   collision_rectangle(WallX, SegPosY, WallX + 24, SegPosY + 7, oCurtain, false, true) != noone ||
 						   collision_rectangle(WallX, SegPosY, WallX + 24, SegPosY + 7, oDoor, false, true) != noone ){
@@ -221,7 +225,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 						break;
 					
 					case TemplateObjGID.WallSideR:
-						var SegPosY = WallY + (SegIndex * 8);
+						SegPosY = WallY + (SegIndex * 8);
 						if(collision_rectangle(WallX, SegPosY, WallX + 24, SegPosY + 7, oWallLight, false, true) != noone ||
 						   collision_rectangle(WallX, SegPosY, WallX + 24, SegPosY + 7, oCurtain, false, true) != noone ||
 						   collision_rectangle(WallX, SegPosY, WallX + 24, SegPosY + 7, oDoor, false, true) != noone ){
@@ -255,13 +259,14 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 	
 	//Draw random cracks
 	
+	var _Flip, _Rotate;
 	for(var _FloorLevel = 0; _FloorLevel < 2; _FloorLevel++){
 		
 		var _TMID = (_FloorLevel == LOWER ? global.TMID_Decor_Lower : global.TMID_Decor_Upper);
 		
 		for(var WallDataIndex = 0; WallDataIndex < WallDataCount[_FloorLevel]; WallDataIndex++){
 		
-			var Wall = WallData[_FloorLevel][WallDataIndex];
+			Wall = WallData[_FloorLevel][WallDataIndex];
 		
 			var WallTileW = array_length(Wall.WallSegments);
 			
@@ -273,38 +278,38 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 				Segment = irandom(WallTileW - 2);
 			
 				var _Mirror = FlipCoin_Bool();
-				var _Flip = false;
-				var _Rotate = false;
+				_Flip = false;
+				_Rotate = false;
 			
 				if(Decor_Wall_GetSegmentStatus(Wall, DecorType.Cracks, Segment, 2)){
 						
 					switch(Wall.gid){
 						case TemplateObjGID.WallSideT:
 						case TemplateObjGID.WallLowerSideT:
-							var PosX = Wall.x + (Segment * 8);
-							var PosY = Wall.y + 8;
+							PosX = Wall.x + (Segment * 8);
+							PosY = Wall.y + 8;
 							break;
 				
 						case TemplateObjGID.WallSideB:
 						case TemplateObjGID.WallLowerSideB:
-							var PosX = Wall.x + (Segment * 8);
-							var PosY = Wall.y;
-							var _Flip = true;
+							PosX = Wall.x + (Segment * 8);
+							PosY = Wall.y;
+							_Flip = true;
 							break;
 				
 						case TemplateObjGID.WallSideL:
 						case TemplateObjGID.WallLowerSideL:
-							var PosX = Wall.x + 8;
-							var PosY = Wall.y + (Segment * 8);
-							var _Flip = true;
-							var _Rotate = true;
+							PosX = Wall.x + 8;
+							PosY = Wall.y + (Segment * 8);
+							_Flip = true;
+							_Rotate = true;
 							break;
 				
 						case TemplateObjGID.WallSideR:
 						case TemplateObjGID.WallLowerSideR:
-							var PosX = Wall.x;
-							var PosY = Wall.y + (Segment * 8);
-							var _Rotate = true;
+							PosX = Wall.x;
+							PosY = Wall.y + (Segment * 8);
+							_Rotate = true;
 							break;
 
 					}
@@ -327,9 +332,10 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 	
 	global.ReplacedMuralWithLight = false; //sometimes replace a mural with a light. Only should be done once so keep track with this variable
 	
+	var _DecorType, MuralStyle, SegmentIndex;
 	for(var WallDataIndex = 0; WallDataIndex < WallDataCount[UPPER]; WallDataIndex++){
 			
-		var Wall = WallData[UPPER][WallDataIndex];
+		Wall = WallData[UPPER][WallDataIndex];
 		var WallX = Wall.x;
 		var WallY = Wall.y;
 		var WallW = Wall.width;
@@ -349,18 +355,18 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 			
 			switch(global.Level.Index){
 				default:
-					var _DecorType = choose(DecorType.Mural, _Column, DecorType.Lighting, DecorType.Lighting, DecorType.Lighting)
+					_DecorType = choose(DecorType.Mural, _Column, DecorType.Lighting, DecorType.Lighting, DecorType.Lighting)
 					break;
 				
 				case DungeonLevel.Catacombs:
-					var _DecorType = choose(DecorType.Mural, DecorType.Mural, _Column, DecorType.Lighting);
+					_DecorType = choose(DecorType.Mural, DecorType.Mural, _Column, DecorType.Lighting);
 					break;
 					
 				case DungeonLevel.Aghanim1:
 					if(WallGID == TemplateObjGID.WallSideT && WallTileW mod 2 == 0){
-						var _DecorType = choose(DecorType.Mural, _Column, DecorType.LargeMural, DecorType.Lighting, DecorType.Lighting, DecorType.Lighting)
+						_DecorType = choose(DecorType.Mural, _Column, DecorType.LargeMural, DecorType.Lighting, DecorType.Lighting, DecorType.Lighting)
 					}else{
-						var _DecorType = choose(DecorType.Mural, _Column, DecorType.Lighting, DecorType.Lighting, DecorType.Lighting)
+						_DecorType = choose(DecorType.Mural, _Column, DecorType.Lighting, DecorType.Lighting, DecorType.Lighting)
 					}
 					break;
 				
@@ -373,7 +379,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 			switch(_DecorType){
 				case DecorType.Mural:
 					
-					var MuralStyle = FlipCoin_Bin();	
+					MuralStyle = FlipCoin_Bin();	
 					
 					switch(global.Level.Index){
 							
@@ -389,7 +395,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 					break;
 				
 				case DecorType.LargeMural:
-					var MuralStyle = FlipCoin_Bin();
+					MuralStyle = FlipCoin_Bin();
 					Decor_Draw_FillWall(_RoomIndex, Wall, _DecorType, irandom_range(1, floor(WallTileW / 11)), MuralStyle);
 					break;
 					
@@ -408,9 +414,9 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 			
 			var DecorStyle = 0;
 			if(ColumnCount > 2)
-				var _DecorType = choose(DecorType.Mural, DecorType.Column);
+				_DecorType = choose(DecorType.Mural, DecorType.Column);
 			else{
-				var _DecorType = DecorType.Mural;
+				_DecorType = DecorType.Mural;
 			}
 			
 			if(_DecorType == DecorType.Mural) DecorStyle = FlipCoin_Bin();
@@ -423,9 +429,9 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 			var DoorPosY = _Door.y;	
 
 			if(WallGID == TemplateObjGID.WallSideT || WallGID == TemplateObjGID.WallSideB){
-				var SegmentIndex = (DoorPosX - WallX) / 8;
+				SegmentIndex = (DoorPosX - WallX) / 8;
 			}else{
-				var SegmentIndex = (DoorPosY - WallY) / 8;
+				SegmentIndex = (DoorPosY - WallY) / 8;
 			}
 			
 			Decor_FillWallFromSegment(_RoomIndex, Wall, _DecorType, SegmentIndex + 6, 4, 1, DecorStyle);			
@@ -445,7 +451,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 	
 	for(var WallDataIndex = 0; WallDataIndex < WallDataCount[UPPER]; WallDataIndex++){
 		
-		var Wall = WallData[UPPER][WallDataIndex];
+		Wall = WallData[UPPER][WallDataIndex];
 		
 		if(_LevelCurtainType != CurtainType.Vines || Wall.gid == TemplateObjGID.WallSideB) continue; //they don't look as good on the bottom, curtains only
 		
@@ -453,10 +459,10 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 		
 		repeat(irandom(6 * min(Room.GridW * Room.GridH, 2))){ //double it if Room is either 2 wide or 2 high
 			
-			var _CurtainInst = noone;
+			_CurtainInst = noone;
 			var WallPosX = Wall.x;
 			var WallPosY = Wall.y;
-			var Segment = irandom(WallTileW - 4);
+			Segment = irandom(WallTileW - 4);
 					
 			switch(Wall.gid){
 				//case TemplateObjGID.WallSideB:
@@ -464,7 +470,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 				case TemplateObjGID.WallSideT:
 					if(Decor_Wall_GetSegmentStatus(Wall, DecorType.Curtain, Segment, 4)){
 						Decor_Wall_SetSegmentStatus(Wall, Segment, 4, WallSegmentStatus.Invalid);
-						var _CurtainInst = instance_create_layer(WallPosX + (Segment * 8), WallPosY, "ObjsDoors_Upper", oCurtain, {Location : (Wall.gid == TemplateObjGID.WallSideT ? "Top" : "Bottom"), DoorInst : noone});
+						_CurtainInst = instance_create_layer(WallPosX + (Segment * 8), WallPosY, "ObjsDoors_Upper", oCurtain, {Location : (Wall.gid == TemplateObjGID.WallSideT ? "Top" : "Bottom"), DoorInst : noone});
 					}
 					break;
 				
@@ -473,7 +479,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 				case TemplateObjGID.WallSideL:
 					if(Decor_Wall_GetSegmentStatus(Wall, DecorType.Curtain, Segment, 4)){
 						Decor_Wall_SetSegmentStatus(Wall, Segment, 4, WallSegmentStatus.Invalid);
-						var _CurtainInst = instance_create_layer(WallPosX, WallPosY + (Segment * 8), "ObjsDoors_Upper", oCurtain, {Location : (Wall.gid == TemplateObjGID.WallSideL ? "Left" : "Right"), DoorInst : noone});
+						_CurtainInst = instance_create_layer(WallPosX, WallPosY + (Segment * 8), "ObjsDoors_Upper", oCurtain, {Location : (Wall.gid == TemplateObjGID.WallSideL ? "Left" : "Right"), DoorInst : noone});
 					}
 					break;
 

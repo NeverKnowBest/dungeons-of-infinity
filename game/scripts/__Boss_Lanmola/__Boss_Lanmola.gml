@@ -1,3 +1,4 @@
+// Feather disable GM2064
 function Lanmola_Spawn(ID){
 	
 	var X = global.CurrentRoom.x + 64 + irandom(global.CurrentRoom.width - 128);

@@ -186,15 +186,16 @@ function Zerberk_Level_SetDoors(_PositionStart, _PositionEnd){
 
 function Zerberk_SetHeroStartPos(_HeroInst, _StartPos){
 
+	var _CornerIndexX, _CornerIndexY, _WallX, _WallY, _WallW, _WallH;
 	switch(_StartPos){
 		case 11:
 		case 12:
 		case 1:
-			var _CornerIndexX = StartWallData[1] mod 3;
-			var _CornerIndexY = StartWallData[1] div 3;
-			var _WallX = LevelCornersX[_CornerIndexX];
-			var _WallY = LevelCornersY[_CornerIndexY];
-			var _WallW = WallWidth[_CornerIndexX];
+			_CornerIndexX = StartWallData[1] mod 3;
+			_CornerIndexY = StartWallData[1] div 3;
+			_WallX = LevelCornersX[_CornerIndexX];
+			_WallY = LevelCornersY[_CornerIndexY];
+			_WallW = WallWidth[_CornerIndexX];
 			_HeroInst.x = _WallX + (_WallW / 2) - 1;
 			_HeroInst.y = _WallY + 26;
 			break;
@@ -202,11 +203,11 @@ function Zerberk_SetHeroStartPos(_HeroInst, _StartPos){
 		case 5:
 		case 6:
 		case 7:
-			var _CornerIndexX = StartWallData[1] mod 3;
-			var _CornerIndexY = StartWallData[1] div 3;
-			var _WallX = LevelCornersX[_CornerIndexX];
-			var _WallY = LevelCornersY[_CornerIndexY];
-			var _WallW = WallWidth[_CornerIndexX];
+			_CornerIndexX = StartWallData[1] mod 3;
+			_CornerIndexY = StartWallData[1] div 3;
+			_WallX = LevelCornersX[_CornerIndexX];
+			_WallY = LevelCornersY[_CornerIndexY];
+			_WallW = WallWidth[_CornerIndexX];
 			_HeroInst.x = _WallX + (_WallW / 2) - 1;
 			_HeroInst.y = _WallY - 6;		
 			break;
@@ -214,11 +215,11 @@ function Zerberk_SetHeroStartPos(_HeroInst, _StartPos){
 		case 2:
 		case 3:
 		case 4:
-			var _CornerIndexX = StartWallData[1] mod 4;
-			var _CornerIndexY = StartWallData[1] div 4;
-			var _WallX = LevelCornersX[_CornerIndexX];
-			var _WallY = LevelCornersY[_CornerIndexY];
-			var _WallH = WallHeight[_CornerIndexY];
+			_CornerIndexX = StartWallData[1] mod 4;
+			_CornerIndexY = StartWallData[1] div 4;
+			_WallX = LevelCornersX[_CornerIndexX];
+			_WallY = LevelCornersY[_CornerIndexY];
+			_WallH = WallHeight[_CornerIndexY];
 			_HeroInst.x = _WallX - 12;
 			_HeroInst.y = _WallY + (_WallH / 2) + 4;
 			_HeroInst.Dir = -1;
@@ -227,11 +228,11 @@ function Zerberk_SetHeroStartPos(_HeroInst, _StartPos){
 		case 8:
 		case 9:
 		case 10:
-			var _CornerIndexX = StartWallData[1] mod 4;
-			var _CornerIndexY = StartWallData[1] div 4;
-			var _WallX = LevelCornersX[_CornerIndexX];
-			var _WallY = LevelCornersY[_CornerIndexY];
-			var _WallH = WallHeight[_CornerIndexY];
+			_CornerIndexX = StartWallData[1] mod 4;
+			_CornerIndexY = StartWallData[1] div 4;
+			_WallX = LevelCornersX[_CornerIndexX];
+			_WallY = LevelCornersY[_CornerIndexY];
+			_WallH = WallHeight[_CornerIndexY];
 			_HeroInst.x = _WallX + 13;
 			_HeroInst.y = _WallY + (_WallH / 2) + 4;
 			_HeroInst.Dir = 1;

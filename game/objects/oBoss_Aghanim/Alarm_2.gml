@@ -5,14 +5,15 @@ if(BombIndex >= BombsTotal){
 
 image_index = 2 + (BombIndex mod 2);
 
+var _HandPosX, _HandPosY;
 switch(image_index){
 	case 2: //Left
-		var _HandPosX = x + global.AghanimHandPos[Dir][0];
-		var _HandPosY = y + global.AghanimHandPos[Dir][1];	
+		_HandPosX = x + global.AghanimHandPos[Dir][0];
+		_HandPosY = y + global.AghanimHandPos[Dir][1];	
 		break;
 	case 3: //Righty
-		var _HandPosX = x + global.AghanimHandPos[Dir][2];
-		var _HandPosY = y + global.AghanimHandPos[Dir][3];	
+		_HandPosX = x + global.AghanimHandPos[Dir][2];
+		_HandPosY = y + global.AghanimHandPos[Dir][3];	
 }
 
 instance_create_layer(_HandPosX, _HandPosY, EffectLayer(UPPER), oSwordBeamHit);

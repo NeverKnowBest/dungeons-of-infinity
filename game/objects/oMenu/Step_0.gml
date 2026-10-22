@@ -1,3 +1,4 @@
+// Feather disable GM2064
 AltTabCheck();
 
 if(instance_exists(ErrorMsgInst)) exit;
@@ -546,7 +547,7 @@ if(_Input_MenuInput){
 	
 }
 
-var _Input_MenuBack = input_check_pressed("menu_back");
+_Input_MenuBack = input_check_pressed("menu_back");
 
 if(_Input_MenuBack || _Back){
 		

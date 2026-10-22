@@ -14,6 +14,7 @@ if(inst != noone){
 event_inherited();
 
 if(WallCollided){
-	var inst = instance_create_layer(x, y_base, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oRodFireEffect, {Index : Index, FloorLevel : FloorLevel});
+	// Feather disable once GM2064
+	inst = instance_create_layer(x, y_base, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oRodFireEffect, {Index : Index, FloorLevel : FloorLevel});
 	instance_destroy(id);
 }

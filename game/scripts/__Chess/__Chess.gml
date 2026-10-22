@@ -121,16 +121,17 @@ function move(___piece_p=[0,0], ___position=[0,0]){
 		}
 	}
 	
+	var __rookxold, __rookxnew;
 	if(__type_piece == King){
 		
 		//change rook too if move is castle king
 		if(check_castle_king[(__piece > 0)] && abs(___piece_p[0] - ___position[0]) == 2){
 			if(___position[0] == 2){
-				var __rookxold = 0;
-				var __rookxnew = 3;
+				__rookxold = 0;
+				__rookxnew = 3;
 			}else{
-				var __rookxold = 7;
-				var __rookxnew = 5;
+				__rookxold = 7;
+				__rookxnew = 5;
 			}
 			var __rook = global.Board[__rookxold][___piece_p[1]];
 	        global.Board[__rookxold][___piece_p[1]] = 0;
@@ -523,15 +524,16 @@ function generate_moves(___piece_p=[0,0],___offsets=[[0,0]])
 
 
 function get_possible_moves(___piece_p=[0,0]){
+	var __move_arr, __capture_arr, __new_x, __new_y;
 	var __piece=0
 	__piece=global.Board[___piece_p[0]][___piece_p[1]]
 	switch(abs(__piece))
 	{
 		case King: 
-			var __move_arr=[]
-	        var __capture_arr=[]
+			__move_arr=[]
+	        __capture_arr=[]
 			//
-			var __new_x=0;var __new_y=0;
+			__new_x=0;__new_y=0;
 	        for(var i=-1;i<=1;i++)
 			{
 	            for(var j=-1;j<=1;j++)
@@ -571,10 +573,10 @@ function get_possible_moves(___piece_p=[0,0]){
 		case Rook:
 	        return generate_moves(___piece_p,[[-1,0],[1,0],[0,-1],[0,1]])
 		case Night:
-			var __move_arr=[]
-	        var __capture_arr=[]
-			var __new_x=0;
-			var __new_y=0;
+			__move_arr=[]
+	        __capture_arr=[]
+			__new_x=0;
+			__new_y=0;
 			var __arr=[-2,-1,1,2]
 	        for(var i=0;i<4;i++)
 	        {
@@ -607,9 +609,9 @@ function get_possible_moves(___piece_p=[0,0]){
 		case Bishop:
 	        return generate_moves(___piece_p,[[-1,-1],[1,1],[1,-1],[-1,1]])
 		default:
-	        var __move_arr=[]
-	        var __capture_arr=[]
-	        var __new_y=___piece_p[1]+__piece
+	        __move_arr=[]
+	        __capture_arr=[]
+	        __new_y=___piece_p[1]+__piece
 			if is_on_board(___piece_p[0], __new_y) and global.Board[___piece_p[0]][__new_y]==0
 			{
 	            array_push(__move_arr,[___piece_p[0],__new_y])

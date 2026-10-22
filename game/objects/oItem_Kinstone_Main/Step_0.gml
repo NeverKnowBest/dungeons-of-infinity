@@ -9,6 +9,7 @@ if(DB_Init){
 
 }
 
+var ContentsFrom, TreasureInst;
 switch(State){
 	case KinstoneState.Idle:
 		Kinstone_Update();
@@ -102,21 +103,21 @@ switch(State){
 		
 		switch(Index){
 			case KinstoneColor.Green:
-				var ContentsFrom = ItemFrom.KinstoneGreen;
+				ContentsFrom = ItemFrom.KinstoneGreen;
 				break;
 			case KinstoneColor.Blue:
-				var ContentsFrom = ItemFrom.KinstoneBlue;
+				ContentsFrom = ItemFrom.KinstoneBlue;
 				break;
 			case KinstoneColor.Red:
-				var ContentsFrom = ItemFrom.KinstoneRed;
+				ContentsFrom = ItemFrom.KinstoneRed;
 				break;
 			case KinstoneColor.Gold:
-				var ContentsFrom = ItemFrom.KinstoneGold;
+				ContentsFrom = ItemFrom.KinstoneGold;
 				break;
 				
 		}
-		var TreasureInst = Treasure_Create(RoomIndex, x - 16, y + 18, RandomItem, true,,,ContentsFrom, ContentsFrom);
-		var TreasureInst = Treasure_Create(RoomIndex, x, y + 18, RandomItem, true,,,ContentsFrom, ContentsFrom);
+		TreasureInst = Treasure_Create(RoomIndex, x - 16, y + 18, RandomItem, true,,,ContentsFrom, ContentsFrom);
+		TreasureInst = Treasure_Create(RoomIndex, x, y + 18, RandomItem, true,,,ContentsFrom, ContentsFrom);
 		
 		Lighting_UpdateLight_RGB(RoomIndex, LightIndex, [TreasureLightColor, TreasureLightColor, TreasureLightColor]);
 		
@@ -154,19 +155,20 @@ switch(State){
 		
 }
 
+var Dir;
 if(FuseInit){
 	
 	
 	WaypointX_Other = BaseX_Other - 8;
 	WaypointY_Other = BaseY_Other - 12;
-	var Dir = point_direction(BaseX_Other, SpriteY_Other, WaypointX_Other, WaypointY_Other);
+	Dir = point_direction(BaseX_Other, SpriteY_Other, WaypointX_Other, WaypointY_Other);
 	var Dist_Other = point_distance(BaseX_Other, SpriteY_Other, WaypointX_Other, WaypointY_Other);
 	vx_Other = lengthdir_x(0.25, Dir);
 	vy_Other = lengthdir_y(0.25, Dir);
 	
 	WaypointX = BaseX + 8;
 	WaypointY = BaseY - 12;
-	var Dir = point_direction(BaseX, SpriteY, WaypointX, WaypointY);
+	Dir = point_direction(BaseX, SpriteY, WaypointX, WaypointY);
 	var Dist = point_distance(BaseX, SpriteY, WaypointX, WaypointY)
 	
 	var VFactor = Dist / Dist_Other;

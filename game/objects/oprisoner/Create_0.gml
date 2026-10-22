@@ -44,12 +44,10 @@ DB_Started = false;
 
 					GotFortune = true;
 					return "Here is your fortune: " + global.Dialogue_Prisoner[Prisoner.FortuneTeller][_FortuneIndex];					
-					break;
 					
 				default:
 					if(DialogueSentence >= (array_length(Dialogue) - (ScriptFunction_GaveRupees() ? 1 : 0)) ) DialogueSentence = 0;
 					return Dialogue[DialogueSentence++];	
-					break;
 			}
 
 		}

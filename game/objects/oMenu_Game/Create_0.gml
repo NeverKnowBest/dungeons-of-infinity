@@ -34,7 +34,7 @@ Close = false;
 FrameW = 128;
 FrameH = 154;
 FrameX = oCamera.X + ((CAM_W - FrameW) / 2);
-FrameY = oCamera.Y + ((CAM_H - FrameH) / 2);;
+FrameY = oCamera.Y + ((CAM_H - FrameH) / 2);
 FrameCentre = FrameX + (FrameW / 2);
 
 PlayTimeY = FrameY + FrameH - 25;

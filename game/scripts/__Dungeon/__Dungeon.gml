@@ -1,3 +1,4 @@
+// Feather disable GM2064
 #macro Room global.Level.Rooms[_RoomIndex]
 #macro DungeonRoom global.Level.DungeonTemplate.Rooms[_RoomIndex]
 #macro StartingRoom (global.Level.Index == DungeonLevel.Castle && _RoomIndex == global.Level.RoomIndex_Entrance)

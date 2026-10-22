@@ -39,7 +39,6 @@ function Switch_Activate(_Action, _Inst){
 				}
 			}
 			return true
-			break;
 			
 		case SwitchAction.RevealHiddenObj:
 			

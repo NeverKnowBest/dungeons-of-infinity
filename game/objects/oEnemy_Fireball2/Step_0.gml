@@ -9,6 +9,7 @@ Lighting_UpdateLight_Radius(RoomIndex, LightIndex, choose(0.5, 0.51, 0.52, 0.53,
 event_inherited();
 
 if(WallCollided){
+	// Feather disable once GM2064
 	instance_create_layer(x, y, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oWallHit, {PlaySound : false});
 	instance_destroy(id);
 }

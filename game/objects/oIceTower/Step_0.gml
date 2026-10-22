@@ -15,7 +15,6 @@ if(image_index < 10){
 			switch(EnemyInst.object_index){
 				case oEnemy_Wallmaster:
 					continue;
-					break;
 					
 				default:
 					//skip bosses

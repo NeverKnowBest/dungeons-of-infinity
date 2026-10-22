@@ -1,3 +1,4 @@
+// Feather disable GM2064
 enum JailType{
 	Prisoner,
 	Open,
@@ -29,6 +30,7 @@ function Dungeon_Draw_Jail(_RoomIndex, _X, _Y, _TileW, _TileH, _Type){
 	
 	var JailIsInSection = InSectionArea(_RoomIndex, _ChecksX, _ChecksY, Room.Section_ID, true);
 	
+	var _Index, WallInst;
 	switch(_Type){
 		
 		case JailType.Prisoner:
@@ -59,7 +61,7 @@ function Dungeon_Draw_Jail(_RoomIndex, _X, _Y, _TileW, _TileH, _Type){
 			}
 			DrawTileBlock(JailBaseWallLayer, _X + _W - 32, _Y + 32, 56, 3, 1, 1);
 		
-			var WallInst = WallObj_Create("Objs_" + FloorLevelStr, _X + 24, _Y + 24, _TileW - 6, 2);
+			WallInst = WallObj_Create("Objs_" + FloorLevelStr, _X + 24, _Y + 24, _TileW - 6, 2);
 			
 			//Light
 			if(Room.Lighting && global.ChallengeOptions[ChallengeOption.Darkness] != ChallengeOption_Darkness.NoLights){
@@ -71,10 +73,10 @@ function Dungeon_Draw_Jail(_RoomIndex, _X, _Y, _TileW, _TileH, _Type){
 			//prisoner
 			if(ds_list_size(global.UnusedPrisoners) == 0){
 				//if all prisoners were used, just use dead prisoner
-				var _Index = choose(Prisoner.Dead1, Prisoner.Dead2, Prisoner.Dead3);
+				_Index = choose(Prisoner.Dead1, Prisoner.Dead2, Prisoner.Dead3);
 			}else{
 				//pick first prisoner index from shuffled list, then delete it from the list so it's not picked twice
-				var _Index = global.UnusedPrisoners[| 0];
+				_Index = global.UnusedPrisoners[| 0];
 				ds_list_delete(global.UnusedPrisoners, 0);
 				
 				if(_Index = Prisoner.WetBandits){
@@ -136,8 +138,8 @@ function Dungeon_Draw_Jail(_RoomIndex, _X, _Y, _TileW, _TileH, _Type){
 			}
 			DrawTileBlock(JailBaseWallLayer, RightSideX + (TilesW_RightSide * 8) - 32, _Y + 32, 56, 3, 1, 1);
 		
-			var WallInst = WallObj_Create("Objs_" + FloorLevelStr, _X + 24, _Y + 24, TilesW_LeftSide - 4, 2);
-			var WallInst = WallObj_Create("Objs_" + FloorLevelStr, RightSideX + 8, _Y + 24, TilesW_RightSide - 4, 2);
+			WallInst = WallObj_Create("Objs_" + FloorLevelStr, _X + 24, _Y + 24, TilesW_LeftSide - 4, 2);
+			WallInst = WallObj_Create("Objs_" + FloorLevelStr, RightSideX + 8, _Y + 24, TilesW_RightSide - 4, 2);
 
 		
 			//Lock

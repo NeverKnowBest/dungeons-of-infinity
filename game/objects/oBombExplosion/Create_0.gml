@@ -1,3 +1,4 @@
+// Feather disable GM2064
 event_inherited();
 
 CollisionList = ds_list_create();

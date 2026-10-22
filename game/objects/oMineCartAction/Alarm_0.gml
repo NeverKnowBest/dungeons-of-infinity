@@ -1,3 +1,4 @@
+// Feather disable GM2064
 var _PosX = x;
 var _PosY = y;
 switch(SpawnDir){

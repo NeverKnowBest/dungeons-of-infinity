@@ -1,3 +1,4 @@
+// Feather disable GM2064
 /// @description Shoot
 
 if(oZerberk_Hero.Dead) exit;

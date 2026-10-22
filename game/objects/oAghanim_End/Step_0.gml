@@ -1,3 +1,4 @@
+// Feather disable GM2064
 if(Exiting){
 	ExitFade += 0.01;
 	audio_sound_gain(MusicID, 1 - ExitFade, 0);

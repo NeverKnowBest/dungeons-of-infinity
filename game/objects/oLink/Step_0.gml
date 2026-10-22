@@ -143,6 +143,7 @@ if(State != LinkState.Hit && !BounceBack) {
 
 	
 //Check for keys and update v's only if in these states
+var S;
 if( (State == LinkState.Standing || State == LinkState.Walking || State == LinkState.Pushing || State == LinkState.Star ) && !BounceBack){
 	
 
@@ -190,9 +191,9 @@ if( (State == LinkState.Standing || State == LinkState.Walking || State == LinkS
 		if(frac(y) != 0){
 			y = round(y / 2) * 2;
 		}
-		var S = MoveAssistSpeed;
+		S = MoveAssistSpeed;
 	}else{
-		var S = ( (ItemHolding == noone && SwordCharge == 0) ? (Action[ActionKey.Run] && !InDoorPassage ? RunSpeed : WalkSpeed) : CarryingSpeed);
+		S = ( (ItemHolding == noone && SwordCharge == 0) ? (Action[ActionKey.Run] && !InDoorPassage ? RunSpeed : WalkSpeed) : CarryingSpeed);
 	}
 	
 
@@ -281,6 +282,7 @@ if(SwordCharge > 0){
 }
 
 //Update states
+var img_index;
 switch(State){
 	
 	case LinkState.Walking:
@@ -434,7 +436,7 @@ switch(State){
 			break;
 		}
 		
-		var img_index = floor(image_index);
+		img_index = floor(image_index);
 		
 		Link_PickupObjPos(img_index);
 	
@@ -452,7 +454,7 @@ switch(State){
 			break;
 		}
 		
-		var img_index = floor(image_index);
+		img_index = floor(image_index);
 		
 		Link_PickupObjPos(img_index);
 		
@@ -598,7 +600,7 @@ if(_checkwalls){
 x += vx; 
 
 
-var _checkwalls = (vy != 0);
+_checkwalls = (vy != 0);
 if(DEBUG){
 	if(global.Clip) _checkwalls = false;
 }

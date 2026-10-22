@@ -1,3 +1,4 @@
+// Feather disable GM2064
 enum DecorType{
 	Mural,
 	LargeMural,
@@ -32,20 +33,22 @@ global.ReplacedMuralWithLight = false;
 
 function Decor_Draw(_RoomIndex, _DecorType, _Wall, _Segment, _DecorStyle = 0){
 	
+	var PosX, PosY;
 	switch(_Wall.gid){
 		case TemplateObjGID.WallSideT:
 		case TemplateObjGID.WallSideB:
-			var PosX = _Wall.x + (_Segment * 8);
-			var PosY = _Wall.y;
+			PosX = _Wall.x + (_Segment * 8);
+			PosY = _Wall.y;
 			break;
 		
 		case TemplateObjGID.WallSideL:
 		case TemplateObjGID.WallSideR:
-			var PosX = _Wall.x;
-			var PosY = _Wall.y + (_Segment * 8);
+			PosX = _Wall.x;
+			PosY = _Wall.y + (_Segment * 8);
 			break;		
 	}	
 	
+	var Lights, LightInst;
 	switch(_DecorType){
 		case DecorType.Column:
 			var Mirror = FlipCoin_Bool();
@@ -105,7 +108,7 @@ function Decor_Draw(_RoomIndex, _DecorType, _Wall, _Segment, _DecorStyle = 0){
 			var LightsInProximity = false;
 			var LightsInProximityList = ds_list_create();
 			//first do wall lights
-			var Lights = collision_circle_list(PosX + 16, PosY + 12, 50, oWallLight, true, true, LightsInProximityList, false);
+			Lights = collision_circle_list(PosX + 16, PosY + 12, 50, oWallLight, true, true, LightsInProximityList, false);
 			
 			for(var i = 0; i < Lights; i++){
 				//these lights are in proximity, but might be in different Rooms. If they are in the same Room, then they are flagged and will be destroyed
@@ -117,7 +120,7 @@ function Decor_Draw(_RoomIndex, _DecorType, _Wall, _Segment, _DecorStyle = 0){
 			}
 			//then check for torches
 			ds_list_clear(LightsInProximityList);
-			var Lights = collision_circle_list(PosX + 16, PosY + 12, 50, oTorch, true, true, LightsInProximityList, false);
+			Lights = collision_circle_list(PosX + 16, PosY + 12, 50, oTorch, true, true, LightsInProximityList, false);
 			
 			for(var i = 0; i < Lights; i++){
 				//these lights are in proximity, but might be in different Rooms. If they are in the same Room, then they are flagged and will be destroyed
@@ -143,16 +146,16 @@ function Decor_Draw(_RoomIndex, _DecorType, _Wall, _Segment, _DecorStyle = 0){
 			if(CreateLight){
 				switch(_Wall.gid){
 					case TemplateObjGID.WallSideT:
-						var LightInst = instance_create_layer(PosX, PosY + 8, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : TOP, Status: LightStatus});
+						LightInst = instance_create_layer(PosX, PosY + 8, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : TOP, Status: LightStatus});
 						break;
 					case TemplateObjGID.WallSideB:
-						var LightInst = instance_create_layer(PosX, PosY, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : BOTTOM, Status: LightStatus});
+						LightInst = instance_create_layer(PosX, PosY, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : BOTTOM, Status: LightStatus});
 						break;
 					case TemplateObjGID.WallSideR:
-						var LightInst = instance_create_layer(PosX, PosY, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : RIGHT, Status: LightStatus});
+						LightInst = instance_create_layer(PosX, PosY, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : RIGHT, Status: LightStatus});
 						break;
 					case TemplateObjGID.WallSideL:
-						var LightInst = instance_create_layer(PosX + 8, PosY, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : LEFT, Status: LightStatus});
+						LightInst = instance_create_layer(PosX + 8, PosY, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : LEFT, Status: LightStatus});
 						break;					
 
 				}
@@ -217,12 +220,10 @@ function Decor_WallTileLen(_Wall){
 		case TemplateObjGID.WallSideT:
 		case TemplateObjGID.WallSideB:
 			return _Wall.TileW;
-			break;
 		
 		case TemplateObjGID.WallSideL:
 		case TemplateObjGID.WallSideR:
 			return _Wall.TileH;
-			break;		
 	}	
 	
 }
@@ -465,10 +466,9 @@ function Decor_MonumentItems(_TMID, _MonumentX, _MonumentY, _MonumentStyle, _Mir
 			switch(_MonumentStyle){
 				case 0:
 					exit;
-					break;
 				case 1: //tomb
 					_ItemStyle = irandom(3);
-					var _PosX = _MonumentX + 8;
+					_PosX = _MonumentX + 8;
 					_TileX = 116 + (_ItemStyle * 2);
 					_TileW = 2;
 					break;
@@ -493,7 +493,7 @@ function Decor_MonumentItems(_TMID, _MonumentX, _MonumentY, _MonumentStyle, _Mir
 				case 3: //platform
 					if(Prob(0.75)) exit;
 					_ItemStyle = irandom(1);
-					var _PosX = _MonumentX + 8;
+					_PosX = _MonumentX + 8;
 					_PosY = _MonumentY;
 					_TileX = 128 + (_ItemStyle * 2);
 					_TileW = 2;					
@@ -514,8 +514,7 @@ function Decor_MonumentItems(_TMID, _MonumentX, _MonumentY, _MonumentStyle, _Mir
 					break;
 				case 2: //rock
 				case 3: //vase
-					exit			
-					break;
+					exit;
 			}	
 			break;
 			

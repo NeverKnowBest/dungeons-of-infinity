@@ -1,3 +1,4 @@
+// Feather disable GM2064
 if(FinalExplosions > 0){
 	
 	instance_create_layer(x + irandom_range(-12, 12), y - 11 + irandom_range(-12, 12), "ObjsHighest", oExplosion_Large, {FloorLevel : FloorLevel});

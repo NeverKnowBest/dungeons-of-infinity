@@ -30,6 +30,7 @@ function Dungeon_Draw_Holes(_RoomIndex){
 	var HoleGrid = ds_grid_create(RoomTilesW, RoomTilesH);
 	ds_grid_clear(HoleGrid, -1);
 			
+	var FloorLevel;
 	for(var HoleIndex = 0; HoleIndex < array_length(HoleArray); HoleIndex++){
 		
 		var Hole = HoleArray[HoleIndex];
@@ -59,7 +60,7 @@ function Dungeon_Draw_Holes(_RoomIndex){
 		}
 
 		//invisible wall to block enemies
-		var FloorLevel = GetFloorLevelID(HoleX + (HoleW / 2), HoleY + (HoleH / 2));
+		FloorLevel = GetFloorLevelID(HoleX + (HoleW / 2), HoleY + (HoleH / 2));
 		var FloorLevelStr = GetFloorLevelString(FloorLevel);
 		var inst = WallObj_Create("Objs_" + FloorLevelStr, HoleX, HoleY, HoleTileW, HoleTileH);
 		inst.FloorLevel = FloorLevel;

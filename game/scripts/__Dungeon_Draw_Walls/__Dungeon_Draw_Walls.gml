@@ -1,11 +1,12 @@
 function DrawFloorTrim(_WallLevel, _x, _y, _TileX, _TileY){
 	
+	var _FloorLayer, _WaterLayer;
 	if(_WallLevel == 0){
-		var _FloorLayer = global.TMID_Floor_Upper;
-		var _WaterLayer = global.TMID_Water_Upper;
+		_FloorLayer = global.TMID_Floor_Upper;
+		_WaterLayer = global.TMID_Water_Upper;
 	}else{
-		var _FloorLayer = global.TMID_Floor_Lower;
-		var _WaterLayer = global.TMID_Water_Lower;		
+		_FloorLayer = global.TMID_Floor_Lower;
+		_WaterLayer = global.TMID_Water_Lower;		
 	}
 	
 	if(tilemap_get_at_pixel(_FloorLayer, _x, _y) != 0){		
@@ -36,6 +37,7 @@ function Dungeon_Draw_Walls(_RoomIndex){
 
 	
 	//Do both upper and lower walls. 
+	var WallArray, LevelStr, TMID_Walls, TilesThemeX, TilesThemeY, TilesX, TilesY;
 	for(var WallLevel = 0; WallLevel < 2; WallLevel++){
 		
 		if(WallLevel == 1 && !variable_struct_exists(Room.Template, "WallsLower")) break; //some template classes don't have the WallsLower layer, so exit
@@ -43,15 +45,15 @@ function Dungeon_Draw_Walls(_RoomIndex){
 		switch(WallLevel){
 
 			case 0: //Upper
-				var WallArray = Room.Template.WallsUpper;
-				var LevelStr = "Upper";
-				var TMID_Walls = global.TMID_Walls_Upper;
+				WallArray = Room.Template.WallsUpper;
+				LevelStr = "Upper";
+				TMID_Walls = global.TMID_Walls_Upper;
 				break;
 				
 			case 1: //Lower
-				var WallArray = Room.Template.WallsLower;
-				var LevelStr = "Lower";
-				var TMID_Walls = global.TMID_Walls_Lower;
+				WallArray = Room.Template.WallsLower;
+				LevelStr = "Lower";
+				TMID_Walls = global.TMID_Walls_Lower;
 				break;
 			
 		}
@@ -61,8 +63,8 @@ function Dungeon_Draw_Walls(_RoomIndex){
 		var FloorTrimTileX = 42;
 		var FloorTrimTileY = LevelTilesY;
 		
-		var TilesThemeX = 0;
-		var TilesThemeY = LevelTilesY;
+		TilesThemeX = 0;
+		TilesThemeY = LevelTilesY;
 		
 		//some templates have a forced level tileset for walls and floors
 		switch(global.Level.Index){
@@ -77,8 +79,8 @@ function Dungeon_Draw_Walls(_RoomIndex){
 		}
 
 		if(Room.ForcedTheme != -1){
-			var TilesThemeX = Room.ForcedTheme > 11 ? 101 : 0;
-			var TilesThemeY = 4 + (Room.ForcedTheme * 6);
+			TilesThemeX = Room.ForcedTheme > 11 ? 101 : 0;
+			TilesThemeY = 4 + (Room.ForcedTheme * 6);
 		}
 
 		
@@ -94,11 +96,11 @@ function Dungeon_Draw_Walls(_RoomIndex){
 			var PropertiesArray = WallObj.properties;
 
 			if(GetPropertyValue(PropertiesArray, "LavaPit") != -1){
-				var TilesX = 84;
-				var TilesY = VillageTilesY + 18;
+				TilesX = 84;
+				TilesY = VillageTilesY + 18;
 			}else{
-				var TilesX = TilesThemeX;
-				var TilesY = TilesThemeY;	
+				TilesX = TilesThemeX;
+				TilesY = TilesThemeY;	
 			}
 		
 			switch(GID){
@@ -178,11 +180,11 @@ function Dungeon_Draw_Walls(_RoomIndex){
 			var PropertiesArray = WallObj.properties;
 			
 			if(GetPropertyValue(PropertiesArray, "LavaPit") != -1){
-				var TilesX = 84;
-				var TilesY = VillageTilesY + 18;
+				TilesX = 84;
+				TilesY = VillageTilesY + 18;
 			}else{
-				var TilesX = TilesThemeX;
-				var TilesY = TilesThemeY;					
+				TilesX = TilesThemeX;
+				TilesY = TilesThemeY;					
 			}
 			
 			switch(GID){	
@@ -328,6 +330,7 @@ function Dungeon_Draw_Walls(_RoomIndex){
 		
 	}
 
+	var WallInst;
 	if(variable_struct_exists(Room.Template, "WallsCommon")){
 	
 		var WallsCommonArray = Room.Template.WallsCommon;
@@ -351,7 +354,7 @@ function Dungeon_Draw_Walls(_RoomIndex){
 
 			
 			if(!struct_exists(Wall, "gid")){
-				var WallInst = WallObj_Create(ObjLayer, WallX, WallY, WallTileW, WallTileH);
+				WallInst = WallObj_Create(ObjLayer, WallX, WallY, WallTileW, WallTileH);
 				continue;
 			}
 			
@@ -381,7 +384,7 @@ function Dungeon_Draw_Walls(_RoomIndex){
 						for(var j = NoEnd_T ? 0 : 1; j < WallTileH - (NoEnd_B ? 0 : 1); j++)		
 							tilemap_set_at_pixel(TMID, RailVID, WallX, WallY + (j * 8));
 					}
-					var WallInst = WallObj_Create(ObjLayer, WallX, WallY, WallTileW, WallTileH);
+					WallInst = WallObj_Create(ObjLayer, WallX, WallY, WallTileW, WallTileH);
 					WallInst.BlockProjectiles = false;
 					WallInst.BlockItems = false;
 					
@@ -457,7 +460,7 @@ function Dungeon_Draw_Walls(_RoomIndex){
 					}
 				
 					if(!IsSwitch && !SpikeBlocks){
-						var WallInst = WallObj_Create(ObjLayer, WallX, WallY, WallTileW, WallTileH);
+						WallInst = WallObj_Create(ObjLayer, WallX, WallY, WallTileW, WallTileH);
 						WallInst.BlockProjectiles = false;
 						WallInst.BlockItems = false;
 						if(!SpikeBlocks) global.SpawnedBlocks = true;
@@ -573,7 +576,7 @@ function Dungeon_Draw_Walls(_RoomIndex){
 
 
 			if(PassIndex == 0){
-				var WallInst = WallObj_Create("Objs_Upper", TLCornerX, TLCornerY, RailTileW, RailTileH);
+				WallInst = WallObj_Create("Objs_Upper", TLCornerX, TLCornerY, RailTileW, RailTileH);
 				if(SectionWallGID == TemplateObjGID.Rail){
 					WallInst.BlockProjectiles = false;
 					WallInst.BlockItems = false;

@@ -1,3 +1,4 @@
+// Feather disable GM2064
 if(global.Paused){
 	ObjIncAlarms();
 	exit;

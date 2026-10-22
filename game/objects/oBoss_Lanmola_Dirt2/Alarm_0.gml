@@ -13,13 +13,13 @@ audio_play_sound_stopall(Sound_Sand2);
 
 var S = 2.25;
 var Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = S; Rock.vy = -S;
-var Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = -S; Rock.vy = -S;
-var Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = S; Rock.vy = S;
-var Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = -S; Rock.vy = S;
+Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = -S; Rock.vy = -S;
+Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = S; Rock.vy = S;
+Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = -S; Rock.vy = S;
 if(oBoss_Lanmola_C.BossCount == 1){
-	var Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = S; Rock.vy = 0;
-	var Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = -S; Rock.vy = 0;
-	var Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = 0; Rock.vy = S;
-	var Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = 0; Rock.vy = -S;	
+	Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = S; Rock.vy = 0;
+	Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = -S; Rock.vy = 0;
+	Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = 0; Rock.vy = S;
+	Rock = instance_create_layer(x, y, "ObjsFloor_Upper", oBoss_Lanmola_Rock); Rock.vx = 0; Rock.vy = -S;	
 }
 instance_destroy(id)

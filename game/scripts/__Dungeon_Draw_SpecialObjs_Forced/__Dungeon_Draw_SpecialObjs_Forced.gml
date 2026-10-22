@@ -1,3 +1,4 @@
+// Feather disable GM2064
 
 
 
@@ -15,6 +16,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 	var MonumentStyleSelected = false;
 	var ColumnStyle = irandom(1);
 	
+	var MonumentStyle, inst, _x, WallInst, _y, SideXR, Inst, _TemplateClass, _TemplateSubClass, DoorWarpTemplateIndex, DoorWarpTemplateID, _TemplateArray, House_MapGridX, House_MapGridY, DoorRoomIndexWarp, ArcadeType, PosX, PosY, _WallInst, XPos, _Inst, WallObjInst, _DoorInst, _Index, _inst, _ObjLayer;
 	for(var SpecialRoomObjIndex = 0; SpecialRoomObjIndex < ObjCount; SpecialRoomObjIndex++){
 		
 		var Obj = SpecialRoomObjsArray[SpecialRoomObjIndex];
@@ -51,7 +53,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				
 				if(!MonumentStyleSelected){
 					
-					var MonumentStyle = Decor_Monuments_AllowedStyle(ObjX, ObjY, true);
+					MonumentStyle = Decor_Monuments_AllowedStyle(ObjX, ObjY, true);
 					
 					switch(global.Level.Index){
 						case DungeonLevel.Catacombs:
@@ -131,15 +133,15 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, 1, 4);
 				WallObj_Create("Objs_" + FloorLevelStr, ObjX + 8, ObjY + 8, 2, 3);
 				WallObj_Create("Objs_" + FloorLevelStr, ObjX + 24, ObjY, 1, 4);
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX + 8, ObjY, 2, 1);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX + 8, ObjY, 2, 1);
 				WallInst.BlockLink = false;
 
 				if(_RodCharger){
-					var inst = instance_create_layer(ObjX + 16, ObjY + 14, "ObjsHigher_" + FloorLevelStr, oRodCharger, {RoomIndex : _RoomIndex});
+					inst = instance_create_layer(ObjX + 16, ObjY + 14, "ObjsHigher_" + FloorLevelStr, oRodCharger, {RoomIndex : _RoomIndex});
 					SignCreate(ObjX + 16, ObjY + 32, global.RodChargerSignText, true);
 					global.Level.RodCharger = true;
 				}else{
-					var inst = instance_create_layer(ObjX + 16, ObjY + 14, "ObjsHigher_" + FloorLevelStr, oItem_Kinstone_Main, {Index : Kinstone_PickIndex(), RoomIndex : _RoomIndex});
+					inst = instance_create_layer(ObjX + 16, ObjY + 14, "ObjsHigher_" + FloorLevelStr, oItem_Kinstone_Main, {Index : Kinstone_PickIndex(), RoomIndex : _RoomIndex});
 					var Color = GetPropertyValue(PropertiesArray, "Color");
 					if(Color != -1){
 						with(inst){
@@ -173,12 +175,12 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 					}
 				}
 
-				var inst = Treasure_Create(_RoomIndex, ObjX, ObjY, _Item, true);
+				inst = Treasure_Create(_RoomIndex, ObjX, ObjY, _Item, true);
 				
 				break;
 
 			case TemplateObjGID.TreasureLarge:
-				var Inst = instance_create_layer(ObjX, ObjY, "Objs_" + FloorLevelStr, oTreasureLarge);
+				Inst = instance_create_layer(ObjX, ObjY, "Objs_" + FloorLevelStr, oTreasureLarge);
 				break;
 				
 			case TemplateObjGID.Altar:
@@ -188,8 +190,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				ClearTileBlock(global.TMID_Water_Lower, ObjX, ObjY, ObjTileW, ObjTileH);
 	
 				//Draw floor
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var FloorX = ObjX + (_x * 8);
 						var FloorY = ObjY + (_y * 8);
 						DrawTileBlock(FloorTMID, FloorX, FloorY, 111, LevelTilesY + 2, 1, 1);							
@@ -207,24 +209,24 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 					var SideX = ObjX + 8 + (_x * 8);
 					DrawTileBlock(WallTMID, SideX, ObjY, 111, LevelTilesY + 1, 1, 1);							
 				}
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, 1);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, 1);
 				WallInst.BlockProjectiles = false;
 				WallInst.BlockItems = false;
 	
 				//Draw L/R sides
 				for(_y = 0; _y < ObjTileH - 2; _y++){
 
-						var SideXR = ObjX + ObjW - 8;
+						SideXR = ObjX + ObjW - 8;
 						var SideY = ObjY + 8 + (_y * 8);
 			
 						DrawTileBlock(WallTMID, ObjX, SideY, 110, LevelTilesY + 2, 1, 1);
 						DrawTileBlock(WallTMID, SideXR, SideY, 112, LevelTilesY + 2, 1, 1);
 						
 				}
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, 1, ObjTileH);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, 1, ObjTileH);
 				WallInst.BlockProjectiles = false;
 				WallInst.BlockItems = false;
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, SideXR, ObjY, 1, ObjTileH);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, SideXR, ObjY, 1, ObjTileH);
 				WallInst.BlockProjectiles = false;
 				WallInst.BlockItems = false;
 	
@@ -232,8 +234,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				var StairsW = ObjTileW - 6;
 				var StairsX = ObjX + (4 * (ObjTileW - StairsW));
 				var StairsY = ObjY + ObjH - 16;
-				for(var _y = 0; _y < 2; _y++){
-					for(var _x = 0; _x < StairsW; _x++){
+				for(_y = 0; _y < 2; _y++){
+					for(_x = 0; _x < StairsW; _x++){
 						var SX = StairsX + (_x * 8);
 						var SY = StairsY + (_y * 8);
 						DrawTileBlock(FloorTMID, SX, SY, 111, LevelTilesY, 1, 1);
@@ -242,7 +244,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 	
 				//Place an EnemyWall on stairs to prevent enemies from going through them
 				//**Replace with WallObj_Create
-				var inst = WallObj_Create("Objs_" + FloorLevelStr, StairsX, StairsY, StairsW, 2);
+				inst = WallObj_Create("Objs_" + FloorLevelStr, StairsX, StairsY, StairsW, 2);
 				inst.FloorLevel = GetFloorLevelID(FloorLevelStr);
 				inst.BlockLink = false;
 				inst.BlockLinkCarry = false;
@@ -255,24 +257,24 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				DrawTileBlock(WallTMID, StairsX + (StairsW * 8), StairsY, 110, LevelTilesY, 1, 1); //TR
 				DrawTileBlock(WallTMID, StairsX - 8, StairsY + 8, 112, LevelTilesY + 3, 1, 1); //BL
 				DrawTileBlock(WallTMID, StairsX + (StairsW * 8), StairsY + 8, 110, LevelTilesY + 3, 1, 1); //TR
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX - 8, StairsY, 1, 2);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX - 8, StairsY, 1, 2);
 				WallInst.BlockProjectiles = false;
 				WallInst.BlockItems = false;
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX + (StairsW * 8), StairsY, 1, 2);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX + (StairsW * 8), StairsY, 1, 2);
 				WallInst.BlockProjectiles = false;
 				WallInst.BlockItems = false;
 	
 				//Draw Bottom Sides
 				var SideLen = (ObjTileW - StairsW - 4) / 2;
 		
-				for(var _x = 0; _x < SideLen; _x++){
+				for(_x = 0; _x < SideLen; _x++){
 					DrawTileBlock(WallTMID, ObjX + 8 + (_x * 8), StairsY + 8, 111, LevelTilesY + 3, 1, 1); 
 					DrawTileBlock(WallTMID, StairsX + (StairsW * 8) + 8 + (_x * 8), StairsY + 8, 111, LevelTilesY + 3, 1, 1); 
 				}
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX - 16, StairsY + 8, 2, 1);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX - 16, StairsY + 8, 2, 1);
 				WallInst.BlockProjectiles = false;
 				WallInst.BlockItems = false;
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX + (StairsW * 8), StairsY + 8, 2, 1);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, StairsX + (StairsW * 8), StairsY + 8, 2, 1);
 				WallInst.BlockProjectiles = false;
 				WallInst.BlockItems = false;
 				
@@ -313,7 +315,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						}				
 					
 						//Create wall obj
-						var WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ShopInst.TileW, ShopInst.TileH - 1,,,oShopWall);
+						WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ShopInst.TileW, ShopInst.TileH - 1,,,oShopWall);
 
 						break;
 					
@@ -335,22 +337,22 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(FloorTMID, ObjX2, ObjY2, 17, 2, 1, 1);
 	
 						//Top & Bottom Edges
-						for(var _x = 1; _x < ObjTileW - 1; _x++){
+						for(_x = 1; _x < ObjTileW - 1; _x++){
 							var FloorX = ObjX + (_x * 8);
 							DrawTileBlock(FloorTMID, FloorX, ObjY, 16, 0, 1, 1);							
 							DrawTileBlock(FloorTMID, FloorX, ObjY2, 16, 2, 1, 1);							
 						}
 	
 						//Top & Bottom Edges
-						for(var _y = 1; _y < ObjTileH - 1; _y++){
+						for(_y = 1; _y < ObjTileH - 1; _y++){
 							var FloorY = ObjY + (_y * 8);
 							DrawTileBlock(FloorTMID, ObjX, FloorY, 15, 1, 1, 1);							
 							DrawTileBlock(FloorTMID, ObjX2, FloorY, 17, 1, 1, 1);							
 						}	
 	
 						//Main floor
-						for(var _y = 1; _y < ObjTileH - 1; _y++){
-							for(var _x = 1; _x < ObjTileW - 1; _x++){
+						for(_y = 1; _y < ObjTileH - 1; _y++){
+							for(_x = 1; _x < ObjTileW - 1; _x++){
 								var FloorX = ObjX + (_x * 8);
 								var FloorY = ObjY + (_y * 8);
 								DrawTileBlock(FloorTMID, FloorX, FloorY, 16, 1, 1, 1);							
@@ -361,7 +363,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						ds_list_add(global.LargeMapItems, ShopInst); 
 						
 						//Create wall obj
-						var WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX + 8, ObjY + 8, ShopInst.TileW - 2, ShopInst.TileH - 2,,,oShopWall);
+						WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX + 8, ObjY + 8, ShopInst.TileW - 2, ShopInst.TileH - 2,,,oShopWall);
 
 						global.Level.ShopCount++;
 					
@@ -378,7 +380,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 			case TemplateObjGID.GemPond:
 			case TemplateObjGID.WishPond:
 
-				var _inst = instance_create_layer(ObjX + 8, ObjY + 8, "ObjsFloor_" + FloorLevelStr, oGemPondWater, {RoomIndex : _RoomIndex, W : ObjW - 16, H : ObjH - 16, GID : ObjGID})
+				_inst = instance_create_layer(ObjX + 8, ObjY + 8, "ObjsFloor_" + FloorLevelStr, oGemPondWater, {RoomIndex : _RoomIndex, W : ObjW - 16, H : ObjH - 16, GID : ObjGID})
 				
 				//Draw Corners
 				DrawTileBlock(WallTMID, ObjX, ObjY, 110, LevelTilesY + 1, 1, 1); //TL
@@ -396,7 +398,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				//Draw L/R sides
 				for(_y = 0; _y < ObjTileH - 2; _y++){
 
-						var SideXR = ObjX + ObjW - 8;
+						SideXR = ObjX + ObjW - 8;
 						var SideY = ObjY + 8 + (_y * 8);
 			
 						DrawTileBlock(WallTMID, ObjX, SideY, 110, LevelTilesY + 2, 1, 1);
@@ -404,7 +406,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						
 				}
 
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, ObjTileH);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, ObjTileH);
 				WallInst.BlockProjectiles = false;
 				WallInst.BlockItems = false;
 				
@@ -471,7 +473,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						}
 			
 						if(SpawnRupee){
-							var Inst = instance_create_layer(RupeePosX + 8, RupeePosY + 14, "Objs_" + FloorLevelStr, oItem_Rupee, {From : ItemFrom.Pot});
+							Inst = instance_create_layer(RupeePosX + 8, RupeePosY + 14, "Objs_" + FloorLevelStr, oItem_Rupee, {From : ItemFrom.Pot});
 							with(Inst){
 								Setup = false;
 								Rupee_Init(ObjGID == TemplateObjGID.Rupee5 ? 5 : (ObjGID == TemplateObjGID.Rupee10 ? 10 : 20));
@@ -504,11 +506,11 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 			case TemplateObjGID.Fairy:
 				
 				if(Prob(Chance_LargeFairy)){
-					var Inst = instance_create_layer(ObjX + 16, ObjY + 14, "Objs_" + FloorLevelStr, oFairy_Health, {RoomIndex : _RoomIndex});
+					Inst = instance_create_layer(ObjX + 16, ObjY + 14, "Objs_" + FloorLevelStr, oFairy_Health, {RoomIndex : _RoomIndex});
 					ds_list_add(global.LargeMapItems, Inst); 
 				}else{
 					repeat(choose(2, 3)){
-						var Inst = instance_create_layer(ObjX + irandom_range(-8, 40), ObjY + irandom_range(16, 64), "Objs_" + FloorLevelStr, oItem_Fairy, {From : ItemFrom.Pot});
+						Inst = instance_create_layer(ObjX + irandom_range(-8, 40), ObjY + irandom_range(16, 64), "Objs_" + FloorLevelStr, oItem_Fairy, {From : ItemFrom.Pot});
 						Inst.Setup = false;
 						Inst.ContainX1 = ObjX - 8;
 						Inst.ContainX2 = ObjX + 40;
@@ -565,7 +567,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(global.TMID_Tiles_Higher, ObjX, ObjY, XOffset, TileStartY, 3, 1);
 				
 						//top//bottom edge
-						for(var _x = 0; _x < ObjTileW - 6; _x++){
+						for(_x = 0; _x < ObjTileW - 6; _x++){
 							DrawTileBlock(global.TMID_Tiles_Higher, ObjX + 24 + (_x * 8), ObjY, 3 + XOffset, TileStartY, 1, 1); //top
 							DrawTileBlock(global.TMID_Tiles_Higher, ObjX + 24 + (_x * 8), RoofY2 - 24, 3 + XOffset, TileStartY + 2, 1, 4); //Bottom
 						}
@@ -574,7 +576,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(global.TMID_Tiles_Higher, RoofX2 - 16, ObjY, 4 + XOffset, TileStartY, 3, 1);
 				
 						//Left/Right side
-						for(var _y = 0; _y < ObjTileH - 8; _y++){
+						for(_y = 0; _y < ObjTileH - 8; _y++){
 							DrawTileBlock(global.TMID_Tiles_Higher, ObjX, ObjY + 8 + (_y * 8), XOffset, TileStartY + 1, 3, 1); //Left
 							DrawTileBlock(global.TMID_Tiles_Higher, RoofX2 - 16, ObjY + 8 + (_y * 8), 4 + XOffset, TileStartY + 1, 3, 1); //Right
 						}				
@@ -586,10 +588,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(global.TMID_Tiles_Higher, RoofX2 - 16, RoofY2 - 24, 4 + XOffset, TileStartY + 2, 3, 4);
 				
 						//Top
-						for(var _y = 0; _y < ObjTileH - 8; _y++){
-							for(var _x = 0; _x < ObjTileW - 6; _x++){
-								var PosX = ObjX + 24 + (_x * 8);
-								var PosY = ObjY + 8 + (_y * 8);
+						for(_y = 0; _y < ObjTileH - 8; _y++){
+							for(_x = 0; _x < ObjTileW - 6; _x++){
+								PosX = ObjX + 24 + (_x * 8);
+								PosY = ObjY + 8 + (_y * 8);
 								DrawTileBlock(global.TMID_Tiles_Higher, PosX, PosY, 3 + XOffset, TileStartY + 1, 1, 1);					
 							}
 						}
@@ -614,8 +616,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(global.TMID_Tiles_Higher, ObjX, ObjY, 7, VillageTilesY + 8, 1, 1);
 
 						//top//bottom edge
-						for(var _x = 0; _x < ObjTileW - 2; _x++){
-							var XPos = ObjX + 8 + (_x * 8);
+						for(_x = 0; _x < ObjTileW - 2; _x++){
+							XPos = ObjX + 8 + (_x * 8);
 							var XTile = 8 + (_x mod 2);
 							DrawTileBlock(global.TMID_Tiles_Higher, XPos, ObjY, XTile, VillageTilesY + 8, 1, 1); //top
 							DrawTileBlock(global.TMID_Tiles_Higher, XPos, RoofY2, XTile, VillageTilesY + 11, 1, 1); //Bottom
@@ -625,8 +627,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(global.TMID_Tiles_Higher, ObjX + (ObjTileW * 8) - 8, ObjY, 10, VillageTilesY + 8, 1, 1);
 
 						//Left/Right side
-						for(var _y = 0; _y < ObjTileH - 4; _y++){
-							var PosY = ObjY + 8 + (_y * 8);
+						for(_y = 0; _y < ObjTileH - 4; _y++){
+							PosY = ObjY + 8 + (_y * 8);
 							DrawTileBlock(global.TMID_Tiles_Higher, ObjX, PosY, 7, VillageTilesY + 9, 1, 1); //Left
 							DrawTileBlock(global.TMID_Tiles_Higher, RoofX2, PosY, 10, VillageTilesY + 9, 1, 1); //Right
 						}	
@@ -638,10 +640,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(global.TMID_Tiles_Higher, RoofX2 , RoofY2, 10, VillageTilesY + 11, 1, 1);
 
 						//Top
-						for(var _y = 0; _y < ObjTileH - 5; _y++){
-							for(var _x = 0; _x < ObjTileW - 2; _x++){
-								var PosX = ObjX + 8 + (_x * 8);
-								var PosY = ObjY + 8 + (_y * 8);
+						for(_y = 0; _y < ObjTileH - 5; _y++){
+							for(_x = 0; _x < ObjTileW - 2; _x++){
+								PosX = ObjX + 8 + (_x * 8);
+								PosY = ObjY + 8 + (_y * 8);
 								DrawTileBlock(global.TMID_Tiles_Higher, PosX, PosY, 8 + (_x mod 2), VillageTilesY + 9 + (_y mod 2), 1, 1);					
 							}
 						}
@@ -654,8 +656,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(global.TMID_Tiles_Higher, ObjX, ObjY, 11, VillageTilesY + 6, 1, 1);
 
 						//top//bottom edge
-						for(var _x = 0; _x < ObjTileW - 2; _x++){
-							var XPos = ObjX + 8 + (_x * 8);
+						for(_x = 0; _x < ObjTileW - 2; _x++){
+							XPos = ObjX + 8 + (_x * 8);
 							DrawTileBlock(global.TMID_Tiles_Higher, XPos, ObjY, 12, VillageTilesY + 6, 1, 1); //top
 							DrawTileBlock(global.TMID_Tiles_Higher, XPos, RoofY2, 12, VillageTilesY + 8, 1, 1); //Bottom
 						}
@@ -664,8 +666,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(global.TMID_Tiles_Higher, ObjX + (ObjTileW * 8) - 8, ObjY, 13, VillageTilesY + 6, 1, 1);
 
 						//Left/Right side
-						for(var _y = 0; _y < ObjTileH - 4; _y++){
-							var PosY = ObjY + 8 + (_y * 8);
+						for(_y = 0; _y < ObjTileH - 4; _y++){
+							PosY = ObjY + 8 + (_y * 8);
 							DrawTileBlock(global.TMID_Tiles_Higher, ObjX, PosY, 11, VillageTilesY + 7, 1, 1); //Left
 							DrawTileBlock(global.TMID_Tiles_Higher, RoofX2, PosY, 13, VillageTilesY + 7, 1, 1); //Right
 						}	
@@ -677,10 +679,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(global.TMID_Tiles_Higher, RoofX2 , RoofY2, 13, VillageTilesY + 8, 1, 1);
 
 						//Top
-						for(var _y = 0; _y < ObjTileH - 5; _y++){
-							for(var _x = 0; _x < ObjTileW - 2; _x++){
-								var PosX = ObjX + 8 + (_x * 8);
-								var PosY = ObjY + 8 + (_y * 8);
+						for(_y = 0; _y < ObjTileH - 5; _y++){
+							for(_x = 0; _x < ObjTileW - 2; _x++){
+								PosX = ObjX + 8 + (_x * 8);
+								PosY = ObjY + 8 + (_y * 8);
 								DrawTileBlock(global.TMID_Tiles_Higher, PosX, PosY, 12, VillageTilesY + 7, 1, 1);					
 							}
 						}
@@ -695,32 +697,32 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				var DoorY = WallY - 16;
 				
 				//determine which Room index the door will warp to
-				var DoorWarpTemplateID = GetPropertyValue(PropertiesArray, "House");
+				DoorWarpTemplateID = GetPropertyValue(PropertiesArray, "House");
 				
 				switch(global.Level.Index){
 					case DungeonLevel.Village:
-						var _TemplateClass = RoomTemplateClass.Village;
-						var _TemplateSubClass = RoomTemplateClass_Village.House;					
+						_TemplateClass = RoomTemplateClass.Village;
+						_TemplateSubClass = RoomTemplateClass_Village.House;					
 						break;
 					
 					case DungeonLevel.Mines:
-						var _TemplateClass = RoomTemplateClass.Mines;
-						var _TemplateSubClass = RoomTemplateClass_Mines.House;							
+						_TemplateClass = RoomTemplateClass.Mines;
+						_TemplateSubClass = RoomTemplateClass_Mines.House;							
 						break;
 				
 				}
 				
-				var _TemplateArray = global.Templates_Room[_TemplateClass][_TemplateSubClass];
+				_TemplateArray = global.Templates_Room[_TemplateClass][_TemplateSubClass];
 				for(var _RoomTemplateIndex = 0; _RoomTemplateIndex < global.Templates_Room_Count[_TemplateClass][_TemplateSubClass]; _RoomTemplateIndex++){
 					var _Template = _TemplateArray[_RoomTemplateIndex];
 					if(_Template.id == DoorWarpTemplateID){
-						var DoorWarpTemplateIndex = _RoomTemplateIndex;
+						DoorWarpTemplateIndex = _RoomTemplateIndex;
 						break;
 					}
 				}
-				var House_MapGridX = GetPropertyValue(_TemplateArray[DoorWarpTemplateIndex][$ "properties"], "House_MapGridX");
-				var House_MapGridY = GetPropertyValue(_TemplateArray[DoorWarpTemplateIndex][$ "properties"], "House_MapGridY");
-				var DoorRoomIndexWarp = global.Level.Map_RoomIndex[House_MapGridY][House_MapGridX];
+				House_MapGridX = GetPropertyValue(_TemplateArray[DoorWarpTemplateIndex][$ "properties"], "House_MapGridX");
+				House_MapGridY = GetPropertyValue(_TemplateArray[DoorWarpTemplateIndex][$ "properties"], "House_MapGridY");
+				DoorRoomIndexWarp = global.Level.Map_RoomIndex[House_MapGridY][House_MapGridX];
 				switch(WallStyle){
 					case 0: //regular
 					case 1: //arcade
@@ -738,7 +740,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				
 						//Door
 						DrawTileBlock(DecorTMID, DoorX, DoorY, 14, TileStartY, 4, 5);
-						var inst = instance_create_layer(DoorX + 8, DoorY + 16, "Objs_" + FloorLevelStr, oHouseDoor);
+						inst = instance_create_layer(DoorX + 8, DoorY + 16, "Objs_" + FloorLevelStr, oHouseDoor);
 						inst.image_index = (WallStyle == 0 ? 0 : 1);
 						inst.House_RoomIndex = DoorRoomIndexWarp;
 						inst.House_X = House_MapGridX * 256;
@@ -763,7 +765,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(WallTMID, ObjX + 56, WallY, 7, VillageTilesY + 12, 1, 2);
 						//Door
 						DrawTileBlock(WallTMID, ObjX + 40, WallY, 11, VillageTilesY + 11, 2, 2);
-						var inst = instance_create_layer(DoorX + 8, DoorY + 16, "Objs_" + FloorLevelStr, oHouseDoor);
+						inst = instance_create_layer(DoorX + 8, DoorY + 16, "Objs_" + FloorLevelStr, oHouseDoor);
 						inst.image_index = 0;
 						inst.House_RoomIndex = DoorRoomIndexWarp;
 						inst.House_X = House_MapGridX * 256;
@@ -788,7 +790,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						
 						//Door
 						DrawTileBlock(DecorTMID, DoorX, DoorY, 14, VillageTilesY, 4, 5);
-						var inst = instance_create_layer(DoorX + 8, DoorY + 16, "Objs_" + FloorLevelStr, oHouseDoor);
+						inst = instance_create_layer(DoorX + 8, DoorY + 16, "Objs_" + FloorLevelStr, oHouseDoor);
 						inst.House_RoomIndex = DoorRoomIndexWarp;
 						inst.House_X = House_MapGridX * 256;
 						inst.House_Y = House_MapGridY * 256;
@@ -817,8 +819,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 		
 			
 			case TemplateObjGID.StoreSign:
-				var _Index = GetPropertyValue(PropertiesArray, "Index");
-				var inst = instance_create_layer(ObjX, ObjY, "ObjsHigher_Upper", oStoreSign, {image_index : _Index});
+				_Index = GetPropertyValue(PropertiesArray, "Index");
+				inst = instance_create_layer(ObjX, ObjY, "ObjsHigher_Upper", oStoreSign, {image_index : _Index});
 				break;
 				
 			case TemplateObjGID.Temple:
@@ -827,8 +829,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				DrawTileBlock(global.TMID_Tiles_Highest, ObjX, ObjY, 18, VillageTilesY + 13, 1, 1);	
 						
 				//top edge
-				for(var _x = 0; _x < 8; _x++){
-					var XPos = ObjX + 8 + (_x * 8);
+				for(_x = 0; _x < 8; _x++){
+					XPos = ObjX + 8 + (_x * 8);
 					DrawTileBlock(global.TMID_Tiles_Highest, XPos, ObjY, 19, VillageTilesY + 13, 1, 1); //top
 				}
 
@@ -836,8 +838,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				DrawTileBlock(global.TMID_Tiles_Highest, ObjX2, ObjY, 20, VillageTilesY + 13, 1, 1);	
 
 				//Left/Right side
-				for(var _y = 0; _y < 3; _y++){
-					var PosY = ObjY + 8 + (_y * 8);
+				for(_y = 0; _y < 3; _y++){
+					PosY = ObjY + 8 + (_y * 8);
 					DrawTileBlock(global.TMID_Tiles_Highest, ObjX, PosY, 18, VillageTilesY + 14, 1, 1); //Left
 					DrawTileBlock(global.TMID_Tiles_Highest, ObjX2, PosY, 20, VillageTilesY + 14, 1, 1); //Right
 				}	
@@ -853,8 +855,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				DrawTileBlock(WallTMID, ObjX2 - 16, ObjY2 - 24, 20, VillageTilesY + 15, 1, 1);
 
 				//Bottom edge
-				for(var _x = 0; _x < 4; _x++){
-					var XPos = ObjX + 24 + (_x * 8);
+				for(_x = 0; _x < 4; _x++){
+					XPos = ObjX + 24 + (_x * 8);
 					DrawTileBlock(global.TMID_Tiles_Highest, XPos, ObjY2 - 24, 19, VillageTilesY + 15, 1, 1); 
 				}
 				DrawTileBlock(WallTMID, ObjX + 8, ObjY + 32, 19, VillageTilesY + 15, 1, 1); 
@@ -863,17 +865,17 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				DrawTileBlock(WallTMID, ObjX2 - 16, ObjY + 32, 17, VillageTilesY + 13, 1, 1); 
 						
 				//Top
-				for(var _y = 0; _y < 3; _y++){
-					for(var _x = 0; _x < 8; _x++){
-						var PosX = ObjX + 8 + (_x * 8);
-						var PosY = ObjY + 8 + (_y * 8);
+				for(_y = 0; _y < 3; _y++){
+					for(_x = 0; _x < 8; _x++){
+						PosX = ObjX + 8 + (_x * 8);
+						PosY = ObjY + 8 + (_y * 8);
 						DrawTileBlock(global.TMID_Tiles_Highest, PosX, PosY, 19, VillageTilesY + 14, 1, 1);					
 					}
 				}
-				for(var _y = 0; _y < 2; _y++){
-					for(var _x = 0; _x < 4; _x++){
-						var PosX = ObjX + 24 + (_x * 8);
-						var PosY = ObjY + 32 + (_y * 8);
+				for(_y = 0; _y < 2; _y++){
+					for(_x = 0; _x < 4; _x++){
+						PosX = ObjX + 24 + (_x * 8);
+						PosY = ObjY + 32 + (_y * 8);
 						DrawTileBlock(global.TMID_Tiles_Highest, PosX, PosY, 19, VillageTilesY + 14, 1, 1);					
 					}
 				}
@@ -892,20 +894,20 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 
 				//determine which Room index the door will warp to
 
-				var DoorWarpTemplateID = GetPropertyValue(PropertiesArray, "House");
-				var _TemplateArray = global.Templates_Room[RoomTemplateClass.Village][RoomTemplateClass_Village.House];
+				DoorWarpTemplateID = GetPropertyValue(PropertiesArray, "House");
+				_TemplateArray = global.Templates_Room[RoomTemplateClass.Village][RoomTemplateClass_Village.House];
 				for(var _RoomTemplateIndex = 0; _RoomTemplateIndex < global.Templates_Room_Count[RoomTemplateClass.Village][RoomTemplateClass_Village.House]; _RoomTemplateIndex++){
 					var _Template = _TemplateArray[_RoomTemplateIndex];
 					if(_Template.id == DoorWarpTemplateID){
-						var DoorWarpTemplateIndex = _RoomTemplateIndex;
+						DoorWarpTemplateIndex = _RoomTemplateIndex;
 						break;
 					}
 				}
-				var House_MapGridX = GetPropertyValue(_TemplateArray[DoorWarpTemplateIndex][$ "properties"], "House_MapGridX");
-				var House_MapGridY = GetPropertyValue(_TemplateArray[DoorWarpTemplateIndex][$ "properties"], "House_MapGridY");
-				var DoorRoomIndexWarp = global.Level.Map_RoomIndex[House_MapGridY][House_MapGridX];
+				House_MapGridX = GetPropertyValue(_TemplateArray[DoorWarpTemplateIndex][$ "properties"], "House_MapGridX");
+				House_MapGridY = GetPropertyValue(_TemplateArray[DoorWarpTemplateIndex][$ "properties"], "House_MapGridY");
+				DoorRoomIndexWarp = global.Level.Map_RoomIndex[House_MapGridY][House_MapGridX];
 				
-				var inst = instance_create_layer(ObjX + 32, ObjY2 - 16, "Objs_" + FloorLevelStr, oHouseDoor);
+				inst = instance_create_layer(ObjX + 32, ObjY2 - 16, "Objs_" + FloorLevelStr, oHouseDoor);
 				inst.image_index = 2;
 				inst.House_RoomIndex = DoorRoomIndexWarp;
 				inst.House_X = House_MapGridX * 256;
@@ -929,7 +931,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 
 						//rails
 						for(var i = 0; i < ObjTileW; i++){
-							var PosX = ObjX + (i * 8);
+							PosX = ObjX + (i * 8);
 							//Top
 							DrawTileBlock(DecorTMID, PosX, ObjY, 27 + (i mod 2), VillageTilesY, 1, 2);
 							//Bottom
@@ -937,10 +939,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						}
 
 						//Floor
-						for(var _y = 0; _y < ObjTileH - 4; _y++){
-							for(var _x = 0; _x < ObjTileW; _x++){
-								var PosX = ObjX + (_x * 8);
-								var PosY = ObjY + 16 + (_y * 8);
+						for(_y = 0; _y < ObjTileH - 4; _y++){
+							for(_x = 0; _x < ObjTileW; _x++){
+								PosX = ObjX + (_x * 8);
+								PosY = ObjY + 16 + (_y * 8);
 								//var Tile = (_x == 0 ? 29 : (_x == ObjTileW - 1 ? 29 : 27));
 								DrawTileBlock(WallTMID, PosX, PosY, 28, VillageTilesY + 2, 1, 1);
 							}
@@ -948,7 +950,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						}
 						
 						//draw the end rails only if there's no NoEnd_L or NoEnd_R
-						if(GetPropertyValue(PropertiesArray, "NoEnd_L") == -1){;		
+						if(GetPropertyValue(PropertiesArray, "NoEnd_L") == -1){		
 							//TL
 							DrawTileBlock(DecorTMID, ObjX, ObjY, 26, VillageTilesY, 1, 2);
 							//BL
@@ -959,7 +961,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 							}
 
 						}
-						if(GetPropertyValue(PropertiesArray, "NoEnd_R") == -1){;		
+						if(GetPropertyValue(PropertiesArray, "NoEnd_R") == -1){		
 							//TR
 							DrawTileBlock(DecorTMID, ObjX2, ObjY, 29, VillageTilesY, 1, 2);
 							//BR
@@ -982,7 +984,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						//TL
 						DrawTileBlock(DecorTMID, ObjX, ObjY, 30, VillageTilesY, 2, 1);
 						for(var i = 0; i < ObjTileH - 2; i++){
-							var PosY = ObjY + 8 + (i * 8);
+							PosY = ObjY + 8 + (i * 8);
 							//Left
 							DrawTileBlock(DecorTMID, ObjX, PosY, 30, VillageTilesY + 1 + (i mod 2), 2, 1);
 							//Right
@@ -996,10 +998,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						DrawTileBlock(DecorTMID, ObjX2 - 8, ObjY2, 33, VillageTilesY + 3, 2, 1);
 
 						//Floor
-						for(var _y = 0; _y < ObjTileH; _y++){
-							for(var _x = 0; _x < ObjTileW - 4; _x++){
-								var PosX = ObjX + 16 + (_x * 8);
-								var PosY = ObjY + (_y * 8);
+						for(_y = 0; _y < ObjTileH; _y++){
+							for(_x = 0; _x < ObjTileW - 4; _x++){
+								PosX = ObjX + 16 + (_x * 8);
+								PosY = ObjY + (_y * 8);
 								var Tile = VillageTilesY + (_y == 0 ? 0 : (_y == ObjTileH - 1 ? 3 : 1));
 								DrawTileBlock(WallTMID, PosX, PosY, 32, Tile, 1, 1);
 							}
@@ -1016,7 +1018,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 				
 			case TemplateObjGID.Waterfall:
-				var inst = instance_create_layer(ObjX, ObjY, "ObjsHigher_Upper", oWaterfall, {W : ObjW, H : ObjH});
+				inst = instance_create_layer(ObjX, ObjY, "ObjsHigher_Upper", oWaterfall, {W : ObjW, H : ObjH});
 				break;
 			
 			case TemplateObjGID.Shadow:
@@ -1036,11 +1038,11 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 				
 			case TemplateObjGID.VillageFortWall:
-				for(var _x = 0; _x < ObjTileW; _x++){
-					var PosX = ObjX + (_x * 8);
+				for(_x = 0; _x < ObjTileW; _x++){
+					PosX = ObjX + (_x * 8);
 					DrawTileBlock(global.TMID_Tiles_Higher, PosX, ObjY, 18, VillageTilesY, 1, 1);
-					for(var _y = 0; _y < ObjTileH - 2; _y++){
-						var PosY = ObjY + 8 + (_y * 8);
+					for(_y = 0; _y < ObjTileH - 2; _y++){
+						PosY = ObjY + 8 + (_y * 8);
 						DrawTileBlock(global.TMID_Tiles_Higher, PosX, PosY, 18, VillageTilesY + 1, 1, 1);
 					}
 					DrawTileBlock(WallTMID, PosX, ObjY2, 18, VillageTilesY + 2, 1, 1);
@@ -1050,24 +1052,24 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				
 			case TemplateObjGID.Arcade:
 				
-				var PosX = ObjX + 12;
-				var PosY = ObjY + 40;
+				PosX = ObjX + 12;
+				PosY = ObjY + 40;
 				switch(ObjType){
-					case "Pitfall": var ArcadeType = oArcade_Pitfall; break;
-					case "Zerberk": var ArcadeType = oArcade_Zerberk; break;
-					case "PopMachine": var ArcadeType = oPopMachine; PosX = ObjX; PosY = ObjY; break;
-					case "ClawMachine": var ArcadeType = oClawMachine; PosX = ObjX; PosY = ObjY; break;
-					case "Poker": var ArcadeType = oArcade_Poker; break;
-					case "Mothula": var ArcadeType = oArcade_Mothula; break;
-					case "ShredderTV": var ArcadeType = oArcade_ShredderTV; break;
-					default: var ArcadeType = oArcade_Fake;	
+					case "Pitfall": ArcadeType = oArcade_Pitfall; break;
+					case "Zerberk": ArcadeType = oArcade_Zerberk; break;
+					case "PopMachine": ArcadeType = oPopMachine; PosX = ObjX; PosY = ObjY; break;
+					case "ClawMachine": ArcadeType = oClawMachine; PosX = ObjX; PosY = ObjY; break;
+					case "Poker": ArcadeType = oArcade_Poker; break;
+					case "Mothula": ArcadeType = oArcade_Mothula; break;
+					case "ShredderTV": ArcadeType = oArcade_ShredderTV; break;
+					default: ArcadeType = oArcade_Fake;	
 				}
-				var inst = instance_create_layer(PosX, PosY, "Objs_" + FloorLevelStr, ArcadeType, {RoomIndex : _RoomIndex});
+				inst = instance_create_layer(PosX, PosY, "Objs_" + FloorLevelStr, ArcadeType, {RoomIndex : _RoomIndex});
 				break;
 
 			case TemplateObjGID.PoolTable:
-				var inst = instance_create_layer(ObjX, ObjY, "Objs_Upper", oPoolTable);
-				var WallInst = WallObj_Create("Objs_Upper", ObjX, ObjY, ObjTileW, ObjTileH);
+				inst = instance_create_layer(ObjX, ObjY, "Objs_Upper", oPoolTable);
+				WallInst = WallObj_Create("Objs_Upper", ObjX, ObjY, ObjTileW, ObjTileH);
 				WallInst.BlockProjectiles = false;
 				break;
 				
@@ -1077,7 +1079,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				DrawTileBlock(WallTMID, ObjX, ObjY + 8, 81, VillageTilesY + 5, 1, 1);
 				DrawTileBlock(WallTMID, ObjX + 8, ObjY + 8, 80, VillageTilesY + 4, 1, 1);
 				//Wall
-				var WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, ObjTileH);
+				WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, ObjTileH);
 				WallInst.BlockProjectiles = false;
 				break;
 				
@@ -1114,7 +1116,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 			case TemplateObjGID.Bar_Hor:
 				//Hor
 				for(var i = 0; i < ObjTileW; i++){
-					var PosX = ObjX + (i * 8);
+					PosX = ObjX + (i * 8);
 					DrawTileBlock(WallTMID, PosX, ObjY, 83, VillageTilesY + 4, 1, 1);
 					DrawTileBlock(WallTMID, PosX, ObjY + 8, 83, VillageTilesY + 5, 1, 2);
 				}
@@ -1126,7 +1128,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 			case TemplateObjGID.Bar_Ver:
 				//Hor
 				for(var i = 0; i < ObjTileH; i++){
-					var PosY = ObjY + (i * 8);
+					PosY = ObjY + (i * 8);
 					DrawTileBlock(WallTMID, ObjX + 8, PosY, 80, VillageTilesY + 5, 1, 1);
 					DrawTileBlock(WallTMID, ObjX, PosY, 81, VillageTilesY + 5, 1, 1);
 				}
@@ -1192,7 +1194,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 
 					default:
 						
-						var inst = instance_create_layer(ObjX, ObjY, "Objs_" + FloorLevelStr, asset_get_index("o" + ObjName), 
+						inst = instance_create_layer(ObjX, ObjY, "Objs_" + FloorLevelStr, asset_get_index("o" + ObjName), 
 							{Name : ObjName, 
 							 Dialogue : SplitStrToArray(GetPropertyValue(PropertiesArray, "Dialogue"), "\n"),
 							 Response : SplitStrToArray(GetPropertyValue(PropertiesArray, "Response"), "\n"),
@@ -1205,11 +1207,11 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						break;
 					
 					case "OldLady":
-						var inst = instance_create_layer(ObjX + 8, ObjY + 3, "Objs_" + FloorLevelStr, oNPC_OldLady);
+						inst = instance_create_layer(ObjX + 8, ObjY + 3, "Objs_" + FloorLevelStr, oNPC_OldLady);
 						break;
 
 					case "ShopKeeper":
-						var inst = instance_create_layer(ObjX, ObjY, "Objs_" + FloorLevelStr, oShopKeeper, {ShopType : GetShopType(ObjName)});
+						inst = instance_create_layer(ObjX, ObjY, "Objs_" + FloorLevelStr, oShopKeeper, {ShopType : GetShopType(ObjName)});
 						inst.sprite_index = asset_get_index("sShopKeeper_" + ObjName);
 						inst.x += sprite_get_xoffset(inst.sprite_index);
 						inst.y += sprite_get_yoffset(inst.sprite_index);
@@ -1266,8 +1268,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 
 			case TemplateObjGID.Tree1:
 				
-				for(var _y = 0; _y < floor(ObjTileH / 4); _y++){
-					for(var _x = 0; _x < floor(ObjTileW / 4); _x++){
+				for(_y = 0; _y < floor(ObjTileH / 4); _y++){
+					for(_x = 0; _x < floor(ObjTileW / 4); _x++){
 						var _TreeX = ObjX + (_x * 32);
 						var _TreeY = ObjY + (_y * 32);
 						DrawTileBlock(WallTMID, _TreeX, _TreeY, 34 + (GetPropertyValue(PropertiesArray, "Pink") != -1 ? 4 : 0), VillageTilesY + 6, 4, 4);
@@ -1279,8 +1281,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 			
 			case TemplateObjGID.Tree2:
-				for(var _y = 0; _y < floor(ObjTileH / 4); _y++){
-					for(var _x = 0; _x < floor(ObjTileW / 3); _x++){
+				for(_y = 0; _y < floor(ObjTileH / 4); _y++){
+					for(_x = 0; _x < floor(ObjTileW / 3); _x++){
 						var _TreeX = ObjX + (_x * 24);
 						var _TreeY = ObjY + (_y * 32);
 						DrawTileBlock(WallTMID, _TreeX, _TreeY, 47, VillageTilesY, 3, 4);
@@ -1291,8 +1293,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Tree3:
-				for(var _y = 0; _y < floor(ObjTileH / 3); _y++){
-					for(var _x = 0; _x < floor(ObjTileW / 2); _x++){
+				for(_y = 0; _y < floor(ObjTileH / 3); _y++){
+					for(_x = 0; _x < floor(ObjTileW / 2); _x++){
 						var _TreeX = ObjX + (_x * 16);
 						var _TreeY = ObjY + (_y * 24);
 						DrawTileBlock(WallTMID, _TreeX, _TreeY, 45, VillageTilesY, 2, 3);
@@ -1303,8 +1305,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 				
 			case TemplateObjGID.Tree4:
-				for(var _y = 0; _y < floor(ObjTileH / 3); _y++){
-					for(var _x = 0; _x < floor(ObjTileW / 2); _x++){
+				for(_y = 0; _y < floor(ObjTileH / 3); _y++){
+					for(_x = 0; _x < floor(ObjTileW / 2); _x++){
 						var _TreeX = ObjX + (_x * 16);
 						var _TreeY = ObjY + (_y * 24);
 						DrawTileBlock(WallTMID, _TreeX, _TreeY, 45, VillageTilesY + 3, 2, 3);
@@ -1316,8 +1318,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				
 			case TemplateObjGID.FenceHor:
 
-				for(var _x = 0; _x < ObjTileW; _x++){
-					var PosX = ObjX + (_x * 8);
+				for(_x = 0; _x < ObjTileW; _x++){
+					PosX = ObjX + (_x * 8);
 					if(_x mod 2 == 0)
 						DrawTileBlock(WallTMID, PosX, ObjY, 26, VillageTilesY + 8, 1, 2);
 					else
@@ -1325,20 +1327,20 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 						
 				}
 
-				var _WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, ObjTileH);			
+				_WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, ObjTileH);			
 				_WallInst.BlockProjectiles = false;
 				break;
 				
 			case TemplateObjGID.FenceVer:
 
-				for(var _y = 0; _y < floor(ObjTileH / 2); _y++){
-					var PosY = ObjY + (_y * 16);
+				for(_y = 0; _y < floor(ObjTileH / 2); _y++){
+					PosY = ObjY + (_y * 16);
 					DrawTileBlock(WallTMID, ObjX, PosY, 29, VillageTilesY + 8, 1, 2);						
 				}
 				
 				DrawTileBlock(WallTMID, ObjX, ObjY2 - 8, 26, VillageTilesY + 8, 1, 2);
 				
-				var _WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, ObjTileH);
+				_WallInst = WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, ObjTileH);
 				_WallInst.BlockProjectiles = false;
 				
 				break;
@@ -1400,10 +1402,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 				
 			case TemplateObjGID.CemetaryWall:
-				for(var _y = 0; _y < floor(ObjTileH / 2); _y++){
-					for(var _x = 0; _x < floor(ObjTileW / 2); _x++){
-						var PosX = ObjX + (_x * 16);
-						var PosY = ObjY + (_y * 16);
+				for(_y = 0; _y < floor(ObjTileH / 2); _y++){
+					for(_x = 0; _x < floor(ObjTileW / 2); _x++){
+						PosX = ObjX + (_x * 16);
+						PosY = ObjY + (_y * 16);
 						DrawTileBlock(WallTMID, PosX, PosY, 48, VillageTilesY + 13, 2, 2);
 					}
 				}
@@ -1420,8 +1422,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Gate:
-				for(var _x = 0; _x < ObjTileW; _x++){
-					var PosX = ObjX + (_x * 8);
+				for(_x = 0; _x < ObjTileW; _x++){
+					PosX = ObjX + (_x * 8);
 					DrawTileBlock(WallTMID, PosX, ObjY, 48 + (_x mod 2), VillageTilesY + 4, 1, 3);
 				}
 				WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, ObjTileW, ObjTileH);
@@ -1499,7 +1501,6 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				DrawTileBlock(DecorTMID, ObjX, ObjY, 66 + (real(ObjType) * 2), VillageTilesY + 14, 2, 3);
 				WallObj_Create("Objs_" + FloorLevelStr, ObjX, ObjY, 2, 3);						
 				break;				
-				break;
 			
 			case TemplateObjGID.Shelves:
 				DrawTileBlock(DecorTMID, ObjX, ObjY, 68, VillageTilesY + 5, 6, 4);
@@ -1534,7 +1535,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				DrawTileBlock(WallTMID, ObjX, ObjY, 46, VillageTilesY + 7, 1, 2);
 				//middle
 				for(var i = 0; i< ObjTileW - 2; i++){
-					var XPos = ObjX + 8 + (i * 8);
+					XPos = ObjX + 8 + (i * 8);
 					DrawTileBlock(WallTMID, XPos, ObjY, 47 + (i mod 2), VillageTilesY + 7, 1, 2);
 				}
 				//Right edge
@@ -1554,7 +1555,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 			
 			case TemplateObjGID.Book:
-				var inst = instance_create_layer(ObjX, ObjY, "Objs_" + FloorLevelStr, oBook);
+				inst = instance_create_layer(ObjX, ObjY, "Objs_" + FloorLevelStr, oBook);
 				break;
 
 			case TemplateObjGID.Garbage:
@@ -1605,7 +1606,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 			
 			case TemplateObjGID.Tree_Large_T:
 				DrawTileBlock(global.TMID_Tiles_Highest, ObjX, ObjY, 94, VillageTilesY, 6, 5);
-				var WallInst = WallObj_Create("Objs_Upper", ObjX, ObjY + 8, ObjTileW, 8);
+				WallInst = WallObj_Create("Objs_Upper", ObjX, ObjY + 8, ObjTileW, 8);
 				WallInst.FloorLevel = UPPER;
 				break;
 			case TemplateObjGID.Tree_Large_B:
@@ -1634,8 +1635,8 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 			
 			case TemplateObjGID.CastleWallFloor:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						DrawTileBlock(global.TMID_Walls_Upper, ObjX + (_x * 8), ObjY + (_y * 8), 93, VillageTilesY + 11, 1, 1);
 					}
 				}
@@ -1669,7 +1670,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				}
 				BushInst.image_index = BushInst.Index;
 				
-				var WallInst = WallObj_Create("ObjsFloor_" + FloorLevelStr, ObjX, ObjY, 2, 2);				
+				WallInst = WallObj_Create("ObjsFloor_" + FloorLevelStr, ObjX, ObjY, 2, 2);				
 				WallInst.BlockItems = false;
 				WallInst.BlockProjectiles = false;
 				BushInst.WallObj = WallInst; //Save wall inst so we can destroy it after bush is grabbed
@@ -1732,9 +1733,9 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 			
 			case TemplateObjGID.Gem:
 				if(global.Level.Index == DungeonLevel.Mines){
-					var _Inst = instance_create_layer(ObjX + 8, ObjY + 16, "Objs_" + FloorLevelStr, oItem_Gem, {From : ItemFrom.Treasure});
+					_Inst = instance_create_layer(ObjX + 8, ObjY + 16, "Objs_" + FloorLevelStr, oItem_Gem, {From : ItemFrom.Treasure});
 				}else{
-					var _Inst = instance_create_layer(ObjX + 8, ObjY + 16, "Objs_" + FloorLevelStr, choose(oItem_Gem, oItem_Gem, oItem_Kinstone), {From : ItemFrom.Treasure});
+					_Inst = instance_create_layer(ObjX + 8, ObjY + 16, "Objs_" + FloorLevelStr, choose(oItem_Gem, oItem_Gem, oItem_Kinstone), {From : ItemFrom.Treasure});
 				}
 				//most of the time, make sure gem or kinstone isn't the same as others in the room
 				
@@ -1837,10 +1838,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 
 				ClearTileBlock(WallTMID, ObjX + 8, ObjY + 8, 2, 2);
 
-				var WallObjInst = collision_point(ObjX, ObjY, oWall, false, true);
+				WallObjInst = collision_point(ObjX, ObjY, oWall, false, true);
 				if(WallObjInst != noone) WallObj_Cutout_H(WallObjInst, ObjX + 8, ObjX + 23);
 				
-				var _DoorInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_" + FloorLevelStr, oDoor);
+				_DoorInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_" + FloorLevelStr, oDoor);
 				_DoorInst.FloorLevel = FloorLevel;
 				_DoorInst.Location = "Top";
 				_DoorInst.AddTracks = GetPropertyValue(PropertiesArray, "AddTrack") != -1;
@@ -1851,10 +1852,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 
 				ClearTileBlock(WallTMID, ObjX + 8, ObjY, 2, 2);
 
-				var WallObjInst = collision_point(ObjX, ObjY, oWall, false, true);
+				WallObjInst = collision_point(ObjX, ObjY, oWall, false, true);
 				if(WallObjInst != noone) WallObj_Cutout_H(WallObjInst, ObjX + 8, ObjX + 23);
 				
-				var _DoorInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_" + FloorLevelStr, oDoor);
+				_DoorInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_" + FloorLevelStr, oDoor);
 				_DoorInst.FloorLevel = FloorLevel;
 				_DoorInst.Location = "Bottom";
 				_DoorInst.AddTracks = GetPropertyValue(PropertiesArray, "AddTrack") != -1;
@@ -1865,10 +1866,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 			
 				ClearTileBlock(WallTMID, ObjX + 16, ObjY + 8, 2, 2);
 
-				var WallObjInst = collision_point(ObjX, ObjY, oWall, false, true);
+				WallObjInst = collision_point(ObjX, ObjY, oWall, false, true);
 				if(WallObjInst != noone) WallObj_Cutout_V(WallObjInst, ObjY + 8, ObjY + 23);
 
-				var _DoorInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_" + FloorLevelStr, oDoor);
+				_DoorInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_" + FloorLevelStr, oDoor);
 				_DoorInst.FloorLevel = FloorLevel;
 				_DoorInst.Location = "Left";
 				_DoorInst.AddTracks = GetPropertyValue(PropertiesArray, "AddTrack") != -1;
@@ -1879,10 +1880,10 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 
 				ClearTileBlock(WallTMID, ObjX + 8, ObjY + 8, 2, 2);
 
-				var WallObjInst = collision_point(ObjX, ObjY, oWall, false, true);
+				WallObjInst = collision_point(ObjX, ObjY, oWall, false, true);
 				if(WallObjInst != noone) WallObj_Cutout_V(WallObjInst, ObjY + 8, ObjY + 23);
 
-				var _DoorInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_" + FloorLevelStr, oDoor);
+				_DoorInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_" + FloorLevelStr, oDoor);
 				_DoorInst.FloorLevel = FloorLevel;
 				_DoorInst.Location = "Right";
 				_DoorInst.AddTracks = GetPropertyValue(PropertiesArray, "AddTrack") != -1;
@@ -1900,17 +1901,17 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 				
 			case TemplateObjGID.Mine_GemRock:
-				var _Index = irandom(9);//GetPropertyValue(PropertiesArray, "Index");
+				_Index = irandom(9);//GetPropertyValue(PropertiesArray, "Index");
 				var GemRockInst = instance_create_layer(ObjX + 8, ObjY + 16, "ObjsFloor_" + FloorLevelStr, oGemRock, {image_index: _Index});
 				break;
 				
 			case TemplateObjGID.Mine_GemWall:
-				var _Index = irandom(9);//GetPropertyValue(PropertiesArray, "Index");
+				_Index = irandom(9);//GetPropertyValue(PropertiesArray, "Index");
 				DrawTileBlock(DecorTMID, ObjX, ObjY, 118 + ((_Index mod 5) * 2), VillageTilesY + 4 + ((_Index div 5) * 2), 2, 2, Prob(0.5));
 				break;
 				
 			case TemplateObjGID.Mine_Mushrooms:
-				var _Index = GetPropertyValue(PropertiesArray, "Index") * 2;
+				_Index = GetPropertyValue(PropertiesArray, "Index") * 2;
 				_Index = choose(_Index, _Index + 1)
 				DrawTileBlock(DecorTMID, ObjX, ObjY, 128 + ((_Index mod 4) * 2), VillageTilesY + 4 + ((_Index div 4) * 2), 2, 2, Prob(0.5));
 				break;
@@ -1920,11 +1921,11 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 					var _PosX = ObjX + (_x * 8);
 					DrawTileBlock(DecorTMID, _PosX, ObjY, 134, VillageTilesY + 18, 1, 4);
 				}
-				var _ObjLayer = "Objs_" + FloorLevelStr;
+				_ObjLayer = "Objs_" + FloorLevelStr;
 				WallObj_Create(_ObjLayer, ObjX, ObjY - 12, ObjTileW, 1);
 				WallObj_Create(_ObjLayer, ObjX, ObjY2, ObjTileW, 1);
 				
-				var _inst = instance_create_layer(ObjX, ObjY, _ObjLayer, oDrawBridgeArea);
+				_inst = instance_create_layer(ObjX, ObjY, _ObjLayer, oDrawBridgeArea);
 				_inst.image_xscale = ObjTileW;
 				_inst.image_yscale = ObjTileH;
 				break;
@@ -1934,11 +1935,11 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 					var _PosY = ObjY + (_y * 8);
 					DrawTileBlock(DecorTMID, ObjX, _PosY, 130, VillageTilesY + 22, 4, 1);
 				}		
-				var _ObjLayer = "Objs_" + FloorLevelStr;
+				_ObjLayer = "Objs_" + FloorLevelStr;
 				WallObj_Create(_ObjLayer, ObjX - 5, ObjY, 1, ObjTileH);
 				WallObj_Create(_ObjLayer, ObjX2 + 5, ObjY, 1, ObjTileH);
 
-				var _inst = instance_create_layer(ObjX, ObjY, _ObjLayer, oDrawBridgeArea);
+				_inst = instance_create_layer(ObjX, ObjY, _ObjLayer, oDrawBridgeArea);
 				_inst.image_xscale = ObjTileW;
 				_inst.image_yscale = ObjTileH;
 				

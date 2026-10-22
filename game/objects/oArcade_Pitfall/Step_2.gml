@@ -1,6 +1,7 @@
 event_inherited();
 
 
+var Y;
 switch(State){
 	
 	case ArcadeState.UnUsed:
@@ -38,16 +39,16 @@ switch(State){
 			var CurrentEnemy = NextEnemy;
 			switch(CurrentEnemy){
 				case oPitfall_Scorpion:
-					var Y = HarryStartY;
+					Y = HarryStartY;
 					break;
 				case oPitfall_Bat:
-					var Y = HarryStartY - 34;
+					Y = HarryStartY - 34;
 					break;
 				case oPitfall_Eagle:
-					var Y = HarryStartY - 38;
+					Y = HarryStartY - 38;
 					break;
 				case oPitfall_Frog:
-					var Y = HarryStartY;
+					Y = HarryStartY;
 					break;
 			}
 			instance_create_layer(CamX + CamW + 8, Y, "System", CurrentEnemy);

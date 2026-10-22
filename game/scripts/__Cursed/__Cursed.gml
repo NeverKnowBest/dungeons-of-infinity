@@ -143,6 +143,7 @@ function GenerateCurse(){
 	ds_list_destroy(_CurseTaskList);
 	
 	
+	var ItemStr;
 	switch(global.CurseTask){
 		case CurseTasks.Kill:
 			global.CurseTaskCount = choose(15, 20, 25, 30, 35, 40, 45, 50);
@@ -191,9 +192,9 @@ function GenerateCurse(){
 			ds_list_destroy(ItemList)
 			
 			switch(global.CurseTaskItem){
-				case ItemClass.Rupee: global.CurseTaskCount = irandom_range(2, 5) * 20; var ItemStr = " rupees."; break;
-				case ItemClass.Heart: global.CurseTaskCount = irandom_range(5, 10); var ItemStr = " hearts."; break;											
-				case ItemClass.HeartPiece: global.CurseTaskCount = 1; var ItemStr = " heart container."; break;						
+				case ItemClass.Rupee: global.CurseTaskCount = irandom_range(2, 5) * 20; ItemStr = " rupees."; break;
+				case ItemClass.Heart: global.CurseTaskCount = irandom_range(5, 10); ItemStr = " hearts."; break;											
+				case ItemClass.HeartPiece: global.CurseTaskCount = 1; ItemStr = " heart container."; break;						
 			}
 	
 			global.CurseTaskStr = "Collect " + string(global.CurseTaskCount) + ItemStr;			

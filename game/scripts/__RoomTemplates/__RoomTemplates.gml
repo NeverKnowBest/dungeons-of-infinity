@@ -393,6 +393,7 @@ function RoomTemplates_Pick(_RoomIndex){
 
 	gml_pragma("forceinline");
 	
+	var _TemplateArray, _TemplateIndex;
 	switch(Room.TemplateClass){
 		
 		case RoomTemplateClass.Special: 				
@@ -401,7 +402,7 @@ function RoomTemplates_Pick(_RoomIndex){
 		case RoomTemplateClass.Village: 
 			
 			
-			var _TemplateArray = global.Templates_Room[RoomTemplateClass.Village][Room.TemplateSubClass]
+			_TemplateArray = global.Templates_Room[RoomTemplateClass.Village][Room.TemplateSubClass]
 			for(var _RoomTemplateIndex = 0; _RoomTemplateIndex < global.Templates_Room_Count[RoomTemplateClass.Village][Room.TemplateSubClass]; _RoomTemplateIndex++){
 				var _Template = _TemplateArray[_RoomTemplateIndex];
 				switch(Room.TemplateSubClass){
@@ -434,7 +435,7 @@ function RoomTemplates_Pick(_RoomIndex){
 		case RoomTemplateClass.Mines: 
 			
 			
-			var _TemplateArray = global.Templates_Room[RoomTemplateClass.Mines][Room.TemplateSubClass]
+			_TemplateArray = global.Templates_Room[RoomTemplateClass.Mines][Room.TemplateSubClass]
 			for(var _RoomTemplateIndex = 0; _RoomTemplateIndex < global.Templates_Room_Count[RoomTemplateClass.Mines][Room.TemplateSubClass]; _RoomTemplateIndex++){
 				var _Template = _TemplateArray[_RoomTemplateIndex];
 				switch(Room.TemplateSubClass){
@@ -458,7 +459,7 @@ function RoomTemplates_Pick(_RoomIndex){
 		
 		case RoomTemplateClass.Other:
 			
-			var _TemplateArray = global.Templates_Room[RoomTemplateClass.Other][Room.TemplateSubClass]
+			_TemplateArray = global.Templates_Room[RoomTemplateClass.Other][Room.TemplateSubClass]
 			
 			for(var _RoomTemplateIndex = 0; _RoomTemplateIndex < global.Templates_Room_Count[RoomTemplateClass.Other][Room.TemplateSubClass]; _RoomTemplateIndex++){
 				
@@ -468,29 +469,25 @@ function RoomTemplates_Pick(_RoomIndex){
 					
 					case RoomTemplateClass_Other.Start:
 						switch(_RoomIndex){
-							case 0: var _TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Start, "South", "Start"); break;
-							case 1: var _TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Start, "North", "Start"); break;
+							case 0: _TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Start, "South", "Start"); break;
+							case 1: _TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Start, "North", "Start"); break;
 						}
 						return global.Templates_Room[RoomTemplateClass.Other][RoomTemplateClass_Other.Start][_TemplateIndex]; 
-						break;		
 						
 					case RoomTemplateClass_Other.Boss:
 					
 						switch(global.Level.Index){
 
 							case DungeonLevel.MoldormsLair: 
-								var _TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Boss, "Moldorm", "Boss");
+								_TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Boss, "Moldorm", "Boss");
 								return global.Templates_Room[RoomTemplateClass.Other][RoomTemplateClass_Other.Boss][_TemplateIndex]; 
-								break;
 							
 							default:
-								var _TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Boss, "Default", "Boss");
+								_TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Boss, "Default", "Boss");
 								return global.Templates_Room[RoomTemplateClass.Other][RoomTemplateClass_Other.Boss][_TemplateIndex]; 
-								break;
 							
 						}
 	
-						break;
 						
 					case RoomTemplateClass_Other.Unique:
 						if(_Template[$ "name"] == Room.TemplateName) return _Template;
@@ -498,7 +495,6 @@ function RoomTemplates_Pick(_RoomIndex){
 					
 					case RoomTemplateClass_Other.Save:
 						return global.Templates_Room[RoomTemplateClass.Other][RoomTemplateClass_Other.Save][0]; 
-						break
 				}
 			}			
 			break;
@@ -515,6 +511,7 @@ function RoomTemplates_Pick(_RoomIndex){
 		return -1; //no template available for that template class
 	}
 	
+	var _BuiltInSection, NewRoomTemplate;
 	for(var _Tries = 0; _Tries < _TemplateCount * 2; _Tries++){
 		
 		var TemplateOk = false;
@@ -527,7 +524,7 @@ function RoomTemplates_Pick(_RoomIndex){
 
 		if(_RoomTemplateClass == RoomTemplateClass.Sections){
 			
-			var _BuiltInSection = GetPropertyValue(RoomTemplate[$ "properties"], "BuiltInSection");
+			_BuiltInSection = GetPropertyValue(RoomTemplate[$ "properties"], "BuiltInSection");
 			
 			if(!SectionFamilyCheck(_BuiltInSection, DungeonRoom.Section_ID)) continue;
 		
@@ -695,7 +692,7 @@ function RoomTemplates_Pick(_RoomIndex){
 			TemplateOk = true;
 			
 
-			var NewRoomTemplate = StructCopy(RoomTemplate);
+			NewRoomTemplate = StructCopy(RoomTemplate);
 			
 			var _TransformTemplate = (_TransformType != ObjTransformation.None || _RoomTemplateClass == RoomTemplateClass.Sections);
 			

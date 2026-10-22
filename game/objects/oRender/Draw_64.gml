@@ -1,6 +1,7 @@
 
 
 
+var _ShieldSpr, _ShieldX, _ShieldY, SwordSprite;
 if(global.MosaicDo){
 	
 	if(!surface_exists(Mosaic_ScreenBuffer)) Mosaic_ScreenBuffer = surface_create(1024, 896);
@@ -32,7 +33,7 @@ if(global.MosaicDo){
 			
 			var _TunicIndex = max(global.Inventory.ItemData[ItemClass.Tunic].Index, 0);
 			if(other.Mosaic_Type == MosaicType.Shock && ShockDrawSword){ //Sword Shock
-				var SwordSprite = asset_get_index("sSword" + string(global.Inventory.ItemData[ItemClass.Sword].Index) + "_Shock");
+				SwordSprite = asset_get_index("sSword" + string(global.Inventory.ItemData[ItemClass.Sword].Index) + "_Shock");
 				//sword (draw sword before drawing link only for UP
 				if(Facing == UP) draw_sprite_ext(SwordSprite, _image_index, _x, _y - 64, 4, 4, 0, c_white, 1);
 				PixelRender(false, false, PaletteSpr != noone, PaletteSpr, _TunicIndex, image_index > 1, KB_In);
@@ -47,9 +48,9 @@ if(global.MosaicDo){
 			
 			if(_DrawShield){
 				ShieldDir = Facing;
-				var _ShieldSpr = ShieldSprite[global.Inventory.ItemData[ItemClass.Shield].Index][ShieldDir];
-				var _ShieldX = _x + (ShieldOffsetX[LinkState.Standing][Facing][0] * 4);
-				var _ShieldY = _y + (ShieldOffsetY[LinkState.Standing][Facing][0] * 4);
+				_ShieldSpr = ShieldSprite[global.Inventory.ItemData[ItemClass.Shield].Index][ShieldDir];
+				_ShieldX = _x + (ShieldOffsetX[LinkState.Standing][Facing][0] * 4);
+				_ShieldY = _y + (ShieldOffsetY[LinkState.Standing][Facing][0] * 4);
 			
 				if(ShieldDir == UP && other.Mosaic_Type == MosaicType.Warp){
 					draw_sprite_ext(_ShieldSpr, 0, _ShieldX, _ShieldY, 4, 4, 0, c_white, 1);

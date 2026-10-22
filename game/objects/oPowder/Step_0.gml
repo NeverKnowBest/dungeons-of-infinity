@@ -1,3 +1,4 @@
+// Feather disable GM2064
 if(Transformed) exit;
 
 var inst = instance_place(x, y, oVillager_Treeman);
@@ -10,7 +11,7 @@ if(inst != noone){
 }
 
 if(image_index >= 6){
-	var inst = instance_place(x, y, oEnemy);
+	inst = instance_place(x, y, oEnemy);
 	if(inst != noone){
 		with(inst){
 
@@ -21,7 +22,6 @@ if(image_index >= 6){
 			switch(object_index){
 				case oEnemy_Wallmaster:
 					exit;
-					break;
 			}
 			
 			if(Enemy_LinkWeaponHit(LinkWeaponClass.Transform, 0, inst, x, y, 0)){

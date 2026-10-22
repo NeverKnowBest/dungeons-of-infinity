@@ -1,3 +1,4 @@
+// Feather disable GM2064
 enum Rod{Stone, Ice, Fire, Bomb, Heart, Wealth}
 global.RodNames = ["Stone", "Ice", "Fire", "Bombs", "Hearts", "Wealth"];
 
@@ -22,16 +23,17 @@ function Rod_Shoot(){
 	
 	var _WeaponInst = instance_create_layer(x, y, _RodLayerName + _FloorLevelStr, oRod_Cane, {Index : _ItemIndex, Facing : Facing, FloorLevel : FloorLevel});
 	
+	var _BeamInst;
 	switch(_ItemIndex){
 		case Rod.Stone:
 		case Rod.Ice:
 		case Rod.Fire:
-			var _BeamInst = instance_create_layer(x, y, "ObjsHigher_" + _FloorLevelStr, oRodBeam, {FloorLevel : FloorLevel});
+			_BeamInst = instance_create_layer(x, y, "ObjsHigher_" + _FloorLevelStr, oRodBeam, {FloorLevel : FloorLevel});
 			break;
 		case Rod.Bomb:
 		case Rod.Heart:
 		case Rod.Wealth:
-			var _BeamInst = instance_create_layer(x, y, "ObjsHigher_" + _FloorLevelStr, oCaneBeam, {FloorLevel : FloorLevel});
+			_BeamInst = instance_create_layer(x, y, "ObjsHigher_" + _FloorLevelStr, oCaneBeam, {FloorLevel : FloorLevel});
 			break;
 			
 	//	case ItemClass.Cane:

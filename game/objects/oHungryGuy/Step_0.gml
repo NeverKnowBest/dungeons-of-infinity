@@ -9,6 +9,7 @@ if(DB_Init){
 
 }
 
+var _FoodValue;
 if(DB_Started){
 	if(!instance_exists(global.DB_Inst)){
 		if(global.DB_ExitCode == 1){
@@ -38,7 +39,7 @@ if(DB_Started){
 						case ItemClass.Food:
 							switch(_ItemIndex){
 								default:
-									var _FoodValue = FoodHearts(_ItemIndex);
+									_FoodValue = FoodHearts(_ItemIndex);
 									break;
 								case Food.GoldenEgg:
 									_FoodValue = 0; //make this the highest priority

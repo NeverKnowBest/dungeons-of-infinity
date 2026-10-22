@@ -1,3 +1,4 @@
+// Feather disable GM2064
 function Warp_Create(_RoomIndex, _x, _y, _FloorLevel){
 
 	var WarpInst = instance_create_layer(_x, _y, "ObjsFloor_" + GetFloorLevelString(_FloorLevel), oWarp, {RoomIndex : _RoomIndex, FloorLevel : _FloorLevel});

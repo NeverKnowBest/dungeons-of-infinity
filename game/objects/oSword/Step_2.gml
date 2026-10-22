@@ -1,3 +1,4 @@
+// Feather disable GM2064
 FloorLevel = oLink.FloorLevel;
 layer = (FloorLevel == LOWER ? global.LayerID_Objs_Lower : global.LayerID_Objs_Upper);
 DepthBehindLink = oLink.depth + 5;
@@ -11,6 +12,7 @@ image_yscale = 1;
 image_angle = 0;
 var CheckCollision = false;
 
+var _SparkleX, _SparkleY, _SparkleDepth;
 switch(oLink.State){
 	
 	case LinkState.Sword:
@@ -597,9 +599,9 @@ switch(oLink.State){
 				if(oLink.State == LinkState.Walking) y += ((img_index + 1) mod 3); //adjust sword based on link's moving frame
 				image_angle = 90;
 				if(CreateSparkle){
-					var _SparkleX = oLink.x - 2 - lerp(0, 15 + global.Inventory.ItemData[ItemClass.Sword].Index, oLink.SwordCharge);
-					var _SparkleY = y - 1 + irandom_range(-3, 3);
-					var _SparkleDepth = DepthInFrontOfLink;
+					_SparkleX = oLink.x - 2 - lerp(0, 15 + global.Inventory.ItemData[ItemClass.Sword].Index, oLink.SwordCharge);
+					_SparkleY = y - 1 + irandom_range(-3, 3);
+					_SparkleDepth = DepthInFrontOfLink;
 				}
 				break;
 		
@@ -612,9 +614,9 @@ switch(oLink.State){
 				image_yscale = -1; 
 				image_angle = 90;
 				if(CreateSparkle){
-					var _SparkleX = oLink.x + 2 + lerp(0, 15 + global.Inventory.ItemData[ItemClass.Sword].Index, oLink.SwordCharge);
-					var _SparkleY = y - 1 + irandom_range(-3, 3);
-					var _SparkleDepth = DepthInFrontOfLink;
+					_SparkleX = oLink.x + 2 + lerp(0, 15 + global.Inventory.ItemData[ItemClass.Sword].Index, oLink.SwordCharge);
+					_SparkleY = y - 1 + irandom_range(-3, 3);
+					_SparkleDepth = DepthInFrontOfLink;
 				}
 				break;
 		
@@ -625,9 +627,9 @@ switch(oLink.State){
 				y = Ly - 10; 
 				if(oLink.State == LinkState.Walking) y += ((img_index + 1) mod 3); //adjust sword based on link's moving frame
 				if(CreateSparkle){
-					var _SparkleX = oLink.x - 1 - lerp(7, 0, oLink.SwordCharge) + irandom_range(-3, 3);
-					var _SparkleY = oLink.y - 8 - lerp(0, 15 + global.Inventory.ItemData[ItemClass.Sword].Index, oLink.SwordCharge);	
-					var _SparkleDepth = DepthInFrontOfLink;
+					_SparkleX = oLink.x - 1 - lerp(7, 0, oLink.SwordCharge) + irandom_range(-3, 3);
+					_SparkleY = oLink.y - 8 - lerp(0, 15 + global.Inventory.ItemData[ItemClass.Sword].Index, oLink.SwordCharge);	
+					_SparkleDepth = DepthInFrontOfLink;
 				}
 				break;
 		
@@ -639,9 +641,9 @@ switch(oLink.State){
 				if(oLink.State == LinkState.Walking) y += ((img_index + 1) mod 3); //adjust sword based on link's moving frame
 				image_angle = 180; 
 				if(CreateSparkle){
-					var _SparkleX = oLink.x + lerp(6, 0, oLink.SwordCharge) + irandom_range(-3, 3);
-					var _SparkleY = oLink.y - 6 + lerp(0, 15 + global.Inventory.ItemData[ItemClass.Sword].Index, oLink.SwordCharge);					
-					var _SparkleDepth = DepthInFrontOfLink;
+					_SparkleX = oLink.x + lerp(6, 0, oLink.SwordCharge) + irandom_range(-3, 3);
+					_SparkleY = oLink.y - 6 + lerp(0, 15 + global.Inventory.ItemData[ItemClass.Sword].Index, oLink.SwordCharge);					
+					_SparkleDepth = DepthInFrontOfLink;
 				}
 				break;			
 			
@@ -662,6 +664,7 @@ switch(oLink.State){
 		
 }
 
+var _Hit;
 if(CheckCollision){ 
 	
 	StarCollisionX = oLink.x - 1;
@@ -673,7 +676,7 @@ if(CheckCollision){
 		
 		var EnemyInst = global.SwordCollisionList[| i];
 		
-		var _Hit = false;
+		_Hit = false;
 		
 		with(EnemyInst){
 			if(State != EnemyState.KnockBack && State != EnemyState.PushBack){
@@ -687,7 +690,7 @@ if(CheckCollision){
 						break;
 					case LinkState.Star:
 					case LinkState.SwordSpin:
-						var _Hit = Enemy_LinkWeaponHit(LinkWeaponClass.Sword, 0, self, oLink.x, oLink.y, point_direction(oLink.x, oLink.y, x, y));
+						_Hit = Enemy_LinkWeaponHit(LinkWeaponClass.Sword, 0, self, oLink.x, oLink.y, point_direction(oLink.x, oLink.y, x, y));
 						break;
 				}
 				if(_Hit){
@@ -719,7 +722,7 @@ if(CheckCollision){
 					Pushback = true;
 						
 					if(InFrontOfLink(x, y)){
-						var _Hit = Enemy_LinkWeaponHit(LinkWeaponClass.Sword, 0, self, other.HitPosX, other.HitPosY, point_direction(oLink.x, oLink.y, x, y));
+						_Hit = Enemy_LinkWeaponHit(LinkWeaponClass.Sword, 0, self, other.HitPosX, other.HitPosY, point_direction(oLink.x, oLink.y, x, y));
 						if(_Hit){
 							oLink.SwordChargeAllowed = false;
 							if(Sword_DoSwordPoke()) exit;

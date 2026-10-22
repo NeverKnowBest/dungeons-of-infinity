@@ -18,12 +18,13 @@ if(oLink.State != LinkState.FallingOverEdge && oLink.State != LinkState.Falling 
 }
 
 
+var PreviousPoints;
 if(State != EnemyState.Killed){
-	var PreviousPoints = array_length(PPX);
+	PreviousPoints = array_length(PPX);
 	for(var i = PreviousPoints - 1; i > 0; i--){
 		PPX[i] = PPX[i - 1];	
 	}
-	var PreviousPoints = array_length(PPY);
+	PreviousPoints = array_length(PPY);
 	for(var i = PreviousPoints - 1; i > 0; i--){
 		PPY[i] = PPY[i - 1];	
 	}

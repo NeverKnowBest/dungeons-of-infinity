@@ -1,3 +1,4 @@
+// Feather disable GM2064
 if(global.Paused){
 	if(!SoundPaused && SoundInst != noone){
 		audio_pause_sound(SoundInst);

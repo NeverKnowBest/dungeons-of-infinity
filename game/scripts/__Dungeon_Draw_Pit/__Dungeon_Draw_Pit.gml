@@ -9,6 +9,7 @@ function Dungeon_Draw_Pit(_RoomIndex){
 	var Walls = array_length(WallArray);
 	
 	//Sides first
+	var TilesX, TilesY;
 	for(var WallIndex = 0; WallIndex < Walls; WallIndex++){
 		
 		var WallObj = WallArray[WallIndex];
@@ -20,11 +21,11 @@ function Dungeon_Draw_Pit(_RoomIndex){
 		var PropertiesArray = WallObj.properties;
 		
 		if(GetPropertyValue(PropertiesArray, "LavaPit") != -1){
-			var TilesX = 122;
-			var TilesY = VillageTilesY + 18;
+			TilesX = 122;
+			TilesY = VillageTilesY + 18;
 		}else{
-			var TilesX = 38;
-			var TilesY = LevelTilesY;
+			TilesX = 38;
+			TilesY = LevelTilesY;
 		}
 	
 		switch(GID){
@@ -77,11 +78,11 @@ function Dungeon_Draw_Pit(_RoomIndex){
 		var PropertiesArray = WallObj.properties;
 		
 		if(GetPropertyValue(PropertiesArray, "LavaPit") != -1){
-			var TilesX = 118;
-			var TilesY = VillageTilesY + 18;
+			TilesX = 118;
+			TilesY = VillageTilesY + 18;
 		}else{
-			var TilesX = 34;
-			var TilesY = LevelTilesY;
+			TilesX = 34;
+			TilesY = LevelTilesY;
 		}
 		
 		switch(GID){	

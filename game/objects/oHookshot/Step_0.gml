@@ -13,6 +13,7 @@ if(!Returning){
 	event_inherited();
 	if(WallCollided){
 		//Once obj is done colliding with wall after delay. See alarm0 in oProjectile
+		// Feather disable once GM2064
 		instance_create_layer(x, y_base, "ObjsHigher_" + GetFloorLevelString(oLink.FloorLevel), oWallHit, {PlaySound: true});
 		SetReturning = true;
 	

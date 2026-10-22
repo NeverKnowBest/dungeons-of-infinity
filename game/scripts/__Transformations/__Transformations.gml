@@ -20,6 +20,7 @@ function TransformObjArray (ObjArray, TransformType, ObjType, RoomW, RoomH){
 	
 	var NewArray = array_create(0);//array_length(ObjArray));
 	
+	var NewX, NewY, NewW, NewH, SBShiftCode;
 	for(var ObjIndex = 0; ObjIndex < ObjCount; ObjIndex++){
 		
 		array_push(NewArray, StructCopy(ObjArray[ObjIndex]));
@@ -32,62 +33,62 @@ function TransformObjArray (ObjArray, TransformType, ObjType, RoomW, RoomH){
 		var OldW = OldObj.width;
 		var OldH = OldObj.height;
 		
-		var NewX = OldX;
-		var NewY = OldY;
-		var NewW = OldW;
-		var NewH = OldH;
+		NewX = OldX;
+		NewY = OldY;
+		NewW = OldW;
+		NewH = OldH;
 		
 		switch(TransformType){
 			case ObjTransformation.FlipH:
-				var NewX = RoomW - OldX - OldW;
+				NewX = RoomW - OldX - OldW;
 				
 				break;
 
 			case ObjTransformation.FlipV:
 				
-				var NewY = RoomH - OldY - OldH;
+				NewY = RoomH - OldY - OldH;
 
 				break;
 
 			case ObjTransformation.FlipHV:
 				
-				var NewX = RoomW - OldX - OldW;
-				var NewY = RoomH - OldY - OldH;
+				NewX = RoomW - OldX - OldW;
+				NewY = RoomH - OldY - OldH;
 		
 				break;
 
 			case ObjTransformation.RotateCW:
 								
-				var NewW = OldH;
-				var NewH = OldW;
-				var NewY = OldX;
-				var NewX = RoomH - OldY - OldH;
+				NewW = OldH;
+				NewH = OldW;
+				NewY = OldX;
+				NewX = RoomH - OldY - OldH;
 
 				break;
 			
 			case ObjTransformation.RotateCCW:
 
-				var NewW = OldH;
-				var NewH = OldW;
-				var NewX = OldY;
-				var NewY = RoomW - OldX - OldW;
+				NewW = OldH;
+				NewH = OldW;
+				NewX = OldY;
+				NewY = RoomW - OldX - OldW;
 
 				break;
 			
 			case ObjTransformation.FlipHRotateCW:
 			
-				var NewW = OldH;
-				var NewH = OldW;				
-				var NewX = RoomH - OldY - OldH;
-				var NewY = RoomW - OldX - OldW;
+				NewW = OldH;
+				NewH = OldW;				
+				NewX = RoomH - OldY - OldH;
+				NewY = RoomW - OldX - OldW;
 
 				break;
 			
 			case ObjTransformation.FlipHRotateCCW:
-				var NewW = OldH;
-				var NewH = OldW;
-				var NewX = OldY;
-				var NewY = OldX;
+				NewW = OldH;
+				NewH = OldW;
+				NewX = OldY;
+				NewY = OldX;
 
 				break;
 			
@@ -104,13 +105,13 @@ function TransformObjArray (ObjArray, TransformType, ObjType, RoomW, RoomH){
 		
 		
 		//Switchboxes	
-		var SBShiftCode = GetPropertyValue(Properties, "SB");
+		SBShiftCode = GetPropertyValue(Properties, "SB");
 		if(SBShiftCode != -1){
 			var NewShiftCode = GetTransformedSBShiftCode(SBShiftCode, TransformType);
 			SetPropertyValue(NewArray[ObjIndex][$ "properties"], "SB", NewShiftCode);
 		}
 
-		var SBShiftCode = GetPropertyValue(Properties, "SBShift");
+		SBShiftCode = GetPropertyValue(Properties, "SBShift");
 		if(SBShiftCode != -1){
 			var NewShiftCode = GetTransformedSBShiftCode(SBShiftCode, TransformType);
 			SetPropertyValue(NewArray[ObjIndex][$ "properties"], "SBShift", NewShiftCode);

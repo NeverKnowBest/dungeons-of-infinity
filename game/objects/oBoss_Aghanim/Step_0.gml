@@ -1,3 +1,4 @@
+// Feather disable GM2064
 event_inherited();
 
 Lighting_UpdateLight_Radius(RoomIndex, LightIndex, LightRadius[irandom(4)]);
@@ -103,6 +104,7 @@ if(State != EnemyState.Killed && Energy <= 0){
 	
 }
 
+var _x, _y, Angle;
 if(State != EnemyState.Killed) PauseCheck
 
 if(ScriptNext){
@@ -182,11 +184,11 @@ if(ScriptNext){
 			image_index = 0;
 			
 			if(instance_exists(Charge_InstL)){
-				var _x = Charge_InstL.x;
-				var _y = Charge_InstL.y;
+				_x = Charge_InstL.x;
+				_y = Charge_InstL.y;
 			}else if(instance_exists(Charge_InstR)){
-				var _x = Charge_InstR.x;
-				var _y = Charge_InstR.y;				
+				_x = Charge_InstR.x;
+				_y = Charge_InstR.y;				
 			}else{
 				
 				//fail safe in case the charge insts don't exist, just shoot from centre of hands
@@ -196,8 +198,8 @@ if(ScriptNext){
 				var _HandPosRX = global.AghanimHandPos[Dir][2];
 				var _HandPosRY = global.AghanimHandPos[Dir][3];
 
-				var _x = x + lerp(_HandPosLX, _HandPosRX, 0.5);
-				var _y = y + lerp(_HandPosLY, _HandPosRY, 0.5);	
+				_x = x + lerp(_HandPosLX, _HandPosRX, 0.5);
+				_y = y + lerp(_HandPosLY, _HandPosRY, 0.5);	
 				
 			}
 			
@@ -212,7 +214,7 @@ if(ScriptNext){
 					ShotInst = instance_create_layer(_x, _y, "ObjsHigher_Upper", oAghanim_EnergyBall, {FloorLevel : UPPER});		
 					ShotInst.image_speed = 0;
 					
-					var Angle = point_direction(_x, _y, oLink.x, oLink.y - 6);
+					Angle = point_direction(_x, _y, oLink.x, oLink.y - 6);
 			
 					ShotInst.vx = lengthdir_x(ShootSpeed, Angle);
 					ShotInst.vy = lengthdir_y(ShootSpeed, Angle);
@@ -226,7 +228,7 @@ if(ScriptNext){
 
 					ShotInst = instance_create_layer(_x, _y, "ObjsHigher_Upper", oAghanim_NewBlueBall, {FloorLevel : UPPER});		
 			
-					var Angle = point_direction(_x, _y, oLink.x, oLink.y - 6);
+					Angle = point_direction(_x, _y, oLink.x, oLink.y - 6);
 			
 					ShotInst.vx = lengthdir_x(ShootSpeed, Angle);
 					ShotInst.vy = lengthdir_y(ShootSpeed, Angle);

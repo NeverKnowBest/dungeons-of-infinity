@@ -73,15 +73,15 @@ if( ds_list_size(_InventorySlotsWithItems) > 0 && (Prob(0.4) || (!_RupeesAllowed
 		
 	var _Slot = global.Inventory.Bags[_InventorySlot[0]].Slots[_InventorySlot[1]];		
 		
-	var ItemChoices_Class = _Slot.ItemClass;
-	var ItemChoices_Index = _Slot.ItemIndex;
+	ItemChoices_Class = _Slot.ItemClass;
+	ItemChoices_Index = _Slot.ItemIndex;
 		
 	switch(global.ItemData[ItemChoices_Class].Type){
 		case ItemType.Inv_Chrg:
-			var ItemChoices_Amount = _Slot.Amount;
+			ItemChoices_Amount = _Slot.Amount;
 			break;
 		default:
-			var ItemChoices_Amount = 1;
+			ItemChoices_Amount = 1;
 			break;
 	}
 		
@@ -109,19 +109,19 @@ if(!TookInventoryItem){
 	ds_list_shuffle(_ItemList);
 		
 	ItemChoices_Class = _ItemList[| 0];
-	var ItemChoices_Index = 0;
+	ItemChoices_Index = 0;
 		
 	switch(ItemChoices_Class){
 		case ItemClass.Rupee:
-			var ItemChoices_Amount = choose(1,1,5,5,10,20,40);
+			ItemChoices_Amount = choose(1,1,5,5,10,20,40);
 			if(ItemChoices_Amount > global.Inventory.ItemData[ItemClass.Rupee].Amount) ItemChoices_Amount = 1;
 			break;
 		case ItemClass.Bombs:
-			var ItemChoices_Amount = choose(1,2,3);
+			ItemChoices_Amount = choose(1,2,3);
 			if(ItemChoices_Amount > global.Inventory.ItemData[ItemClass.Bombs].Amount[0]) ItemChoices_Amount = 1;
 			break;
 		case ItemClass.Arrows:
-			var ItemChoices_Amount = choose(1,1,2,2,3,5,8,10);
+			ItemChoices_Amount = choose(1,1,2,2,3,5,8,10);
 			if(ItemChoices_Amount > global.Inventory.ItemData[ItemClass.Arrows].Amount[0]) ItemChoices_Amount = 1;
 			break;
 			

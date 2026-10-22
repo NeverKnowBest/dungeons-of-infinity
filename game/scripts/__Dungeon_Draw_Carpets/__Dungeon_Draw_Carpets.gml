@@ -272,6 +272,7 @@ function Dungeon_Draw_CarpetsFull(_RoomIndex){
 	
 	var FullCarpets = Prob(Chance_Decor_CarpetsFull) || Room.GridW == 2 || Room.GridH == 2;
 	
+	var CarpetX, CarpetY, CarpetTileW, CarpetTileH;
 	if(FullCarpets){
 
 		var CarpetArray = Room.Template[$ "CarpetsFull"];
@@ -282,10 +283,10 @@ function Dungeon_Draw_CarpetsFull(_RoomIndex){
 				
 		var Carpet = CarpetArray[FullCarpetList[| 0]];
 			
-		var CarpetX = Room.x + Carpet.x;
-		var CarpetY = Room.y + Carpet.y;
-		var CarpetTileW = Carpet.width / 8;
-		var CarpetTileH = Carpet.height / 8;
+		CarpetX = Room.x + Carpet.x;
+		CarpetY = Room.y + Carpet.y;
+		CarpetTileW = Carpet.width / 8;
+		CarpetTileH = Carpet.height / 8;
 		
 		var TMID = GetFloorLevelTMID("Tiles_Floor", CarpetX, CarpetY);	
 
@@ -328,10 +329,10 @@ function Dungeon_Draw_CarpetsFull(_RoomIndex){
 			}
 		}
 
-		var CarpetX = _X1;
-		var CarpetY = _Y1;
-		var CarpetTileW = (_X2 - _X1 + 1) / 8;
-		var CarpetTileH = (_Y2 - _Y1 + 1) / 8;
+		CarpetX = _X1;
+		CarpetY = _Y1;
+		CarpetTileW = (_X2 - _X1 + 1) / 8;
+		CarpetTileH = (_Y2 - _Y1 + 1) / 8;
 
 		if(CarpetTileW >= 10 && CarpetTileH >= 10){
 			Carpet_Draw_Full(CarpetX, CarpetY, CarpetTileW, CarpetTileH, TMID);

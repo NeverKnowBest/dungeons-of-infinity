@@ -37,6 +37,7 @@ if(_CompassOwned){
 
 
 //icons
+var _PosX, _PosY;
 if(_CompassOwned){
 
 	if(global.Level.IsBossLevel){
@@ -101,8 +102,8 @@ if(_CompassOwned){
 				if(global.Level.Index == DungeonLevel.Village){
 					//if village, draw rod charger where it would be in the world, not in the room which is off view
 					var _RoomIndex = global.Level.Map_RoomIndex[2][3];
-					var _PosX = global.Level.Rooms[_RoomIndex].MapX + 33;
-					var _PosY = global.Level.Rooms[_RoomIndex].MapY + 37;
+					_PosX = global.Level.Rooms[_RoomIndex].MapX + 33;
+					_PosY = global.Level.Rooms[_RoomIndex].MapY + 37;
 					draw_sprite(sLargeMap_RodCharger, 0, _PosX, _PosY + 4);
 				}else{
 					draw_sprite(sLargeMap_RodCharger, 0, _x, _y);					
@@ -111,14 +112,14 @@ if(_CompassOwned){
 
 			case oFairy_Health:
 			case oItem_Fairy:
-				var _PosX = global.Level.Rooms[inst.RoomIndex].MapX + 7;
-				var _PosY = global.Level.Rooms[inst.RoomIndex].MapY + 7;
+				_PosX = global.Level.Rooms[inst.RoomIndex].MapX + 7;
+				_PosY = global.Level.Rooms[inst.RoomIndex].MapY + 7;
 				draw_sprite(sLargeMap_Fairy, 0, _PosX, _PosY);
 				break;
 			
 			case oGemPondWater:
-				var _PosX = global.Level.Rooms[inst.RoomIndex].MapX + 8;
-				var _PosY = global.Level.Rooms[inst.RoomIndex].MapY + 8;
+				_PosX = global.Level.Rooms[inst.RoomIndex].MapX + 8;
+				_PosY = global.Level.Rooms[inst.RoomIndex].MapY + 8;
 				draw_sprite(sLargeMap_GemPond, 0, _PosX, _PosY);	
 				break;
 				

@@ -57,14 +57,14 @@ DB_Started = false;
 	Addr=3; DB_Script_Awake[# 0, Addr] = DBScriptCode.End;		DB_Script_Awake[# ++i, Addr] = 1; i = 0;
 
 
-	DB_Script_Letter = ds_grid_create(5, 2); var i = 0; var Addr=0;
+	DB_Script_Letter = ds_grid_create(5, 2); i = 0; Addr=0;
 
 			DB_Script_Letter[# 0, Addr] = DBScriptCode.Dialogue;	DB_Script_Letter[# ++i, Addr] = Dialogue_ReadLetter;	DB_Script_Letter[# ++i, Addr] = 1; i = 0;
 	Addr=1; DB_Script_Letter[# 0, Addr] = DBScriptCode.End;			DB_Script_Letter[# ++i, Addr] = 0; i = 0;
 
 
 
-	DB_Script_Farewell = ds_grid_create(5, 4); var i = 0; var Addr=0;
+	DB_Script_Farewell = ds_grid_create(5, 4); i = 0; Addr=0;
 
 			DB_Script_Farewell[# 0, Addr] = DBScriptCode.Dialogue;	DB_Script_Farewell[# ++i, Addr] = method(self, ScriptFunction_OldLady_DialogueFarewell);	DB_Script_Farewell[# ++i, Addr] = 1; i = 0;
 	Addr=1;	DB_Script_Farewell[# 0, Addr] = DBScriptCode.IfGoto;	DB_Script_Farewell[# ++i, Addr] = method(self, ScriptFunction_OldLady_Letter);		DB_Script_Farewell[# ++i, Addr] = 3;	DB_Script_Farewell[# ++i, Addr] = 2; i = 0;

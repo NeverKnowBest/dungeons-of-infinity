@@ -27,7 +27,7 @@ function LinkSprites_Load(){
 	global.LinkCharacterSpr[LinkCharacter.Wolf] = sLinkCharacter_Wolf; 
 	global.LinkCharacterSpr[LinkCharacter.Mouse] = sLinkCharacter_Mouse;
 
-	global.LinkCharacterPal[LinkCharacter.Link] = (global.Xmas ? sPalette_Link_Xmas : sPalette_Link); ;
+	global.LinkCharacterPal[LinkCharacter.Link] = (global.Xmas ? sPalette_Link_Xmas : sPalette_Link);
 	global.LinkCharacterPal[LinkCharacter.Girl] = sPalette_Girl;
 	global.LinkCharacterPal[LinkCharacter.Monkey] = sPalette_Monkey;
 	global.LinkCharacterPal[LinkCharacter.Frog] = sPalette_Frog;
@@ -37,13 +37,14 @@ function LinkSprites_Load(){
 	global.LinkCharacterPal[LinkCharacter.Wolf] = sPalette_Wolf;
 	global.LinkCharacterPal[LinkCharacter.Mouse] = sPalette_Mouse;
 	
+	var _File;
 	for(var i = 0; i < 9; i++){
 		
 		var _ChrDir = GAMEDIR_DATA + "Characters\\" + string(i + 1);
 		
 		if (directory_exists(_ChrDir)){
 			
-			var _File = file_find_first(_ChrDir + "\\*.png", fa_none);
+			_File = file_find_first(_ChrDir + "\\*.png", fa_none);
 		    file_find_close();
 			
 			if(_File == "<null>" || _File == ""){	
@@ -57,13 +58,13 @@ function LinkSprites_Load(){
 			
 			if (directory_exists(_PalDir)){
 				
-				var _File = file_find_first(_PalDir + "\\*.png", fa_none);
+				_File = file_find_first(_PalDir + "\\*.png", fa_none);
 				file_find_close();
 				
 				if(_File == "<null>" || _File == ""){
 					continue;					
 				}else{
-					global.LinkCharacterPal[i] = sprite_add(_PalDir + "\\" + _File, 1, false, false, 0, 0);;
+					global.LinkCharacterPal[i] = sprite_add(_PalDir + "\\" + _File, 1, false, false, 0, 0);
 				}
 				
 			}
@@ -110,9 +111,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Stand Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -136,9 +137,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Stand Right
 		
-			var SprW = 18;
-			var SprH = 24;		
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;		
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -162,9 +163,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Stand Left
 		
-			var SprW = 18;
-			var SprH = 24;		
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;		
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -190,9 +191,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 		#region Walk Down
 
-			var SprW = 16;
-			var SprH = 26;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 26;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -252,9 +253,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Walk Up
 
-			var SprW = 16;
-			var SprH = 26;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 26;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -315,11 +316,11 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Walk Right
 
-			var SprW = 18;
-			var SprH = 25;
+			SprW = 18;
+			SprH = 25;
 			var OrigX = 9;
 			var OrigY = 22;
-			var SprSurface = surface_create(SprW, SprH);
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -379,11 +380,11 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Walk Left
 
-			var SprW = 18;
-			var SprH = 25;
-			var OrigX = 9;
-			var OrigY = 22;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 25;
+			OrigX = 9;
+			OrigY = 22;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 
 			draw_clear_alpha(c_black, 0.0);
@@ -411,9 +412,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 		#region Sword Down
 			
-			var SprW = 16;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//frame 1,2
@@ -462,9 +463,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Sword Up
 			
-			var SprW = 16;
-			var SprH = 29;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 29;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//frame 1,2
@@ -513,9 +514,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Sword Right
 			
-			var SprW = 23;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 23;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//frame 1,2
@@ -568,11 +569,11 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Sword Left
 
-			var SprW = 23;
-			var SprH = 24;
-			var OrigX = 14;
-			var OrigY = 21;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 23;
+			SprH = 24;
+			OrigX = 14;
+			OrigY = 21;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 
 			draw_clear_alpha(c_black, 0.0);
@@ -599,9 +600,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Sword Poke Down
 
-			var SprW = 16;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//frame 0
@@ -631,9 +632,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Sword Poke Up
 
-			var SprW = 16;
-			var SprH = 26;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 26;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//frame 0
@@ -664,9 +665,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Sword Poke Right
 
-			var SprW = 18;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//frame 0
@@ -697,11 +698,11 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Sword Poke Left
 
-			var SprW = 18;
-			var SprH = 24;
-			var OrigX = 9;
-			var OrigY = 21;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;
+			OrigX = 9;
+			OrigY = 21;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 
 			draw_clear_alpha(c_black, 0.0);
@@ -729,9 +730,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Down
 			
-			var SprW = 18;
-			var SprH = 25;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 25;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -761,9 +762,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 
-			var SprW = 18;
-			var SprH = 25;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 25;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -808,9 +809,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Right
 		
-			var SprW = 18;
-			var SprH = 25;		
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 25;		
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -850,9 +851,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 		
-			var SprW = 18;
-			var SprH = 25;		
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 25;		
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 
 			draw_clear_alpha(c_black, 0.0);
@@ -879,9 +880,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Down
 			
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -928,9 +929,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -977,9 +978,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Right
 
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1009,9 +1010,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 		
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1038,9 +1039,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Down
 			
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1071,9 +1072,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1104,9 +1105,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Right
 
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1137,9 +1138,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 		
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1166,9 +1167,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Down
 			
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1203,9 +1204,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1239,9 +1240,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Right
 
-			var SprW = 19;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 19;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1275,9 +1276,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 		
-			var SprW = 19;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 19;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1304,9 +1305,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Down
 			
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1336,9 +1337,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1367,9 +1368,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Right
 
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1398,9 +1399,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 		
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1427,9 +1428,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Down
 			
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1466,9 +1467,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1505,9 +1506,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Right
 
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1544,9 +1545,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 		
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1573,9 +1574,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 		#region Down
 			
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1593,9 +1594,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1613,9 +1614,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Right
 		
-			var SprW = 18;
-			var SprH = 24;		
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;		
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1633,9 +1634,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 		
-			var SprW = 18;
-			var SprH = 24;		
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;		
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1656,9 +1657,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Down
 			
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1694,9 +1695,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1732,9 +1733,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Right
 
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1770,9 +1771,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 		
-			var SprW = 18;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1799,9 +1800,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Down
 			
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1843,9 +1844,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1887,9 +1888,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Right
 
-			var SprW = 17;
-			var SprH = 22;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 17;
+			SprH = 22;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1932,9 +1933,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 		
-			var SprW = 17;
-			var SprH = 22;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 17;
+			SprH = 22;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -1961,9 +1962,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Down
 
-			var SprW = 16;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			draw_clear_alpha(c_black, 0.0);
@@ -1980,9 +1981,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Up
 
-			var SprW = 16;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			draw_clear_alpha(c_black, 0.0);
@@ -1999,9 +2000,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Right
 
-			var SprW = 16;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			draw_clear_alpha(c_black, 0.0);
@@ -2018,9 +2019,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Left
 
-			var SprW = 16;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			draw_clear_alpha(c_black, 0.0);
@@ -2039,9 +2040,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 	#region Dead
 
-		var SprW = 24;
-		var SprH = 32;
-		var SprSurface = surface_create(SprW, SprH);
+		SprW = 24;
+		SprH = 32;
+		SprSurface = surface_create(SprW, SprH);
 		surface_set_target(SprSurface);
 		
 		draw_clear_alpha(c_black, 0.0);
@@ -2071,9 +2072,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 	#region Falling
 
-		var SprW = 24;
-		var SprH = 24;
-		var SprSurface = surface_create(SprW, SprH);
+		SprW = 24;
+		SprH = 24;
+		SprSurface = surface_create(SprW, SprH);
 		surface_set_target(SprSurface);
 		
 		draw_clear_alpha(c_black, 0.0);
@@ -2114,9 +2115,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 	#region Shock
 
-		var SprW = 16;
-		var SprH = 24;
-		var SprSurface = surface_create(SprW, SprH);
+		SprW = 16;
+		SprH = 24;
+		SprSurface = surface_create(SprW, SprH);
 		surface_set_target(SprSurface);
 		
 		draw_clear_alpha(c_black, 0.0);
@@ -2149,9 +2150,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 	#region Star 
 
-		var SprW = 18;
-		var SprH = 24;
-		var SprSurface = surface_create(SprW, SprH);
+		SprW = 18;
+		SprH = 24;
+		SprSurface = surface_create(SprW, SprH);
 		surface_set_target(SprSurface);
 		
 		//Frame 1 Down 1
@@ -2209,9 +2210,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 		#region Stand Sword Spin Charge Down
 			
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -2229,9 +2230,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Stand Sword Spin Charge Up
 
-			var SprW = 16;
-			var SprH = 24;	
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;	
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -2249,9 +2250,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Stand Sword Spin Charge Right
 		
-			var SprW = 18;
-			var SprH = 24;		
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;		
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -2269,9 +2270,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Stand Sword Spin Charge Left
 		
-			var SprW = 18;
-			var SprH = 24;		
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;		
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -2292,9 +2293,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 		#region Walk Spin Charge Down
 
-			var SprW = 16;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -2342,9 +2343,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Walk Spin Charge Up
 
-			var SprW = 16;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -2392,11 +2393,11 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Walk Spin Charge Right
 
-			var SprW = 18;
-			var SprH = 24;
-			var OrigX = 9;
-			var OrigY = 21;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;
+			OrigX = 9;
+			OrigY = 21;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -2426,11 +2427,11 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Walk Spin Charge Left
 
-			var SprW = 18;
-			var SprH = 24;
-			var OrigX = 9;
-			var OrigY = 21;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;
+			OrigX = 9;
+			OrigY = 21;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 
 			draw_clear_alpha(c_black, 0.0);
@@ -2458,9 +2459,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Down
 			
-			var SprW = 18;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//Frame 0 Wind 1
@@ -2542,9 +2543,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Up
 			
-			var SprW = 18;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 18;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//Frame 0 Wind 1
@@ -2627,9 +2628,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 		#region Right
 			
-			var SprW = 19;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 19;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//Frame 0 Wind 1
@@ -2712,9 +2713,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region Left
 
-			var SprW = 19;
-			var SprH = 24;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 19;
+			SprH = 24;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//Frame 0 Wind 1
@@ -2799,9 +2800,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 	#region Holding Item
 			
-		var SprW = 16;
-		var SprH = 24;
-		var SprSurface = surface_create(SprW, SprH);
+		SprW = 16;
+		SprH = 24;
+		SprSurface = surface_create(SprW, SprH);
 		surface_set_target(SprSurface);
 			
 		draw_clear_alpha(c_black, 0.0);
@@ -2819,9 +2820,9 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 	#region Holding Item 2 (Ending triforce)
 			
-		var SprW = 16;
-		var SprH = 24;
-		var SprSurface = surface_create(SprW, SprH);
+		SprW = 16;
+		SprH = 24;
+		SprSurface = surface_create(SprW, SprH);
 		surface_set_target(SprSurface);
 			
 		draw_clear_alpha(c_black, 0.0);
@@ -2841,9 +2842,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 		#region 1
 
-			var SprW = 16;
-			var SprH = 16;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 16;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -2981,9 +2982,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region 2
 
-			var SprW = 16;
-			var SprH = 16;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 16;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//Frame 1-4
@@ -3059,9 +3060,9 @@ function LinkSprites_Construct(_CharacterIndex){
 	
 		#region 1
 
-			var SprW = 16;
-			var SprH = 32;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 32;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 		
 			draw_clear_alpha(c_black, 0.0);
@@ -3194,9 +3195,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 		#region 2
 
-			var SprW = 16;
-			var SprH = 21;
-			var SprSurface = surface_create(SprW, SprH);
+			SprW = 16;
+			SprH = 21;
+			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//Frame 1-3
@@ -3275,9 +3276,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 	#region Dungeon Icon
 			
-		var SprW = 16;
-		var SprH = 16;	
-		var SprSurface = surface_create(SprW, SprH);
+		SprW = 16;
+		SprH = 16;	
+		SprSurface = surface_create(SprW, SprH);
 		surface_set_target(SprSurface);
 		
 		draw_clear_alpha(c_black, 0.0);
@@ -3293,9 +3294,9 @@ function LinkSprites_Construct(_CharacterIndex){
 
 	#region Map Icon
 			
-		var SprW = 16;
-		var SprH = 16;	
-		var SprSurface = surface_create(SprW, SprH);
+		SprW = 16;
+		SprH = 16;	
+		SprSurface = surface_create(SprW, SprH);
 		surface_set_target(SprSurface);
 		
 		draw_clear_alpha(c_black, 0.0);

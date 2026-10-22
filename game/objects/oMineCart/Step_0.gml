@@ -28,27 +28,30 @@ if(_MineCartActionInst != noone){
 		case "Destroy":
 			instance_destroy(id);
 			exit;
-			break;
 			
 		case "DirSwitch":
 			switch(Dir){
 				case LEFT:
 					x = _MineCartActionInst.bbox_right;
+					// Feather disable once GM2064
 					DirSwitchInst = instance_create_layer(x, y, layer, oMineCartDirSwitch, {sprite_index : _MineCartActionInst.Value1 == UP ? sMineCartDirSwitch_LeftToUp: sMineCartDirSwitch_LeftToDown});
 					break;
 		
 				case RIGHT:
 					x = _MineCartActionInst.bbox_left - sprite_width;
+					// Feather disable once GM2064
 					DirSwitchInst = instance_create_layer(x, y, layer, oMineCartDirSwitch, {sprite_index : _MineCartActionInst.Value1 == UP ? sMineCartDirSwitch_RightToUp: sMineCartDirSwitch_RightToDown});
 					break;
 		
 				case UP:
 					y = _MineCartActionInst.bbox_bottom;
+					// Feather disable once GM2064
 					DirSwitchInst = instance_create_layer(x, y, layer, oMineCartDirSwitch, {sprite_index : _MineCartActionInst.Value1 == LEFT ? sMineCartDirSwitch_UpToLeft: sMineCartDirSwitch_UpToRight});
 					break;
 		
 				case DOWN:
 					y = _MineCartActionInst.bbox_top - sprite_height;
+					// Feather disable once GM2064
 					DirSwitchInst = instance_create_layer(x, y, layer, oMineCartDirSwitch, {sprite_index : _MineCartActionInst.Value1 == LEFT ? sMineCartDirSwitch_DownToLeft: sMineCartDirSwitch_DownToRight});
 					break;	
 	
@@ -58,7 +61,6 @@ if(_MineCartActionInst != noone){
 			DirSwitchNextDir = _MineCartActionInst.Value1;
 			exit;
 			
-			break;
 	
 	}
 	

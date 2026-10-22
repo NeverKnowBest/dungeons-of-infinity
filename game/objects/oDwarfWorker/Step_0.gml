@@ -1,6 +1,7 @@
 PauseObj
 
 if(!Spark && image_index >= 3 && image_index < 5){
+	// Feather disable once GM2064
 	instance_create_layer(x + 22 - (Flip ? 44 : 0), y + 14, "ObjsHigher_" + FloorLevelStr, oWallHit, {PlaySound: distance_to_object(oLink) < 220});
 	Spark = true;
 }

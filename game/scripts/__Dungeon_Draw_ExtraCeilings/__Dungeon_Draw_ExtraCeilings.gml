@@ -5,6 +5,7 @@ function Dungeon_Draw_ExtraCeilings(_RoomIndex){
 	
 	var _TilesY = (global.Level.Index == DungeonLevel.Aghanim2 ? LevelTilesY_Aghanim2 : LevelTilesY);
 	
+	var _TMID;
 	for(var ExtraCeilingIndex = 0; ExtraCeilingIndex < array_length(Room.Template.ExtraCeilings); ExtraCeilingIndex++){
 		
 		var _Obj = Room.Template.ExtraCeilings[ExtraCeilingIndex];
@@ -17,11 +18,11 @@ function Dungeon_Draw_ExtraCeilings(_RoomIndex){
 		if(GetPropertyValue(PropertiesArray, "Boss") != -1){
 			//clear the existing ceiling and place this ceiling at a lower layer so it doesn't cover the bosses who jump high and the crystal falling
 			ClearTileBlock(global.TMID_Tiles_Ceiling, TLCornerX, TLCornerY, TileW, TileH);
-			var _TMID = global.TMID_Decor_Upper;
+			_TMID = global.TMID_Decor_Upper;
 		}else if(GetPropertyValue(PropertiesArray, "Higher") != -1){
-			var _TMID = global.TMID_Tiles_Higher;
+			_TMID = global.TMID_Tiles_Higher;
 		}else{
-			var _TMID = global.TMID_Tiles_Ceiling;
+			_TMID = global.TMID_Tiles_Ceiling;
 		}
 		
 		for(var _y = 0; _y < TileH; _y++){

@@ -26,7 +26,8 @@ if(!global.Users[global.UserIndex].Prefs[Pref.HUD]) exit;
 draw_sprite_ext(sHUD_Life, 0, MainSide + 15, 3, 1, 1, 0, HealthLowPulseColor, 1);
 	
 //draw empty containers first
-for(var _HeartIndex = 0; _HeartIndex < global.Inventory.ItemData[ItemClass.HeartPiece].Amount; _HeartIndex++){
+var _HeartIndex;
+for(_HeartIndex = 0; _HeartIndex < global.Inventory.ItemData[ItemClass.HeartPiece].Amount; _HeartIndex++){
 	draw_sprite_ext(sHUD_Heart, 0, HeartsX[_HeartIndex], HeartsY[_HeartIndex], 1, 1, 0, HealthLowPulseColor, 1);	
 }
 	
@@ -34,7 +35,7 @@ var _HealthToDraw = max(LinkHealth - AddHealth, 0);
 	
 //full hearts
 var _FullHearts = floor(_HealthToDraw);
-for(var _HeartIndex = 0; _HeartIndex < _FullHearts; _HeartIndex++){
+for(_HeartIndex = 0; _HeartIndex < _FullHearts; _HeartIndex++){
 	draw_sprite_ext(sHUD_Heart, 4, HeartsX[_HeartIndex], HeartsY[_HeartIndex], 1, 1, 0, HealthLowPulseColor, 1);
 }
 	

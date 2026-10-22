@@ -1,3 +1,4 @@
+// Feather disable GM2064
 enum EnemyState{
 	Idle,
 	Wake,
@@ -399,26 +400,27 @@ function Enemy_CheckHit(){
 		
 	var _AttackPts = ATTACK();
 	
+	var _Damage;
 	if(Hit_LinkWeaponClass == LinkWeaponClass.Sword && Hit_LinkWeaponEffect == H_FF){
 		Hit_LinkWeaponEffect = EnemyHitEffect.Damage;
-		var _Damage = global.LinkSwordDamage[_AttackPts][EnergyIndex];
+		_Damage = global.LinkSwordDamage[_AttackPts][EnergyIndex];
 		if(oLink.State == LinkState.SwordSpin){
 			_Damage *= (Enemy_IsBoss(object_index) ? 1.5 : 2);
 		}
 		
 	}else if(Hit_LinkWeaponClass == LinkWeaponClass.Arrow && Hit_LinkWeaponEffect >= 1){
-		var _Damage = Hit_LinkWeaponEffect + floor(_AttackPts / 2.5);
+		_Damage = Hit_LinkWeaponEffect + floor(_AttackPts / 2.5);
 		Hit_LinkWeaponEffect = EnemyHitEffect.Damage;
 		
 	}else if(Hit_LinkWeaponClass == LinkWeaponClass.Bomb && Hit_LinkWeaponEffect >= 1){
 		Hit_LinkWeaponEffect = EnemyHitEffect.Damage;
-		var _Damage = BombDmg;
+		_Damage = BombDmg;
 			
 	}else if(Hit_LinkWeaponClass == LinkWeaponClass.SwordBeam && Hit_LinkWeaponEffect == H_FF){
 		Hit_LinkWeaponEffect = EnemyHitEffect.Damage;
-		var _Damage = global.LinkSwordDamage[max(_AttackPts - 2, 1)][EnergyIndex];						
+		_Damage = global.LinkSwordDamage[max(_AttackPts - 2, 1)][EnergyIndex];						
 	}else if(Hit_LinkWeaponEffect >= 1){
-		var _Damage = Hit_LinkWeaponEffect + (max(_AttackPts - 1, 0) * 0.25);
+		_Damage = Hit_LinkWeaponEffect + (max(_AttackPts - 1, 0) * 0.25);
 		Hit_LinkWeaponEffect = EnemyHitEffect.Damage;						
 	}				
 		
@@ -496,6 +498,7 @@ function Enemy_Attack(_MaxAttackPoints){
 
 function Enemy_Hit_KnockBack(_Stun, _Damage){
 	
+	var _Shards, _PoofX, _PoofY, _Sections;
 	if(State == EnemyState.Frozen){
 		
 		var _Layer = "ObjsHigher_" + GetFloorLevelString(FloorLevel);
@@ -508,13 +511,13 @@ function Enemy_Hit_KnockBack(_Stun, _Damage){
 			default:
 				var SprW = sprite_get_width(sprite_index);
 				var SprH = sprite_get_height(sprite_index);
-				var _Shards = ceil((SprW * SprH) / 28); //the larger the enemy, the more shards
+				_Shards = ceil((SprW * SprH) / 28); //the larger the enemy, the more shards
 
 				repeat(_Shards){ 
 					instance_create_layer(x, y_base, _Layer, oIceShard, {FloorLevel : FloorLevel, z : z});
 				}	
-				var _PoofX = x - sprite_get_xoffset(sprite_index) + (SprW / 2);
-				var _PoofY = y - sprite_get_yoffset(sprite_index) + (SprH / 2);
+				_PoofX = x - sprite_get_xoffset(sprite_index) + (SprW / 2);
+				_PoofY = y - sprite_get_yoffset(sprite_index) + (SprH / 2);
 				instance_create_layer(_PoofX, _PoofY, layer, oPoof_NoSound);
 				break;
 			
@@ -522,35 +525,35 @@ function Enemy_Hit_KnockBack(_Stun, _Damage){
 				switch(Dir){
 					case VERTICAL:
 					
-						var _Sections = W / 16;
+						_Sections = W / 16;
 
 						for(var i = 0; i < _Sections; i++){
-							var _Shards = irandom_range(3,5); //the larger the enemy, the more shards
+							_Shards = irandom_range(3,5); //the larger the enemy, the more shards
 							
 							var _x = x + (i * 16);
 							var _y = y_base + 8;
 							repeat(_Shards){ 
 								instance_create_layer(_x, _y, _Layer, oIceShard, {FloorLevel : FloorLevel, z : z});
 							}	
-							var _PoofX = _x;
-							var _PoofY = _y;
+							_PoofX = _x;
+							_PoofY = _y;
 							instance_create_layer(_PoofX, _PoofY, layer, oPoof_NoSound);							
 						}
 						break;
 					case HORIZONTAL:
 					
-						var _Sections = H / 16;
+						_Sections = H / 16;
 
 						for(var i = 0; i < _Sections; i++){
-							var _Shards = irandom_range(3,5); //the larger the enemy, the more shards
+							_Shards = irandom_range(3,5); //the larger the enemy, the more shards
 							
 							var _x = x + 8;
 							var _y = y_base + (i * 16);
 							repeat(_Shards){ 
 								instance_create_layer(_x, _y, _Layer, oIceShard, {FloorLevel : FloorLevel, z : z});
 							}	
-							var _PoofX = _x;
-							var _PoofY = _y;
+							_PoofX = _x;
+							_PoofY = _y;
 							instance_create_layer(_PoofX, _PoofY, layer, oPoof_NoSound);							
 						}						
 						break;
@@ -799,18 +802,19 @@ function SpawnBoss(_RoomIndex){
 	
 	var VarStruct = {FloorLevel : UPPER, ItemHolding : -1, SectionID: 0, RoomIndex : _RoomIndex};
 	
+	var inst;
 	switch(global.Level.Index){
 		
 		case DungeonLevel.CastleJails:
-			var inst = instance_create_layer(Room.x + 20, Room.y + 20, "System", oBoss_Armos_C, VarStruct); 				
+			inst = instance_create_layer(Room.x + 20, Room.y + 20, "System", oBoss_Armos_C, VarStruct); 				
 			break;
 				
 		case DungeonLevel.LanmolasLair:
-			var inst = instance_create_layer(Room.x + 20, Room.y + 20, "System", oBoss_Lanmola_C, VarStruct);
+			inst = instance_create_layer(Room.x + 20, Room.y + 20, "System", oBoss_Lanmola_C, VarStruct);
 			break;
 				
 		case DungeonLevel.MoldormsLair:
-			var inst = instance_create_layer(Room.x + 128, Room.y + 80, "ObjsHigher_Upper", oBoss_Moldorm, VarStruct);			
+			inst = instance_create_layer(Room.x + 128, Room.y + 80, "ObjsHigher_Upper", oBoss_Moldorm, VarStruct);			
 			break;
 			
 	}
@@ -825,7 +829,6 @@ function Enemy_UpdateState(NewState, Variable = 0){
 		switch(NewState){
 			default:
 				exit;
-				break;
 			case EnemyState.KnockBack:
 			//case EnemyState.Frozen:
 			case EnemyState.Transformed:
@@ -839,6 +842,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 	
 	State = NewState;
 	
+	var A, _Hearts, _Rupees, _PoofInst;
 	switch(State){
 		
 		case EnemyState.Idle:
@@ -939,7 +943,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					//If so, then move to position outside of other Zol. This is to prevent more than 1 zol teleporting to the same spot
 					var ZolInst = instance_place(oLink.x, oLink.y, oEnemy_Zol);
 					if(ZolInst != noone){
-						var A = point_direction(x, y, oLink.x, oLink.y);
+						A = point_direction(x, y, oLink.x, oLink.y);
 						var IncX = lengthdir_x(1, A);
 						var IncY = lengthdir_y(1, A);
 						while(!place_meeting(x + IncX, y + IncY, oEnemy_Zol)){
@@ -1182,7 +1186,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					
 				case oEnemy_Gibdo:
 					Gibdo_UpdateDir(DirFaceLink());
-					alarm[0] = irandom_range(60, 150);;
+					alarm[0] = irandom_range(60, 150);
 					break;
 				
 				case oEnemy_Goriya:
@@ -1473,7 +1477,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					break;
 					
 				case oEnemy_Ropa:
-					var A = (oLink.Cape ? irandom(359) : point_direction(x, y_base, oLink.x, oLink.y));
+					A = (oLink.Cape ? irandom(359) : point_direction(x, y_base, oLink.x, oLink.y));
 					vx = lengthdir_x(1, A);
 					vy = lengthdir_y(1, A);
 					vz = choose(1,2,3);	
@@ -1501,7 +1505,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					break;
 					
 				case oEnemy_Zol:
-					var A = point_direction(x, y_base, oLink.x, oLink.y);
+					A = point_direction(x, y_base, oLink.x, oLink.y);
 					vx = lengthdir_x(1, A);
 					vy = lengthdir_y(1, A);
 					vz = 2;
@@ -1732,7 +1736,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 			Hit_Allowed = true;
 			FrozenSparkleCounter = FrozenSparkleTime;
 			Enemy_TransformUpdate();
-			var _PoofInst = instance_create_layer(ObjCenterX(), ObjCenterY(), EffectLayer(FloorLevel), instance_exists(oPoof) ? oPoof_NoSound : oPoof);	
+			_PoofInst = instance_create_layer(ObjCenterX(), ObjCenterY(), EffectLayer(FloorLevel), instance_exists(oPoof) ? oPoof_NoSound : oPoof);	
 			_PoofInst.depth = depth - 5;
 			audio_play_sound_stopall(Sound_Cane_Magic);
 			audio_play_sound_stopall(Sound_Chicken_Hit);
@@ -1773,16 +1777,16 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					
 					switch(Size){
 						case EnemySize.Tiny:
-							var _Hearts = 1;
+							_Hearts = 1;
 							break;
 						case EnemySize.Small:
-							var _Hearts = choose(1, 1, 1, 2);
+							_Hearts = choose(1, 1, 1, 2);
 							break;
 						case EnemySize.Medium:
-							var _Hearts = choose(1, 1, 1, 2, 2);
+							_Hearts = choose(1, 1, 1, 2, 2);
 							break;
 						case EnemySize.Large:
-							var _Hearts = choose(1, 1, 2, 2, 3);
+							_Hearts = choose(1, 1, 2, 2, 3);
 							if(Prob(0.015) && Item_Allowed(ItemClass.HeartPiece)) _HeartPiece = ItemClass.HeartPiece;
 							break;
 						
@@ -1798,16 +1802,16 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					
 					switch(Size){
 						case EnemySize.Tiny:
-							var _Rupees = irandom_range(1, 5);
+							_Rupees = irandom_range(1, 5);
 							break;
 						case EnemySize.Small:
-							var _Rupees = irandom_range(2, 8);
+							_Rupees = irandom_range(2, 8);
 							break;
 						case EnemySize.Medium:
-							var _Rupees = irandom_range(3, 10);
+							_Rupees = irandom_range(3, 10);
 							break;
 						case EnemySize.Large:
-							var _Rupees = irandom_range(4, 15);
+							_Rupees = irandom_range(4, 15);
 							if(Prob(0.05) && Item_Allowed(ItemClass.Gem)) _Gem = ItemClass.Gem;
 							break;
 						
@@ -1820,7 +1824,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					break;				
 			}
 			
-			var _PoofInst = instance_create_layer(ObjCenterX(), ObjCenterY(), EffectLayer(_FloorLevel), oPoof);	
+			_PoofInst = instance_create_layer(ObjCenterX(), ObjCenterY(), EffectLayer(_FloorLevel), oPoof);	
 			_PoofInst.depth = depth - 5;
 			audio_play_sound_stopall(Sound_Cane_Magic);
 			break;
@@ -2475,22 +2479,23 @@ function Enemy_ShootRedBall(_x, _y){
 
 function Enemy_WallCollisionNewDir(Orientation){
 	
+	var Dir1, Dir2, Dir3, Dir4, Wall1, Wall2;
 	switch(Orientation){
 		case HORIZONTAL:
-			var Dir1 = LEFT;
-			var Dir2 = RIGHT;
-			var Dir3 = UP;
-			var Dir4 = DOWN;
-			var Wall1 = ObjCollision(x, y - 6, oWall, FloorLevel);
-			var Wall2 = ObjCollision(x, y + 6, oWall, FloorLevel);
+			Dir1 = LEFT;
+			Dir2 = RIGHT;
+			Dir3 = UP;
+			Dir4 = DOWN;
+			Wall1 = ObjCollision(x, y - 6, oWall, FloorLevel);
+			Wall2 = ObjCollision(x, y + 6, oWall, FloorLevel);
 			break;
 		case VERTICAL:
-			var Dir1 = UP;
-			var Dir2 = DOWN;
-			var Dir3 = LEFT;
-			var Dir4 = RIGHT;
-			var Wall1 = ObjCollision(x - 6, y, oWall, FloorLevel);
-			var Wall2 = ObjCollision(x + 6, y, oWall, FloorLevel);
+			Dir1 = UP;
+			Dir2 = DOWN;
+			Dir3 = LEFT;
+			Dir4 = RIGHT;
+			Wall1 = ObjCollision(x - 6, y, oWall, FloorLevel);
+			Wall2 = ObjCollision(x + 6, y, oWall, FloorLevel);
 			break;
 	}
 
@@ -2511,18 +2516,19 @@ function Enemy_LinkInSight(_Dir, _Offset, _Distance){
 	if(!Sight || FloorLevel != oLink.FloorLevel || oLink.Cape) return false;
 	
 	//Checks a rectangle in front of enemy of width 2x_Offset at _Distance away
+	var SightX1, SightY1, SightX2, SightY2;
 	switch(_Dir){
 		case UP:
-			var SightX1 = x - _Offset; var SightY1 = y - _Distance;	var SightX2 = x + _Offset; var SightY2 = y;					
+			SightX1 = x - _Offset; SightY1 = y - _Distance;	SightX2 = x + _Offset; SightY2 = y;					
 			break;
 		case DOWN:
-			var SightX1 = x - _Offset; var SightY1 = y; var SightX2 = x + _Offset; var SightY2 = y + _Distance;	
+			SightX1 = x - _Offset; SightY1 = y; SightX2 = x + _Offset; SightY2 = y + _Distance;	
 			break;
 		case LEFT:
-			var SightX1 = x - _Distance; var SightY1 = y - 6 - _Offset; var SightX2 = x; var SightY2 = y - 6 + _Offset;	
+			SightX1 = x - _Distance; SightY1 = y - 6 - _Offset; SightX2 = x; SightY2 = y - 6 + _Offset;	
 			break;
 		case RIGHT:
-			var SightX1 = x; var SightY1 = y - 6 - _Offset; var SightX2 = x + _Distance; var SightY2 = y - 6 + _Offset;	
+			SightX1 = x; SightY1 = y - 6 - _Offset; SightX2 = x + _Distance; SightY2 = y - 6 + _Offset;	
 			break;
 	}
 	
@@ -2568,7 +2574,6 @@ function Enemy_Reset(_RoomIndex){
 					Scared = false;
 				}
 				continue;
-				break;
 		}
 
 		if(RoomIndex == _RoomIndex){
@@ -2697,7 +2702,6 @@ function Enemy_IsWall(_EnemyIndex){
 		case oEnemy_Cannon:
 		case oEnemy_Medusa:
 			return true
-			break;
 			
 	}
 	
@@ -2712,7 +2716,6 @@ function Enemy_IsUnderground(_EnemyIndex){
 		case oEnemy_Geldman:
 		case oEnemy_Leever:
 			return true
-			break;
 			
 	}
 	
@@ -2728,7 +2731,6 @@ function Enemy_CanBeHidden(_EnemyIndex){
 		case oEnemy_Wizzrobe:
 		case oEnemy_Zol:
 			return true
-			break;
 			
 	}
 	
@@ -2743,7 +2745,6 @@ function Enemy_IsInvincible(_EnemyIndex){
 		case oEnemy_Kyameron_Emitter:
 		case oEnemy_Wallmaster:
 			return true
-			break;
 			
 	}
 	
@@ -2759,7 +2760,6 @@ function Enemy_IsObstacle(_EnemyIndex){
 		case oEnemy_RollingSpike:
 		case oEnemy_MovingSpikeBlock:
 			return true
-			break;
 			
 	}
 	
@@ -2774,7 +2774,6 @@ function Enemy_CanJump(_EnemyIndex){
 		case oEnemy_Tektite:
 		case oEnemy_Ropa:
 			return true
-			break;
 			
 	}
 	
@@ -2791,7 +2790,6 @@ function Enemy_CanFly(_EnemyIndex){
 		case oEnemy_Poe:
 		case oEnemy_Zirro:
 			return true
-			break;
 			
 	}
 	

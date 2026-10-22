@@ -1,3 +1,4 @@
+// Feather disable GM2064
 
 TileW = ShopW / 8;
 TileH = ShopH / 8;
@@ -21,6 +22,7 @@ Inventory = array_create(Slots, noone);
 //global.Dungeon_Shop_Type[RoomIndex] = ShopType;
 
 
+var ShopKeeperIndex;
 if(ShopType == ShopTypes.Various){
 		
 	ShopKeeperInst = instance_create_layer(x + (ShopW / 2), y+21, "Objs_" + FloorLevelStr, oShopKeeper, {ShopType : ShopType});
@@ -38,7 +40,7 @@ if(ShopType == ShopTypes.Various){
 		
 		if(ds_list_size(global.UnusedShopKeepers) > 0){
 			//pick first shop keeper index from shuffled list, then delete it from the list so it's not picked twice
-			var ShopKeeperIndex = global.UnusedShopKeepers[| 0];
+			ShopKeeperIndex = global.UnusedShopKeepers[| 0];
 			ds_list_delete(global.UnusedShopKeepers, 0);
 		}else{
 			//if all shop keepers were used, just pick random one

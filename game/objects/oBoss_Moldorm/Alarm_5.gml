@@ -1,3 +1,4 @@
+// Feather disable GM2064
 /// @description Explosion
 
 for(var _BodyIndex = MoldormSection.Tail; _BodyIndex >= MoldormSection.BodyL1; _BodyIndex--){

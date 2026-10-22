@@ -287,11 +287,12 @@ function Inventory_SetPosition(_BagIndex, _X1, _Y1, _X2, _Y2){
 function Inventory_DrawBags(){
 	
 	
+	var _BagAlpha, _Bag;
 	for(var B = 0; B < Inventory_Bags; B++){
 		
 		var _BagIndex = global.InventoryDrawBagOrder[B];
 		
-		var _Bag = global.Inventory.Bags[_BagIndex];
+		_Bag = global.Inventory.Bags[_BagIndex];
 		
 		if(_Bag.Status == InventoryBagStatus.Closed) continue;
 	
@@ -300,11 +301,11 @@ function Inventory_DrawBags(){
 			
 			case InventoryBagStatus.Opening:
 			case InventoryBagStatus.Closing:
-				var _BagAlpha = global.Inventory.Bags[InventoryBag.Main].Position;
+				_BagAlpha = global.Inventory.Bags[InventoryBag.Main].Position;
 				break;
 			
 			default:
-				var _BagAlpha = 1;
+				_BagAlpha = 1;
 				break;
 				
 		}		
@@ -458,9 +459,10 @@ function Inventory_DrawItem(_BagIndex, _SlotIndex, _OffsetX = 0, _OffsetY = 0){
 	if(_ItemClass == -1) exit;
 	
 	//get item sprite
+	var _SprInd;
 	switch(_ItemClass){
-		case ItemClass.Sword: var _SprInd = sItem_Sword_Inventory; break;
-		default: var _SprInd = object_get_sprite(ObjIndexFromItemClass(_ItemClass)); break;
+		case ItemClass.Sword: _SprInd = sItem_Sword_Inventory; break;
+		default: _SprInd = object_get_sprite(ObjIndexFromItemClass(_ItemClass)); break;
 	}
 
 	switch(_ItemClass){
@@ -476,12 +478,13 @@ function Inventory_DrawItem(_BagIndex, _SlotIndex, _OffsetX = 0, _OffsetY = 0){
 	
 	draw_sprite(_SprInd, _ItemIndex, DrawItemX, DrawItemY);
 	
+	var _DrawAmount, _ItemAmount;
 	switch(_ItemClass){
 		
 		case ItemClass.ArrowQuiver:
 			if(global.Inventory.ItemData[ItemClass.ArrowQuiver].Owns[0]){
-				var _ItemAmount = global.Inventory.ItemData[ItemClass.Arrows].Amount[0];
-				var _DrawAmount = true;	
+				_ItemAmount = global.Inventory.ItemData[ItemClass.Arrows].Amount[0];
+				_DrawAmount = true;	
 			}
 			break;
 			
@@ -491,14 +494,14 @@ function Inventory_DrawItem(_BagIndex, _SlotIndex, _OffsetX = 0, _OffsetY = 0){
 		case ItemClass.GemBag:
 			var _InventoryBag = ItemClassToInventoryBag(_ItemClass);
 			if(global.Inventory.ItemData[_ItemClass].Owns[0]){
-				var _ItemAmount = BagCount[_InventoryBag];
-				var _DrawAmount = _ItemAmount > 0;	
+				_ItemAmount = BagCount[_InventoryBag];
+				_DrawAmount = _ItemAmount > 0;	
 			}					
 			break;
 			
 		default:
-			var _ItemAmount = global.Inventory.Bags[_BagIndex].Slots[_SlotIndex].Amount;
-			var _DrawAmount = global.ItemData[_ItemClass].Type == ItemType.Inv_Chrg || global.Inventory.Bags[_BagIndex].Slots[_SlotIndex].Amount > 1;
+			_ItemAmount = global.Inventory.Bags[_BagIndex].Slots[_SlotIndex].Amount;
+			_DrawAmount = global.ItemData[_ItemClass].Type == ItemType.Inv_Chrg || global.Inventory.Bags[_BagIndex].Slots[_SlotIndex].Amount > 1;
 			break;
 	}
 	
@@ -807,6 +810,7 @@ function Inventory_UseItem(_Slot, _FromInventory){
 	
 	var _Error = false;
 	
+	var _Added, _ObjIndex, Inst;
 	switch(_ItemClass){
 		
 		case ItemClass.Bow: 
@@ -869,9 +873,9 @@ function Inventory_UseItem(_Slot, _FromInventory){
 					case Ring.Bombs:
 
 						if(global.Inventory.ItemData[ItemClass.BombBag].Owns[0])
-							var _Added = Item_Consume(ItemClass.Bombs, 0, Ring_BombAmount);
+							_Added = Item_Consume(ItemClass.Bombs, 0, Ring_BombAmount);
 						else{
-							var _Added = Inventory_Add(ItemClass.Bombs, 0, Ring_BombAmount);
+							_Added = Inventory_Add(ItemClass.Bombs, 0, Ring_BombAmount);
 						}
 						
 						if(!_Added){
@@ -882,9 +886,9 @@ function Inventory_UseItem(_Slot, _FromInventory){
 					
 					case Ring.Arrows:
 						if(global.Inventory.ItemData[ItemClass.ArrowQuiver].Owns[0])
-							var _Added = Item_Consume(ItemClass.Arrows, 0, Ring_ArrowAmount);
+							_Added = Item_Consume(ItemClass.Arrows, 0, Ring_ArrowAmount);
 						else{
-							var _Added = Inventory_Add(ItemClass.Arrows, 0, Ring_ArrowAmount);
+							_Added = Inventory_Add(ItemClass.Arrows, 0, Ring_ArrowAmount);
 						}
 						if(!_Added){
 							var _DropPos = Item_DropPos();
@@ -926,17 +930,17 @@ function Inventory_UseItem(_Slot, _FromInventory){
 			if(oLink.InDoor_BlockItem || oLink.InDoor_House || !oLink.InDoor_Aligned) break;
 			
 			switch(_ItemClass){
-				case ItemClass.Bombs: var _ObjIndex = oBomb; break;
-				case ItemClass.Gem: var _ObjIndex = oGem; break;
-				case ItemClass.Orb: var _ObjIndex = oOrb; break;
-				case ItemClass.WishStone: var _ObjIndex = oWishStone; break;
+				case ItemClass.Bombs: _ObjIndex = oBomb; break;
+				case ItemClass.Gem: _ObjIndex = oGem; break;
+				case ItemClass.Orb: _ObjIndex = oOrb; break;
+				case ItemClass.WishStone: _ObjIndex = oWishStone; break;
 			}
 			
 			switch(oLink.Facing){
-				case LEFT: var Inst = instance_create_layer(oLink.x - 14, oLink.y, oLink.layer, _ObjIndex, {From : ItemFrom.Inventory, FloorLevel : oLink.FloorLevel}); break;
-				case RIGHT: var Inst = instance_create_layer(oLink.x + 14, oLink.y, oLink.layer, _ObjIndex, {From : ItemFrom.Inventory, FloorLevel : oLink.FloorLevel}); break;
-				case UP: var Inst = instance_create_layer(oLink.x, oLink.y - 12, oLink.layer, _ObjIndex, {From : ItemFrom.Inventory, FloorLevel : oLink.FloorLevel}); break;
-				case DOWN: var Inst = instance_create_layer(oLink.x, oLink.y + 12, oLink.layer, _ObjIndex, {From : ItemFrom.Inventory, FloorLevel : oLink.FloorLevel}); break;
+				case LEFT: Inst = instance_create_layer(oLink.x - 14, oLink.y, oLink.layer, _ObjIndex, {From : ItemFrom.Inventory, FloorLevel : oLink.FloorLevel}); break;
+				case RIGHT: Inst = instance_create_layer(oLink.x + 14, oLink.y, oLink.layer, _ObjIndex, {From : ItemFrom.Inventory, FloorLevel : oLink.FloorLevel}); break;
+				case UP: Inst = instance_create_layer(oLink.x, oLink.y - 12, oLink.layer, _ObjIndex, {From : ItemFrom.Inventory, FloorLevel : oLink.FloorLevel}); break;
+				case DOWN: Inst = instance_create_layer(oLink.x, oLink.y + 12, oLink.layer, _ObjIndex, {From : ItemFrom.Inventory, FloorLevel : oLink.FloorLevel}); break;
 			}
 			Inst.Index = _ItemIndex;
 			

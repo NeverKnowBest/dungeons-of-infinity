@@ -17,10 +17,11 @@ if(Zerberk_WallCollisionX(id) || Zerberk_WallCollisionY(id)){
 }
 
 
+var inst;
 switch(From){
 	
 	case 0: //Hero
-		var inst = instance_place(x, y, oZerberk_Robot)
+		inst = instance_place(x, y, oZerberk_Robot)
 		if(inst != noone){
 			global.Arcade_ActiveInst.Score += inst.Points;
 			inst.Destroyed = true;
@@ -33,7 +34,7 @@ switch(From){
 		
 		if(oZerberk_Hero.Dead) break;
 		
-		var inst = instance_place(x, y, oZerberk_Hero)
+		inst = instance_place(x, y, oZerberk_Hero)
 		if(inst != noone){
 			Zerberk_Hero_Death();
 			Destroyed = true;

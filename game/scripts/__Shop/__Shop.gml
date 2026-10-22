@@ -18,11 +18,12 @@ function Shop_CreateItem(_Slot){
 	
 	var _ItemFrom = ItemFrom.Shop;
 	
+	var _ItemClass;
 	switch(ShopType){
 		
 		case ShopTypes.Various:
 		
-			var _ItemClass = Probs_RandomItemClass(ItemFrom.Shop);
+			_ItemClass = Probs_RandomItemClass(ItemFrom.Shop);
 			
 			if(global.Swordless){
 				if(_ItemClass != ItemClass.Bow && Item_Allowed(ItemClass.Bow)){
@@ -38,28 +39,28 @@ function Shop_CreateItem(_Slot){
 			
 		case ShopTypes.Weapons: 
 			_ItemFrom = ItemFrom.WeaponStore;
-			var _ItemClass = Probs_RandomItemClass(ItemFrom.WeaponStore); 
+			_ItemClass = Probs_RandomItemClass(ItemFrom.WeaponStore); 
 			break;
 		case ShopTypes.Foods: 
 			_ItemFrom = ItemFrom.FoodStore;
-			var _ItemClass = Probs_RandomItemClass(ItemFrom.FoodStore); 
+			_ItemClass = Probs_RandomItemClass(ItemFrom.FoodStore); 
 			if(_ItemClass == ItemClass.Potion) _ItemIndex = Potion.Milk;
 			break;
 		case ShopTypes.Potions:
-			var _ItemClass = Prob(0.85) ? ItemClass.Potion : ItemClass.MagicLarge;
+			_ItemClass = Prob(0.85) ? ItemClass.Potion : ItemClass.MagicLarge;
 			if(_ItemClass == ItemClass.Potion) _ItemIndex = choose(Potion.Health, Potion.HealthMagic, Potion.Magic, Potion.Antidote); 
 			break;	
 		case ShopTypes.Treasures: 
 			_ItemFrom = ItemFrom.TreasureStore;
-			var _ItemClass = Probs_RandomItemClass(_ItemFrom); 
+			_ItemClass = Probs_RandomItemClass(_ItemFrom); 
 			break;
 		case ShopTypes.Magic: 
 			_ItemFrom = ItemFrom.MagicStore;
-			var _ItemClass = Probs_RandomItemClass(_ItemFrom); 
+			_ItemClass = Probs_RandomItemClass(_ItemFrom); 
 			break;
 		case ShopTypes.Bombs: 
 			
-			var _ItemClass = ItemClass.Bombs;
+			_ItemClass = ItemClass.Bombs;
 			
 			if(Prob(0.2) && Item_Allowed(ItemClass.BombBag, 0, _ItemFrom)){
 				_ItemClass = ItemClass.BombBag;				
@@ -72,12 +73,13 @@ function Shop_CreateItem(_Slot){
 	}
 
 
+	var ItemInst;
 	switch(_ItemClass){
 		case ItemClass.Treasure:
-			var ItemInst = Treasure_Create(RoomIndex, x, y, RandomItem, false, ShopType == ShopTypes.Various,, _ItemFrom); //temporarily create item at shop's x/y. Will reposition after
+			ItemInst = Treasure_Create(RoomIndex, x, y, RandomItem, false, ShopType == ShopTypes.Various,, _ItemFrom); //temporarily create item at shop's x/y. Will reposition after
 			break;
 		default:
-			var ItemInst = instance_create_layer(x, y, "Objs_" + FloorLevelStr, ObjIndexFromItemClass(_ItemClass), {From : _ItemFrom});
+			ItemInst = instance_create_layer(x, y, "Objs_" + FloorLevelStr, ObjIndexFromItemClass(_ItemClass), {From : _ItemFrom});
 		
 	}
 	

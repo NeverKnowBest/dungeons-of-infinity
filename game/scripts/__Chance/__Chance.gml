@@ -140,7 +140,6 @@ function Lighting_GetRoomStatus(_RoomIndex){
 		case DungeonLevel.Catacombs:
 		case DungeonLevel.MoldormsLair:
 			return true;
-			break;			
 
 	}
 	

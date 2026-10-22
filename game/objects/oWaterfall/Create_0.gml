@@ -1,3 +1,4 @@
+// Feather disable GM2064
 RoomIndex = Dungeon_GetRoomIndex(x, y);
 FloorLevel = GetFloorLevelID(x, y);
 

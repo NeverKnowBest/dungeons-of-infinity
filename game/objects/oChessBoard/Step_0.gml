@@ -1,11 +1,13 @@
+// Feather disable GM2064
+var MsgInst;
 if(!DB_Started && input_check_pressed("item")){
 	
 	switch(Status){
 		case ChessStatus.Playing:
-			var MsgInst = instance_create_layer(0, 0, "System", oDialogueBox_Chess, {Msg : "Resign?"});
+			MsgInst = instance_create_layer(0, 0, "System", oDialogueBox_Chess, {Msg : "Resign?"});
 			break;
 		case ChessStatus.GameOver:
-			var MsgInst = instance_create_layer(0, 0, "System", oDialogueBox_Chess, {Msg : "New Game?"});
+			MsgInst = instance_create_layer(0, 0, "System", oDialogueBox_Chess, {Msg : "New Game?"});
 			break;
 	
 	}
@@ -43,6 +45,7 @@ if(DB_Started){
 }
 
  
+var DepthStr, BestMoveStrPos;
 if(Status == ChessStatus.Playing){
 	
 	MoveType = MoveTypes.None;
@@ -105,15 +108,15 @@ if(Status == ChessStatus.Playing){
 				FEN_BeforeAIMove = BoardToFen();
 				
 				if(HalfMove <= 9)
-					var DepthStr = string(irandom_range(5, 8)); //stronger for first few opening moves
+					DepthStr = string(irandom_range(5, 8)); //stronger for first few opening moves
 				else
-					var DepthStr = string(irandom_range(2, 5));
+					DepthStr = string(irandom_range(2, 5));
 					
 				ExecutedProcessWriteToStandardInput(StockfishProcess, "position fen " + FEN_BeforeAIMove + "\ngo depth " + DepthStr + "\n");
 			
 				do{
 					AIOutput = ExecutedProcessReadFromStandardOutput(StockfishProcess)
-					var BestMoveStrPos = string_pos("bestmove", AIOutput);
+					BestMoveStrPos = string_pos("bestmove", AIOutput);
 		
 				}until (BestMoveStrPos != 0)
 			

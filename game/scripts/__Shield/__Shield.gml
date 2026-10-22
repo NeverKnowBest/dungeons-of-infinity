@@ -87,7 +87,7 @@ function Shield_InitData(){
 	ShieldOffsetY[LinkState.Rod][DOWN] = array_create(5, -7);
 	ShieldOffsetX[LinkState.Rod][LEFT] = array_create(5, 0);
 	ShieldOffsetY[LinkState.Rod][LEFT] = array_create(5, -7); 
-	ShieldOffsetX[LinkState.Rod][RIGHT] = array_create(5, 0);; 
+	ShieldOffsetX[LinkState.Rod][RIGHT] = array_create(5, 0); 
 	ShieldOffsetY[LinkState.Rod][RIGHT] = array_create(5, -7); 
 
 }
@@ -122,6 +122,7 @@ function Shield_Draw(){
 	
 	if(ItemHolding != noone && instance_exists(ItemHolding)) exit; //if holding an item don't draw shield
 	
+	var _PosX, _PosY;
 	if(oCamera.RoomTransition == NONE || oCamera.OpenTransition){ //you can spot the larger shields at Link's feet when he's waiting at a door for the camera to finish transitoning, so don't draw the shield during the transition
 		var ImgInd = floor(image_index);
 		switch(State){
@@ -170,18 +171,18 @@ function Shield_Draw(){
 		if(SwordCharge > 0){
 			switch(State){
 				case LinkState.Standing:
-					var _PosX = x + ShieldOffsetX_SwordCharge_Stand[Facing][ImgInd];
-					var _PosY = y + ShieldOffsetY_SwordCharge_Stand[Facing][ImgInd];
+					_PosX = x + ShieldOffsetX_SwordCharge_Stand[Facing][ImgInd];
+					_PosY = y + ShieldOffsetY_SwordCharge_Stand[Facing][ImgInd];
 					break;
 				default:
-					var _PosX = x + ShieldOffsetX_SwordCharge_Walk[Facing][ImgInd];
-					var _PosY = y + ShieldOffsetY_SwordCharge_Walk[Facing][ImgInd];
+					_PosX = x + ShieldOffsetX_SwordCharge_Walk[Facing][ImgInd];
+					_PosY = y + ShieldOffsetY_SwordCharge_Walk[Facing][ImgInd];
 					break;
 			}
 				
 		}else{
-			var _PosX = x + ShieldOffsetX[_State][Facing][ImgInd];
-			var _PosY = y + ShieldOffsetY[_State][Facing][ImgInd];			
+			_PosX = x + ShieldOffsetX[_State][Facing][ImgInd];
+			_PosY = y + ShieldOffsetY[_State][Facing][ImgInd];			
 		}
 		
 		draw_sprite(ShieldSprite[global.Inventory.ItemData[ItemClass.Shield].Index][ShieldDir], 0, _PosX, _PosY);

@@ -4,6 +4,7 @@ Link_PauseHitFlashingTimer();
 if(global.Inventory.Bags[InventoryBag.Main].Status == InventoryBagStatus.Closing) exit;
 
 
+var _ItemUsed, _ItemClass, _BagIndex, _SlotIndex;
 if(!DB_Started && !instance_exists(global.DB_Inst)){
 
 		
@@ -27,13 +28,13 @@ if(!DB_Started && !instance_exists(global.DB_Inst)){
 			
 			if(MenuItemGrid[# 1, MenuSelectionIndex]){
 				
-				var _BagIndex = global.Inventory.SlotSelected[0];
-				var _SlotIndex = global.Inventory.SlotSelected[1];
+				_BagIndex = global.Inventory.SlotSelected[0];
+				_SlotIndex = global.Inventory.SlotSelected[1];
 				
 				var _Bag = global.Inventory.Bags[_BagIndex];
 				var _Slot = _Bag.Slots[_SlotIndex];
 				
-				var _ItemClass = _Slot.ItemClass;
+				_ItemClass = _Slot.ItemClass;
 				var _ItemIndex = _Slot.ItemIndex;
 			
 				switch(MenuSelectionIndex){	
@@ -46,10 +47,10 @@ if(!DB_Started && !instance_exists(global.DB_Inst)){
 					
 					case 1: //use
 						if(Item_CanUse(_ItemClass, _ItemIndex)){
-							var _ItemUsed = Inventory_UseItem(Inventory_SelectedSlot, true);
+							_ItemUsed = Inventory_UseItem(Inventory_SelectedSlot, true);
 							audio_play_sound(Sound_TextDone, 1, false);
 						}else{
-							var _ItemUsed = false;
+							_ItemUsed = false;
 							audio_play_sound_stopall(Sound_Error);
 						}
 						break;
@@ -88,7 +89,6 @@ if(!DB_Started && !instance_exists(global.DB_Inst)){
 						case ItemClass.WishStone:
 							global.Inventory.Bags[InventoryBag.Main].Status = InventoryBagStatus.Closing;
 							exit;
-							break;
 							
 						case ItemClass.Ring: //don't disable the menu if using a ring since you generally want to use it multiple times in a row
 							break;
@@ -101,7 +101,6 @@ if(!DB_Started && !instance_exists(global.DB_Inst)){
 							global.Inventory.SlotEquiped[1] = _SlotIndex;
 							global.Inventory.Bags[InventoryBag.Main].Status = InventoryBagStatus.Closing;
 							exit;
-							break;
 					}					
 					
 				}

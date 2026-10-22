@@ -94,11 +94,12 @@ function SplitSentenceToArray(Sentence, Font, MaxPixelLen){
 
 	draw_set_font(Font);
 
+	var WordStart;
 	do{
 	
 		var LineDone = false;
 		var Line = ""
-		var WordStart = LineStart;
+		WordStart = LineStart;
 	
 		do{
 

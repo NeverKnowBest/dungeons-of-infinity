@@ -37,6 +37,7 @@ function Dungeon_CreateDoors(_RoomIndex){
 	surface_set_target(DoorsSprSurface);
 	draw_clear_alpha(c_black, 0);
 	
+	var TMID_Walls, WallObjInst, WallX, WallY, WallGID, ScaleX, ScaleY, Position, Dx, Dy, Dw, Dh;
 	for(var DoorIndex = 0; DoorIndex < Room.DoorCount; DoorIndex++){
 		
 		//var DungeonDoor = DungeonRoom.Doors[DoorIndex];
@@ -120,11 +121,11 @@ function Dungeon_CreateDoors(_RoomIndex){
 
 		if(_DoorInst.FloorLevel == UPPER){
 			//var TMID_Floors_Common = global.TMID2_Upper;
-			var TMID_Walls = global.TMID_Walls_Upper;	
+			TMID_Walls = global.TMID_Walls_Upper;	
 			var TMID_Decor = global.TMID_Decor_Upper;
 		}else{
 			//var TMID_Floors_Common = global.TMID2_Lower;
-			var TMID_Walls = global.TMID_Walls_Lower;
+			TMID_Walls = global.TMID_Walls_Lower;
 			var TMID_Decor = global.TMID_Decor_Lower;
 		}
 
@@ -139,7 +140,7 @@ function Dungeon_CreateDoors(_RoomIndex){
 				}else
 					ClearTileBlock(TMID_Walls, TLCornerX + 8, TLCornerY + 8, 2, 2);
 
-				var WallObjInst = collision_point(TLCornerX + 4, TLCornerY + 4, oWall, false, true);
+				WallObjInst = collision_point(TLCornerX + 4, TLCornerY + 4, oWall, false, true);
 				if(WallObjInst != noone) WallObj_Cutout_H(WallObjInst, TLCornerX + 8, TLCornerX + 23);
 				
 				break;
@@ -147,7 +148,7 @@ function Dungeon_CreateDoors(_RoomIndex){
 			case "Bottom":	
 				ClearTileBlock(TMID_Walls, TLCornerX + 8, TLCornerY, 2, 2);
 				
-				var WallObjInst = collision_point(TLCornerX + 4, TLCornerY + 4, oWall, false, true);
+				WallObjInst = collision_point(TLCornerX + 4, TLCornerY + 4, oWall, false, true);
 				if(WallObjInst != noone) WallObj_Cutout_H(WallObjInst, TLCornerX + 8, TLCornerX + 23);
 
 				break;
@@ -155,7 +156,7 @@ function Dungeon_CreateDoors(_RoomIndex){
 			case "Left":
 			case "Right":
 				ClearTileBlock(TMID_Walls, TLCornerX + (_DoorInst.Location == "Left" ? 8 : 0), TLCornerY + 8, 2, 2);
-				var WallObjInst = collision_point(TLCornerX + 4, TLCornerY + 4, oWall, false, true);
+				WallObjInst = collision_point(TLCornerX + 4, TLCornerY + 4, oWall, false, true);
 				if(WallObjInst != noone) WallObj_Cutout_V(WallObjInst, TLCornerY + 8, TLCornerY + 23);
 				break;
 		}
@@ -165,39 +166,39 @@ function Dungeon_CreateDoors(_RoomIndex){
 		//Place an enemy door blocker at every door to prevent enemies from going through them
 		switch(_DoorInst.Location){
 			case "Top":
-				var WallX = TLCornerX + 8;
-				var WallY = TLCornerY;
-				var WallGID = _DoorInst.FloorLevel == UPPER ? TemplateObjGID.WallSideT : TemplateObjGID.WallLowerSideT;
-				var ScaleX = 2;
-				var ScaleY = 3;
-				var Position = TOP;
+				WallX = TLCornerX + 8;
+				WallY = TLCornerY;
+				WallGID = _DoorInst.FloorLevel == UPPER ? TemplateObjGID.WallSideT : TemplateObjGID.WallLowerSideT;
+				ScaleX = 2;
+				ScaleY = 3;
+				Position = TOP;
 				break;
 				
 			case "Left":
-				var WallX = TLCornerX;
-				var WallY = TLCornerY + 8;
-				var WallGID = _DoorInst.FloorLevel == UPPER ? TemplateObjGID.WallSideL : TemplateObjGID.WallLowerSideL;
-				var ScaleX = 3;
-				var ScaleY = 2;
-				var Position = LEFT;
+				WallX = TLCornerX;
+				WallY = TLCornerY + 8;
+				WallGID = _DoorInst.FloorLevel == UPPER ? TemplateObjGID.WallSideL : TemplateObjGID.WallLowerSideL;
+				ScaleX = 3;
+				ScaleY = 2;
+				Position = LEFT;
 				break;
 			
 			case "Bottom":
-				var WallX = TLCornerX + 8;
-				var WallY = TLCornerY;
-				var WallGID = _DoorInst.FloorLevel == UPPER ? TemplateObjGID.WallSideB : TemplateObjGID.WallLowerSideB;
-				var ScaleX = 2;
-				var ScaleY = 3;
-				var Position = BOTTOM;
+				WallX = TLCornerX + 8;
+				WallY = TLCornerY;
+				WallGID = _DoorInst.FloorLevel == UPPER ? TemplateObjGID.WallSideB : TemplateObjGID.WallLowerSideB;
+				ScaleX = 2;
+				ScaleY = 3;
+				Position = BOTTOM;
 				break;
 			
 			case "Right":
-				var WallX = TLCornerX;
-				var WallY = TLCornerY + 8;
-				var WallGID = _DoorInst.FloorLevel == UPPER ? TemplateObjGID.WallSideR : TemplateObjGID.WallLowerSideR;
-				var ScaleX = 3;
-				var ScaleY = 2;
-				var Position = RIGHT;
+				WallX = TLCornerX;
+				WallY = TLCornerY + 8;
+				WallGID = _DoorInst.FloorLevel == UPPER ? TemplateObjGID.WallSideR : TemplateObjGID.WallLowerSideR;
+				ScaleX = 3;
+				ScaleY = 2;
+				Position = RIGHT;
 				break;
 			
 		}
@@ -223,16 +224,16 @@ function Dungeon_CreateDoors(_RoomIndex){
 		var MapDoorY = (TLCornerY - Room.y) / 8;
 		switch(_DoorInst.Location){
 			case "Top":
-				var Dx = MapDoorX;	var Dy = MapDoorY - 5; var Dw = 4; var Dh = 8;
+				Dx = MapDoorX;	Dy = MapDoorY - 5; Dw = 4; Dh = 8;
 				break;
 			case "Bottom":
-				var Dx = MapDoorX;	var Dy = MapDoorY; var Dw = 4; var Dh = 8;
+				Dx = MapDoorX;	Dy = MapDoorY; Dw = 4; Dh = 8;
 				break;
 			case "Left":
-				var Dx = MapDoorX - 5;	var Dy = MapDoorY; var Dw = 8; var Dh = 4;
+				Dx = MapDoorX - 5;	Dy = MapDoorY; Dw = 8; Dh = 4;
 				break;
 			case "Right":
-				var Dx = MapDoorX;	var Dy = MapDoorY; var Dw = 8; var Dh = 4;
+				Dx = MapDoorX;	Dy = MapDoorY; Dw = 8; Dh = 4;
 				break;
 		}
 						
@@ -998,7 +999,7 @@ function Door_SetPassageArea(_DoorInst){
 			case "Left":
 
 				sprite_index = sDoorMaskV;
-				PassageArea[0] = x - 48 - (FloorLevel == LOWER ? 48 : 0);;
+				PassageArea[0] = x - 48 - (FloorLevel == LOWER ? 48 : 0);
 				PassageArea[1] = y - 12;
 				PassageArea[2] = x + 8;
 				PassageArea[3] = y + 35;
@@ -1049,14 +1050,13 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 						
 				case RoomSize._1x2:
 				
 					switch(ARDoorPos){
 						case 1: case 13: return 5 + A;
 						case 3: case 15: if(ARGridY == CRGridY) return 10 + A; else return 8 + A;
-						case 5: case 17: return 1 + A;;
+						case 5: case 17: return 1 + A;
 						case 6: case 18: return 12 + A;
 						case 7: case 19: return 11 + A;
 						case 9: case 21: if(ARGridY == CRGridY) return 2 + A; else return 4 + A;
@@ -1065,7 +1065,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 					
 				case RoomSize._2x1:
 
@@ -1081,7 +1080,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 						
 				case RoomSize._2x2:
 				
@@ -1093,7 +1091,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 			}
 				
 			break;
@@ -1117,7 +1114,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 						
 				case RoomSize._1x2:
 				
@@ -1126,7 +1122,7 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						case 2: case 14: if(ARGridY == CRGridY) return 10 + A; else return 8 + A;
 						case 3: case 15: if(ARGridY == CRGridY) return 9 + A; else return -1;
 						case 4: case 16: if(ARGridY == CRGridY) return 8 + A; else return 10 + A;
-						case 5: case 17: return 1 + A;;
+						case 5: case 17: return 1 + A;
 						case 6: case 18: return 12 + A;
 						case 7: case 19: return 11 + A;
 						case 8: case 20: if(ARGridY == CRGridY) return 4 + A; else return 2 + A;
@@ -1137,7 +1133,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 					
 				case RoomSize._2x1:
 
@@ -1151,7 +1146,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 						
 				case RoomSize._2x2:
 				
@@ -1167,7 +1161,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 			}
 			
 			break;
@@ -1192,21 +1185,19 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 						
 				case RoomSize._1x2:
 				
 					switch(ARDoorPos){
 						case 1: case 13: return 6 + A;
 						case 3: case 15: if(ARGridY == CRGridY) return 10 + A; else return 8 + A;
-						case 5: case 17: return 12 + A;;
+						case 5: case 17: return 12 + A;
 						case 7: case 19: return 12 + A;
 						case 9: case 21: if(ARGridY == CRGridY) return 2 + A; else return 4 + A;
 						case 11: case 23: return 6 + A;
 						default: return -1;
 								
 					}
-					break;
 					
 				case RoomSize._2x1:
 
@@ -1226,7 +1217,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 						
 				case RoomSize._2x2:
 				
@@ -1242,7 +1232,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 			}
 			
 			break;
@@ -1264,7 +1253,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 						
 				case RoomSize._1x2:
 				
@@ -1282,7 +1270,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 					
 				case RoomSize._2x1:
 
@@ -1300,7 +1287,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 						
 				case RoomSize._2x2:
 				
@@ -1320,7 +1306,6 @@ function Door_GetConnectedPos(ARGridX, ARGridY, ARSize, CRGridX, CRGridY, CRSize
 						default: return -1;
 								
 					}
-					break;
 			}
 			
 			break;

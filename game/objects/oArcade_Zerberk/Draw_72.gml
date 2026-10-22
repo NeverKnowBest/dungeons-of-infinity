@@ -10,6 +10,7 @@ draw_rectangle(0, 0, CamW, CamH, false);
 //var _Hx = floor(Hero.x);
 //var _Hy = floor(Hero.y);
 
+var _Spr;
 for(var _WallX = 0; _WallX < 12; _WallX++){
 	
 	if(WallStatusX[_WallX] == 0) continue;
@@ -19,10 +20,10 @@ for(var _WallX = 0; _WallX < 12; _WallX++){
 	
 	switch(WallStatusX[_WallX]){
 		case 1: //normal walls
-			var _Spr = sZerberk_Level_Wall;
+			_Spr = sZerberk_Level_Wall;
 			break;
 		case 2: //door
-			var _Spr = sZerberk_Level_DoorH;
+			_Spr = sZerberk_Level_DoorH;
 			break;
 
 	}
@@ -42,10 +43,10 @@ for(var _WallY = 0; _WallY < 12; _WallY++){
 
 	switch(WallStatusY[_WallY]){
 		case 1: //normal walls
-			var _Spr = sZerberk_Level_Wall;
+			_Spr = sZerberk_Level_Wall;
 			break;
 		case 2: //door
-			var _Spr = sZerberk_Level_DoorV;
+			_Spr = sZerberk_Level_DoorV;
 			break;
 
 	}

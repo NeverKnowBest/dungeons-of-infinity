@@ -1,24 +1,26 @@
+// Feather disable GM2064
 /// @description Shoot
 
+var inst;
 switch(Dir){
 	case LEFT:
-		var inst = instance_create_layer(x - 8, y - 7, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oBeam, {Type : Type});
+		inst = instance_create_layer(x - 8, y - 7, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oBeam, {Type : Type});
 		inst.vx = -inst.Speed;
 		inst.sprite_index = sBeam_Left;
 		break;
 	case RIGHT:
-		var inst = instance_create_layer(x + 8, y - 7, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oBeam, {Type : Type});
+		inst = instance_create_layer(x + 8, y - 7, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oBeam, {Type : Type});
 		inst.vx = inst.Speed;
 		inst.sprite_index = sBeam_Right;
 		break;
 	case UP:
-		var inst = instance_create_layer(x, y - 14, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oBeam, {Type : Type});
+		inst = instance_create_layer(x, y - 14, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oBeam, {Type : Type});
 		inst.vy = -inst.Speed;
 		inst.sprite_index = sBeam_Up;
 		Hit_AllowedTimer = 3;
 		break;
 	case DOWN:
-		var inst = instance_create_layer(x, y + 6, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oBeam, {Type : Type});
+		inst = instance_create_layer(x, y + 6, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oBeam, {Type : Type});
 		inst.vy = inst.Speed;
 		inst.sprite_index = sBeam_Down;
 		break;

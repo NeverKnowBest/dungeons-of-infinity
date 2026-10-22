@@ -1,3 +1,4 @@
+// Feather disable GM2064
 
 if(global.Arcade_ActiveInst.State != ArcadeState.GameStarted && global.Arcade_ActiveInst.State != ArcadeState.Special) exit;
 
@@ -108,8 +109,6 @@ if(input_check_pressed("sword")){
 		instance_create_layer(x - 5, y - 12, layer, oZerberk_Laser, {image_index : 0, vx : -LaserV, vy : 0, From : 0});
 		exit;		
 	}
-
-	exit;
 }
 
 

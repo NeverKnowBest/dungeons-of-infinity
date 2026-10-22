@@ -1,4 +1,4 @@
-
+// Feather disable GM2064
 function Zora_Splash(){
 
 	var Splashes = 8;

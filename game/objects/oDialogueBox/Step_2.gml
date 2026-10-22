@@ -185,7 +185,6 @@ switch(Status){
 		
 		instance_destroy(id);
 		exit;
-		break;
 			
 }
 

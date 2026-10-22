@@ -34,7 +34,8 @@ switch(global.Inventory.SlotSelected[0]){
 Inventory_Update();
 
 //Disable top row slots that don't have items, enable the rest.
-for(var i = 0; i < global.Inventory.Bags[InventoryBag.Main].Columns; i++) {
+var i;
+for(i = 0; i < global.Inventory.Bags[InventoryBag.Main].Columns; i++) {
 	
 	var _Slot = global.Inventory.Bags[InventoryBag.Main].Slots[i];
 	
@@ -77,7 +78,7 @@ MenuEnable = false;
 
 MenuItems = 4;
 MenuItemGrid = ds_grid_create(2, MenuItems); //x0 = menu caption, x1 = enable status
-var i = 0;
+i = 0;
 MenuItemGrid[# 0,   i] = "EQUIP";   MenuItemGrid[# 1, i] = true;
 MenuItemGrid[# 0, ++i] = "USE";		MenuItemGrid[# 1, i] = true;
 MenuItemGrid[# 0, ++i] = "DROP";	MenuItemGrid[# 1, i] = true;
@@ -87,7 +88,7 @@ MenuSeperator = string_repeat(" ", 3);
 MenuStr = "";
 MenuItemPos[0] = 0;
 draw_set_font(global.Font_Small);
-for(var i = 0; i < MenuItems; i++){
+for(i = 0; i < MenuItems; i++){
 	MenuItemW[i] = string_width(MenuItemGrid[# 0, i]);
 	MenuStr += (MenuItemGrid[# 0, i] + (i < MenuItems - 1 ? MenuSeperator : ""));
 	MenuItemPos[i+1] = string_width(MenuStr);
@@ -129,7 +130,7 @@ DB_Started = false;
 	} 
 
 	
-	DBScript_Info = ds_grid_create(3, 2); var i = 0; 
+	DBScript_Info = ds_grid_create(3, 2); i = 0; 
 
 var	Addr=0;	DBScript_Info[# 0, Addr] = DBScriptCode.Dialogue	DBScript_Info[# ++i, Addr] = method(self, DBScriptFunction_Inventory_ItemInfo);	DBScript_Info[# ++i, Addr] = 1; i = 0;
 	Addr=1;	DBScript_Info[# 0, Addr] = DBScriptCode.End;		DBScript_Info[# ++i, Addr] = 0; i = 0;

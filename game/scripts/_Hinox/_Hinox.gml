@@ -13,11 +13,12 @@ function Hinox_Shoot(){
 	
 	var Layer = "ObjsHigher_" + GetFloorLevelString(x, y);
 
+	var BombInst;
 	switch(Dir){
-		case LEFT:	var BombInst = instance_create_layer(x - 7, y, Layer, oBomb); break;
-		case RIGHT:	var BombInst = instance_create_layer(x + 7, y, Layer, oBomb); break;
-		case UP:	var BombInst = instance_create_layer(x + 13, y, Layer, oBomb); break;
-		case DOWN:	var BombInst = instance_create_layer(x - 13, y, Layer, oBomb); break;
+		case LEFT:	BombInst = instance_create_layer(x - 7, y, Layer, oBomb); break;
+		case RIGHT:	BombInst = instance_create_layer(x + 7, y, Layer, oBomb); break;
+		case UP:	BombInst = instance_create_layer(x + 13, y, Layer, oBomb); break;
+		case DOWN:	BombInst = instance_create_layer(x - 13, y, Layer, oBomb); break;
 	
 	}
 	var LinkPosX = oLink.x + irandom_range(-12, 12) + (oLink.vx * 40);

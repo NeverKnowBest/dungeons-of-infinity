@@ -48,11 +48,12 @@ if(CanShoot && oCamera.InView(EyeX, EyeY) && !oLink.Cape){
 	}
 }
 
+var NewPointX, NewPointY;
 if(Shooting){
 
 	repeat(3){
-		var NewPointX = LaserPointsX[LaserPoints - 1] + lengthdir_x(LaserPointSpacing, AngleToLink);
-		var NewPointY = LaserPointsY[LaserPoints - 1] + lengthdir_y(LaserPointSpacing, AngleToLink);
+		NewPointX = LaserPointsX[LaserPoints - 1] + lengthdir_x(LaserPointSpacing, AngleToLink);
+		NewPointY = LaserPointsY[LaserPoints - 1] + lengthdir_y(LaserPointSpacing, AngleToLink);
 		array_push(LaserPointsX, NewPointX);
 		array_push(LaserPointsY, NewPointY);
 		array_push(LaserLights, Lighting_CreateLight(RoomIndex, NewPointX, NewPointY, 0.09, [0.9,0.2,0.2]));

@@ -100,6 +100,7 @@ var LinkLampStrength = LampStrength[global.Inventory.ItemData[ItemClass.Lamp].In
 
 var DoorFadeFactor = 1;
 
+var FadeFactor1, FadeFactor2;
 if(InDoorPassage != 0){ 
 
 	var FadeSpeed = 28; //Higher = slower
@@ -107,13 +108,13 @@ if(InDoorPassage != 0){
 	switch(PassageOrientation){		
 		
 		case TOP_BOTTOM:
-			var FadeFactor1 = clamp(1 - ((DoorPassage[3] - y + 15) / FadeSpeed), 0, 1);
-			var FadeFactor2 = clamp(1 - ((y - DoorPassage[1] - 5) / FadeSpeed), 0, 1);
+			FadeFactor1 = clamp(1 - ((DoorPassage[3] - y + 15) / FadeSpeed), 0, 1);
+			FadeFactor2 = clamp(1 - ((y - DoorPassage[1] - 5) / FadeSpeed), 0, 1);
 			break;
 			
 		case LEFT_RIGHT:
-			var FadeFactor1 = clamp(1 - ((DoorPassage[2] + 7 - x) / FadeSpeed), 0, 1);
-			var FadeFactor2 = clamp(1 - ((x - DoorPassage[0] + 7) / FadeSpeed), 0, 1);
+			FadeFactor1 = clamp(1 - ((DoorPassage[2] + 7 - x) / FadeSpeed), 0, 1);
+			FadeFactor2 = clamp(1 - ((x - DoorPassage[0] + 7) / FadeSpeed), 0, 1);
 			
 			break;
 			

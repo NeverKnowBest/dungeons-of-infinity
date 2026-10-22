@@ -1,3 +1,4 @@
+// Feather disable GM2064
 
 
 enum ItemClass {ArrowQuiver, Arrows, BagSlot, Book, BombBag, Bombs, Boomerang, Bow, Cane, Cape,				//0-9
@@ -606,10 +607,10 @@ function Item_Info(_ItemClass, _ItemIndex){
 		case ItemClass.Tunic: return "+" + string(_ItemIndex) + " Defense";
 		case ItemClass.Shield: 
 			switch(_ItemIndex){
-				case 0: return "+" + string(_ItemIndex + 1) + " Defense. Blocks small projectiles."; break;
-				case 1: return "+" + string(_ItemIndex + 1) + " Defense. Blocks larger projectiles and small fireballs."; break;
-				case 2: return "+" + string(_ItemIndex + 1) + " Defense. Blocks larger projectiles, large fireballs, and magic beams."; break;
-				case 3: return "+" + string(_ItemIndex + 1) + " Defense. Blocks all projectiles, magic beams, and lasers."; break;
+				case 0: return "+" + string(_ItemIndex + 1) + " Defense. Blocks small projectiles.";
+				case 1: return "+" + string(_ItemIndex + 1) + " Defense. Blocks larger projectiles and small fireballs.";
+				case 2: return "+" + string(_ItemIndex + 1) + " Defense. Blocks larger projectiles, large fireballs, and magic beams.";
+				case 3: return "+" + string(_ItemIndex + 1) + " Defense. Blocks all projectiles, magic beams, and lasers.";
 			}
 			break;
 			
@@ -891,6 +892,7 @@ function Item_Allowed(_ItemClass, _ItemIndex = -1, _From = ItemFrom.Anywhere){
 
 	//Limit items from small treasures if their limit count is above 0. 
 	//Should be from small treasures since if you start the game, all the good items have a high limit count, so most if not all would be not allowed for large treasure chests and gold kinstone.
+	var _IndexesToCheckList, _MaxDefensePointsThatExist, _AttkOrDef;
 	if(FromAnySmallTreasure(_From) && global.ItemData[_ItemClass].LimitCount > 0 && !FromAnyKinstone(_From)) return false
 
 
@@ -957,9 +959,9 @@ function Item_Allowed(_ItemClass, _ItemIndex = -1, _From = ItemFrom.Anywhere){
 
 			//make a list of indexes to check. If the index is specified, the list will only have that value. If it's -1, then the list will have all indexes
 			if(_ItemIndex == -1){
-				var _IndexesToCheckList = ds_list_create_sequence(0, array_length(global.Inventory.ItemData[_ItemClass].Owns) - 1);
+				_IndexesToCheckList = ds_list_create_sequence(0, array_length(global.Inventory.ItemData[_ItemClass].Owns) - 1);
 			}else{
-				var _IndexesToCheckList = ds_list_create();
+				_IndexesToCheckList = ds_list_create();
 				ds_list_add(_IndexesToCheckList, _ItemIndex);
 			}
 			
@@ -1002,7 +1004,6 @@ function Item_Allowed(_ItemClass, _ItemIndex = -1, _From = ItemFrom.Anywhere){
 			
 			return ItemIsAvailable;
 			
-			break;
 		
 		case ItemType.Inv_Upg:
 
@@ -1025,7 +1026,7 @@ function Item_Allowed(_ItemClass, _ItemIndex = -1, _From = ItemFrom.Anywhere){
 				case ItemClass.Shield:
 				case ItemClass.Tunic:
 					
-					var _MaxDefensePointsThatExist = MaxDefensePointsThatExist();
+					_MaxDefensePointsThatExist = MaxDefensePointsThatExist();
 					
 					if(_MaxDefensePointsThatExist >= ChallengeMax_Defense) return false;
 					
@@ -1035,17 +1036,17 @@ function Item_Allowed(_ItemClass, _ItemIndex = -1, _From = ItemFrom.Anywhere){
 			
 				case ItemClass.Gloves:
 					
-					var _MaxDefensePointsThatExist = MaxDefensePointsThatExist();
+					_MaxDefensePointsThatExist = MaxDefensePointsThatExist();
 					
 					if(global.Inventory.ItemData[ItemClass.Gloves].Index == -1){
 						
 						if(_MaxDefensePointsThatExist >= ChallengeMax_Defense) return false;
 						
-						var _AttkOrDef = _MaxDefensePointsThatExist;
+						_AttkOrDef = _MaxDefensePointsThatExist;
 						
 					}else{
 						
-						var _AttkOrDef = MaxAttackPointsThatExist();
+						_AttkOrDef = MaxAttackPointsThatExist();
 						
 					}
 					
@@ -1532,21 +1533,21 @@ function ItemSpawn(_ItemClass, _x, _y, _From, _SpawnType, _FloorLevel, _ValidChe
 	
 	var _FloorLevelStr = GetFloorLevelString(_FloorLevel);
 	
+	var Layer;
 	switch(_SpawnType){
 		
 		default: 
-			var Layer = "ObjsHigher_" + _FloorLevelStr; 
+			Layer = "ObjsHigher_" + _FloorLevelStr; 
 			break;
 		
 		case ItemSpawnType.DropSky:
 		case ItemSpawnType.Float:
-			var Layer = "ObjsHighest"; break;
-			break;
+			Layer = "ObjsHighest"; break;
 			
 		case ItemSpawnType.DropInventory:
 		case ItemSpawnType.DropScatter: 
 		case ItemSpawnType.Appear: 
-			var Layer = "Objs_" + _FloorLevelStr; 
+			Layer = "Objs_" + _FloorLevelStr; 
 			break;		
 			
 	}
@@ -1934,7 +1935,7 @@ function Item_PickAvailableIndex(_ItemClass, _From = ItemFrom.Anywhere){
 	
 	if(ds_list_size(AvailableItems) > 0){
 		ds_list_shuffle(AvailableItems);
-		var _Index = AvailableItems[| 0];
+		_Index = AvailableItems[| 0];
 	}
 		
 	ds_list_destroy(AvailableItems);

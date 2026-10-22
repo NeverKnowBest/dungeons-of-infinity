@@ -17,6 +17,7 @@ TextY = y + 7;
 
 if(ShowBox) draw_sprite_stretched(sprite_index, image_index, x, y, DialogueBoxW, DialogueBoxH);
 	
+var _Y, Str;
 if(SurfaceH > 0){
 
 	if(!surface_exists(Surface)) Surface = surface_create(SurfaceW, floor(SurfaceH));
@@ -36,14 +37,14 @@ if(SurfaceH > 0){
 	}
 	
 	for(var i = 0; i < DialogueLen; i++){
-		var _Y = SurfaceY + (i * 16);
+		_Y = SurfaceY + (i * 16);
 		draw_text(_X, _Y, DialogueArray[i]);		
 	}
 
 	switch(ScriptCode){
 		case DBScriptCode.Dialogue_YesNo:
 			draw_set_halign(fa_center);
-			var Str = "Yes   No";
+			Str = "Yes   No";
 			YPos = (DialogueLen mod 3 == 2 ? _Y + 16: _Y + 24)
 			draw_text(BoxCenter, YPos, Str);
 			draw_text(BoxCenter + (InputChoice == 0 ? -25 : 6), YPos, chr(136));
@@ -51,7 +52,7 @@ if(SurfaceH > 0){
 			
 		case DBScriptCode.Dialogue_Buy:
 			draw_set_halign(fa_center);
-			var Str = "Buy   Cancel   Info";
+			Str = "Buy   Cancel   Info";
 			draw_text(BoxCenter, _Y + 24, Str);
 			switch(InputChoice){
 				case 0:	draw_text(BoxCenter + -52, _Y + 24, chr(136)); break;
@@ -62,7 +63,7 @@ if(SurfaceH > 0){
 			
 		case DBScriptCode.Dialogue_ChessEnd:
 			draw_set_halign(fa_center);
-			var Str = "Cancel    Quit    New Game";
+			Str = "Cancel    Quit    New Game";
 			draw_text(BoxCenter, _Y + 24, Str);
 			switch(InputChoice){
 				case 0:	draw_text(BoxCenter + -72, _Y + 24, chr(136)); break;

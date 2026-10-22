@@ -7,8 +7,9 @@ if(HitFlashingStatus) exit;
 
 
 //Use surface if descending so we can dim the sprite, something we can't do because of the shader
+var LinkSpr;
 if(State == LinkState.Descending){
-	var LinkSpr = surface_create(sprite_width, sprite_height);	
+	LinkSpr = surface_create(sprite_width, sprite_height);	
 	surface_set_target(LinkSpr);
 	draw_clear_alpha(c_black, 0.0);	
 }
@@ -119,11 +120,12 @@ if(Facing != UP){
 }
 
 
+var c;
 if(State == LinkState.Descending){
 	//progressively dim the sprite when going down
 	surface_reset_target();
-	if(DescendingPhase == 1) var c = 255 - (image_index * 10);
-	else var c = 80 + (image_index * 10);
+	if(DescendingPhase == 1) c = 255 - (image_index * 10);
+	else c = 80 + (image_index * 10);
 	//For some reason, the surface is pushed 1 pixel when DescendingPhase == 1 && DescendingLocation == BOTTOM, so subtract 1 if that's the case
 	draw_surface_ext(LinkSpr, x - sprite_xoffset, y - sprite_yoffset - (DescendingPhase == 1 && DescendingLocation == BOTTOM ? 1 : 0), 1, 1, 0, make_color_rgb(c, c, c), 1);
 	surface_free(LinkSpr);

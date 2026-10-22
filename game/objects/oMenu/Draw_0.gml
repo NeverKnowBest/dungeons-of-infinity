@@ -39,6 +39,7 @@ for(var i = 0; i < Menu_Count[MenuWin_Main_MenuIndex]; i++){
 draw_set_font(global.MenuFont);
 
 
+var PosX, PosY, _ChallengeIndex;
 if(MenuWinInst_Options.visible){
 	
 	switch(MenuWin_Options_MenuIndex){
@@ -140,7 +141,7 @@ if(MenuWinInst_Options.visible){
 			draw_set_halign(fa_center);
 			draw_set_valign(fa_center);
 			var Chr = 0;
-			for(var _y = 0; _y < global.LetterGridRows; _y++){
+			for(_y = 0; _y < global.LetterGridRows; _y++){
 				
 				if(_y == global.LetterGridRows - 1){
 					draw_set_halign(fa_left);
@@ -149,8 +150,8 @@ if(MenuWinInst_Options.visible){
 				
 				for(var _x = 0; _x < global.LetterGridColumns; _x++){
 					var Letter = global.NewUserChrMap[Chr];
-					var PosX = LetterGridX + (_x * global.LetterGridSpacingW) + (_y < global.LetterGridRows - 1 ? 3 : 0);
-					var PosY = LetterGridY + (_y * global.LetterGridSpacingH) + (_y < global.LetterGridRows - 1 ? 8 : 0);
+					PosX = LetterGridX + (_x * global.LetterGridSpacingW) + (_y < global.LetterGridRows - 1 ? 3 : 0);
+					PosY = LetterGridY + (_y * global.LetterGridSpacingH) + (_y < global.LetterGridRows - 1 ? 8 : 0);
 					switch(Letter){
 						case "!": draw_text(PosX, PosY, "Ok"); break;
 						case "@": draw_text(PosX, PosY, ""); break;
@@ -171,8 +172,8 @@ if(MenuWinInst_Options.visible){
 		
 		case MenuIndex.Character:
 			for(var i = 0; i < LinkCharacters; i++){
-				var PosX = MenuWinInst_Options.x + 24 + ((i mod 3) * 42);
-				var PosY = MenuWinInst_Options.y + 21 + ((i div 3) * 48);
+				PosX = MenuWinInst_Options.x + 24 + ((i mod 3) * 42);
+				PosY = MenuWinInst_Options.y + 21 + ((i div 3) * 48);
 				//if(i < 2)	
 					draw_sprite(global.CharacterSprites, i, PosX, PosY);
 				//else 
@@ -186,8 +187,8 @@ if(MenuWinInst_Options.visible){
 			
 			draw_set_halign(fa_right);
 			
-			var PosX = MenuWinInst_Options.x + 112;
-			var PosY = MenuWinInst_Options.y + 14;
+			PosX = MenuWinInst_Options.x + 112;
+			PosY = MenuWinInst_Options.y + 14;
 			var Stats = global.Users[global.UserIndex].Stats;
 			
 			draw_text(PosX, PosY, "Games Played:"); PosY+=16;
@@ -199,8 +200,8 @@ if(MenuWinInst_Options.visible){
 			draw_text(PosX, PosY, "Treasures Opened:"); PosY+=16;
 			
 			draw_set_halign(fa_left);
-			var PosX = MenuWinInst_Options.x + 116;
-			var PosY = MenuWinInst_Options.y + 14;
+			PosX = MenuWinInst_Options.x + 116;
+			PosY = MenuWinInst_Options.y + 14;
 			draw_text(PosX, PosY, string(Stats[Stat.GamesPlayed])); PosY+=16;
 			draw_text(PosX, PosY, string(Stats[Stat.GamesWon])); PosY+=16;
 			draw_text(PosX, PosY, Stats[Stat.BestTime] == 0 ? "0" : Time_Str(Stats[Stat.BestTime])); PosY+=16;
@@ -296,7 +297,7 @@ if(MenuWinInst_Options.visible){
 				}
 				_Y += 10;
 			}			
-			for(var _ChallengeIndex = 0; _ChallengeIndex < ChallengeCount; _ChallengeIndex++){
+			for(_ChallengeIndex = 0; _ChallengeIndex < ChallengeCount; _ChallengeIndex++){
 				draw_sprite(global.Challenges[_ChallengeIndex] ? sCheckbox : sCheckBox_Innactive, global.Challenges[_ChallengeIndex] ? 1 : 0, _X, _Y);
 				_Y += 10;
 			}
@@ -312,8 +313,8 @@ if(MenuWinInst_Options.visible){
 
 			draw_set_halign(fa_right);
 			
-			var PosX = MenuWinInst_Options.x + 136;
-			var PosY = MenuWinInst_Options.y + 14;
+			PosX = MenuWinInst_Options.x + 136;
+			PosY = MenuWinInst_Options.y + 14;
 
 			draw_text(PosX, PosY, "Sword:"); PosY+=16;
 			draw_text(PosX, PosY, "Action:"); PosY+=16;
@@ -326,8 +327,8 @@ if(MenuWinInst_Options.visible){
 			
 			
 			draw_set_halign(fa_left);
-			var PosX = MenuWinInst_Options.x + 140;
-			var PosY = MenuWinInst_Options.y + 14;
+			PosX = MenuWinInst_Options.x + 140;
+			PosY = MenuWinInst_Options.y + 14;
 				
 			for(var i = 0; i < global.BindingIconCount[Input_Index.Gamepad]; i++){
 
@@ -348,8 +349,8 @@ if(MenuWinInst_Options.visible){
 			draw_set_halign(fa_right);
 			draw_set_font(global.Font_Small);
 			
-			var PosX = MenuWinInst_Options.x + 136;
-			var PosY = MenuWinInst_Options.y + 22;
+			PosX = MenuWinInst_Options.x + 136;
+			PosY = MenuWinInst_Options.y + 22;
 			var _TextSep = 9;
 			
 			draw_text(PosX, PosY, "UP:"); PosY+=_TextSep;
@@ -367,8 +368,8 @@ if(MenuWinInst_Options.visible){
 			
 
 			draw_set_halign(fa_left);
-			var PosX = MenuWinInst_Options.x + 140;
-			var PosY = MenuWinInst_Options.y + 22;
+			PosX = MenuWinInst_Options.x + 140;
+			PosY = MenuWinInst_Options.y + 22;
 				
 			for(var i = 0; i < global.BindingIconCount[Input_Index.Keyboard]; i++){
 				

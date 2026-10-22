@@ -1,3 +1,4 @@
+// Feather disable GM2064
 instance_create_layer(x + irandom_range(-8, 8), y + 4 + irandom_range(-8, 8), EffectLayer(UPPER), oExplosion_Large, {FloorLevel : FloorLevel});
 TakeItems_Explosions--;
 if(TakeItems_Explosions <= 0){

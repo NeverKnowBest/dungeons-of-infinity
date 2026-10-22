@@ -6,6 +6,7 @@ if(DB_Started){
 
 		alarm[0] = 60;
 		
+		var inst;
 		switch(Index){
 			
 			case Prisoner.Justin:
@@ -29,7 +30,7 @@ if(DB_Started){
 			
 					global.Paused = true;
 			
-					var inst = instance_create_layer(x, y, "ObjsHigher_Upper", oItem_Letter);
+					inst = instance_create_layer(x, y, "ObjsHigher_Upper", oItem_Letter);
 					HoldUpItem(inst);
 			
 					GaveLetter = true;

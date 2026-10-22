@@ -23,6 +23,7 @@ function Bow_Set(){
 
 function Arrow_Create(){
 
+	var _A;
 	switch(BowArrow){
 
 		default:
@@ -31,12 +32,12 @@ function Arrow_Create(){
 			
 		case Bow.Spread:
 			
-			var _A = instance_create_layer(x, y, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oArrow);
+			_A = instance_create_layer(x, y, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oArrow);
 			_A.Index = 2;
 						
 			var _V = 1.25;
 						
-			var _A = instance_create_layer(x, y, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oArrow);
+			_A = instance_create_layer(x, y, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oArrow);
 			_A.Index = 2;
 						
 			switch(Facing){
@@ -44,7 +45,7 @@ function Arrow_Create(){
 				case LEFT: case RIGHT: _A.vy -= _V; break;
 			}
 					
-			var _A = instance_create_layer(x, y, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oArrow);
+			_A = instance_create_layer(x, y, "ObjsHigher_" + GetFloorLevelString(FloorLevel), oArrow);
 			_A.Index = 2;
 						
 			switch(Facing){

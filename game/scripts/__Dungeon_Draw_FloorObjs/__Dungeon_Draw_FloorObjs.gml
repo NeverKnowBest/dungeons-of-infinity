@@ -1,3 +1,4 @@
+// Feather disable GM2064
 
 function Dungeon_Draw_FloorObjs(_RoomIndex){
 	
@@ -5,6 +6,7 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 	
 	var FloorObjArray = Room.Template.FloorObjs;
 
+	var Tile, Tx, TileY, _x, _y;
 	for(var FloorObjIndex = 0; FloorObjIndex < array_length(FloorObjArray); FloorObjIndex++){
 		
 		var Obj = FloorObjArray[FloorObjIndex];
@@ -67,10 +69,10 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				//don't draw carpets for certain levels
 				if(global.Level.Index == DungeonLevel.Catacombs || global.Level.Index == DungeonLevel.Sewers || global.Level.Index == DungeonLevel.MoldormsLair) break;
 				
-				var TileY = global.Level.Index == DungeonLevel.Aghanim2 ? LevelTilesY_Aghanim2 : LevelTilesY;
+				TileY = global.Level.Index == DungeonLevel.Aghanim2 ? LevelTilesY_Aghanim2 : LevelTilesY;
 				
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(FloorTMID, GetTileID(111, TileY + 2), _TileX, _TileY);
@@ -94,22 +96,22 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				DrawTileBlock(FloorTMID, ObjX2, ObjY2, 17, 2, 1, 1);
 	
 				//Top & Bottom Edges
-				for(var _x = 0; _x < ObjTileW - 2; _x++){
+				for(_x = 0; _x < ObjTileW - 2; _x++){
 					var FloorX = ObjX + 8 + (_x * 8);
 					DrawTileBlock(FloorTMID, FloorX, ObjY, 16, 0, 1, 1);							
 					DrawTileBlock(FloorTMID, FloorX, ObjY2, 16, 2, 1, 1);							
 				}
 	
 				//Top & Bottom Edges
-				for(var _y = 0; _y < ObjTileH - 2; _y++){
+				for(_y = 0; _y < ObjTileH - 2; _y++){
 					var FloorY = ObjY + 8 + (_y * 8);
 					DrawTileBlock(FloorTMID, ObjX, FloorY, 15, 1, 1, 1);							
 					DrawTileBlock(FloorTMID, ObjX2, FloorY, 17, 1, 1, 1);							
 				}	
 	
 				//Main floor
-				for(var _y = 0; _y < ObjTileH - 2; _y++){
-					for(var _x = 0; _x < ObjTileW - 2; _x++){
+				for(_y = 0; _y < ObjTileH - 2; _y++){
+					for(_x = 0; _x < ObjTileW - 2; _x++){
 						var FloorX = ObjX + 8 + (_x * 8);
 						var FloorY = ObjY + 8 + (_y * 8);
 						DrawTileBlock(FloorTMID, FloorX, FloorY, 16, 1, 1, 1);							
@@ -118,8 +120,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 				
 			case TemplateObjGID.Path1:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(FloorTMID, GetTileID(30 + (_x mod 2), VillageTilesY + 4 + (_y mod 2)), _TileX, _TileY);
@@ -128,8 +130,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 				
 			case TemplateObjGID.Path2:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(DecorTMID, GetTileID(32, VillageTilesY + 5), _TileX, _TileY);
@@ -137,8 +139,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				}	
 				break;
 			case TemplateObjGID.Path3:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(DecorTMID, GetTileID(30 + (_x mod 2), VillageTilesY + 6 + (_y mod 2)), _TileX, _TileY);
@@ -147,8 +149,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Path4:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(WaterTMID, GetTileID(32, VillageTilesY + 7), _TileX, _TileY);
@@ -157,8 +159,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Path5:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(WaterTMID, GetTileID(33 + (_x mod 2), VillageTilesY + 4 + (_y mod 2)), _TileX, _TileY);
@@ -167,8 +169,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Path6:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(WaterTMID, GetTileID(32, VillageTilesY + 6), _TileX, _TileY);
@@ -177,8 +179,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Path7:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(WaterTMID, GetTileID(32, VillageTilesY + 8), _TileX, _TileY);
@@ -187,8 +189,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Path8:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(WaterTMID, GetTileID(32, VillageTilesY + 9), _TileX, _TileY);
@@ -197,8 +199,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Path9:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(DecorTMID, GetTileID(30 + (_x mod 2), VillageTilesY + 8), _TileX, _TileY);
@@ -207,8 +209,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Path10:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(DecorTMID, GetTileID(15 + (_x mod 2), VillageTilesY + 4), _TileX, _TileY);
@@ -217,8 +219,8 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 				
 			case TemplateObjGID.PathTrim:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						tilemap_set_at_pixel(WaterTMID, GetTileID(32, VillageTilesY + 4), _TileX, _TileY);
@@ -227,19 +229,19 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 			
 			case TemplateObjGID.Dirt:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						
 						if(Prob(0.3)){ //normal dirt
-							var Tile = GetTileID(37, VillageTilesY + 2);
+							Tile = GetTileID(37, VillageTilesY + 2);
 							
 						}else if(Prob(0.9)){ //other dirt 
-							var Tile = choose(GetTileID(37, VillageTilesY + 1), GetTileID(36, VillageTilesY + 2), GetTileID(38, VillageTilesY + 2),  GetTileID(37, VillageTilesY + 3));
+							Tile = choose(GetTileID(37, VillageTilesY + 1), GetTileID(36, VillageTilesY + 2), GetTileID(38, VillageTilesY + 2),  GetTileID(37, VillageTilesY + 3));
 							
 						}else{ //rocks
-							var Tile = choose(GetTileID(35, VillageTilesY), GetTileID(39, VillageTilesY), GetTileID(35, VillageTilesY + 1), GetTileID(39, VillageTilesY + 1));
+							Tile = choose(GetTileID(35, VillageTilesY), GetTileID(39, VillageTilesY), GetTileID(35, VillageTilesY + 1), GetTileID(39, VillageTilesY + 1));
 						}
 
 						tilemap_set_at_pixel(WaterTMID, Tile, _TileX, _TileY);
@@ -248,17 +250,17 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 			
 			case TemplateObjGID.Dirt_Edge1:
-				var Tx = (global.Level.Index == DungeonLevel.Start ? 89 : 36);
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				Tx = (global.Level.Index == DungeonLevel.Start ? 89 : 36);
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						
 						switch(ObjRot){
-							case 0:		var Tile = GetTileID(Tx, VillageTilesY + 1); break;
-							case 90:	var Tile = GetTileID(Tx + 2, VillageTilesY + 1); break;
-							case -90:	var Tile = GetTileID(Tx, VillageTilesY + 3); break;
-							case 180:	var Tile = GetTileID(Tx + 2, VillageTilesY + 3); break;
+							case 0:		Tile = GetTileID(Tx, VillageTilesY + 1); break;
+							case 90:	Tile = GetTileID(Tx + 2, VillageTilesY + 1); break;
+							case -90:	Tile = GetTileID(Tx, VillageTilesY + 3); break;
+							case 180:	Tile = GetTileID(Tx + 2, VillageTilesY + 3); break;
 						}
 
 						tilemap_set_at_pixel(WaterTMID, Tile, _TileX, _TileY);
@@ -267,17 +269,17 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Dirt_Edge2:
-				var Tx = (global.Level.Index == DungeonLevel.Start ? 89 : 36);
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				Tx = (global.Level.Index == DungeonLevel.Start ? 89 : 36);
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						
 						switch(ObjRot){
-							case 0:		var Tile = GetTileID(Tx, VillageTilesY); break;
-							case 90:	var Tile = GetTileID(Tx + 2, VillageTilesY); break;
-							case -90:	var Tile = GetTileID(Tx, VillageTilesY + 4); break;
-							case 180:	var Tile = GetTileID(Tx + 2, VillageTilesY + 4); break;
+							case 0:		Tile = GetTileID(Tx, VillageTilesY); break;
+							case 90:	Tile = GetTileID(Tx + 2, VillageTilesY); break;
+							case -90:	Tile = GetTileID(Tx, VillageTilesY + 4); break;
+							case 180:	Tile = GetTileID(Tx + 2, VillageTilesY + 4); break;
 						}
 
 						tilemap_set_at_pixel(WaterTMID, Tile, _TileX, _TileY);
@@ -286,17 +288,17 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Dirt_Edge3:
-				var Tx = (global.Level.Index == DungeonLevel.Start ? 88: 35);
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				Tx = (global.Level.Index == DungeonLevel.Start ? 88: 35);
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
 						var _TileY = ObjY + (_y * 8);
 						
 						switch(ObjRot){
-							case 0:		var Tile = GetTileID(Tx + 2, VillageTilesY); break;
-							case 90:	var Tile = GetTileID(Tx + 4, VillageTilesY + 2); break;
-							case -90:	var Tile = GetTileID(Tx, VillageTilesY + 2); break;
-							case 180:	var Tile = GetTileID(Tx + 2, VillageTilesY + 4); break;
+							case 0:		Tile = GetTileID(Tx + 2, VillageTilesY); break;
+							case 90:	Tile = GetTileID(Tx + 4, VillageTilesY + 2); break;
+							case -90:	Tile = GetTileID(Tx, VillageTilesY + 2); break;
+							case 180:	Tile = GetTileID(Tx + 2, VillageTilesY + 4); break;
 						}
 
 						tilemap_set_at_pixel(WaterTMID, Tile, _TileX, _TileY);
@@ -305,10 +307,10 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 			
 			case TemplateObjGID.Sand:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var TileX = ObjX + (_x * 8);
-						var TileY = ObjY + (_y * 8);
+						TileY = ObjY + (_y * 8);
 						DrawTileBlock(FloorTMID, TileX, TileY, 42 + ((TileX / 8) mod 2), 40 + ((TileY / 8) mod 2), 1, 1);	
 					}
 				}
@@ -350,10 +352,10 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 			
 			case TemplateObjGID.Mine_Lava:
-				for(var _y = 0; _y < ObjTileH; _y++){
-					for(var _x = 0; _x < ObjTileW; _x++){
+				for(_y = 0; _y < ObjTileH; _y++){
+					for(_x = 0; _x < ObjTileW; _x++){
 						var TileX = ObjX + (_x * 8);
-						var TileY = ObjY + (_y * 8);
+						TileY = ObjY + (_y * 8);
 						DrawTileBlock(global.TMID_Lava, TileX, TileY, 126 + ((TileX / 8) mod 2), VillageTilesY + 18 + ((TileY / 8) mod 2), 1, 1);	
 					}
 				}

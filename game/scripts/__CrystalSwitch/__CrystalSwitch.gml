@@ -1,3 +1,4 @@
+// Feather disable GM2064
 function Crystal_Create(_RoomIndex, _x, _y){
 	
 	var FloorLevelStr = GetFloorLevelString(_x, _y);

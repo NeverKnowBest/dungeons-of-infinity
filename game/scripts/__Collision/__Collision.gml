@@ -84,10 +84,11 @@ function WallCollision(CollidedWallList, VX, VY, WallObj){
 	var WallList = ds_list_create();
 	ds_list_clear(WallList);
 	
+	var Walls;
 	if(object_index == oLink) //temp, convert Link to use y_base
-		var Walls = instance_place_list(x + VX, y + VY, WallObj, WallList, false);
+		Walls = instance_place_list(x + VX, y + VY, WallObj, WallList, false);
 	else
-		var Walls = instance_place_list(x + VX, y_base + VY, WallObj, WallList, false);
+		Walls = instance_place_list(x + VX, y_base + VY, WallObj, WallList, false);
 
 	if(object_index == oLink){
 		//if there's more than 1 walls, we have to check to see if one of those is moving, If so, remove it from the list so we can perform the collision on the non-moving one only
@@ -188,8 +189,9 @@ function WallCollision(CollidedWallList, VX, VY, WallObj){
 
 function CheckProjectileCollision(_FloorLevel){
 	
+	var inst;
 	if(!HitCrystalSwitch){
-		var inst = ObjCollision(x, y_base, oCrystalSwitch, _FloorLevel);
+		inst = ObjCollision(x, y_base, oCrystalSwitch, _FloorLevel);
 		if(inst != noone){
 			if(inst.visible && !inst.HitPause){
 				inst.Hit = true;
@@ -199,7 +201,7 @@ function CheckProjectileCollision(_FloorLevel){
 		}
 	}
 
-	var inst = ObjCollision(x, y_base, oPickupObj, _FloorLevel);
+	inst = ObjCollision(x, y_base, oPickupObj, _FloorLevel);
 	if(inst != noone){
 		if(inst.Hidden){
 			inst.State = PickupObjState.Idle;
@@ -214,7 +216,7 @@ function CheckProjectileCollision(_FloorLevel){
 		case oSwordBeam: //put objs here that can light torches and open curtains
 		case oRodBeam:
 		case oCaneBeam:
-			var inst = ObjCollision(x, y, oTorch, _FloorLevel);
+			inst = ObjCollision(x, y, oTorch, _FloorLevel);
 			if(inst != noone) inst.Lighting = true;
 		
 		case oArrow:
@@ -230,7 +232,7 @@ function CheckProjectileCollision(_FloorLevel){
 
 	for(var i = 0; i < ds_list_size(_EnemyList); i++){
 		
-		var inst = _EnemyList[| i];
+		inst = _EnemyList[| i];
 		
 		if(inst.State == EnemyState.OnFire || inst.Energy <= EnemyEnergyConsideredDead){
 			ds_list_destroy(_EnemyList);

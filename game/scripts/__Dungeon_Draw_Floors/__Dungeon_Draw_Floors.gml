@@ -14,12 +14,12 @@ function Dungeon_Draw_Floors(_RoomIndex){
 	var FloorTileY = LevelTilesY;
 		
 	if(Room.ForcedTheme_Floor_Upper != -1){ 
-		var FloorTileX_Upper = 42 + (Room.ForcedTheme_Floor_Upper * 2);
-		var FloorTileY = 4 + (Room.ForcedTheme_Floor * 6);
+		FloorTileX_Upper = 42 + (Room.ForcedTheme_Floor_Upper * 2);
+		FloorTileY = 4 + (Room.ForcedTheme_Floor * 6);
 	}
 	if(Room.ForcedTheme_Floor_Lower != -1){ 
-		var FloorTileX_Lower = 42 + (Room.ForcedTheme_Floor_Lower * 2);
-		var FloorTileY = 4 + (Room.ForcedTheme_Floor * 6);
+		FloorTileX_Lower = 42 + (Room.ForcedTheme_Floor_Lower * 2);
+		FloorTileY = 4 + (Room.ForcedTheme_Floor * 6);
 	}
 
 	
@@ -165,29 +165,30 @@ function Dungeon_Draw_Floors(_RoomIndex){
 
 function Dungeon_Draw_FloorDecor(_x, _y, DecorType){
 	
+	var TileStartX, TileStartY, Tiles;
 	switch(DecorType){
 		case FloorDecor.Blood:
-			var TileStartX = 104;
-			var TileStartY = 0;
-			var Tiles = 3;
+			TileStartX = 104;
+			TileStartY = 0;
+			Tiles = 3;
 			break;
 		
 		case FloorDecor.Bones:
-			var TileStartX = 104;
-			var TileStartY = 2;
-			var Tiles = 4;
+			TileStartX = 104;
+			TileStartY = 2;
+			Tiles = 4;
 			break;	
 
 		case FloorDecor.BloodBones:
-			var TileStartX = 110;
-			var TileStartY = 0;
-			var Tiles = 3;
+			TileStartX = 110;
+			TileStartY = 0;
+			Tiles = 3;
 			break;	
 
 		case FloorDecor.Grass:
-			var TileStartX = 112;
-			var TileStartY = 2;
-			var Tiles = 4;
+			TileStartX = 112;
+			TileStartY = 2;
+			Tiles = 4;
 			break;	
 
 			

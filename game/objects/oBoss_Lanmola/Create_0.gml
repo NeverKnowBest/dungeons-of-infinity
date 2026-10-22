@@ -14,6 +14,7 @@ var AngleList = ds_list_create()
 var AngleMultiples = 5;
 var AngleDivs = floor(360 / AngleMultiples);
 
+var MaxDistance;
 for(var i = 0; i < AngleDivs; i++){
 	
 	var A = i * AngleMultiples; 
@@ -27,9 +28,9 @@ for(var i = 0; i < AngleDivs; i++){
 		//****NOTE******: 
 		//If Speed, or vz/time in Lanmola_Update() under switch(Path), or GM Paths change, you have to recalculate the maximums as they depend on those variables.
 		//See Lanmola_Update().
-		case LanmolaPath1: var MaxDistance = 107; break;
-		case LanmolaPath2: var MaxDistance = 122; break;
-		case LanmolaPath3: var MaxDistance = 52; break;
+		case LanmolaPath1: MaxDistance = 107; break;
+		case LanmolaPath2: MaxDistance = 122; break;
+		case LanmolaPath3: MaxDistance = 52; break;
 	}
 	
 	//for each angle, check if there's a wall collision at that distance. If so, don't add

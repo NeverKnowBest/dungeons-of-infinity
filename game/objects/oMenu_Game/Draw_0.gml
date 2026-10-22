@@ -10,6 +10,7 @@ draw_sprite_stretched(sprite_index, 0, FrameX, FrameY, FrameW, FrameH);
 
 
 
+var TextPosX, TextPosY, SelectorX;
 for(var i = 0; i < MenuItems[Index]; i++){
 	
 	draw_set_font(global.MenuFont_Innactive);
@@ -23,26 +24,26 @@ for(var i = 0; i < MenuItems[Index]; i++){
 		case MenuSelection_GameMenuID.Main:
 	
 			draw_set_halign(fa_center);
-			var TextPosX = FrameCentre;
-			var TextPosY = FrameY + 24 + (i * 20);
-			var SelectorX = FrameCentre - (TextW / 2) - 2;
+			TextPosX = FrameCentre;
+			TextPosY = FrameY + 24 + (i * 20);
+			SelectorX = FrameCentre - (TextW / 2) - 2;
 			
 			break;
 	
 		case MenuSelection_GameMenuID.Options:
 
 			draw_set_halign(fa_left);
-			var TextPosX = FrameX + 20;	
-			var TextPosY = FrameY + 18 + (i * 18);
-			var SelectorX = FrameX + 18;
+			TextPosX = FrameX + 20;	
+			TextPosY = FrameY + 18 + (i * 18);
+			SelectorX = FrameX + 18;
 
 			break;
 		
 		case MenuSelection_GameMenuID.Quit:
 			draw_set_halign(fa_center);
-			var TextPosX = FrameCentre;
-			var TextPosY = FrameY + 48 + (i * 20);
-			var SelectorX = FrameCentre - (TextW / 2) - 2;			
+			TextPosX = FrameCentre;
+			TextPosY = FrameY + 48 + (i * 20);
+			SelectorX = FrameCentre - (TextW / 2) - 2;			
 			break;
 	}
 

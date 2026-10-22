@@ -1,3 +1,4 @@
+// Feather disable GM2064
 if(DB_Init){
 	
 	global.DB_Inst = instance_create_layer(0,0, "System", oDialogueBox);
@@ -9,6 +10,7 @@ if(DB_Init){
 
 }
 
+var inst;
 if(DB_Started){
 	if(!instance_exists(global.DB_Inst)){
 		if(global.DB_ExitCode == 1){
@@ -21,12 +23,12 @@ if(DB_Started){
 				
 				if(ItemHolding == RandomItem){
 					
-					var inst = instance_create_layer(x, y, "ObjsHigher_Upper", ObjIndexFromItemClass(Probs_RandomItemClass(ItemFrom.Treasure)), {From : ItemFrom.Treasure});
+					inst = instance_create_layer(x, y, "ObjsHigher_Upper", ObjIndexFromItemClass(Probs_RandomItemClass(ItemFrom.Treasure)), {From : ItemFrom.Treasure});
 
 					//If item is revival pendant, just set it as a large magic(a dead guy would have been revised if he had it)
 					if(inst.object_index == oItem_Pendant && inst.Index == Pendant.Revival){
 						instance_destroy(inst);
-						var inst = instance_create_layer(x, y, "ObjsHigher_Upper", oItem_Magic_Large, {From : ItemFrom.Treasure});
+						inst = instance_create_layer(x, y, "ObjsHigher_Upper", oItem_Magic_Large, {From : ItemFrom.Treasure});
 					}
 					
 					if(Item_Valid(inst.Class, inst.Index)){				
