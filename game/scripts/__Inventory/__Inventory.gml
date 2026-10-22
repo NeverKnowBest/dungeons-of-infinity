@@ -250,7 +250,7 @@ function Inventory_InitBagSlot() constructor{
 	
 	X = 0;
 	Y = 0;
-	ItemClass = -1;
+	self.ItemClass = -1; //"self." needed: name clashes with enum ItemClass
 	ItemIndex = -1;
 	Amount = 0;
 	Enabled = true;  //false means cursor can't be moved on slot

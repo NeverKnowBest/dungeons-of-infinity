@@ -28,14 +28,14 @@ Override = false;
 
 ResetEnemies = false;
 
-function SetToRoomIndex(_RoomIndex, _ActivateRoom = false, EnemyReset = true){
+function SetToRoomIndex(_RoomIndex, _ActivateRoom = false, EnemyReset = true, _X = undefined, _Y = undefined){
 	
 	if(_ActivateRoom) Dungeon_RoomActivate(_RoomIndex);
 	
-	//optional: args 3 & 4 can set the camera at that location
-	if(argument_count == 5){
-		X = argument[1];	
-		Y = argument[2];
+	//optional: _X & _Y can set the camera at that location
+	if(_X != undefined && _Y != undefined){
+		X = _X;
+		Y = _Y;
 	}
 	
 	if(EnemyReset) Enemy_Reset(_RoomIndex);

@@ -1268,7 +1268,7 @@ function Item_Consume(_ItemClass, _ItemIndex = 0, _Amount = 1){
 				HealthAdd(-0.5);
 				if(oLink.State == LinkState.Dead) break;
 				UpdateState(LinkState.Hit);
-				LinkBounceBack(0, 0, 10, 0, false);
+				LinkBounceBack(0, 0, 10, false);
 			}else{
 				HealthAdd(1); 
 			}

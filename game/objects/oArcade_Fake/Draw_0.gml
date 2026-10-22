@@ -7,6 +7,6 @@ draw_sprite(sArcadeFront, Front, x, y);
 draw_sprite(MiniScreen_Sprite, MiniScreen_SpriteIndex, x - 6, y - 27);
 
 draw_sprite(sShadow_Large, 0, x, PlayerY);
-draw_sprite(Player, PlayerImageIndex, x, PlayerY);
+draw_sprite(PlayerSprite, PlayerImageIndex, x, PlayerY);
 
 shader_reset();

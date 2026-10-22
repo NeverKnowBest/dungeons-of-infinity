@@ -159,7 +159,7 @@ function User_SaveDataStruct() constructor{
 	Inventory = 0;
 	
 	ChallengeOptions = 0;
-	Challenges = 0;
+	self.Challenges = 0; //"self." needed: name clashes with enum Challenges
 	
 	Cursed = false;
 	CurseEffect = 0;
