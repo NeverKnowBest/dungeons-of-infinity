@@ -1,6 +1,6 @@
 # Zelda: Dungeons of Infinity
 
-Source code and development assets for Dungeons of Infinity and its editors, all developed originally by Justin Boheimer and maintained by the fan community.
+Source code and development assets for Dungeons of Infinity and its editors, all developed originally by Justin Bohemier and maintained by the fan community.
 
 # ZDOI Discord Server
 https://discord.gg/2FY2G63VXa
