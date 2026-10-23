@@ -9,7 +9,7 @@
 
 
 
-#macro VERSION "1.2.1"
+#macro VERSION "1.2.2 CE"
 
 
 #macro DEBUG false
