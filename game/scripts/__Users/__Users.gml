@@ -405,3 +405,113 @@ function User_UpdateMusicSFX(){
 	audio_group_set_gain(audiogroup_SFX, _SFX ? global.SFXVol : 0, 0);
 
 }
+
+//settings page
+#macro SETTINGS_VISIBLE_ROWS 7
+
+enum SettingsRow{
+	Back,
+	Music,
+	Sound,
+	Fullscreen,
+	Gore,
+	Lighting,
+	AltTabPause,
+	StairPause,
+	SaveVersionCheck,
+	SkipIntro,
+	StickSensitivity
+}
+
+//keep the selected row visible and lay the rows out from the top
+function Settings_UpdateScroll(){
+	var _Count = Menu_Count[MenuIndex.Settings];
+	if(Selector_Index_Options < Settings_Scroll) Settings_Scroll = Selector_Index_Options;
+	if(Selector_Index_Options >= Settings_Scroll + SETTINGS_VISIBLE_ROWS) Settings_Scroll = Selector_Index_Options - SETTINGS_VISIBLE_ROWS + 1;
+	Settings_Scroll = clamp(Settings_Scroll, 0, max(0, _Count - SETTINGS_VISIBLE_ROWS));
+	for(var i = 0; i < _Count; i++) Menu_Y[MenuIndex.Settings][i] = 70 + ((i - Settings_Scroll) * 16);
+}
+
+function Settings_IsSlider(_Row){ return _Row == SettingsRow.Music || _Row == SettingsRow.Sound || _Row == SettingsRow.StickSensitivity; }
+
+function Settings_Value(_Row){
+	switch(_Row){
+		case SettingsRow.Music: return string(round(global.MusicVol * 100)) + "%";
+		case SettingsRow.Sound: return string(round(global.SFXVol * 100)) + "%";
+		case SettingsRow.Fullscreen: return global.Fullscreen ? "On" : "Off";
+		case SettingsRow.Gore: return global.Gore ? "On" : "Off";
+		case SettingsRow.Lighting: return global.GlobalLighting ? "On" : "Off";
+		case SettingsRow.AltTabPause: return global.AltTabPause ? "On" : "Off";
+		case SettingsRow.StairPause: return global.StairPause ? "On" : "Off";
+		case SettingsRow.SaveVersionCheck: return global.SaveVersionCheck ? "On" : "Off";
+		case SettingsRow.SkipIntro: return global.CanSkipTitle ? "On" : "Off";
+		case SettingsRow.StickSensitivity: return string(round(global.Gamepad_AnalogueThreshold * 100)) + "%";
+	}
+	return "";
+}
+
+//slider position, 0 to 1
+function Settings_Fraction(_Row){
+	switch(_Row){
+		case SettingsRow.Music: return global.MusicVol;
+		case SettingsRow.Sound: return global.SFXVol;
+		case SettingsRow.StickSensitivity: return (global.Gamepad_AnalogueThreshold - 0.05) / 0.9;
+	}
+	return 0;
+}
+
+function Settings_Change(_Row, _Dir){
+	if(_Row <= 0) return;
+	switch(_Row){
+		case SettingsRow.Music:
+			global.MusicVol = clamp(round((global.MusicVol + (_Dir * 0.01)) * 100) / 100, 0, 1);
+			User_UpdateMusicSFX();
+			break;
+		case SettingsRow.Sound:
+			var _Old = global.SFXVol;
+			global.SFXVol = clamp(round((global.SFXVol + (_Dir * 0.01)) * 100) / 100, 0, 1);
+			User_UpdateMusicSFX();
+			if(global.SFXVol == _Old) return;
+			break;
+		case SettingsRow.Fullscreen:
+			global.Fullscreen = !global.Fullscreen;
+			window_set_fullscreen(global.Fullscreen);
+			break;
+		case SettingsRow.Gore: global.Gore = !global.Gore; break;
+		case SettingsRow.Lighting: global.GlobalLighting = !global.GlobalLighting; break;
+		case SettingsRow.AltTabPause: global.AltTabPause = !global.AltTabPause; break;
+		case SettingsRow.StairPause: global.StairPause = !global.StairPause; break;
+		case SettingsRow.SaveVersionCheck: global.SaveVersionCheck = !global.SaveVersionCheck; break;
+		case SettingsRow.SkipIntro: global.CanSkipTitle = !global.CanSkipTitle; break;
+		case SettingsRow.StickSensitivity:
+			global.Gamepad_AnalogueThreshold = clamp(round((global.Gamepad_AnalogueThreshold + (_Dir * 0.01)) * 100) / 100, 0.05, 0.95);
+			break;
+	}
+	if(Settings_IsSlider(_Row)){
+		if(_Row == SettingsRow.Sound && (current_time - (variable_global_exists("Settings_LastBlip") ? global.Settings_LastBlip : 0)) > 150){ audio_play_sound(Sound_Text, 1, false); global.Settings_LastBlip = current_time; }
+		Settings_Dirty = true;
+	}else{
+		audio_play_sound(Sound_Text, 1, false);
+		Settings_SaveIni();
+	}
+}
+
+//writes the settings to options.ini (saved in the appdata folder, not next to the exe)
+function Settings_SaveIni(){
+	try{
+		ini_open("options.ini");
+		ini_write_real("Screen", "Fullscreen", global.Fullscreen ? 1 : 0);
+		ini_write_real("Audio", "MusicVol", round(global.MusicVol * 100) / 100);
+		ini_write_real("Audio", "SFXVol", round(global.SFXVol * 100) / 100);
+		ini_write_real("Preferences", "Gore", global.Gore ? 1 : 0);
+		ini_write_real("Preferences", "Lighting", global.GlobalLighting ? 1 : 0);
+		ini_write_real("Preferences", "AltTabPause", global.AltTabPause ? 1 : 0);
+		ini_write_real("Preferences", "StairPause", global.StairPause ? 1 : 0);
+		ini_write_real("Preferences", "SaveVersionCheck", global.SaveVersionCheck ? 1 : 0);
+		ini_write_real("Preferences", "CanSkipTitle", global.CanSkipTitle ? 1 : 0);
+		ini_write_real("Controls", "AnalogueThreshold", round(global.Gamepad_AnalogueThreshold * 100) / 100);
+		ini_close();
+	}catch(_e){
+		show_debug_message("Settings_SaveIni failed: " + string(_e.message));
+	}
+}

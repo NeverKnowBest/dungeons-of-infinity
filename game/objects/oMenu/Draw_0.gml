@@ -48,6 +48,7 @@ if(MenuWinInst_Options.visible){
 			
 			for(var i = 0; i < Menu_Count[MenuWin_Options_MenuIndex]; i++){
 				
+				if(MenuWin_Options_MenuIndex == MenuIndex.Settings && (i < Settings_Scroll || i >= Settings_Scroll + SETTINGS_VISIBLE_ROWS)) continue;
 				var _OffsetY = 0;
 				
 				switch(MenuWin_Options_MenuIndex){
@@ -129,9 +130,27 @@ if(MenuWinInst_Options.visible){
 				}
 				
 				draw_text(MenuWinInst_Options.x + 32, Menu_Y[MenuWin_Options_MenuIndex][i] + _OffsetY, Menu[MenuWin_Options_MenuIndex][i]);
+				if(MenuWin_Options_MenuIndex == MenuIndex.Settings && i > 0){
+					draw_set_halign(fa_right);
+					draw_text(MenuWinInst_Options.x + MenuWinInst_Options.W - 16, Menu_Y[MenuWin_Options_MenuIndex][i], Settings_Value(i));
+					draw_set_halign(fa_left);
+					if(Settings_IsSlider(i)){
+						var _BX = MenuWinInst_Options.x + MenuWinInst_Options.W - 16 - 34 - 46;
+						var _BY = Menu_Y[MenuWin_Options_MenuIndex][i] + 6;
+						draw_set_color(c_dkgray); draw_rectangle(_BX, _BY, _BX + 40, _BY + 3, false);
+						draw_set_color(c_white); draw_rectangle(_BX, _BY, _BX + round(40 * Settings_Fraction(i)), _BY + 3, false);
+						draw_rectangle(_BX + round(40 * Settings_Fraction(i)) - 1, _BY - 2, _BX + round(40 * Settings_Fraction(i)) + 1, _BY + 5, false);
+					}
+				}
 				
 				draw_set_font(global.MenuFont);
 				
+			}
+			if(MenuWin_Options_MenuIndex == MenuIndex.Settings){
+				var _AX = MenuWinInst_Options.x + MenuWinInst_Options.W - 16;
+				draw_set_color(c_white);
+				if(Settings_Scroll > 0) draw_triangle(_AX - 4, 66, _AX + 4, 66, _AX, 60, false);
+				if(Settings_Scroll + SETTINGS_VISIBLE_ROWS < Menu_Count[MenuIndex.Settings]) draw_triangle(_AX - 4, 190, _AX + 4, 190, _AX, 196, false);
 			}
 			break;
 		

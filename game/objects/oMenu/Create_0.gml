@@ -101,21 +101,14 @@ surface_reset_target();
 surface_free(SprSurface);
 
 
-global.ChallengeOptions = array_create(ChallengeOptionCount);
-global.ChallengeOptions[ChallengeOption.StartingHearts] = 0;
-global.ChallengeOptions[ChallengeOption.HeartsMax] = 0;
-global.ChallengeOptions[ChallengeOption.Defense] = 0;
-global.ChallengeOptions[ChallengeOption.Darkness] = 0;
-global.ChallengeOptions[ChallengeOption.Inventory] = 0;
-global.ChallengeOptions[ChallengeOption.MaxRupees] = 0;
-global.ChallengeOptions[ChallengeOption.ShopPrices] = 0;
-global.ChallengeOptions[ChallengeOption.Enemies] = 0;
-global.ChallengeOptions[ChallengeOption.Curses] = 0;
-
-global.Challenges = array_create(ChallengeCount, false);
+global.ChallengeOptions = array_create(array_length(global.ChallengeOptionInfo), 0);
+global.Challenges = array_create(array_length(global.ChallengeInfo), false);
 
 Selector_Index_Main = 0;
 Selector_Index_Options = 0;
+Menu_HoldFrames = 0;
+Menu_Dirty = false;
+Menu_LastBlip = 0;
 Selector_Frame = 0;
 alarm[0] = 8;
 
@@ -143,51 +136,141 @@ Bindings_GetIcons(Input_Index.Gamepad);
 Bindings_GetIcons(Input_Index.Keyboard);
 
 	
-Menu_Create(MenuIndex.NameSelect, "Select User",,,, "1.", "2.", "3.", "4.", "5.", "{s}Exit");
-Menu_Create(MenuIndex.NewUser, "Register Your Name", 24, false,, "");
-Menu_Create(MenuIndex.NewGame, "",,,, "New Game", "{s}Options", "{s}Stats", "{s}Cheats", "{s}Back");
-Menu_Create(MenuIndex.ContinueGame, "",,,, "Continue", "{s}New Game", "{s}Options", "{s}Stats", "{s}Back");
-Menu_Create(MenuIndex.NewGame_Start, "Start Game", 18,,, "Start", "{s}Character", "{s}Bonus Item", "{s}Challenges", "{s}Back");
-Menu_Create(MenuIndex.Character, "Select a Character", 18, false,, "");
+#region Menu pages
+// Each page lists its rows in display order; see Menu_Create / Menu_Item in __Menu for the available row types and page settings.
 
-Menu_Create(MenuIndex.Gear, "Pick a Bonus Item", 18,, 16,  "None", 
-															string(StartingGear_Rupees) + " Rupees", 
-															"+1 Inv Slot",
-															"+1 Health", 
-															"Wooden Shield", 
-															"Rod of Stone", 
-															string(StartingGear_Orbs) + " Fire Orbs", 
-															"Antidote");
-															
-Menu_Create(MenuIndex.Challenges, "Enable Challenges", 18,,10,	"BACK", 
-																"STARTING HEARTS",
-																"MAX HEARTS",
-																"MAX DEFENSE",
-																"DARKNESS",
-																"STARTING INV",
-																"MAX RUPEES",
-																"SHOP PRICES",
-																"ENEMIES",
-																"CURSES",
-																"NO MAP",
-																"NO FOOD ITEMS",
-																"WALL MASTER");
-																
-Menu_Create(MenuIndex.Options, "Options",,,, "Back", "{s}Controls", "{s}User");
-Menu_Create(MenuIndex.Controls, "Controls", 30,,, "Back", "{s}Gamepad", "{s}Keyboard");
-Menu_Create(MenuIndex.Controls_Gamepad, "Remap Gamepad", 25,,, "Back", "Remap", "Default");
-Menu_Create(MenuIndex.Controls_Keyboard, "Remap Keyboard", 25,,, "Back", "Remap", "Default");
-Menu_Create(MenuIndex.User, "User",,,, "Back", "{s}Rename", "{s}Delete");
-Menu_Create(MenuIndex.UserDelete, "Delete?", 10,,, "No", "Yes");
-Menu_Create(MenuIndex.Stats, "Stats", 22, false,, "");
-Menu_Create(MenuIndex.Cheats, "Cheats", 25,,, "Back", "Save", "Inf. HP", "Inf. Magic", "Inf. Rupees", "Inf. Keys");
+var _UserRows = [];
+for(var i = 0; i < global.MaxUsers; i++){
+	array_push(_UserRows, Menu_Item(string(i + 1) + ".", Menu_SelectUser, { User: i, OnDraw: Menu_DrawUserName }));
+}
+array_push(_UserRows, Menu_Item("{s}Exit", function(){ game_end(); }));
+Menu_Create(MenuIndex.NameSelect, "Select User", _UserRows);
 
-Menu_Create(MenuIndex.Cheats, "Cheats", 25,,, "Back", "Save",
-	"Inf. HP",
-	"Inf. Magic",
-	"Inf. Rupees",
-	"Inf. Keys",
-	"Inf. Arrows");
+Menu_Create(MenuIndex.NewUser, "Register Your Name", [], { TileW: 24, Selector: false });
+
+var _BackToUsers = function(){
+	Win_Main_Activate(MenuIndex.NameSelect,, Sound_Throw);
+	Selector_Index_Main = global.UserIndex;
+};
+Menu_Create(MenuIndex.NewGame, "", [
+	Menu_LinkSide("New Game", MenuIndex.NewGame_Start),
+	Menu_LinkMain("{s}Options", MenuIndex.Options),
+	Menu_LinkSide("{s}Stats", MenuIndex.Stats),
+	Menu_LinkSide("{s}Cheats", MenuIndex.Cheats),
+	Menu_BackItem("{s}Back")
+], { OnBack: _BackToUsers });
+Menu_Create(MenuIndex.ContinueGame, "", [
+	Menu_Item("Continue", Menu_TryContinue),
+	Menu_LinkSide("{s}New Game", MenuIndex.NewGame_Start),
+	Menu_LinkMain("{s}Options", MenuIndex.Options),
+	Menu_LinkSide("{s}Stats", MenuIndex.Stats),
+	Menu_LinkSide("{s}Cheats", MenuIndex.Cheats),
+	Menu_BackItem("{s}Back")
+], { OnBack: _BackToUsers });
+
+var _BackToUserHome = function(){ Win_Main_Activate(Menu_UserHome(),, Sound_Throw); };
+var _BackToStartGame = function(){ Win_Options_Swap(MenuIndex.NewGame_Start); };
+
+Menu_Create(MenuIndex.NewGame_Start, "Start Game", [
+	Menu_Item("Start", Menu_StartGame),
+	Menu_LinkSwap("{s}Character", MenuIndex.Character, { OnDraw: Menu_DrawCharacterPreview }),
+	Menu_LinkSwap("{s}Bonus Item", MenuIndex.Gear, { OnDraw: Menu_DrawGearPreview }),
+	Menu_LinkSwap("{s}Challenges", MenuIndex.Challenges, { OnDraw: Menu_DrawChallengeSkull }),
+	Menu_BackItem("{s}Back")
+], { TileW: 18, OnBack: _BackToUserHome });
+
+Menu_Create(MenuIndex.Character, "Select a Character", [], { TileW: 18, Selector: false, OnBack: _BackToStartGame });
+
+var _GearRows = [];
+for(var i = 0; i < array_length(global.GearInfo); i++){
+	array_push(_GearRows, Menu_Item(global.GearInfo[i].Label, Menu_PickGear, { Gear: i, OnDraw: Menu_DrawGearRow }));
+}
+// Backing out also keeps the highlighted item, like confirming it
+Menu_Create(MenuIndex.Gear, "Pick a Bonus Item", _GearRows, { TileW: 18, OnBack: function(){ Menu_PickGear(Menu_SelectedRow()); } });
+
+var _ChallengeRows = [Menu_BackItem("BACK")];
+for(var i = 0; i < array_length(global.ChallengeOptionInfo); i++){
+	array_push(_ChallengeRows, Menu_Item(global.ChallengeOptionInfo[i].Label, Menu_CycleChallengeOption, { Option: i, Title: Menu_ChallengeOptionTitle, OnDraw: Menu_DrawChallengeOption }));
+}
+for(var i = 0; i < array_length(global.ChallengeInfo); i++){
+	array_push(_ChallengeRows, Menu_Item(global.ChallengeInfo[i].Label, Menu_ToggleChallenge, { Challenge: i, Title: Menu_ChallengeTitle, OnDraw: Menu_DrawChallengeCheckbox }));
+}
+Menu_Create(MenuIndex.Challenges, "Enable Challenges", _ChallengeRows, {
+	TileW: 18, YSpace: 10, Font: global.Font_Small, TextOffsetY: 4,
+	OnBack: function(){ Win_Options_Swap(MenuIndex.NewGame_Start, Sound_Throw); }
+});
+
+Menu_Create(MenuIndex.Stats, "Stats", [], { TileW: 22, Selector: false, OnBack: _BackToUserHome });
+
+// Cheats are toggles on the current user, listed from global.CheatList; changes are kept in memory until Save writes them to disk
+var _CheatRows = [
+	Menu_BackItem(),
+	Menu_Item("Save", function(){ User_Save(); Menu_Back(); })
+];
+for(var i = 0; i < array_length(global.CheatList); i++){
+	array_push(_CheatRows, Menu_Toggle(global.CheatList[i].Label, Menu_GetCheat, Menu_SetCheat, { Key: global.CheatList[i].Key }));
+}
+Menu_Create(MenuIndex.Cheats, "Cheats", _CheatRows, { TileW: 25, VisibleRows: MENU_VISIBLE_ROWS, OnBack: _BackToUserHome });
+
+Menu_Create(MenuIndex.Options, "Options", [
+	Menu_BackItem(),
+	Menu_LinkSide("{s}Settings", MenuIndex.Settings),
+	Menu_LinkMain("{s}Controls", MenuIndex.Controls),
+	Menu_LinkMain("{s}User", MenuIndex.User)
+], { OnBack: _BackToUserHome });
+
+// Settings are written to options.ini on every change (sliders: once released)
+Menu_Create(MenuIndex.Settings, "Settings", [
+	Menu_BackItem(),
+	Menu_GlobalSlider("Music Volume", "MusicVol", 0, 1, User_UpdateMusicSFX),
+	Menu_GlobalSlider("Sound Volume", "SFXVol", 0, 1, User_UpdateMusicSFX, true),
+	Menu_GlobalToggle("Fullscreen", "Fullscreen", function(){ window_set_fullscreen(global.Fullscreen); }),
+	Menu_GlobalToggle("Gore", "Gore"),
+	Menu_GlobalToggle("Lighting", "GlobalLighting"),
+	Menu_GlobalToggle("Alt-Tab Pause", "AltTabPause"),
+	Menu_GlobalToggle("Stair Pause", "StairPause"),
+	Menu_GlobalToggle("Save Version Check", "SaveVersionCheck"),
+	Menu_GlobalToggle("Skip Intro", "CanSkipTitle"),
+	Menu_GlobalSlider("Stick Sens.", "Gamepad_AnalogueThreshold", 0.05, 0.95)
+], { TileW: 32, VisibleRows: MENU_VISIBLE_ROWS, Parent: MenuIndex.Options, OnCommit: Settings_SaveIni });
+
+Menu_Create(MenuIndex.Controls, "Controls", [
+	Menu_BackItem(),
+	Menu_LinkSide("{s}Gamepad", MenuIndex.Controls_Gamepad),
+	Menu_LinkSide("{s}Keyboard", MenuIndex.Controls_Keyboard)
+], { TileW: 30, Parent: MenuIndex.Options });
+
+Menu_Create(MenuIndex.Controls_Gamepad, "Remap Gamepad", [
+	Menu_BackItem(),
+	Menu_Item("Remap", Menu_RemapControls, { Input: Input_Index.Gamepad }),
+	Menu_Item("Default", Menu_ResetControls, { Input: Input_Index.Gamepad })
+], { TileW: 25, Parent: MenuIndex.Controls });
+
+Menu_Create(MenuIndex.Controls_Keyboard, "Remap Keyboard", [
+	Menu_BackItem(),
+	Menu_Item("Remap", Menu_RemapControls, { Input: Input_Index.Keyboard }),
+	Menu_Item("Default", Menu_ResetControls, { Input: Input_Index.Keyboard })
+], { TileW: 25, Parent: MenuIndex.Controls });
+
+Menu_Create(MenuIndex.User, "User", [
+	Menu_BackItem(),
+	Menu_Item("{s}Rename", function(){
+		NameEntry_Rename = true;
+		Win_Options_Activate(MenuIndex.NewUser, Sound_Throw);
+		LetterGrid_Init();
+	}),
+	Menu_LinkSide("{s}Delete", MenuIndex.UserDelete, Sound_Throw)
+], { Parent: MenuIndex.Options });
+
+Menu_Create(MenuIndex.UserDelete, "Delete?", [
+	Menu_BackItem("No"),
+	Menu_Item("Yes", function(){
+		User_Delete();
+		Win_Main_Activate(MenuIndex.NameSelect, true, Sound_KinstoneConnect);
+	})
+], { TileW: 10, Parent: MenuIndex.User });
+
+#endregion
 
 Win_Main_Activate(MenuWin_Main_MenuIndex);
 

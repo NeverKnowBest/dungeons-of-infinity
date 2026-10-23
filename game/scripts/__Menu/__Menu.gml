@@ -14,80 +14,8 @@ enum MenuIndex{
 	Challenges,
 	Controls,
 	Controls_Gamepad,
-	Controls_Keyboard
-}
-
-
-enum MenuSelection_NewGame{
-	NewGame,
-	Options,
-	Stats,
-	Cheats,
-	Back	
-}
-
-enum MenuSelection_ContinueGame{
-	ContinueGame,
-	NewGame,
-	Options,
-	Stats,
-	Cheats,
-	Back	
-}
-
-enum MenuSelection_NewGame_Start{
-	Start,
-	Character,
-	Gear,
-	Challenges,
-	Back	
-}
-
-enum MenuSelection_Options{
-	Back,
-	Controls,
-	User,
-	Cheats
-}
-
-enum MenuSelection_Cheats{
-	Back,
-	Save,
-	InfHealth,
-	InfMagic,
-	InfRupees,
-	InfKeys,
-	InfArrows,
-	Max
-}
-
-enum MenuSelection_Options_Controls{
-	Back,
-	Gamepad,
-	Keyboard
-}
-
-enum MenuSelection_Options_Controls_Gamepad{
-	Back,
-	Remap,
-	Default
-}
-
-enum MenuSelection_Options_Controls_Keyboard{
-	Back,
-	Remap,
-	Default
-}
-
-enum MenuSelection_Options_User{
-	Back,
-	ChangeName,
-	Delete
-}
-
-enum MenuSelection_Options_User_Delete{
-	No,
-	Yes
+	Controls_Keyboard,
+	Settings
 }
 
 enum MenuSelection_GameMenuID{
@@ -99,14 +27,14 @@ enum MenuSelection_GameMenu{
 	Resume,
 	NewGame,
 	Options,
-	QuitTitle,	
-	QuitDesktop	
+	QuitTitle,
+	QuitDesktop
 }
 enum MenuSelection_GameMenuOptions{
 	Back,
 	SFX,
 	Music,
-	HUD,	
+	HUD,
 	CRT,
 	ItemMsg
 }
@@ -129,8 +57,8 @@ global.MenuFont_Innactive2 = font_add_sprite(sFont_Black, ord(" "), true, 0);
 function Menu_StartGame(){
 	audio_stop_all();
 	audio_play_sound(Sound_TextDone, 1, false);
-	room_goto(Room_Dungeon);	
-	
+	room_goto(Room_Dungeon);
+
 }
 
 function Menu_ContinueGame(){
@@ -138,35 +66,38 @@ function Menu_ContinueGame(){
 	audio_play_sound(Sound_TextDone, 1, false);
 	global.SaveLevel = true;
 	global.Continue = true;
-	room_goto(Room_Dungeon);	
-	
+	room_goto(Room_Dungeon);
+
 }
 
 
 function Win_Main_Activate(_MenuIndex, _ResetSelector = true, _Sound = Sound_TextDone){
-	
+
 	MenuWin_Main_Active = true;
 	MenuWin_Main_MenuIndex = _MenuIndex;
-	
+
 	MenuWin_Main_X_End = MenuWin_Main_X_Default;
 
 	MenuWin_Main_Shift = true;
 	MenuWin_Main_Shift_Dir = 1;
-	
+
 	MenuWin_Options_Active = false;
-	
+
 	Menu_Active = false;
 	Menu_ActiveIndex = _MenuIndex;
 
 	MenuWinInst_Main.sprite_index = sMenuWin;
-	MenuWinInst_Title1.sprite_index = sMenuWin;	
+	MenuWinInst_Title1.sprite_index = sMenuWin;
 	MenuWinInst_Options.visible = false;
 	MenuWinInst_Title2.visible = false;
-	
-	if(_ResetSelector) Selector_Index_Main = 0;
-	
+
+	if(_ResetSelector){
+		Selector_Index_Main = 0;
+		Menu_Scroll[_MenuIndex] = 0;
+	}
+
 	audio_play_sound(_Sound, 1, false);
-	
+
 }
 
 function Win_Main_SetX(_x){
@@ -176,16 +107,16 @@ function Win_Main_SetX(_x){
 
 
 function Win_Options_Activate(_MenuIndex, _Sound = Sound_TextDone){
-	
+
 	Menu_ActiveIndex = _MenuIndex;
-	
+
 	MenuWin_Options_MenuIndex = _MenuIndex;
-	MenuWin_Options_Active = true;	
-	
+	MenuWin_Options_Active = true;
+
 	var ScrW = camera_get_view_width(view_camera[0]);
 
 	MenuWinInst_Options.W = Menu_TileW[_MenuIndex] * 8;
-	
+
 	MenuWin_Main_X_End = (ScrW - (MenuWinInst_Main.W + MenuWinInst_Options.W + 8)) / 2;
 
 	MenuWinInst_Options.x = MenuWin_Main_X_End + MenuWinInst_Main.W + 8;
@@ -197,44 +128,484 @@ function Win_Options_Activate(_MenuIndex, _Sound = Sound_TextDone){
 	MenuWinInst_Title1.sprite_index = sMenuWin_Innactive;
 	MenuWinInst_Options.visible = false;
 	MenuWinInst_Title2.visible = false;
-	
+
 	MenuWin_Main_Active = false;
 	MenuWin_Main_Shift = true;
 	MenuWin_Main_Shift_Dir = MenuWin_Main_X_End >= MenuWinInst_Main.x ? 1 : -1;
-		
+
 	Menu_Active = false;
-	
+
 	Selector_Index_Options = 0;
-	
+	Menu_Scroll[_MenuIndex] = 0;
+	Menu_HoldFrames = 0;
+
 	audio_play_sound(_Sound, 1, false);
-	
+
 }
 
-function Menu_Create(_MenuIndex, _Title, _TileW = 20, _Selector = true, _YSpace = 16){ 
-	
-	Menu_Title[_MenuIndex] = _Title;
-	Menu_TileW[_MenuIndex] = _TileW;
-	Menu_Selector[_MenuIndex] = _Selector;
-	
-	for(var i = 0; i < argument_count - 5; i++){
-		Menu[_MenuIndex][i] = argument[5 + i];
-	}
-	
-	Menu_Count[_MenuIndex] = array_length(Menu[_MenuIndex]);
-	
-	Menu_Y[_MenuIndex][0] = 70;
-	for(var i = 1; i < Menu_Count[_MenuIndex]; i++){
-		var YSpace = _YSpace;
-		var Str = Menu[_MenuIndex][i];
-		if(string_pos("{s}", Str)  != 0){
-			Menu[_MenuIndex][i] = string_copy(Str, 4, string_length(Str) - 3);
-			YSpace += 8;
+// Swaps the options window to another page without sliding the windows again (e.g. Start Game -> Character).
+function Win_Options_Swap(_MenuIndex, _Sound = Sound_TextDone){
+	Menu_ActiveIndex = _MenuIndex;
+	MenuWin_Options_MenuIndex = _MenuIndex;
+	Selector_Index_Options = 0;
+	Menu_Scroll[_MenuIndex] = 0;
+	Menu_HoldFrames = 0;
+	audio_play_sound(_Sound, 1, false);
+}
+
+// The main page for the current user: "Continue" if they have a save, "New Game" otherwise.
+function Menu_UserHome(){
+	return global.Users[global.UserIndex].SaveData == -1 ? MenuIndex.NewGame : MenuIndex.ContinueGame;
+}
+
+
+#region Generic menu pages
+/*
+	A menu page is a list of row structs (see Menu_Item) passed to Menu_Create.
+	Each row carries its own label and behaviour, so oMenu's Step/Draw never need to know what "row N" means,
+	and a page's size is simply how many rows it was given.
+
+	Row callbacks are rebound to oMenu and are always called with the row struct as their first argument,
+	so any extra fields given to a row (e.g. { Key: "Inf_Health" }) can be used as that row's data.
+*/
+
+#macro MENU_TOP_Y 70				// y of the first row of every page
+#macro MENU_VISIBLE_ROWS 7			// rows that fit in a window at 16px spacing; longer pages scroll
+#macro MENU_SLIDER_W 40
+#macro MENU_SLIDER_STEP 0.01
+#macro MENU_SLIDER_REPEAT_DELAY 18	// frames left/right must be held before a slider starts repeating
+#macro MENU_SLIDER_REPEAT_RATE 2	// frames between repeats after that
+
+function Menu_Bind(_Fn){
+	return is_callable(_Fn) ? method(self, _Fn) : _Fn;
+}
+
+/// @param {String} _Label		Row text. A "{s}" prefix adds 8px of extra space above the row.
+/// @param {Function} _OnSelect	Called as _OnSelect(row) when the row is confirmed.
+/// @param {Struct} _Fields		Extra fields copied onto the row. Recognised ones:
+///								OnDraw(row, winX, y)	extra drawing next to the row
+///								Title(row)				options window title while the row is selected
+function Menu_Item(_Label, _OnSelect = undefined, _Fields = undefined){
+	var _Gap = string_copy(_Label, 1, 3) == "{s}";
+	var _Item = {
+		Label: _Gap ? string_delete(_Label, 1, 3) : _Label,
+		Gap: _Gap,
+		OnSelect: Menu_Bind(_OnSelect),
+		OnDraw: undefined,
+		Title: undefined,
+		Get: undefined,
+		Set: undefined,
+		Slider: false,
+		Min: 0,
+		Max: 1,
+		Blip: false
+	};
+	if(_Fields != undefined){
+		var _Names = variable_struct_get_names(_Fields);
+		for(var i = 0; i < array_length(_Names); i++){
+			_Item[$ _Names[i]] = _Fields[$ _Names[i]];
 		}
-		Menu_Y[_MenuIndex][i] = Menu_Y[_MenuIndex][i - 1] + YSpace;
+		_Item.OnDraw = Menu_Bind(_Item.OnDraw);
+		_Item.Title = Menu_Bind(_Item.Title);
+		if(variable_struct_exists(_Item, "OnSet")) _Item.OnSet = Menu_Bind(_Item.OnSet);
+	}
+	return _Item;
+}
+
+// An On/Off row. _Get(row) returns the current bool, _Set(value, row) stores a new one. Left/right or confirm flips it.
+function Menu_Toggle(_Label, _Get, _Set, _Fields = undefined){
+	var _Item = Menu_Item(_Label, undefined, _Fields);
+	_Item.Get = Menu_Bind(_Get);
+	_Item.Set = Menu_Bind(_Set);
+	return _Item;
+}
+
+// A percentage slider between _Min and _Max. Holding left/right repeats. _Blip plays a (throttled) tick while sliding.
+function Menu_Slider(_Label, _Get, _Set, _Min = 0, _Max = 1, _Blip = false, _Fields = undefined){
+	var _Item = Menu_Toggle(_Label, _Get, _Set, _Fields);
+	_Item.Slider = true;
+	_Item.Min = _Min;
+	_Item.Max = _Max;
+	_Item.Blip = _Blip;
+	return _Item;
+}
+
+// Toggle/slider rows bound straight to a global variable by name. _OnSet() runs after each change.
+function Menu_GlobalToggle(_Label, _Global, _OnSet = undefined){
+	return Menu_Toggle(_Label, Menu_GetGlobal, Menu_SetGlobal, { Global: _Global, OnSet: _OnSet });
+}
+function Menu_GlobalSlider(_Label, _Global, _Min = 0, _Max = 1, _OnSet = undefined, _Blip = false){
+	return Menu_Slider(_Label, Menu_GetGlobal, Menu_SetGlobal, _Min, _Max, _Blip, { Global: _Global, OnSet: _OnSet });
+}
+function Menu_GetGlobal(_Row){
+	return variable_global_get(_Row.Global);
+}
+function Menu_SetGlobal(_Value, _Row){
+	variable_global_set(_Row.Global, _Value);
+	if(_Row.OnSet != undefined) _Row.OnSet(_Row);
+}
+
+// Rows that open another page: in the main (left) window, beside it in the options (right) window,
+// or in place of the page currently in the options window.
+function Menu_LinkMain(_Label, _MenuIndex, _Fields = {}){
+	_Fields.Target = _MenuIndex;
+	return Menu_Item(_Label, function(_Row){ Win_Main_Activate(_Row.Target); }, _Fields);
+}
+function Menu_LinkSide(_Label, _MenuIndex, _Sound = Sound_TextDone, _Fields = {}){
+	_Fields.Target = _MenuIndex;
+	_Fields.Sound = _Sound;
+	return Menu_Item(_Label, function(_Row){ Win_Options_Activate(_Row.Target, _Row.Sound); }, _Fields);
+}
+function Menu_LinkSwap(_Label, _MenuIndex, _Fields = {}){
+	_Fields.Target = _MenuIndex;
+	return Menu_Item(_Label, function(_Row){ Win_Options_Swap(_Row.Target); }, _Fields);
+}
+function Menu_BackItem(_Label = "Back"){
+	return Menu_Item(_Label, Menu_Back);
+}
+
+/// @param {Real} _MenuIndex
+/// @param {String} _Title
+/// @param {Array} _Items	Rows built with Menu_Item and friends. Pages drawn by hand (name entry, stats...) pass [].
+/// @param {Struct} _Config	Optional page settings:
+///							TileW (20)			options window width, in 8px tiles
+///							Selector (true)		draw the selector arrow / allow moving it
+///							YSpace (16)			pixels between rows
+///							VisibleRows (all)	rows shown at once; the rest scroll
+///							Font, TextOffsetY	row label font and y offset
+///							Parent				main-window page that Back returns to (selector kept)
+///							OnBack()			called on Back instead, when there is no Parent
+///							OnCommit()			called after values change (toggles: right away, sliders: on release/Back)
+function Menu_Create(_MenuIndex, _Title, _Items, _Config = {}){
+
+	var _Count = array_length(_Items);
+
+	Menu[_MenuIndex] = _Items;
+	Menu_Count[_MenuIndex] = _Count;
+	Menu_Title[_MenuIndex] = _Title;
+	Menu_TileW[_MenuIndex] = _Config[$ "TileW"] ?? 20;
+	Menu_Selector[_MenuIndex] = _Config[$ "Selector"] ?? true;
+	Menu_VisibleRows[_MenuIndex] = min(_Config[$ "VisibleRows"] ?? _Count, _Count);
+	Menu_Font[_MenuIndex] = _Config[$ "Font"] ?? global.MenuFont;
+	Menu_TextOffsetY[_MenuIndex] = _Config[$ "TextOffsetY"] ?? 0;
+	Menu_Parent[_MenuIndex] = _Config[$ "Parent"];
+	Menu_OnBack[_MenuIndex] = Menu_Bind(_Config[$ "OnBack"]);
+	Menu_OnCommit[_MenuIndex] = Menu_Bind(_Config[$ "OnCommit"]);
+	Menu_Scroll[_MenuIndex] = 0;
+
+	// Unscrolled row positions; Menu_RowY applies the scroll
+	var _YSpace = _Config[$ "YSpace"] ?? 16;
+	var _Y = MENU_TOP_Y;
+	Menu_Y[_MenuIndex] = array_create(_Count);
+	for(var i = 0; i < _Count; i++){
+		if(i > 0) _Y += _YSpace + (_Items[i].Gap ? 8 : 0);
+		Menu_Y[_MenuIndex][i] = _Y;
 	}
 
-
 }
+
+function Menu_RowY(_MenuIndex, _Row){
+	return Menu_Y[_MenuIndex][_Row] - (Menu_Y[_MenuIndex][Menu_Scroll[_MenuIndex]] - MENU_TOP_Y);
+}
+
+function Menu_IsRowVisible(_MenuIndex, _Row){
+	var _Scroll = Menu_Scroll[_MenuIndex];
+	return _Row >= _Scroll && _Row < _Scroll + Menu_VisibleRows[_MenuIndex];
+}
+
+// Row struct under the selector of the active page, or undefined for pages without rows
+function Menu_SelectedRow(){
+	if(Menu_Count[Menu_ActiveIndex] == 0) return undefined;
+	return Menu[Menu_ActiveIndex][MenuWin_Main_Active ? Selector_Index_Main : Selector_Index_Options];
+}
+
+// Moves a page's selector by _Dir (wrapping), scrolls to keep it visible, and returns the new index
+function Menu_MoveSelector(_MenuIndex, _Index, _Dir){
+	var _Count = Menu_Count[_MenuIndex];
+	_Index = (_Index + _Dir + _Count) mod _Count;
+
+	var _Visible = Menu_VisibleRows[_MenuIndex];
+	var _Scroll = Menu_Scroll[_MenuIndex];
+	if(_Index < _Scroll) _Scroll = _Index;
+	if(_Index >= _Scroll + _Visible) _Scroll = _Index - _Visible + 1;
+	Menu_Scroll[_MenuIndex] = clamp(_Scroll, 0, _Count - _Visible);
+
+	audio_play_sound(Sound_Text, 1, false);
+	return _Index;
+}
+
+function Menu_RowHasValue(_Row){
+	return _Row.Get != undefined;
+}
+
+function Menu_RowValueText(_Row){
+	var _Value = _Row.Get(_Row);
+	if(_Row.Slider) return string(round(_Value * 100)) + "%";
+	return _Value ? "On" : "Off";
+}
+
+// Slider fill, 0 to 1
+function Menu_RowFraction(_Row){
+	return clamp((_Row.Get(_Row) - _Row.Min) / (_Row.Max - _Row.Min), 0, 1);
+}
+
+// Confirm on a row: run its action, or flip it if it's a toggle
+function Menu_RowSelect(_Row){
+	if(_Row.OnSelect != undefined) _Row.OnSelect(_Row);
+	else if(Menu_RowHasValue(_Row) && !_Row.Slider) Menu_RowChange(_Row, 1);
+}
+
+// Left/right on a value row. Toggles flip and commit at once; sliders step and commit when released.
+function Menu_RowChange(_Row, _Dir){
+	if(!_Row.Slider){
+		_Row.Set(!_Row.Get(_Row), _Row);
+		audio_play_sound(Sound_Text, 1, false);
+		Menu_Dirty = true;
+		Menu_Commit();
+		return;
+	}
+
+	var _Old = _Row.Get(_Row);
+	var _New = clamp(round((_Old + (_Dir * MENU_SLIDER_STEP)) * 100) / 100, _Row.Min, _Row.Max);
+	if(_New == _Old) return;
+
+	_Row.Set(_New, _Row);
+	Menu_Dirty = true;
+	if(_Row.Blip && current_time - Menu_LastBlip > 150){
+		audio_play_sound(Sound_Text, 1, false);
+		Menu_LastBlip = current_time;
+	}
+}
+
+// Handles left/right being held on a value row. Called every frame the row is selected.
+function Menu_RowHold(_Row){
+	var _Dir = (input_check("menu_right") ? 1 : 0) - (input_check("menu_left") ? 1 : 0);
+	if(_Dir == 0){
+		if(Menu_HoldFrames > 0) Menu_Commit();
+		Menu_HoldFrames = 0;
+		return;
+	}
+
+	var _Repeat = _Row.Slider && Menu_HoldFrames > MENU_SLIDER_REPEAT_DELAY && (Menu_HoldFrames mod MENU_SLIDER_REPEAT_RATE == 0);
+	if(Menu_HoldFrames == 0 || _Repeat) Menu_RowChange(_Row, _Dir);
+	Menu_HoldFrames++;
+}
+
+// Runs the active page's OnCommit if any of its values changed since the last commit
+function Menu_Commit(){
+	if(!Menu_Dirty) return;
+	Menu_Dirty = false;
+	var _OnCommit = Menu_OnCommit[Menu_ActiveIndex];
+	if(_OnCommit != undefined) _OnCommit();
+}
+
+// Leaves the active page: back to its Parent page, or whatever its OnBack does
+function Menu_Back(){
+	Menu_Commit();
+	var _MenuIndex = Menu_ActiveIndex;
+	if(Menu_Parent[_MenuIndex] != undefined) Win_Main_Activate(Menu_Parent[_MenuIndex], false, Sound_Throw);
+	else if(Menu_OnBack[_MenuIndex] != undefined) Menu_OnBack[_MenuIndex]();
+}
+
+// Draws a row's value right-aligned in its window, with a slider bar to its left for sliders
+function Menu_DrawRowValue(_Row, _WinX, _WinW, _Y){
+	var _Right = _WinX + _WinW - 16;
+	draw_set_halign(fa_right);
+	draw_text(_Right, _Y, Menu_RowValueText(_Row));
+	draw_set_halign(fa_left);
+
+	if(!_Row.Slider) return;
+	var _BX = _Right - 80;
+	var _BY = _Y + 6;
+	var _Fill = round(MENU_SLIDER_W * Menu_RowFraction(_Row));
+	draw_set_color(c_dkgray);
+	draw_rectangle(_BX, _BY, _BX + MENU_SLIDER_W, _BY + 3, false);
+	draw_set_color(c_white);
+	draw_rectangle(_BX, _BY, _BX + _Fill, _BY + 3, false);
+	draw_rectangle(_BX + _Fill - 1, _BY - 2, _BX + _Fill + 1, _BY + 5, false);
+}
+
+// Up/down arrows in a window's right edge when its page has rows scrolled out of view
+function Menu_DrawScrollArrows(_MenuIndex, _WinInst){
+	var _Scroll = Menu_Scroll[_MenuIndex];
+	var _X = _WinInst.x + _WinInst.W - 16;
+	var _Bottom = _WinInst.y + _WinInst.H;
+	draw_set_color(c_white);
+	if(_Scroll > 0) draw_triangle(_X - 4, MENU_TOP_Y - 4, _X + 4, MENU_TOP_Y - 4, _X, MENU_TOP_Y - 10, false);
+	if(_Scroll + Menu_VisibleRows[_MenuIndex] < Menu_Count[_MenuIndex]) draw_triangle(_X - 4, _Bottom - 22, _X + 4, _Bottom - 22, _X, _Bottom - 16, false);
+}
+
+#endregion
+
+#region Page-specific row callbacks
+
+function Menu_SelectUser(_Row){
+	global.UserIndex = _Row.User;
+
+	if(global.Users[global.UserIndex].Name == ""){
+		Win_Options_Activate(MenuIndex.NewUser);
+		LetterGrid_Init();
+		return;
+	}
+
+	var _Sound = Sound_TextDone;
+	switch(User_VerifyIntegrity()){
+		case 1:
+			ErrorMsgInst = MsgBox("Keyboard profile error, resetting to default controls.",,,,80);
+			_Sound = Sound_Error;
+			break;
+		case 2:
+			ErrorMsgInst = MsgBox("Gamepad profile error, resetting to default controls.",,,,80);
+			_Sound = Sound_Error;
+			break;
+	}
+	Win_Main_Activate(Menu_UserHome(),, _Sound);
+	Menu_Title[MenuIndex.ContinueGame] = global.Users[global.UserIndex].Name;
+	Menu_Title[MenuIndex.NewGame] = global.Users[global.UserIndex].Name;
+	input_profile_import(global.Users[global.UserIndex].InputProfile_Gamepad, "gamepad");
+	input_profile_import(global.Users[global.UserIndex].InputProfile_Keyboard, "keyboard");
+	Bindings_GetIcons(Input_Index.Gamepad);
+	Bindings_GetIcons(Input_Index.Keyboard);
+}
+
+function Menu_DrawUserName(_Row, _WinX, _Y){
+	draw_text(_WinX + 43, _Y, global.Users[_Row.User].Name);
+}
+
+function Menu_TryContinue(){
+	if(!global.SaveVersionCheck || global.Users[global.UserIndex].SaveData.GameVersion == VERSION){
+		Menu_ContinueGame();
+	}else{
+		ErrorMsgInst = MsgBox("Save file version error!\\Use the game version the save\\was created with.",,Sound_Error,,80);
+	}
+}
+
+function Menu_DrawCharacterPreview(_Row, _WinX, _Y){
+	draw_sprite(global.CharacterSprites, global.LinkCharacterIndex, _WinX + 94, _Y - 6);
+}
+
+function Menu_DrawGearPreview(_Row, _WinX, _Y){
+	var _Gear = global.GearInfo[global.StartingGear];
+	Menu_DrawGear(global.StartingGear, _WinX + 102, _Y + 17 + _Gear.OffsetY);
+}
+
+// Gear icon, plus the amount it gives for stackable gear
+function Menu_DrawGear(_GearIndex, _X, _Y){
+	var _Gear = global.GearInfo[_GearIndex];
+	draw_sprite(_Gear.Sprite, _Gear.Image, _X, _Y);
+
+	var _Amount = undefined;
+	var _AmountX = 0;
+	switch(_GearIndex){
+		case StartingGear.Rupees:	_Amount = StartingGear_Rupees; _AmountX = -1; break;
+		case StartingGear.Rod:		_Amount = global.MaxRodCharge[Rod.Stone]; break;
+		case StartingGear.Orbs:		_Amount = StartingGear_Orbs; _AmountX = 3; break;
+	}
+	if(_Amount == undefined) return;
+
+	draw_set_font(global.Font_ItemValues);
+	draw_text(_X + _AmountX, _Y - 6, string(_Amount));
+	draw_set_font(global.MenuFont);
+}
+
+function Menu_DrawGearRow(_Row, _WinX, _Y){
+	var _Gear = global.GearInfo[_Row.Gear];
+	Menu_DrawGear(_Row.Gear, _WinX + 123 + _Gear.OffsetX, _Y + 17 + _Gear.OffsetY);
+}
+
+function Menu_PickGear(_Row){
+	global.StartingGear = _Row.Gear;
+	Win_Options_Swap(MenuIndex.NewGame_Start);
+}
+
+function Menu_AnyChallengeActive(){
+	for(var i = 0; i < array_length(global.ChallengeOptions); i++){
+		if(global.ChallengeOptions[i] > 0) return true;
+	}
+	for(var i = 0; i < array_length(global.Challenges); i++){
+		if(global.Challenges[i]) return true;
+	}
+	return false;
+}
+
+function Menu_DrawChallengeSkull(_Row, _WinX, _Y){
+	if(Menu_AnyChallengeActive()) draw_sprite(sLargeMap_Boss, 0, _WinX + 95, _Y + 1);
+}
+
+function Menu_CycleChallengeOption(_Row){
+	var _Levels = array_length(global.ChallengeOptionInfo[_Row.Option].Titles);
+	global.ChallengeOptions[_Row.Option] = (global.ChallengeOptions[_Row.Option] + 1) mod _Levels;
+	audio_play_sound(Sound_TextDone, 1, false);
+}
+
+function Menu_ChallengeOptionTitle(_Row){
+	return global.ChallengeOptionInfo[_Row.Option].Titles[global.ChallengeOptions[_Row.Option]];
+}
+
+// Bar showing the challenge level; most bars shrink as the challenge gets harder, the rest grow
+function Menu_DrawChallengeOption(_Row, _WinX, _Y){
+	var _Option = _Row.Option;
+	var _Level = global.ChallengeOptions[_Option];
+	var _X = _WinX + 103.5;
+	_Y += 3;
+
+	switch(_Option){
+		case ChallengeOption.MaxRupees:
+			draw_sprite_stretched(sChallengeOptions, _Option, _X + 0.5, _Y, 8 * (4 - _Level), 8);
+			break;
+		case ChallengeOption.ShopPrices:
+			draw_sprite_stretched(sChallengeOptions, _Option, _X + 0.5, _Y, 8 * (_Level + 1), 8);
+			break;
+		case ChallengeOption.Darkness:
+			if(_Level == ChallengeOption_Darkness.NoLights) draw_sprite(sChallengeOptions, 9, _X, _Y);
+			else draw_sprite_stretched(sChallengeOptions, _Option, _X, _Y, 8 * (4 - _Level), 8);
+			break;
+		case ChallengeOption.StartingHearts:
+		case ChallengeOption.HeartsMax:
+		case ChallengeOption.Defense:
+		case ChallengeOption.Inventory:
+			draw_sprite_stretched(sChallengeOptions, _Option, _X, _Y, 8 * (4 - _Level), 8);
+			break;
+		default:
+			draw_sprite_stretched(sChallengeOptions, _Option, _X, _Y, 8 * (_Level + 1), 8);
+			break;
+	}
+}
+
+function Menu_ToggleChallenge(_Row){
+	global.Challenges[_Row.Challenge] = !global.Challenges[_Row.Challenge];
+	audio_play_sound(Sound_TextDone, 1, false);
+}
+
+function Menu_ChallengeTitle(_Row){
+	return global.ChallengeInfo[_Row.Challenge].Title;
+}
+
+function Menu_DrawChallengeCheckbox(_Row, _WinX, _Y){
+	var _On = global.Challenges[_Row.Challenge];
+	draw_sprite(_On ? sCheckbox : sCheckBox_Innactive, _On ? 1 : 0, _WinX + 103, _Y + 2);
+}
+
+function Menu_RemapControls(_Row){
+	instance_create_layer(-100, -100, "Menu", oInputRemap, {InputIndex : _Row.Input});
+}
+
+function Menu_ResetControls(_Row){
+	input_profile_reset_bindings(_Row.Input == Input_Index.Gamepad ? "gamepad" : "keyboard");
+	User_SaveControls();
+	Bindings_GetIcons(_Row.Input);
+	audio_play_sound(Sound_Throw, 1, false);
+}
+
+// Cheat rows read/write the current user's Cheats struct; _Row.Key is the cheat's name in it
+function Menu_GetCheat(_Row){
+	return global.Users[global.UserIndex].Cheats[$ _Row.Key] == true;
+}
+function Menu_SetCheat(_Value, _Row){
+	global.Users[global.UserIndex].Cheats[$ _Row.Key] = _Value;
+}
+
+#endregion
 
 function LetterGrid_Init(){
 	LetterGridX = MenuWinInst_Options.x + 14;
@@ -245,17 +616,17 @@ function LetterGrid_Init(){
 	NameEntryCross_Y = LetterGrid_GetY(NameEntryCross_GridY);
 	NameEntryCross_MoveEndX = NameEntryCross_X;
 	NameEntryCross_MoveEndY = NameEntryCross_Y;
-	NameEntry_Name = "";	
+	NameEntry_Name = "";
 }
 
 function LetterGrid_GetX(_GridX){
-	return LetterGridX + (_GridX * global.LetterGridSpacingW);	
+	return LetterGridX + (_GridX * global.LetterGridSpacingW);
 }
 function LetterGrid_GetY(_GridY){
-	return LetterGridY + (_GridY * global.LetterGridSpacingH);	
+	return LetterGridY + (_GridY * global.LetterGridSpacingH);
 }
 function LetterGrid_GetGridX(_X){
-	return floor((_X - LetterGridX) / global.LetterGridSpacingW);	
+	return floor((_X - LetterGridX) / global.LetterGridSpacingW);
 }
 function LetterGrid_GetGridY(_Y){
 	return floor((_Y - LetterGridY) / global.LetterGridSpacingH);
@@ -277,5 +648,5 @@ function LetterGrid_DrawCrossHair_V(){
 
 function LetterGrid_GetLetter(){
 	return global.NewUserChrMap[(NameEntryCross_GridY * global.LetterGridColumns) + NameEntryCross_GridX];
-	
+
 }

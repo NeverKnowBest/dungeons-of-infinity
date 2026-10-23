@@ -66,6 +66,30 @@ switch(Menu_ActiveIndex){
 		}
 		break;
 		
+	case MenuIndex.Settings:
+		if(_Input_MenuDown){
+			Selector_Index_Options = (Selector_Index_Options + 1) mod Menu_Count[MenuIndex.Settings];
+			Settings_UpdateScroll();
+			audio_play_sound(Sound_Text, 1, false);
+		}else if(_Input_MenuUp){
+			Selector_Index_Options = (Selector_Index_Options - 1 + Menu_Count[MenuIndex.Settings]) mod Menu_Count[MenuIndex.Settings];
+			Settings_UpdateScroll();
+			audio_play_sound(Sound_Text, 1, false);
+		}else if(Settings_IsSlider(Selector_Index_Options)){
+			var _Dir = (input_check("menu_right") ? 1 : 0) - (input_check("menu_left") ? 1 : 0);
+			if(_Dir != 0){
+				var _Fire = (Settings_HoldFrames == 0) || (Settings_HoldFrames > 18 && (Settings_HoldFrames mod 2 == 0));
+				if(_Fire) Settings_Change(Selector_Index_Options, _Dir);
+				Settings_HoldFrames++;
+			}else{
+				Settings_HoldFrames = 0;
+				if(Settings_Dirty){ Settings_Dirty = false; Settings_SaveIni(); }
+			}
+		}else if(_Input_MenuLeft || _Input_MenuRight){
+			Settings_Change(Selector_Index_Options, _Input_MenuRight ? 1 : -1);
+		}
+		break;
+
 	case MenuIndex.Character:
 		if(_Input_MenuUp){
 			global.LinkCharacterIndex -= 3;
@@ -429,12 +453,24 @@ if(_Input_MenuInput){
 			}
 			break;
 			
+		case MenuIndex.Settings:
+			if(Selector_Index_Options == 0) _Back = true;
+			else if(!Settings_IsSlider(Selector_Index_Options)) Settings_Change(Selector_Index_Options, 1);
+			break;
+
 		case MenuIndex.Options:
 			
 			switch(Selector_Index_Main){
 
 				case MenuSelection_Options.Back:
 					_Back = true;
+					break;
+
+				case MenuSelection_Options.Settings:
+					Selector_Index_Options = 0;
+					Settings_Scroll = 0;
+					Settings_UpdateScroll();
+					Win_Options_Activate(MenuIndex.Settings);
 					break;
 						
 				case MenuSelection_Options.Controls:
@@ -630,8 +666,10 @@ if(_Input_MenuBack || _Back){
 			Win_Main_Activate(global.Users[global.UserIndex].SaveData == -1 ? MenuIndex.NewGame : MenuIndex.ContinueGame,, Sound_Throw);
 			break;
 			
+		case MenuIndex.Settings:
 		case MenuIndex.Controls:
 		case MenuIndex.User:
+			if(Menu_ActiveIndex == MenuIndex.Settings && Settings_Dirty){ Settings_Dirty = false; Settings_SaveIni(); }
 			Win_Main_Activate(MenuIndex.Options, false, Sound_Throw);
 			break;
 			
