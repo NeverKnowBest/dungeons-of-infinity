@@ -107,7 +107,6 @@ global.Challenges = array_create(array_length(global.ChallengeInfo), false);
 Selector_Index_Main = 0;
 Selector_Index_Options = 0;
 Menu_HoldFrames = 0;
-Menu_Dirty = false;
 Menu_LastBlip = 0;
 Selector_Frame = 0;
 alarm[0] = 8;
@@ -156,7 +155,6 @@ Menu_Create(MenuIndex.NewGame, "", [
 	Menu_LinkSide("New Game", MenuIndex.NewGame_Start),
 	Menu_LinkMain("{s}Options", MenuIndex.Options),
 	Menu_LinkSide("{s}Stats", MenuIndex.Stats),
-	Menu_LinkSide("{s}Cheats", MenuIndex.Cheats),
 	Menu_BackItem("{s}Back")
 ], { OnBack: _BackToUsers });
 Menu_Create(MenuIndex.ContinueGame, "", [
@@ -164,7 +162,6 @@ Menu_Create(MenuIndex.ContinueGame, "", [
 	Menu_LinkSide("{s}New Game", MenuIndex.NewGame_Start),
 	Menu_LinkMain("{s}Options", MenuIndex.Options),
 	Menu_LinkSide("{s}Stats", MenuIndex.Stats),
-	Menu_LinkSide("{s}Cheats", MenuIndex.Cheats),
 	Menu_BackItem("{s}Back")
 ], { OnBack: _BackToUsers });
 
@@ -202,26 +199,36 @@ Menu_Create(MenuIndex.Challenges, "Enable Challenges", _ChallengeRows, {
 
 Menu_Create(MenuIndex.Stats, "Stats", [], { TileW: 22, Selector: false, OnBack: _BackToUserHome });
 
-// Cheats are toggles on the current user, listed from global.CheatList; changes are kept in memory until Save writes them to disk
-var _CheatRows = [
-	Menu_BackItem(),
-	Menu_Item("Save", function(){ User_Save(); Menu_Back(); })
-];
-for(var i = 0; i < array_length(global.CheatList); i++){
-	array_push(_CheatRows, Menu_Toggle(global.CheatList[i].Label, Menu_GetCheat, Menu_SetCheat, { Key: global.CheatList[i].Key }));
-}
-Menu_Create(MenuIndex.Cheats, "Cheats", _CheatRows, { TileW: 25, VisibleRows: MENU_VISIBLE_ROWS, OnBack: _BackToUserHome });
-
 Menu_Create(MenuIndex.Options, "Options", [
 	Menu_BackItem(),
 	Menu_LinkSide("{s}Settings", MenuIndex.Settings),
 	Menu_LinkMain("{s}Controls", MenuIndex.Controls),
-	Menu_LinkMain("{s}User", MenuIndex.User)
+	Menu_LinkMain("{s}User", MenuIndex.User),
+	Menu_LinkSide("{s}Cheats", MenuIndex.Cheats)
 ], { OnBack: _BackToUserHome });
 
-// Settings are written to options.ini on every change (sliders: once released)
+// Cheats are toggles on the current user, listed from global.CheatList. Ungrouped cheats go on the Cheats page,
+// followed by a link to each group's own sub-page, in the order the groups first appear in the list.
+// Save writes them to the user file; Back puts them back the way they were.
+var _CheatPage = array_concat([Menu_BackItem(), Menu_SaveItem()], Menu_CheatRows());
+var _CheatGroups = Menu_CheatGroups();
+for(var i = 0; i < array_length(_CheatGroups); i++){
+	var _Group = _CheatGroups[i];
+	var _GroupPage = Menu_NewPageIndex();
+	Menu_Create(_GroupPage, _Group, array_concat([Menu_BackItem(), Menu_SaveItem()], Menu_CheatRows(_Group)), {
+		TileW: 32, VisibleRows: MENU_VISIBLE_ROWS, OnSave: User_Save,
+		OnBack: function(_Sound){ Win_Options_Swap(MenuIndex.Cheats, _Sound); }
+	});
+	array_push(_CheatPage, Menu_LinkSwap((i == 0 ? "{s}" : "") + _Group, _GroupPage));
+}
+Menu_Create(MenuIndex.Cheats, "Cheats", _CheatPage, {
+	TileW: 25, VisibleRows: MENU_VISIBLE_ROWS, Parent: MenuIndex.Options, OnSave: User_Save
+});
+
+// Settings apply live so they can be previewed; Save writes them to options.ini, Back puts them back
 Menu_Create(MenuIndex.Settings, "Settings", [
 	Menu_BackItem(),
+	Menu_SaveItem(),
 	Menu_GlobalSlider("Music Volume", "MusicVol", 0, 1, User_UpdateMusicSFX),
 	Menu_GlobalSlider("Sound Volume", "SFXVol", 0, 1, User_UpdateMusicSFX, true),
 	Menu_GlobalToggle("Fullscreen", "Fullscreen", function(){ window_set_fullscreen(global.Fullscreen); }),
@@ -232,7 +239,7 @@ Menu_Create(MenuIndex.Settings, "Settings", [
 	Menu_GlobalToggle("Save Version Check", "SaveVersionCheck"),
 	Menu_GlobalToggle("Skip Intro", "CanSkipTitle"),
 	Menu_GlobalSlider("Stick Sens.", "Gamepad_AnalogueThreshold", 0.05, 0.95)
-], { TileW: 32, VisibleRows: MENU_VISIBLE_ROWS, Parent: MenuIndex.Options, OnCommit: Settings_SaveIni });
+], { TileW: 32, VisibleRows: MENU_VISIBLE_ROWS, Parent: MenuIndex.Options, OnSave: Settings_SaveIni });
 
 Menu_Create(MenuIndex.Controls, "Controls", [
 	Menu_BackItem(),

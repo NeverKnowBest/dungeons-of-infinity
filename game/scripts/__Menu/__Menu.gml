@@ -15,7 +15,9 @@ enum MenuIndex{
 	Controls,
 	Controls_Gamepad,
 	Controls_Keyboard,
-	Settings
+	Settings,
+
+	FirstGenerated	// Pages built from data at runtime, from Menu_NewPageIndex
 }
 
 enum MenuSelection_GameMenuID{
@@ -161,12 +163,15 @@ function Menu_UserHome(){
 
 #region Generic menu pages
 /*
-	A menu page is a list of row structs (see Menu_Item) passed to Menu_Create.
-	Each row carries its own label and behaviour, so oMenu's Step/Draw never need to know what "row N" means,
-	and a page's size is simply how many rows it was given.
+	A menu page lists row structs that are passed to Menu_Create.
+	Each row is dynamically generated; A page's size is simply how many rows it was given.
 
 	Row callbacks are rebound to oMenu and are always called with the row struct as their first argument,
 	so any extra fields given to a row (e.g. { Key: "Inf_Health" }) can be used as that row's data.
+
+	Pages with value rows (toggles/sliders) are editable. Changes apply live so they can be previewed,
+	but the values are remembered when the page is opened through a link row. Back puts them back the way
+	they were (the Back row reads "Discard" while there are unsaved changes), and only Save keeps them.
 */
 
 #macro MENU_TOP_Y 70				// y of the first row of every page
@@ -193,6 +198,7 @@ function Menu_Item(_Label, _OnSelect = undefined, _Fields = undefined){
 		OnSelect: Menu_Bind(_OnSelect),
 		OnDraw: undefined,
 		Title: undefined,
+		IsBack: false,
 		Get: undefined,
 		Set: undefined,
 		Slider: false,
@@ -245,37 +251,54 @@ function Menu_SetGlobal(_Value, _Row){
 	if(_Row.OnSet != undefined) _Row.OnSet(_Row);
 }
 
-// Rows that open another page: in the main (left) window, beside it in the options (right) window,
+// Rows that open another page in the main (left) window, beside it in the options (right) window,
 // or in place of the page currently in the options window.
+// Opening a page through any of these is what starts its edit session, via Menu_TakeSnapshot
 function Menu_LinkMain(_Label, _MenuIndex, _Fields = {}){
 	_Fields.Target = _MenuIndex;
-	return Menu_Item(_Label, function(_Row){ Win_Main_Activate(_Row.Target); }, _Fields);
+	return Menu_Item(_Label, function(_Row){
+		Win_Main_Activate(_Row.Target);
+		Menu_TakeSnapshot(_Row.Target);
+	}, _Fields);
 }
 function Menu_LinkSide(_Label, _MenuIndex, _Sound = Sound_TextDone, _Fields = {}){
 	_Fields.Target = _MenuIndex;
 	_Fields.Sound = _Sound;
-	return Menu_Item(_Label, function(_Row){ Win_Options_Activate(_Row.Target, _Row.Sound); }, _Fields);
+	return Menu_Item(_Label, function(_Row){
+		Win_Options_Activate(_Row.Target, _Row.Sound);
+		Menu_TakeSnapshot(_Row.Target);
+	}, _Fields);
 }
 function Menu_LinkSwap(_Label, _MenuIndex, _Fields = {}){
 	_Fields.Target = _MenuIndex;
-	return Menu_Item(_Label, function(_Row){ Win_Options_Swap(_Row.Target); }, _Fields);
+	return Menu_Item(_Label, function(_Row){
+		Win_Options_Swap(_Row.Target);
+		Menu_TakeSnapshot(_Row.Target);
+	}, _Fields);
 }
+
+// Leaves the page, discarding unsaved changes on editable pages
 function Menu_BackItem(_Label = "Back"){
-	return Menu_Item(_Label, Menu_Back);
+	return Menu_Item(_Label, Menu_Back, { IsBack: true });
+}
+
+// Keeps the page's changes (runs the page's OnSave) and leaves it
+function Menu_SaveItem(_Label = "Save"){
+	return Menu_Item(_Label, Menu_Save);
 }
 
 /// @param {Real} _MenuIndex
 /// @param {String} _Title
 /// @param {Array} _Items	Rows built with Menu_Item and friends. Pages drawn by hand (name entry, stats...) pass [].
 /// @param {Struct} _Config	Optional page settings:
-///							TileW (20)			options window width, in 8px tiles
-///							Selector (true)		draw the selector arrow / allow moving it
-///							YSpace (16)			pixels between rows
-///							VisibleRows (all)	rows shown at once; the rest scroll
-///							Font, TextOffsetY	row label font and y offset
-///							Parent				main-window page that Back returns to (selector kept)
-///							OnBack()			called on Back instead, when there is no Parent
-///							OnCommit()			called after values change (toggles: right away, sliders: on release/Back)
+///  TileW (20)					options window width, in 8px tiles
+///  Selector (true)			draw the selector arrow / allow moving it
+///  YSpace (16)				pixels between rows
+///  VisibleRows (all)			rows shown at once; the rest scroll
+///  Font, TextOffsetY			row label font and y offset
+///  Parent						main-window page that Back returns to (selector kept)
+///  OnBack(sound)				called on Back/Save instead, when there is no Parent; sound is the one to play
+///  OnSave()					called by the Save row to write the page's values to disk
 function Menu_Create(_MenuIndex, _Title, _Items, _Config = {}){
 
 	var _Count = array_length(_Items);
@@ -290,7 +313,8 @@ function Menu_Create(_MenuIndex, _Title, _Items, _Config = {}){
 	Menu_TextOffsetY[_MenuIndex] = _Config[$ "TextOffsetY"] ?? 0;
 	Menu_Parent[_MenuIndex] = _Config[$ "Parent"];
 	Menu_OnBack[_MenuIndex] = Menu_Bind(_Config[$ "OnBack"]);
-	Menu_OnCommit[_MenuIndex] = Menu_Bind(_Config[$ "OnCommit"]);
+	Menu_OnSave[_MenuIndex] = Menu_Bind(_Config[$ "OnSave"]);
+	Menu_Snapshot[_MenuIndex] = undefined;
 	Menu_Scroll[_MenuIndex] = 0;
 
 	// Unscrolled row positions; Menu_RowY applies the scroll
@@ -302,6 +326,12 @@ function Menu_Create(_MenuIndex, _Title, _Items, _Config = {}){
 		Menu_Y[_MenuIndex][i] = _Y;
 	}
 
+}
+
+// A free page index for pages that don't have a MenuIndex entry
+function Menu_NewPageIndex(){
+	var _Used = variable_instance_exists(id, "Menu") ? array_length(Menu) : 0;
+	return max(_Used, MenuIndex.FirstGenerated);
 }
 
 function Menu_RowY(_MenuIndex, _Row){
@@ -355,13 +385,11 @@ function Menu_RowSelect(_Row){
 	else if(Menu_RowHasValue(_Row) && !_Row.Slider) Menu_RowChange(_Row, 1);
 }
 
-// Left/right on a value row. Toggles flip and commit at once; sliders step and commit when released.
+// Left/right on a value row: toggles flip, sliders step
 function Menu_RowChange(_Row, _Dir){
 	if(!_Row.Slider){
 		_Row.Set(!_Row.Get(_Row), _Row);
 		audio_play_sound(Sound_Text, 1, false);
-		Menu_Dirty = true;
-		Menu_Commit();
 		return;
 	}
 
@@ -370,7 +398,6 @@ function Menu_RowChange(_Row, _Dir){
 	if(_New == _Old) return;
 
 	_Row.Set(_New, _Row);
-	Menu_Dirty = true;
 	if(_Row.Blip && current_time - Menu_LastBlip > 150){
 		audio_play_sound(Sound_Text, 1, false);
 		Menu_LastBlip = current_time;
@@ -381,7 +408,6 @@ function Menu_RowChange(_Row, _Dir){
 function Menu_RowHold(_Row){
 	var _Dir = (input_check("menu_right") ? 1 : 0) - (input_check("menu_left") ? 1 : 0);
 	if(_Dir == 0){
-		if(Menu_HoldFrames > 0) Menu_Commit();
 		Menu_HoldFrames = 0;
 		return;
 	}
@@ -391,20 +417,65 @@ function Menu_RowHold(_Row){
 	Menu_HoldFrames++;
 }
 
-// Runs the active page's OnCommit if any of its values changed since the last commit
-function Menu_Commit(){
-	if(!Menu_Dirty) return;
-	Menu_Dirty = false;
-	var _OnCommit = Menu_OnCommit[Menu_ActiveIndex];
-	if(_OnCommit != undefined) _OnCommit();
+// Remembers the current values of a page's value rows, so Back can put them back
+function Menu_TakeSnapshot(_MenuIndex){
+	var _Values = array_create(Menu_Count[_MenuIndex], undefined);
+	for(var i = 0; i < Menu_Count[_MenuIndex]; i++){
+		var _Row = Menu[_MenuIndex][i];
+		if(Menu_RowHasValue(_Row)) _Values[i] = _Row.Get(_Row);
+	}
+	Menu_Snapshot[_MenuIndex] = _Values;
 }
 
-// Leaves the active page: back to its Parent page, or whatever its OnBack does
+function Menu_HasChanges(_MenuIndex){
+	var _Snapshot = Menu_Snapshot[_MenuIndex];
+	if(_Snapshot == undefined) return false;
+	for(var i = 0; i < Menu_Count[_MenuIndex]; i++){
+		var _Row = Menu[_MenuIndex][i];
+		if(Menu_RowHasValue(_Row) && _Row.Get(_Row) != _Snapshot[i]) return true;
+	}
+	return false;
+}
+
+// Puts back value rows that changed since the snapshot (through Set, so side effects like volume re-apply)
+function Menu_RestoreSnapshot(_MenuIndex){
+	var _Snapshot = Menu_Snapshot[_MenuIndex];
+	if(_Snapshot == undefined) return;
+	for(var i = 0; i < Menu_Count[_MenuIndex]; i++){
+		var _Row = Menu[_MenuIndex][i];
+		if(Menu_RowHasValue(_Row) && _Row.Get(_Row) != _Snapshot[i]) _Row.Set(_Snapshot[i], _Row);
+	}
+}
+
+// Leaves the active page, discarding unsaved changes
 function Menu_Back(){
-	Menu_Commit();
+	Menu_RestoreSnapshot(Menu_ActiveIndex);
+	Menu_Leave();
+}
+
+// Writes the active page's values, then leaves it. The save also becomes the new baseline for any parent
+// page still open (e.g. Cheats under one of its group sub-pages), since it wrote their values too.
+function Menu_Save(){
+	var _OnSave = Menu_OnSave[Menu_ActiveIndex];
+	if(_OnSave != undefined) _OnSave();
+	for(var i = 0; i < array_length(Menu_Snapshot); i++){
+		if(Menu_Snapshot[i] != undefined) Menu_TakeSnapshot(i);
+	}
+	Menu_Leave(Sound_ItemGet);
+}
+
+// Goes to the active page's Parent, or runs its OnBack
+// _Sound is what plays as the page closes (Back and Save sound different)
+function Menu_Leave(_Sound = Sound_Throw){
 	var _MenuIndex = Menu_ActiveIndex;
-	if(Menu_Parent[_MenuIndex] != undefined) Win_Main_Activate(Menu_Parent[_MenuIndex], false, Sound_Throw);
-	else if(Menu_OnBack[_MenuIndex] != undefined) Menu_OnBack[_MenuIndex]();
+	Menu_Snapshot[_MenuIndex] = undefined;
+	if(Menu_Parent[_MenuIndex] != undefined) Win_Main_Activate(Menu_Parent[_MenuIndex], false, _Sound);
+	else if(Menu_OnBack[_MenuIndex] != undefined) Menu_OnBack[_MenuIndex](_Sound);
+}
+
+// Back rows read "Discard" while their page has unsaved changes
+function Menu_RowLabel(_Row, _HasChanges){
+	return (_Row.IsBack && _HasChanges) ? "Discard" : _Row.Label;
 }
 
 // Draws a row's value right-aligned in its window, with a slider bar to its left for sliders
@@ -587,6 +658,7 @@ function Menu_DrawChallengeCheckbox(_Row, _WinX, _Y){
 }
 
 function Menu_RemapControls(_Row){
+	// Feather disable once GM2064
 	instance_create_layer(-100, -100, "Menu", oInputRemap, {InputIndex : _Row.Input});
 }
 
@@ -595,6 +667,27 @@ function Menu_ResetControls(_Row){
 	User_SaveControls();
 	Bindings_GetIcons(_Row.Input);
 	audio_play_sound(Sound_Throw, 1, false);
+}
+
+// Group names used in global.CheatList, in the order they first appear
+function Menu_CheatGroups(){
+	var _Groups = [];
+	for(var i = 0; i < array_length(global.CheatList); i++){
+		var _Group = global.CheatList[i][$ "Group"];
+		if(_Group != undefined && !array_contains(_Groups, _Group)) array_push(_Groups, _Group);
+	}
+	return _Groups;
+}
+
+// Toggle rows for every cheat in global.CheatList whose Group matches (undefined = the main Cheats page)
+function Menu_CheatRows(_Group = undefined){
+	var _Rows = [];
+	for(var i = 0; i < array_length(global.CheatList); i++){
+		var _Cheat = global.CheatList[i];
+		if(_Cheat[$ "Group"] != _Group) continue;
+		array_push(_Rows, Menu_Toggle(_Cheat.Label, Menu_GetCheat, Menu_SetCheat, { Key: _Cheat.Key }));
+	}
+	return _Rows;
 }
 
 // Cheat rows read/write the current user's Cheats struct; _Row.Key is the cheat's name in it

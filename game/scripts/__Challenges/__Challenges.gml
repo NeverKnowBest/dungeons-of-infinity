@@ -9,7 +9,6 @@ enum ChallengeOption{
 	Enemies,
 	Curses
 }
-#macro ChallengeOptionCount 9
 
 enum ChallengeOption_Defense{
 	Normal,
@@ -30,27 +29,25 @@ enum Challenges{
 	NoFood,	
 	WallMaster
 }
-#macro ChallengeCount 3
 
 
-global.ChallengeOptionTitles = array_create(ChallengeOptionCount);
+// Menu label and per-level description of each challenge option, keyed by ChallengeOption
+global.ChallengeOptionInfo = [];
+global.ChallengeOptionInfo[ChallengeOption.StartingHearts] =	{ Label: "STARTING HEARTS",	Titles: ["4 hearts", "3 hearts", "2 hearts", "1 heart"] };
+global.ChallengeOptionInfo[ChallengeOption.HeartsMax] =			{ Label: "MAX HEARTS",		Titles: ["16 hearts", "8 hearts", "6 hearts", "5 hearts"] };
+global.ChallengeOptionInfo[ChallengeOption.Defense] =			{ Label: "MAX DEFENSE",		Titles: ["Normal", "Lvl 4 defense max", "Lvl 3 defense max", "Lvl 2 defense max"] };
+global.ChallengeOptionInfo[ChallengeOption.Darkness] =			{ Label: "DARKNESS",		Titles: ["Normal", "More dark rooms", "All dark rooms", "No lights, no lamps"] };
+global.ChallengeOptionInfo[ChallengeOption.Inventory] =			{ Label: "STARTING INV",	Titles: ["5 slots", "4 slots", "3 slots", "2 slots"] };
+global.ChallengeOptionInfo[ChallengeOption.MaxRupees] =			{ Label: "MAX RUPEES",		Titles: ["No Limit", "400 Rupees", "300 Rupees", "200 Rupees"] };
+global.ChallengeOptionInfo[ChallengeOption.ShopPrices] =		{ Label: "SHOP PRICES",		Titles: ["Normal prices", "More expensive", "Much more expensive", "5th Avenue"] };
+global.ChallengeOptionInfo[ChallengeOption.Enemies] =			{ Label: "ENEMIES",			Titles: ["Normal", "More enemies", "Much more enemies", "I am Death Incarnate!"] };
+global.ChallengeOptionInfo[ChallengeOption.Curses] =			{ Label: "CURSES",			Titles: ["Normal", "More curses", "Much more curses", "Curses Galore!"] };
 
-global.ChallengeOptionTitles[ChallengeOption.StartingHearts] = ["4 hearts", "3 hearts", "2 hearts", "1 heart"];
-global.ChallengeOptionTitles[ChallengeOption.HeartsMax] = ["16 hearts", "8 hearts", "6 hearts", "5 hearts"];
-global.ChallengeOptionTitles[ChallengeOption.Defense] = ["Normal", "Lvl 4 defense max", "Lvl 3 defense max", "Lvl 2 defense max"];
-global.ChallengeOptionTitles[ChallengeOption.Darkness] = ["Normal", "More dark rooms", "All dark rooms", "No lights, no lamps"];
-global.ChallengeOptionTitles[ChallengeOption.Inventory] = ["5 slots", "4 slots", "3 slots", "2 slots"];
-global.ChallengeOptionTitles[ChallengeOption.MaxRupees] = ["No Limit", "400 Rupees", "300 Rupees", "200 Rupees"];
-global.ChallengeOptionTitles[ChallengeOption.ShopPrices] = ["Normal prices", "More expensive", "Much more expensive", "5th Avenue"];
-global.ChallengeOptionTitles[ChallengeOption.Enemies] = ["Normal", "More enemies", "Much more enemies", "I am Death Incarnate!"];
-global.ChallengeOptionTitles[ChallengeOption.Curses] = ["Normal", "More curses", "Much more curses", "Curses Galore!"];
-
-
-global.ChallengeTitles = array_create(ChallengeCount);
-
-global.ChallengeTitles[Challenges.NoMap] = "Map isn't visible";
-global.ChallengeTitles[Challenges.NoFood] = "No food items spawned";
-global.ChallengeTitles[Challenges.WallMaster] = "A Wall Master hunts you";
+// Menu label and description of each on/off challenge, keyed by Challenges
+global.ChallengeInfo = [];
+global.ChallengeInfo[Challenges.NoMap] =		{ Label: "NO MAP",			Title: "Map isn't visible" };
+global.ChallengeInfo[Challenges.NoFood] =		{ Label: "NO FOOD ITEMS",	Title: "No food items spawned" };
+global.ChallengeInfo[Challenges.WallMaster] =	{ Label: "WALL MASTER",		Title: "A Wall Master hunts you" };
 
 global.ChallengeMaxArray_Hearts = [16, 8, 6, 5];
 #macro ChallengeMax_Hearts global.ChallengeMaxArray_Hearts[global.ChallengeOptions[ChallengeOption.HeartsMax]]
