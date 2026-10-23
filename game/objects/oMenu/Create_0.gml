@@ -145,7 +145,7 @@ Bindings_GetIcons(Input_Index.Keyboard);
 	
 Menu_Create(MenuIndex.NameSelect, "Select User",,,, "1.", "2.", "3.", "4.", "5.", "{s}Exit");
 Menu_Create(MenuIndex.NewUser, "Register Your Name", 24, false,, "");
-Menu_Create(MenuIndex.NewGame, "",,,, "New Game", "{s}Options", "{s}Stats", "{s}Back");
+Menu_Create(MenuIndex.NewGame, "",,,, "New Game", "{s}Options", "{s}Stats", "{s}Cheats", "{s}Back");
 Menu_Create(MenuIndex.ContinueGame, "",,,, "Continue", "{s}New Game", "{s}Options", "{s}Stats", "{s}Back");
 Menu_Create(MenuIndex.NewGame_Start, "Start Game", 18,,, "Start", "{s}Character", "{s}Bonus Item", "{s}Challenges", "{s}Back");
 Menu_Create(MenuIndex.Character, "Select a Character", 18, false,, "");
@@ -173,7 +173,6 @@ Menu_Create(MenuIndex.Challenges, "Enable Challenges", 18,,10,	"BACK",
 																"NO FOOD ITEMS",
 																"WALL MASTER");
 																
-																
 Menu_Create(MenuIndex.Options, "Options",,,, "Back", "{s}Controls", "{s}User");
 Menu_Create(MenuIndex.Controls, "Controls", 30,,, "Back", "{s}Gamepad", "{s}Keyboard");
 Menu_Create(MenuIndex.Controls_Gamepad, "Remap Gamepad", 25,,, "Back", "Remap", "Default");
@@ -181,6 +180,7 @@ Menu_Create(MenuIndex.Controls_Keyboard, "Remap Keyboard", 25,,, "Back", "Remap"
 Menu_Create(MenuIndex.User, "User",,,, "Back", "{s}Rename", "{s}Delete");
 Menu_Create(MenuIndex.UserDelete, "Delete?", 10,,, "No", "Yes");
 Menu_Create(MenuIndex.Stats, "Stats", 22, false,, "");
+Menu_Create(MenuIndex.Cheats, "Cheats", 25,,, "Back", "Save", "Inf. HP", "Inf. Magic", "Inf. Rupees");
 
 Win_Main_Activate(MenuWin_Main_MenuIndex);
 

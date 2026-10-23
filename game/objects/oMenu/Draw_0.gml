@@ -343,6 +343,25 @@ if(MenuWinInst_Options.visible){
 			}
 
 			break;
+			
+		case MenuIndex.Cheats:
+
+			draw_set_halign(fa_right);
+			PosX = MenuWinInst_Options.x + 140;
+			PosY = MenuWinInst_Options.y + 17;
+			
+			PosY+=16;
+			PosY+=16;
+			
+			var InfHealthEnabledStr = global.Users[global.UserIndex].Cheats.Inf_Health == false ? "OFF" : "ON";
+			var InfMagicEnabledStr = global.Users[global.UserIndex].Cheats.Inf_Magic == false ? "OFF" : "ON";
+			var InfRupeesEnabledStr = global.Users[global.UserIndex].Cheats.Inf_Rupees == false ? "OFF" : "ON";
+			
+			draw_text(PosX, PosY, InfHealthEnabledStr); PosY+=16;
+			draw_text(PosX, PosY, InfMagicEnabledStr); PosY+=16;
+			draw_text(PosX, PosY, InfRupeesEnabledStr); PosY+=16;
+			
+			break;
 		
 		case MenuIndex.Controls_Keyboard:
 		

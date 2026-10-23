@@ -221,7 +221,6 @@ switch(Menu_ActiveIndex){
 						audio_play_sound(Sound_Error, 1, false);
 						break;
 					}
-							
 					if(NameEntry_Rename){
 						global.Users[global.UserIndex].Name = NameEntry_Name;
 					}else{
@@ -318,7 +317,9 @@ if(_Input_MenuInput){
 				case MenuSelection_NewGame.Stats:
 					Win_Options_Activate(MenuIndex.Stats);	
 					break;
-						
+				case MenuSelection_NewGame.Cheats:
+					Win_Options_Activate(MenuIndex.Cheats);	
+					break;
 				case MenuSelection_NewGame.Back:
 					_Back = true;
 					break;
@@ -349,6 +350,10 @@ if(_Input_MenuInput){
 
 				case MenuSelection_ContinueGame.Stats:
 					Win_Options_Activate(MenuIndex.Stats);	
+					break;
+					
+				case MenuSelection_ContinueGame.Cheats:
+					Win_Options_Activate(MenuIndex.Cheats);	
 					break;
 						
 				case MenuSelection_ContinueGame.Back:
@@ -439,6 +444,10 @@ if(_Input_MenuInput){
 				case MenuSelection_Options.User:
 					Win_Main_Activate(MenuIndex.User);	
 					break;
+					
+				case MenuSelection_Options.Cheats:
+					Win_Options_Activate(MenuIndex.Cheats);
+					break;
 				
 			}
 			
@@ -463,7 +472,28 @@ if(_Input_MenuInput){
 			}
 			
 			break;	
-	
+		
+		case MenuIndex.Cheats:
+			switch(Selector_Index_Options){
+				case MenuSelection_Cheats.Back:
+					_Back = true;
+					break;
+				case MenuSelection_Cheats.Save:
+					User_Save();
+					_Back = true;
+					break;
+				case MenuSelection_Cheats.InfHealth:
+					global.Users[global.UserIndex].Cheats.Inf_Health = !global.Users[global.UserIndex].Cheats.Inf_Health;	
+					break;
+				case MenuSelection_Cheats.InfMagic:
+					global.Users[global.UserIndex].Cheats.Inf_Magic = !global.Users[global.UserIndex].Cheats.Inf_Magic;
+					break;
+				case MenuSelection_Cheats.InfRupees:
+					global.Users[global.UserIndex].Cheats.Inf_Rupees = !global.Users[global.UserIndex].Cheats.Inf_Rupees;
+					break;
+			}
+			
+			break;	
 		case MenuIndex.Controls_Gamepad:
 			
 			switch(Selector_Index_Options){
@@ -567,6 +597,7 @@ if(_Input_MenuBack || _Back){
 			break;
 			
 		case MenuIndex.Stats:
+		case MenuIndex.Cheats:
 			Win_Main_Activate(global.Users[global.UserIndex].SaveData == -1 ? MenuIndex.NewGame : MenuIndex.ContinueGame,, Sound_Throw);
 			break;
 			

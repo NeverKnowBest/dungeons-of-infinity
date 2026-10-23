@@ -8,6 +8,7 @@ enum MenuIndex{
 	User,
 	UserDelete,
 	Stats,
+	Cheats,
 	Character,
 	Gear,
 	Challenges,
@@ -21,6 +22,7 @@ enum MenuSelection_NewGame{
 	NewGame,
 	Options,
 	Stats,
+	Cheats,
 	Back	
 }
 
@@ -29,6 +31,7 @@ enum MenuSelection_ContinueGame{
 	NewGame,
 	Options,
 	Stats,
+	Cheats,
 	Back	
 }
 
@@ -43,7 +46,17 @@ enum MenuSelection_NewGame_Start{
 enum MenuSelection_Options{
 	Back,
 	Controls,
-	User	
+	User,
+	Cheats
+}
+
+enum MenuSelection_Cheats{
+	Back,
+	Save,
+	InfHealth,
+	InfMagic,
+	InfRupees,
+	Max
 }
 
 enum MenuSelection_Options_Controls{

@@ -36,6 +36,12 @@ function User_Create() constructor {
 	
 	Stats = array_create(global.StatCount);
 
+	Cheats = {
+		Inf_Health: false,
+		Inf_Magic: false,
+		Inf_Rupees: false,
+	};
+
 	SaveData = -1;
 
 	DungeonSeq = array_create(DungeonClasses - 1);
