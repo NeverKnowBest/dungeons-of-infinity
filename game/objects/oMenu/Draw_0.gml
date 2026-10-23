@@ -189,7 +189,7 @@ if(MenuWinInst_Options.visible){
 			
 			PosX = MenuWinInst_Options.x + 112;
 			PosY = MenuWinInst_Options.y + 14;
-			var Stats = global.Users[global.UserIndex].Stats;
+			var Stats = User.Stats;
 			
 			draw_text(PosX, PosY, "Games Played:"); PosY+=16;
 			draw_text(PosX, PosY, "Games Won:"); PosY+=16;
@@ -353,15 +353,16 @@ if(MenuWinInst_Options.visible){
 			PosY+=16;
 			
 			var InfHealthEnabledStr, InfMagicEnabledStr, InfRupeesEnabledStr, InfKeysEnabledStr, InfArrowsEnabledStr = "OFF";
+			var User = global.Users[global.UserIndex];
 			try {
-				InfHealthEnabledStr = global.Users[global.UserIndex].Cheats.Inf_Health == false ? "OFF" : "ON";
-				InfMagicEnabledStr = global.Users[global.UserIndex].Cheats.Inf_Magic == false ? "OFF" : "ON";
-				InfRupeesEnabledStr = global.Users[global.UserIndex].Cheats.Inf_Rupees == false ? "OFF" : "ON";
-				InfKeysEnabledStr = global.Users[global.UserIndex].Cheats.Inf_Keys == false ? "OFF" : "ON";
-				InfArrowsEnabledStr = global.Users[global.UserIndex].Cheats.Inf_Arrows == false ? "OFF" : "ON";
+				InfHealthEnabledStr = User.Cheats.Inf_Health == false ? "OFF" : "ON";
+				InfMagicEnabledStr = User.Cheats.Inf_Magic == false ? "OFF" : "ON";
+				InfRupeesEnabledStr = User.Cheats.Inf_Rupees == false ? "OFF" : "ON";
+				InfKeysEnabledStr = User.Cheats.Inf_Keys == false ? "OFF" : "ON";
+				InfArrowsEnabledStr = User.Cheats.Inf_Arrows == false ? "OFF" : "ON";
 			} catch (_exception) {
 				// Cheat settings were not defined: Re-initialize all of them
-				Init_Cheats_Struct();
+				Init_Cheats_Struct(User);
 			}
 			
 			draw_text(PosX, PosY, InfHealthEnabledStr); PosY+=16;
@@ -369,6 +370,7 @@ if(MenuWinInst_Options.visible){
 			draw_text(PosX, PosY, InfRupeesEnabledStr); PosY+=16;
 			draw_text(PosX, PosY, InfKeysEnabledStr); PosY+=16;
 			draw_text(PosX, PosY, InfArrowsEnabledStr); PosY+=16;
+			
 			
 			break;
 		

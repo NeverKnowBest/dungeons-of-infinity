@@ -151,7 +151,7 @@ function User_VerifyIntegrity(){
 	
 	
 	// Cheats initialization
-	Init_Cheats_Struct();
+	Init_Cheats_Struct(User);
 	
 	User_Save();
 	

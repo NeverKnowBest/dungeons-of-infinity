@@ -27,8 +27,9 @@ function Init_Gameplay_Cheats(){
 	}
 }
 
-function Init_Cheats_Struct() {
-	var _CheatsStruct = global.Users[global.UserIndex].Cheats;
+function Init_Cheats_Struct(_User) {
+	if(!variable_struct_exists(_User, "Cheats")) variable_struct_set(_User, "Cheats", {});
+	var _CheatsStruct = _User.Cheats;
 	
 	if(!variable_struct_exists(_CheatsStruct, "Inf_Health")) variable_struct_set(_CheatsStruct, "Inf_Health", false);
 	if(!variable_struct_exists(_CheatsStruct, "Inf_Magic")) variable_struct_set(_CheatsStruct, "Inf_Magic", false);
