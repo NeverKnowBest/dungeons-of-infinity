@@ -29,7 +29,7 @@ if(MenuWin_Main_Shift){
 
 if(!Menu_Active) exit;
 
-//if(global.DebugEnabled){
+//if(DEBUG){
 //	if(!Bindings_Remap && keyboard_check_pressed(vk_escape)) game_end();
 //}
 

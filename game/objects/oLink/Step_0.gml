@@ -574,7 +574,7 @@ PushingDirY = 0;
 
 
 var _checkwalls = (vx != 0);
-if(global.DebugEnabled){
+if(DEBUG){
 	if(global.Clip) _checkwalls = false;
 }
 if(_checkwalls){
@@ -601,7 +601,7 @@ x += vx;
 
 
 _checkwalls = (vy != 0);
-if(global.DebugEnabled){
+if(DEBUG){
 	if(global.Clip) _checkwalls = false;
 }
 if(_checkwalls){

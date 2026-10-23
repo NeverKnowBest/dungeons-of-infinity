@@ -67,7 +67,7 @@ function Cam_UpdatePos(){
 	
 	Cam_SetPos(oLink.x - W_2, oLink.y - H_2 - 22);
 	
-	if(global.DebugEnabled){
+	if(DEBUG){
 		if(!global.Clip){
 			if(X < global.CurrentRoom.x) X = global.CurrentRoom.x;
 			if(Y < global.CurrentRoom.y) Y = global.CurrentRoom.y;

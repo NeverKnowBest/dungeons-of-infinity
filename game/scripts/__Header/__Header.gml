@@ -12,7 +12,7 @@
 #macro VERSION "1.2.1"
 
 
-#macro global.DebugEnabled true
+#macro DEBUG false
 
 
 

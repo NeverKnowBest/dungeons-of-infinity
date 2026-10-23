@@ -206,7 +206,7 @@ if(global.ArcadeVP_Show){
 
 
 
-if(global.DebugEnabled){
+if(DEBUG){
 
 	if(Stats){
 	

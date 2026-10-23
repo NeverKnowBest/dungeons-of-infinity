@@ -1,4 +1,4 @@
-if(global.DebugEnabled){
+if(DEBUG){
 	Stats = false;
 	FPS_Real = 0;
 	FPS_Game = 0;
