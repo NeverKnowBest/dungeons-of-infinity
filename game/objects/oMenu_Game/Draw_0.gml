@@ -8,93 +8,70 @@ draw_set_color(#FFFFFF);
 
 draw_sprite_stretched(sprite_index, 0, FrameX, FrameY, FrameW, FrameH);
 
+var _Page = Menu_ActiveIndex;
+var _Config = Menu_Config[_Page];
+var _Centered = _Config[$ "Centered"] ?? false;
+var _Changed = Menu_HasChanges(_Page);
+// The frame's border is 15px on every side (nine-slice), so values and scroll arrows stay a few pixels inside it
+var _ValueRight = FrameX + FrameW - 20;
 
+// Page title (the quit prompt, "Options", "Cheats"...), flagged while there are unsaved changes
+var _Title = Menu_Title[_Page];
+if(_Title != ""){
+	draw_set_font(global.MenuFont);
+	draw_set_halign(fa_center);
+	draw_text(FrameCentre, FrameY + (_Config[$ "TitleY"] ?? 8), _Changed ? _Title + " (unsaved)" : _Title);
+}
 
-var TextPosX, TextPosY, SelectorX;
-for(var i = 0; i < MenuItems[Index]; i++){
-	
+var _LastRowY = FrameY;
+for(var i = 0; i < Menu_Count[_Page]; i++){
+
+	if(!Menu_IsRowVisible(_Page, i)) continue;
+
+	var _Row = Menu[_Page][i];
+	var _Text = Menu_RowLabel(_Row, _Changed);
+	var _TextY = FrameY + Menu_RowY(_Page, i);
+	_LastRowY = _TextY;
+
 	draw_set_font(global.MenuFont_Innactive);
-	
-	var Text = MenuText[Index][i];
-	
-	var TextW = string_width(Text);
-	var TextH = string_height(Text);
-	
-	switch(Index){
-		case MenuSelection_GameMenuID.Main:
-	
-			draw_set_halign(fa_center);
-			TextPosX = FrameCentre;
-			TextPosY = FrameY + 24 + (i * 20);
-			SelectorX = FrameCentre - (TextW / 2) - 2;
-			
-			break;
-	
-		case MenuSelection_GameMenuID.Options:
+	var _TextW = string_width(_Text);
+	var _TextH = string_height(_Text);
 
-			draw_set_halign(fa_left);
-			TextPosX = FrameX + 20;	
-			TextPosY = FrameY + 18 + (i * 18);
-			SelectorX = FrameX + 18;
-
-			break;
-		
-		case MenuSelection_GameMenuID.Quit:
-			draw_set_halign(fa_center);
-			TextPosX = FrameCentre;
-			TextPosY = FrameY + 48 + (i * 20);
-			SelectorX = FrameCentre - (TextW / 2) - 2;			
-			break;
+	var _TextX, _SelectorX;
+	if(_Centered){
+		draw_set_halign(fa_center);
+		_TextX = FrameCentre;
+		_SelectorX = FrameCentre - (_TextW / 2) - 2;
+	}else{
+		draw_set_halign(fa_left);
+		_TextX = FrameX + 20;
+		_SelectorX = FrameX + 18;
 	}
 
 	if(i == SelectorPos){
 		draw_set_color(#284028);
 		draw_set_font(global.MenuFont);
-		var SelectorY = TextPosY - 2;
-		var SelectorX2 = SelectorX + TextW + 3;
-		var SelectorY2 = SelectorY + TextH + 2;
-		draw_rectangle(SelectorX, SelectorY, SelectorX2, SelectorY2, false)
+		draw_rectangle(_SelectorX, _TextY - 2, _SelectorX + _TextW + 3, _TextY + _TextH, false);
 	}
-	
-	draw_set_color(#FFFFFF);
-	
-	draw_text(TextPosX, TextPosY, Text);
 
-	if(Index == MenuSelection_GameMenuID.Quit){
-		draw_set_font(global.MenuFont);
-		switch(QuitTo){
-			case 0:
-				draw_text(TextPosX, FrameY + 24, "New Game?");
-				break;
-				
-			case 1:
-				draw_text(TextPosX, FrameY + 24, "Quit to Title?");
-				break;
-				
-			case 2:
-				draw_text(TextPosX, FrameY + 24, "Quit to Desktop?");
-				break;
-		}
-		
-	}
-	
+	draw_set_color(#FFFFFF);
+	draw_text(_TextX, _TextY, _Text);
 	draw_set_halign(fa_left);
 
-	if(Index == MenuSelection_GameMenuID.Options && i > 0){
-		
-		var _Pref = global.Users[global.UserIndex].Prefs[i - 1];
-		if(!_Pref){
+	// Toggles and sliders: value on the right edge, greyed out when off
+	if(Menu_RowHasValue(_Row)){
+		if(!_Row.Slider && !_Row.Get(_Row)){
 			draw_set_font(global.MenuFont_Innactive);
 			draw_set_color(#404040);
 		}
-		
-		draw_text(FrameCentre + 28, TextPosY, _Pref ? "On" : "Off");
-	
+		Menu_DrawRowValue(_Row, _TextX + _TextW, _ValueRight, _TextY);
 	}
-	
+
 	draw_set_color(#FFFFFF);
-	
+
 }
+
+Menu_DrawScrollArrows(_Page, _ValueRight - 4, FrameY + Menu_RowY(_Page, Menu_Scroll[_Page]), _LastRowY + 18);
 
 draw_set_font(global.Font_Small);
 draw_set_halign(fa_center);

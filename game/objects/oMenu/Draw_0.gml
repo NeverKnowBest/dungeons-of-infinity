@@ -26,7 +26,7 @@ for(var i = 0; i < Menu_Count[MenuWin_Main_MenuIndex]; i++){
 	draw_text(MenuWinInst_Main.x + 32, _RowY, Menu_RowLabel(_Row, _MainChanged));
 	if(_Row.OnDraw != undefined) _Row.OnDraw(_Row, MenuWinInst_Main.x, _RowY);
 }
-Menu_DrawScrollArrows(MenuWin_Main_MenuIndex, MenuWinInst_Main);
+Menu_DrawScrollArrows(MenuWin_Main_MenuIndex, MenuWinInst_Main.x + MenuWinInst_Main.W - 16, MENU_TOP_Y, MenuWinInst_Main.y + MenuWinInst_Main.H - 22);
 		
 
 //Draw Options menu
@@ -50,14 +50,16 @@ if(MenuWinInst_Options.visible){
 				var _Row = Menu[_Page][i];
 				var _RowY = Menu_RowY(_Page, i);
 				
+				var _Label = Menu_RowLabel(_Row, _Changed);
 				draw_set_font(Menu_Font[_Page]);
-				draw_text(_WinX + 32, _RowY + Menu_TextOffsetY[_Page], Menu_RowLabel(_Row, _Changed));
+				draw_text(_WinX + 32, _RowY + Menu_TextOffsetY[_Page], _Label);
+				var _LabelRight = _WinX + 32 + string_width(_Label);
 				draw_set_font(global.MenuFont);
 				
-				if(Menu_RowHasValue(_Row)) Menu_DrawRowValue(_Row, _WinX, MenuWinInst_Options.W, _RowY);
+				if(Menu_RowHasValue(_Row)) Menu_DrawRowValue(_Row, _LabelRight, _WinX + MenuWinInst_Options.W - 16, _RowY);
 				if(_Row.OnDraw != undefined) _Row.OnDraw(_Row, _WinX, _RowY);
 			}
-			Menu_DrawScrollArrows(_Page, MenuWinInst_Options);
+			Menu_DrawScrollArrows(_Page, _WinX + MenuWinInst_Options.W - 16, MENU_TOP_Y, MenuWinInst_Options.y + MenuWinInst_Options.H - 22);
 			
 			var _Selected = Menu_Count[_Page] > 0 ? Menu[_Page][Selector_Index_Options] : undefined;
 			if(_Selected != undefined && _Selected.Title != undefined) _OptionsTitle = _Selected.Title(_Selected);
