@@ -15,7 +15,7 @@ if(DB_Started){
 
 			case 1:
 				
-				oHUD.AddRupees -= oLink.ShopItemLook.Price_Modified;
+				RupeesAdd(-oLink.ShopItemLook.Price_Modified);
 
 				if(Inventory_ItemIsEquiped){
 					if(Inventory_EquipedItem.ItemClass == ItemClass.Coupon){

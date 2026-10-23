@@ -26,7 +26,7 @@ switch(State){
 		
 		audio_stop_sound(WinSound);
 		
-		global.Inventory.ItemData[ItemClass.Rupee].Amount -= (Bet + 1);
+		RupeesAdd(-(Bet + 1), false);
 
 		WinAmount = 0;
 		
@@ -148,7 +148,7 @@ switch(State){
 					if(ReelSpinResult != MothulaSlotSymbol.None) audio_play_sound(WinSound, 1, false);
 						
 					WinAmount = WinMul[ReelSpinResult] * (Bet + 1);
-					global.Inventory.ItemData[ItemClass.Rupee].Amount += WinAmount;
+					RupeesAdd(WinAmount, false);
 
 					GameReady = false;
 					alarm[4] = GameReadyDelay;	

@@ -1250,7 +1250,7 @@ function Item_Consume(_ItemClass, _ItemIndex = 0, _Amount = 1){
 			if(Curse_Check(CurseEffects.RupeesNoValue) && !global.CurseTreasure_Rupees) RupeeAmount = 0;			
 			global.CurseTreasure_Rupees = false;
 			
-			oHUD.AddRupees += RupeeAmount; 
+			RupeesAdd(RupeeAmount);
 					
 			global.StatsToAdd[Stat.Rupees] += RupeeAmount;
 					
@@ -1909,6 +1909,27 @@ function MagicUse(Amount){
 	_Magic.Amount -= Amount;
 	return Amount;
 		
+}
+
+/// Every rupee gain or loss goes through here.
+/// @param {Real} _Amount Amount of rupees to gain or lose.
+/// @param {Bool} _Roll If true, the HUD counts the total towards the change (pickups, shops). Otherwise, the total changes at once (arcade bets, theft).
+function RupeesAdd(_Amount, _Roll = true){
+	
+	// Inf. Rupees cheat
+	// Whatever was bought/won/lost still happens, but the total doesn't move
+	if(Cheat_On("Cheat_Inf_Rupees")){
+		global.Inventory.ItemData[ItemClass.Rupee].Amount = CHEAT_INF_RUPEES;
+		return;
+	}
+	
+	if(_Roll){
+		oHUD.AddRupees += _Amount;
+	}else{
+		var _Rupees = global.Inventory.ItemData[ItemClass.Rupee];
+		_Rupees.Amount = max(_Rupees.Amount + _Amount, 0);
+	}
+	
 }
 
 function HeartPieceAdd(){

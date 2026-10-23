@@ -172,8 +172,8 @@ if(DEBUG){
 		if(global.Inventory.ItemData[ItemClass.Tunic].Index < 0) global.Inventory.ItemData[ItemClass.Tunic].Index = 3;
 	}
 	
-	if(keyboard_check(vk_home)) global.Inventory.ItemData[ItemClass.Rupee].Amount += 5;
-	if(keyboard_check(vk_end)) global.Inventory.ItemData[ItemClass.Rupee].Amount -= 5;
+	if(keyboard_check(vk_home)) RupeesAdd(5, false);
+	if(keyboard_check(vk_end)) RupeesAdd(-5, false);
 
 	if(keyboard_check_pressed(vk_pageup)) HealthAdd(0.25);
 	if(keyboard_check_pressed(vk_pagedown)) HealthAdd(-0.25);

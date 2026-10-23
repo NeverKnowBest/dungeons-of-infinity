@@ -145,7 +145,7 @@ switch(global.ItemData[ItemChoices_Class].Type){
 				with(ItemInst){
 					Setup = false;
 					Rupee_Init(Amount);
-					global.Inventory.ItemData[ItemClass.Rupee].Amount -= Amount;
+					RupeesAdd(-Amount, false);
 				}					
 				break;	
 					

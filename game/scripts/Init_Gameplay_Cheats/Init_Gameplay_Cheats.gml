@@ -42,9 +42,10 @@ function Init_Gameplay_Cheats(){
 		global.Inventory.ItemData[ItemClass.Magic].Amount = MAGICAMOUNT_MAX;
 	}
 	
-	// Inf. Rupees
-	if (global.Users[global.UserIndex].Cheats.Inf_Rupees){
-		global.Inventory.ItemData[ItemClass.Rupee].Amount = 9999;
+	// Inf. Rupees: transactions still happen, but RupeesAdd keeps the total here
+	if (Cheat_On("Cheat_Inf_Rupees")){
+		global.Inventory.ItemData[ItemClass.Rupee].Amount = CHEAT_INF_RUPEES;
+		oHUD.AddRupees = 0;
 	}
 	
 	// Inf. Keys

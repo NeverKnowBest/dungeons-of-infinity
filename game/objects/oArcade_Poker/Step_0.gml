@@ -25,7 +25,7 @@ switch(State){
 		
 	case ArcadeState.GameStartInit:
 		audio_stop_sound(WinSound);
-		global.Inventory.ItemData[ItemClass.Rupee].Amount -= (Bet + 1);
+		RupeesAdd(-(Bet + 1), false);
 		Poker_InitDeck();
 
 		//Poker_MoveCardToFront(Poker_CardIndex(Poker_RealValueToIndex(14), PokerSuit.Spade));
