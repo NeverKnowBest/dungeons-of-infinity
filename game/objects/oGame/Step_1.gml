@@ -67,9 +67,9 @@ if(NormalLinkState){
 	}	
 }
 
-//if(global.DebugEnabled) exit;
+//if(DEBUG) exit;
 
-if(global.DebugEnabled){
+if(DEBUG){
 
 	
 	if(Restart){
