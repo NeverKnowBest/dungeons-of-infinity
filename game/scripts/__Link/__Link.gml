@@ -538,12 +538,17 @@ function UpdateState(NewState, var1 = undefined){
 			break;
 			
 		case LinkState.Bow:
-
+			var _ConsumedArrowAmount = -1;
+			
+			// Inf. Arrows Cheat
+			if (global.Users[global.UserIndex].Cheats.Inf_Arrows)
+				_ConsumedArrowAmount = 0;
+			
 			ObjSetImageSpeed(1);
 			if(global.Inventory.ItemData[ItemClass.ArrowQuiver].Owns[0])
-				Item_Consume(ItemClass.Arrows, 0, -1);
+				Item_Consume(ItemClass.Arrows, 0, _ConsumedArrowAmount);
 			else
-				Inventory_Add(ItemClass.Arrows, 0, -1, Inventory_FindItem(ItemClass.Arrows));
+				Inventory_Add(ItemClass.Arrows, 0, _ConsumedArrowAmount, Inventory_FindItem(ItemClass.Arrows));
 			
 			Bow_Set();
 

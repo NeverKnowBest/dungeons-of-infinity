@@ -57,6 +57,7 @@ enum MenuSelection_Cheats{
 	InfMagic,
 	InfRupees,
 	InfKeys,
+	InfArrows,
 	Max
 }
 

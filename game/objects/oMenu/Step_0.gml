@@ -472,8 +472,8 @@ if(_Input_MenuInput){
 			}
 			
 			break;	
-		
 		case MenuIndex.Cheats:
+			var _Cheats = global.Users[global.UserIndex].Cheats;
 			switch(Selector_Index_Options){
 				case MenuSelection_Cheats.Back:
 					_Back = true;
@@ -483,20 +483,23 @@ if(_Input_MenuInput){
 					_Back = true;
 					break;
 				case MenuSelection_Cheats.InfHealth:
-					global.Users[global.UserIndex].Cheats.Inf_Health = !global.Users[global.UserIndex].Cheats.Inf_Health;	
+					_Cheats.Inf_Health = !_Cheats.Inf_Health;	
 					break;
 				case MenuSelection_Cheats.InfMagic:
-					global.Users[global.UserIndex].Cheats.Inf_Magic = !global.Users[global.UserIndex].Cheats.Inf_Magic;
+					_Cheats.Inf_Magic = !_Cheats.Inf_Magic;
 					break;
 				case MenuSelection_Cheats.InfRupees:
-					global.Users[global.UserIndex].Cheats.Inf_Rupees = !global.Users[global.UserIndex].Cheats.Inf_Rupees;
+					_Cheats.Inf_Rupees = !_Cheats.Inf_Rupees;
 					break;
 				case MenuSelection_Cheats.InfKeys:
-					global.Users[global.UserIndex].Cheats.Inf_Keys = !global.Users[global.UserIndex].Cheats.Inf_Keys;
+					_Cheats.Inf_Keys = !_Cheats.Inf_Keys;
+					break;
+				case MenuSelection_Cheats.InfArrows:
+					_Cheats.Inf_Arrows = !_Cheats.Inf_Arrows;
 					break;
 			}
 			
-			break;	
+			break;
 		case MenuIndex.Controls_Gamepad:
 			
 			switch(Selector_Index_Options){
@@ -574,9 +577,6 @@ if(_Input_MenuInput){
 			break;
 					
 	}
-	
-		
-
 	
 }
 

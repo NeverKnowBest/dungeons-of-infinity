@@ -1896,6 +1896,7 @@ function MagicAdd(Amount){
 function MagicUse(Amount){
 	if (global.Users[global.UserIndex].Cheats.Inf_Magic){
 		if (Amount < 0)
+		if (Amount > 0)
 			exit;
 	}
 	

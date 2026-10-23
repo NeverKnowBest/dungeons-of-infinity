@@ -182,6 +182,13 @@ Menu_Create(MenuIndex.UserDelete, "Delete?", 10,,, "No", "Yes");
 Menu_Create(MenuIndex.Stats, "Stats", 22, false,, "");
 Menu_Create(MenuIndex.Cheats, "Cheats", 25,,, "Back", "Save", "Inf. HP", "Inf. Magic", "Inf. Rupees", "Inf. Keys");
 
+Menu_Create(MenuIndex.Cheats, "Cheats", 25,,, "Back", "Save",
+	"Inf. HP",
+	"Inf. Magic",
+	"Inf. Rupees",
+	"Inf. Keys",
+	"Inf. Arrows");
+
 Win_Main_Activate(MenuWin_Main_MenuIndex);
 
 
