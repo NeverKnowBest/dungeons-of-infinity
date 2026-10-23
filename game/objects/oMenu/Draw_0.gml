@@ -17,21 +17,16 @@ var _OptionsTitle = Menu_Title[MenuWin_Options_MenuIndex];
 
 draw_set_font(MenuWin_Main_Active ? global.MenuFont : global.MenuFont_Innactive);
 
+var _MainChanged = Menu_HasChanges(MenuWin_Main_MenuIndex);
+if(_MainChanged) _MainTitle += " (unsaved)";
 for(var i = 0; i < Menu_Count[MenuWin_Main_MenuIndex]; i++){
-	
-	draw_text(MenuWinInst_Main.x + 32, Menu_Y[MenuWin_Main_MenuIndex][i], Menu[MenuWin_Main_MenuIndex][i]);
-	
-	switch(MenuWin_Main_MenuIndex){
-		case MenuIndex.NameSelect:
-				if(i < global.MaxUsers) draw_text(MenuWinInst_Main.x + 43, Menu_Y[MenuWin_Main_MenuIndex][i], global.Users[i].Name);
-			break;
-	
-	}
-	
-	
-	
-	
+	if(!Menu_IsRowVisible(MenuWin_Main_MenuIndex, i)) continue;
+	var _Row = Menu[MenuWin_Main_MenuIndex][i];
+	var _RowY = Menu_RowY(MenuWin_Main_MenuIndex, i);
+	draw_text(MenuWinInst_Main.x + 32, _RowY, Menu_RowLabel(_Row, _MainChanged));
+	if(_Row.OnDraw != undefined) _Row.OnDraw(_Row, MenuWinInst_Main.x, _RowY);
 }
+Menu_DrawScrollArrows(MenuWin_Main_MenuIndex, MenuWinInst_Main.x + MenuWinInst_Main.W - 16, MENU_TOP_Y, MenuWinInst_Main.y + MenuWinInst_Main.H - 22);
 		
 
 //Draw Options menu
@@ -39,119 +34,35 @@ for(var i = 0; i < Menu_Count[MenuWin_Main_MenuIndex]; i++){
 draw_set_font(global.MenuFont);
 
 
-var PosX, PosY, _ChallengeIndex;
+var PosX, PosY;
 if(MenuWinInst_Options.visible){
 	
 	switch(MenuWin_Options_MenuIndex){
 		
+		// Pages built from rows: label, then the row's value/slider and any extra icons it draws
 		default:
-			
-			for(var i = 0; i < Menu_Count[MenuWin_Options_MenuIndex]; i++){
+			var _Page = MenuWin_Options_MenuIndex;
+			var _WinX = MenuWinInst_Options.x;
+			var _Changed = Menu_HasChanges(_Page);
+			if(_Changed) _OptionsTitle += " (unsaved)";
+			for(var i = 0; i < Menu_Count[_Page]; i++){
+				if(!Menu_IsRowVisible(_Page, i)) continue;
+				var _Row = Menu[_Page][i];
+				var _RowY = Menu_RowY(_Page, i);
 				
-				if(MenuWin_Options_MenuIndex == MenuIndex.Settings && (i < Settings_Scroll || i >= Settings_Scroll + SETTINGS_VISIBLE_ROWS)) continue;
-				var _OffsetY = 0;
-				
-				switch(MenuWin_Options_MenuIndex){
-					case MenuIndex.NewGame_Start:
-						//character
-						if(i == 1) draw_sprite(global.CharacterSprites, global.LinkCharacterIndex, MenuWinInst_Options.x + 94, Menu_Y[MenuWin_Options_MenuIndex][i] - 6);
-						//starting gear
-						if(i == 2){
-							var _SlotIndex = global.StartingGear * 4;
-							var _SprIndex = global.GearSprites[_SlotIndex];
-							var _ImgIndex = global.GearSprites[_SlotIndex + 1];
-							var _SprOffsetX = 0;//global.GearSprites[_SlotIndex + 2];
-							var _SprOffsetY = global.GearSprites[_SlotIndex + 3];
-							var _PosX = MenuWinInst_Options.x + 102 + _SprOffsetX;
-							var _PosY = Menu_Y[MenuWin_Options_MenuIndex][i] + 17 + _SprOffsetY;
-							draw_sprite(_SprIndex, _ImgIndex, _PosX, _PosY);
-							switch(_SprIndex){
-								case sItem_Rupee:
-									draw_set_font(global.Font_ItemValues);
-									draw_text(_PosX - 1, _PosY - 6, string(StartingGear_Rupees))
-									draw_set_font(global.MenuFont);
-									break;
-								//case sItem_BagSlot:
-								//	draw_set_font(global.Font_ItemValues);
-								//	draw_text(_PosX + 2, _PosY - 7, "+")
-								//	draw_set_font(global.MenuFont);
-								//	break;
-								case sItem_Rod:
-									draw_set_font(global.Font_ItemValues);
-									draw_text(_PosX, _PosY - 6, string(global.MaxRodCharge[Rod.Stone]))
-									draw_set_font(global.MenuFont);
-									break;
-								case sItem_Orb:
-									draw_set_font(global.Font_ItemValues);
-									draw_text(_PosX + 3, _PosY - 6, string(StartingGear_Orbs))
-									draw_set_font(global.MenuFont);
-									break;
-								
-							}
-
-						}
-						if(i == 3){
-							
-							var _DrawSkull = false;
-							
-							for(var _ChallengeOptionIndex = 0; _ChallengeOptionIndex < ChallengeOptionCount; _ChallengeOptionIndex++){
-								if(global.ChallengeOptions[_ChallengeOptionIndex] > 0){
-									_DrawSkull = true;
-									break;									
-								}
-							}
-							
-							if(!_DrawSkull){
-								for(_ChallengeIndex = 0; _ChallengeIndex < ChallengeCount; _ChallengeIndex++){
-									if(global.Challenges[_ChallengeIndex]){
-										_DrawSkull = true;
-										break;
-									}
-								}							
-							}
-							
-							if(_DrawSkull){
-								var _PosX = MenuWinInst_Options.x + 95;
-								var _PosY = Menu_Y[MenuWin_Options_MenuIndex][i] + 1;
-								draw_sprite(sLargeMap_Boss, 0, _PosX, _PosY);								
-							}
-						}
-						break;
-					
-					//case MenuIndex.Gear:
-					//	draw_set_font(global.Font_Small);
-					//	break;
-
-					case MenuIndex.Challenges:
-						draw_set_font(global.Font_Small);
-						_OffsetY = 4;
-						break;
-					
-				}
-				
-				draw_text(MenuWinInst_Options.x + 32, Menu_Y[MenuWin_Options_MenuIndex][i] + _OffsetY, Menu[MenuWin_Options_MenuIndex][i]);
-				if(MenuWin_Options_MenuIndex == MenuIndex.Settings && i > 0){
-					draw_set_halign(fa_right);
-					draw_text(MenuWinInst_Options.x + MenuWinInst_Options.W - 16, Menu_Y[MenuWin_Options_MenuIndex][i], Settings_Value(i));
-					draw_set_halign(fa_left);
-					if(Settings_IsSlider(i)){
-						var _BX = MenuWinInst_Options.x + MenuWinInst_Options.W - 16 - 34 - 46;
-						var _BY = Menu_Y[MenuWin_Options_MenuIndex][i] + 6;
-						draw_set_color(c_dkgray); draw_rectangle(_BX, _BY, _BX + 40, _BY + 3, false);
-						draw_set_color(c_white); draw_rectangle(_BX, _BY, _BX + round(40 * Settings_Fraction(i)), _BY + 3, false);
-						draw_rectangle(_BX + round(40 * Settings_Fraction(i)) - 1, _BY - 2, _BX + round(40 * Settings_Fraction(i)) + 1, _BY + 5, false);
-					}
-				}
-				
+				var _Label = Menu_RowLabel(_Row, _Changed);
+				draw_set_font(Menu_Font[_Page]);
+				draw_text(_WinX + 32, _RowY + Menu_TextOffsetY[_Page], _Label);
+				var _LabelRight = _WinX + 32 + string_width(_Label);
 				draw_set_font(global.MenuFont);
 				
+				if(Menu_RowHasValue(_Row)) Menu_DrawRowValue(_Row, _LabelRight, _WinX + MenuWinInst_Options.W - 16, _RowY);
+				if(_Row.OnDraw != undefined) _Row.OnDraw(_Row, _WinX, _RowY);
 			}
-			if(MenuWin_Options_MenuIndex == MenuIndex.Settings){
-				var _AX = MenuWinInst_Options.x + MenuWinInst_Options.W - 16;
-				draw_set_color(c_white);
-				if(Settings_Scroll > 0) draw_triangle(_AX - 4, 66, _AX + 4, 66, _AX, 60, false);
-				if(Settings_Scroll + SETTINGS_VISIBLE_ROWS < Menu_Count[MenuIndex.Settings]) draw_triangle(_AX - 4, 190, _AX + 4, 190, _AX, 196, false);
-			}
+			Menu_DrawScrollArrows(_Page, _WinX + MenuWinInst_Options.W - 16, MENU_TOP_Y, MenuWinInst_Options.y + MenuWinInst_Options.H - 22);
+			
+			var _Selected = Menu_Count[_Page] > 0 ? Menu[_Page][Selector_Index_Options] : undefined;
+			if(_Selected != undefined && _Selected.Title != undefined) _OptionsTitle = _Selected.Title(_Selected);
 			break;
 		
 		case MenuIndex.NewUser:
@@ -208,7 +119,7 @@ if(MenuWinInst_Options.visible){
 			
 			PosX = MenuWinInst_Options.x + 112;
 			PosY = MenuWinInst_Options.y + 14;
-			var Stats = global.Users[global.UserIndex].Stats;
+			var Stats = User.Stats;
 			
 			draw_text(PosX, PosY, "Games Played:"); PosY+=16;
 			draw_text(PosX, PosY, "Games Won:"); PosY+=16;
@@ -236,98 +147,6 @@ if(MenuWinInst_Options.visible){
 	//extra drawing stuff. If menu has to be drawn, plus other things need to be drawn too
 	switch(MenuWin_Options_MenuIndex){
 	
-		case MenuIndex.Gear:
-			//draw_set_halign(fa_center);
-			//draw_set_font(global.FontNumbers);
-
-			for(var _ItemIndex = 0; _ItemIndex < GearItems; _ItemIndex++){
-				var _SlotIndex = _ItemIndex * 4;
-				var _SprOffsetX = global.GearSprites[_SlotIndex + 2];
-				var _SprOffsetY = global.GearSprites[_SlotIndex + 3];
-				var _PosX = MenuWinInst_Options.x + 123 + _SprOffsetX;
-				var _PosY = MenuWinInst_Options.y + 35 + (_ItemIndex * 16) + _SprOffsetY;
-				var _SprIndex = global.GearSprites[_SlotIndex];
-				var _ImgIndex = global.GearSprites[_SlotIndex + 1];				
-				draw_sprite(_SprIndex, _ImgIndex, _PosX, _PosY);
-				switch(_ItemIndex){
-					case StartingGear.Rupees:
-						draw_set_font(global.Font_ItemValues);
-						draw_text(_PosX - 1, _PosY - 6, string(StartingGear_Rupees))
-						draw_set_font(global.MenuFont);
-						break;
-					//case StartingGear.Inventory:
-					//	draw_set_font(global.Font_ItemValues);
-					//	draw_text(_PosX + 2, _PosY - 7, "+")
-					//	draw_set_font(global.MenuFont);
-					//	break;
-					case StartingGear.Rod:
-						draw_set_font(global.Font_ItemValues);
-						draw_text(_PosX, _PosY - 6, string(global.MaxRodCharge[Rod.Stone]))
-						draw_set_font(global.MenuFont);
-						break;
-					case StartingGear.Orbs:
-						draw_set_font(global.Font_ItemValues);
-						draw_text(_PosX + 3, _PosY - 6, string(StartingGear_Orbs))
-						draw_set_font(global.MenuFont);
-						break;
-
-							
-				}
-				
-			}
-			//draw_set_halign(fa_left);
-			//draw_set_font(global.MenuFont);
-			break;
-			
-		case MenuIndex.Challenges:
-			
-			var _X = MenuWinInst_Options.x + 103;
-			var _Y = MenuWinInst_Options.y + 30;
-			for(var _ChallengeOptionIndex = 0; _ChallengeOptionIndex < ChallengeOptionCount; _ChallengeOptionIndex++){
-				
-				switch(_ChallengeOptionIndex){
-					
-					case ChallengeOption.StartingHearts:
-					case ChallengeOption.HeartsMax:
-					case ChallengeOption.Defense:
-					case ChallengeOption.Inventory:
-						draw_sprite_stretched(sChallengeOptions, _ChallengeOptionIndex, _X + 0.5, _Y + 1, 8 * (4 - global.ChallengeOptions[_ChallengeOptionIndex]), 8);
-						break;
-					
-					case ChallengeOption.MaxRupees:
-						draw_sprite_stretched(sChallengeOptions, _ChallengeOptionIndex, _X + 1, _Y + 1, 8 * (4 - global.ChallengeOptions[_ChallengeOptionIndex]), 8);
-						break;
-						
-					case ChallengeOption.ShopPrices:
-						draw_sprite_stretched(sChallengeOptions, _ChallengeOptionIndex, _X + 1, _Y + 1, 8 * (global.ChallengeOptions[_ChallengeOptionIndex] + 1), 8);
-						break;
-						
-					case ChallengeOption.Darkness:
-						if(global.ChallengeOptions[_ChallengeOptionIndex] == ChallengeOption_Darkness.NoLights){
-							draw_sprite(sChallengeOptions, 9, _X + 0.5, _Y + 1);
-						}else{
-							draw_sprite_stretched(sChallengeOptions, _ChallengeOptionIndex, _X + 0.5, _Y + 1, 8 * (4 - global.ChallengeOptions[_ChallengeOptionIndex]), 8);
-						}						
-						break;
-					
-					default:
-						draw_sprite_stretched(sChallengeOptions, _ChallengeOptionIndex, _X + 0.5, _Y + 1, 8 * (global.ChallengeOptions[_ChallengeOptionIndex] + 1), 8);
-						break;
-				}
-				_Y += 10;
-			}			
-			for(_ChallengeIndex = 0; _ChallengeIndex < ChallengeCount; _ChallengeIndex++){
-				draw_sprite(global.Challenges[_ChallengeIndex] ? sCheckbox : sCheckBox_Innactive, global.Challenges[_ChallengeIndex] ? 1 : 0, _X, _Y);
-				_Y += 10;
-			}
-			if(Selector_Index_Options > 0 && Selector_Index_Options <= ChallengeOptionCount){
-				var _OptionIndex = Selector_Index_Options - 1;
-				_OptionsTitle = global.ChallengeOptionTitles[_OptionIndex][global.ChallengeOptions[_OptionIndex]];
-			}else if(Selector_Index_Options > ChallengeOptionCount){
-				_OptionsTitle = global.ChallengeTitles[Selector_Index_Options - ChallengeOptionCount - 1];
-			}
-			break;
-			
 		case MenuIndex.Controls_Gamepad:
 
 			draw_set_halign(fa_right);
@@ -362,7 +181,7 @@ if(MenuWinInst_Options.visible){
 			}
 
 			break;
-		
+			
 		case MenuIndex.Controls_Keyboard:
 		
 			draw_set_halign(fa_right);
@@ -414,10 +233,8 @@ if(MenuWinInst_Options.visible){
 
 
 
-if(Menu_Selector[MenuWin_Main_MenuIndex]) draw_sprite(MenuWin_Main_Active ? sMenu_Selector_Active : sMenu_Selector_Innactive, Selector_Frame, MenuWinInst_Main.x + 12, Menu_Y[MenuWin_Main_MenuIndex][Selector_Index_Main]);
-if(Menu_Active && MenuWin_Options_Active && Menu_Selector[MenuWin_Options_MenuIndex]) draw_sprite(sMenu_Selector_Active, Selector_Frame, MenuWinInst_Options.x + 12, Menu_Y[MenuWin_Options_MenuIndex][Selector_Index_Options]);
-
-
+if(Menu_Selector[MenuWin_Main_MenuIndex]) draw_sprite(MenuWin_Main_Active ? sMenu_Selector_Active : sMenu_Selector_Innactive, Selector_Frame, MenuWinInst_Main.x + 12, Menu_RowY(MenuWin_Main_MenuIndex, Selector_Index_Main));
+if(Menu_Active && MenuWin_Options_Active && Menu_Selector[MenuWin_Options_MenuIndex]) draw_sprite(sMenu_Selector_Active, Selector_Frame, MenuWinInst_Options.x + 12, Menu_RowY(MenuWin_Options_MenuIndex, Selector_Index_Options));
 
 draw_set_halign(fa_center);
 draw_set_font(MenuWin_Main_Active ? global.MenuFont : global.MenuFont_Innactive);

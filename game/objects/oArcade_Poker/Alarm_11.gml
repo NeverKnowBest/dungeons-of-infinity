@@ -44,7 +44,7 @@ switch(GameState){
 			audio_play_sound(WinSound, 1, false);
 			
 			WinAmount = Poker_GetWinAmount();
-			global.Inventory.ItemData[ItemClass.Rupee].Amount += WinAmount;
+			RupeesAdd(WinAmount, false);
 		}
 		
 		State = ArcadeState.GameOver;

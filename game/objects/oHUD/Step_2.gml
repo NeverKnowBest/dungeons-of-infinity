@@ -173,7 +173,7 @@ global.MapHidden = Curse_Check(CurseEffects.MapNotVisible) || global.Challenges[
 
 MapOwned = global.Inventory.ItemData[ItemClass.Map].Owns[0] || oLink.StandingOnMap;
 CompassOwned = global.Inventory.ItemData[ItemClass.Compass].Owns[0] || oLink.StandingOnCompass;
-DirectionPendant = Pendant_Check(Pendant.Direction);
+DirectionPendant = Map_DirectionPendantActive();
 
 DrawMap = MapOwned|| DirectionPendant;
 DrawCompass = CompassOwned || DirectionPendant;

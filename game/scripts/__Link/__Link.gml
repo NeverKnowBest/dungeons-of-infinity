@@ -259,7 +259,6 @@ function Link_SetStartingItems(){
 		
 	}
 	else{
-		
 		global.Inventory.ItemData[ItemClass.Rupee].Amount = 0;
 		global.Inventory.ItemData[ItemClass.HeartPiece].Amount = ChallengeMax_StartingHearts;
 		global.Inventory.ItemData[ItemClass.Magic].Amount = 0;
@@ -300,6 +299,8 @@ function Link_SetStartingItems(){
 		LinkHealth = global.Inventory.ItemData[ItemClass.HeartPiece].Amount;
 		
 	}
+	
+	Init_Gameplay_Cheats();
 	
 	Inventory_Update();	
 
@@ -537,12 +538,17 @@ function UpdateState(NewState, var1 = undefined){
 			break;
 			
 		case LinkState.Bow:
-
+			var _ConsumedArrowAmount = -1;
+			
+			// Inf. Arrows Cheat
+			if (Cheat_On("Cheat_Inf_Arrows"))
+				_ConsumedArrowAmount = 0;
+			
 			ObjSetImageSpeed(1);
 			if(global.Inventory.ItemData[ItemClass.ArrowQuiver].Owns[0])
-				Item_Consume(ItemClass.Arrows, 0, -1);
+				Item_Consume(ItemClass.Arrows, 0, _ConsumedArrowAmount);
 			else
-				Inventory_Add(ItemClass.Arrows, 0, -1, Inventory_FindItem(ItemClass.Arrows));
+				Inventory_Add(ItemClass.Arrows, 0, _ConsumedArrowAmount, Inventory_FindItem(ItemClass.Arrows));
 			
 			Bow_Set();
 
@@ -2244,7 +2250,7 @@ function CheckItems(){
 					HoldUpItem(ItemInst,, false, false);
 					HoldBossCrystal = true;
 					var _MusicLen = audio_sound_length(Music_Boss_Defeated);
-					alarm[10] = global.Users[global.UserIndex].Prefs[Pref.Music] && _MusicLen != -1 ? _MusicLen * 60 : 180; //hold delay
+					alarm[10] = global.MusicVol > 0 && _MusicLen != -1? _MusicLen * 60 : 180; //hold delay
 					break;
 			}
 			

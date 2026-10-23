@@ -42,70 +42,28 @@ var _Input_MenuRight = input_check_pressed("menu_right");
 var _Input_MenuInput =  input_check_pressed("menu_input");
 var _Input_MenuBack = input_check_pressed("menu_back");
 
-var _Back = false;
-
 switch(Menu_ActiveIndex){
 	
+	// Any page built from rows: up/down moves the selector (scrolling if needed), left/right changes toggles and sliders
 	default:
-		if(MenuWin_Main_Active || (MenuWin_Options_Active && Menu_Selector[MenuWin_Options_MenuIndex]) ){
-			if(_Input_MenuDown){
-				if(MenuWin_Main_Active)	Selector_Index_Main = (Selector_Index_Main + 1) mod Menu_Count[MenuWin_Main_MenuIndex];
-				if(MenuWin_Options_Active)	Selector_Index_Options = (Selector_Index_Options + 1) mod Menu_Count[MenuWin_Options_MenuIndex];
-				audio_play_sound(Sound_Text, 1, false);
-			}else if(_Input_MenuUp){
-				if(MenuWin_Main_Active){
-					Selector_Index_Main--;
-					if(Selector_Index_Main < 0) Selector_Index_Main = Menu_Count[MenuWin_Main_MenuIndex] - 1;
-				}
-				if(MenuWin_Options_Active){
-					Selector_Index_Options--;
-					if(Selector_Index_Options < 0) Selector_Index_Options = Menu_Count[MenuWin_Options_MenuIndex] - 1;
-				}
-				audio_play_sound(Sound_Text, 1, false);
-			}
-		}
-		break;
+		var _Win_Main = MenuWin_Main_Active;
+		if(!_Win_Main && !(MenuWin_Options_Active && Menu_Selector[MenuWin_Options_MenuIndex])) break;
 		
-	case MenuIndex.Settings:
-		if(_Input_MenuDown){
-			Selector_Index_Options = (Selector_Index_Options + 1) mod Menu_Count[MenuIndex.Settings];
-			Settings_UpdateScroll();
-			audio_play_sound(Sound_Text, 1, false);
-		}else if(_Input_MenuUp){
-			Selector_Index_Options = (Selector_Index_Options - 1 + Menu_Count[MenuIndex.Settings]) mod Menu_Count[MenuIndex.Settings];
-			Settings_UpdateScroll();
-			audio_play_sound(Sound_Text, 1, false);
-		}else if(Settings_IsSlider(Selector_Index_Options)){
-			var _Dir = (input_check("menu_right") ? 1 : 0) - (input_check("menu_left") ? 1 : 0);
-			if(_Dir != 0){
-				var _Fire = (Settings_HoldFrames == 0) || (Settings_HoldFrames > 18 && (Settings_HoldFrames mod 2 == 0));
-				if(_Fire) Settings_Change(Selector_Index_Options, _Dir);
-				Settings_HoldFrames++;
-			}else{
-				Settings_HoldFrames = 0;
-				if(Settings_Dirty){ Settings_Dirty = false; Settings_SaveIni(); }
-			}
-		}else if(_Input_MenuLeft || _Input_MenuRight){
-			Settings_Change(Selector_Index_Options, _Input_MenuRight ? 1 : -1);
+		var _Dir = _Input_MenuDown ? 1 : (_Input_MenuUp ? -1 : 0);
+		if(_Dir != 0){
+			if(_Win_Main) Selector_Index_Main = Menu_MoveSelector(MenuWin_Main_MenuIndex, Selector_Index_Main, _Dir);
+			else Selector_Index_Options = Menu_MoveSelector(MenuWin_Options_MenuIndex, Selector_Index_Options, _Dir);
+			break;
 		}
+		
+		var _Row = Menu_SelectedRow();
+		if(_Row != undefined && Menu_RowHasValue(_Row)) Menu_RowHold(_Row);
 		break;
 
 	case MenuIndex.Character:
-		if(_Input_MenuUp){
-			global.LinkCharacterIndex -= 3;
-			if(global.LinkCharacterIndex < 0) global.LinkCharacterIndex += LinkCharacters;
-			audio_play_sound(Sound_Text, 1, false);
-		}else if(_Input_MenuDown){
-			global.LinkCharacterIndex += 3;
-			if(global.LinkCharacterIndex >= LinkCharacters) global.LinkCharacterIndex -= LinkCharacters;
-			audio_play_sound(Sound_Text, 1, false);
-		}else if(_Input_MenuLeft){
-			global.LinkCharacterIndex -= 1;
-			if(global.LinkCharacterIndex < 0) global.LinkCharacterIndex += LinkCharacters;
-			audio_play_sound(Sound_Text, 1, false);
-		}else if(_Input_MenuRight){
-			global.LinkCharacterIndex = (global.LinkCharacterIndex + 1) mod LinkCharacters;
-			if(global.LinkCharacterIndex >= LinkCharacters) global.LinkCharacterIndex -= LinkCharacters;
+		var _Step = _Input_MenuUp ? -3 : (_Input_MenuDown ? 3 : (_Input_MenuLeft ? -1 : (_Input_MenuRight ? 1 : 0)));
+		if(_Step != 0){
+			global.LinkCharacterIndex = (global.LinkCharacterIndex + _Step + LinkCharacters) mod LinkCharacters;
 			audio_play_sound(Sound_Text, 1, false);
 		}
 		break;
@@ -245,7 +203,6 @@ switch(Menu_ActiveIndex){
 						audio_play_sound(Sound_Error, 1, false);
 						break;
 					}
-							
 					if(NameEntry_Rename){
 						global.Users[global.UserIndex].Name = NameEntry_Name;
 					}else{
@@ -284,371 +241,11 @@ switch(Menu_ActiveIndex){
 					
 }
 
-
-
-
+// Confirm runs the selected row's action; pages without rows (Stats, Character...) just close
 if(_Input_MenuInput){
-		
-	switch(Menu_ActiveIndex){
-			
-		case MenuIndex.NameSelect:
-			
-			if(Selector_Index_Main == Menu_Count[MenuIndex.NameSelect] - 1)
-				game_end(); //exit
-			else{
-				global.UserIndex = Selector_Index_Main;
-				if(global.Users[global.UserIndex].Name == ""){
-					Win_Options_Activate(MenuIndex.NewUser);
-					LetterGrid_Init();
-
-				}else{
-					var _ErrorCode = User_VerifyIntegrity();
-					var _Sound = Sound_TextDone;
-					switch(_ErrorCode){								
-						case 1: //input profile error
-							ErrorMsgInst = MsgBox("Keyboard profile error, resetting to default controls.",,,,80);
-							_Sound = Sound_Error;
-							break;
-						case 2: //input profile error
-							ErrorMsgInst = MsgBox("Gamepad profile error, resetting to default controls.",,,,80);
-							_Sound = Sound_Error;
-							break;
-					}
-					Win_Main_Activate(global.Users[global.UserIndex].SaveData == -1 ? MenuIndex.NewGame : MenuIndex.ContinueGame,, _Sound);
-					Menu_Title[MenuIndex.ContinueGame] = global.Users[global.UserIndex].Name;
-					Menu_Title[MenuIndex.NewGame] = global.Users[global.UserIndex].Name;
-					input_profile_import(global.Users[global.UserIndex].InputProfile_Gamepad, "gamepad");
-					input_profile_import(global.Users[global.UserIndex].InputProfile_Keyboard, "keyboard");	
-					Bindings_GetIcons(Input_Index.Gamepad);
-					Bindings_GetIcons(Input_Index.Keyboard);
-						
-				}
-					
-			}
-
-			break;
-			
-		case MenuIndex.NewGame:
-
-			switch(Selector_Index_Main){
-				case MenuSelection_NewGame.NewGame:
-					Win_Options_Activate(MenuIndex.NewGame_Start);	
-					break;
-							
-				case MenuSelection_NewGame.Options:
-					Win_Main_Activate(MenuIndex.Options);	
-					break;
-
-				case MenuSelection_NewGame.Stats:
-					Win_Options_Activate(MenuIndex.Stats);	
-					break;
-						
-				case MenuSelection_NewGame.Back:
-					_Back = true;
-					break;
-				
-			}
-			
-			break;
-				
-		case MenuIndex.ContinueGame:
-
-			switch(Selector_Index_Main){
-				case MenuSelection_ContinueGame.ContinueGame:
-					if( (global.SaveVersionCheck && global.Users[global.UserIndex].SaveData.GameVersion == VERSION) ||
-						!global.SaveVersionCheck){
-						Menu_ContinueGame();
-					}else{
-						ErrorMsgInst = MsgBox("Save file version error!\\Use the game version the save\\was created with.",,Sound_Error,,80);
-					}
-					break;
-						
-				case MenuSelection_ContinueGame.NewGame:
-					Win_Options_Activate(MenuIndex.NewGame_Start);	
-					break;
-							
-				case MenuSelection_ContinueGame.Options:
-					Win_Main_Activate(MenuIndex.Options);	
-					break;
-
-				case MenuSelection_ContinueGame.Stats:
-					Win_Options_Activate(MenuIndex.Stats);	
-					break;
-						
-				case MenuSelection_ContinueGame.Back:
-					_Back = true;
-					break;
-				
-			}
-			
-			break;
-				
-		case MenuIndex.NewGame_Start:
-				
-			switch(Selector_Index_Options){
-				case MenuSelection_NewGame_Start.Start:
-					Menu_StartGame();
-					break;
-						
-				case MenuSelection_NewGame_Start.Character:
-					Menu_ActiveIndex = MenuIndex.Character;
-					MenuWin_Options_MenuIndex = MenuIndex.Character;
-					Selector_Index_Options = 0;
-					audio_play_sound(Sound_TextDone, 1, false);
-					break;
-					
-				case MenuSelection_NewGame_Start.Gear:
-					Menu_ActiveIndex = MenuIndex.Gear;
-					MenuWin_Options_MenuIndex = MenuIndex.Gear;
-					Selector_Index_Options = 0;
-					audio_play_sound(Sound_TextDone, 1, false);						
-					break;
-
-				case MenuSelection_NewGame_Start.Challenges:
-					Menu_ActiveIndex = MenuIndex.Challenges;
-					MenuWin_Options_MenuIndex = MenuIndex.Challenges;
-					Selector_Index_Options = 0;					
-					audio_play_sound(Sound_TextDone, 1, false);						
-					break;
-					
-				case MenuSelection_NewGame_Start.Back:
-					_Back = true;
-					break;
-				
-			}					
-			break;
-			
-		case MenuIndex.Stats:
-		case MenuIndex.Character:
-		case MenuIndex.Gear:
-			_Back = true;
-			break;
-				
-		case MenuIndex.Challenges:
-			switch(Selector_Index_Options){
-				case 0: //back
-					_Back = true;
-					break;
-					
-				default:
-						
-
-					if(Selector_Index_Options > 0 && Selector_Index_Options <= ChallengeOptionCount){
-						var _OptionIndex = Selector_Index_Options - 1;
-						global.ChallengeOptions[_OptionIndex] = (global.ChallengeOptions[_OptionIndex] + 1) mod 4;						
-					}else if(Selector_Index_Options > ChallengeOptionCount){
-						var _ChallengeIndex = Selector_Index_Options - ChallengeOptionCount - 1;
-						global.Challenges[_ChallengeIndex] = !global.Challenges[_ChallengeIndex];
-					}
-			
-						
-					audio_play_sound(Sound_TextDone, 1, false);
-					break;
-				
-			}
-			break;
-			
-		case MenuIndex.Settings:
-			if(Selector_Index_Options == 0) _Back = true;
-			else if(!Settings_IsSlider(Selector_Index_Options)) Settings_Change(Selector_Index_Options, 1);
-			break;
-
-		case MenuIndex.Options:
-			
-			switch(Selector_Index_Main){
-
-				case MenuSelection_Options.Back:
-					_Back = true;
-					break;
-
-				case MenuSelection_Options.Settings:
-					Selector_Index_Options = 0;
-					Settings_Scroll = 0;
-					Settings_UpdateScroll();
-					Win_Options_Activate(MenuIndex.Settings);
-					break;
-						
-				case MenuSelection_Options.Controls:
-					Win_Main_Activate(MenuIndex.Controls);	
-					break;
-
-				case MenuSelection_Options.User:
-					Win_Main_Activate(MenuIndex.User);	
-					break;
-				
-			}
-			
-			break;
-
-		case MenuIndex.Controls:
-			
-			switch(Selector_Index_Main){
-							
-				case MenuSelection_Options_Controls.Back:
-					_Back = true;
-					break;
-				
-				case MenuSelection_Options_Controls.Gamepad:
-					Win_Options_Activate(MenuIndex.Controls_Gamepad);
-					break;
-				
-				case MenuSelection_Options_Controls.Keyboard:
-					Win_Options_Activate(MenuIndex.Controls_Keyboard);
-					break;
-				
-			}
-			
-			break;	
-	
-		case MenuIndex.Controls_Gamepad:
-			
-			switch(Selector_Index_Options){
-							
-				case MenuSelection_Options_Controls_Gamepad.Back:
-					_Back = true;
-					break;
-					
-				case MenuSelection_Options_Controls_Gamepad.Remap:
-					instance_create_layer(-100, -100, "Menu", oInputRemap, {InputIndex : Input_Index.Gamepad})
-					break;
-					
-				case MenuSelection_Options_Controls_Gamepad.Default:
-					input_profile_reset_bindings("gamepad");
-					User_SaveControls();
-					Bindings_GetIcons(Input_Index.Gamepad);
-					audio_play_sound(Sound_Throw, 1, false);
-					break;
-			}
-			
-			break;	
-	
-		case MenuIndex.Controls_Keyboard:
-			
-			switch(Selector_Index_Options){
-							
-				case MenuSelection_Options_Controls_Keyboard.Back:
-					_Back = true;
-					break;
-
-				case MenuSelection_Options_Controls_Keyboard.Remap:
-					instance_create_layer(-100, -100, "Menu", oInputRemap, {InputIndex : Input_Index.Keyboard})
-					break;
-						
-				case MenuSelection_Options_Controls_Keyboard.Default:
-					input_profile_reset_bindings("keyboard");
-					User_SaveControls();
-					Bindings_GetIcons(Input_Index.Keyboard);
-					audio_play_sound(Sound_Throw, 1, false);
-			}
-			
-			break;	
-	
-		case MenuIndex.User:
-			
-			switch(Selector_Index_Main){
-							
-				case MenuSelection_Options_User.Back:
-					_Back = true;
-					break;
-				
-				case MenuSelection_Options_User.ChangeName:
-					NameEntry_Rename = true;
-					Win_Options_Activate(MenuIndex.NewUser,Sound_Throw);
-					LetterGrid_Init();
-					break;
-				
-				case MenuSelection_Options_User.Delete:
-					Win_Options_Activate(MenuIndex.UserDelete,Sound_Throw);
-					break;
-				
-			}
-			
-			break;	
-	
-		case MenuIndex.UserDelete:
-			switch(Selector_Index_Options){
-				case MenuSelection_Options_User_Delete.No:
-					_Back = true;					
-					break;
-				case MenuSelection_Options_User_Delete.Yes:
-					User_Delete();
-					Win_Main_Activate(MenuIndex.NameSelect, true, Sound_KinstoneConnect);				
-			}
-			break;
-					
-	}
-	
-		
-
-	
+	var _Selected = Menu_SelectedRow();
+	if(_Selected == undefined) Menu_Back();
+	else Menu_RowSelect(_Selected);
+}else if(_Input_MenuBack){
+	Menu_Back();
 }
-
-_Input_MenuBack = input_check_pressed("menu_back");
-
-if(_Input_MenuBack || _Back){
-		
-	switch(Menu_ActiveIndex){
-		case MenuIndex.NewGame:
-			Win_Main_Activate(MenuIndex.NameSelect,, Sound_Throw);
-			Selector_Index_Main = global.UserIndex;
-			break;
-				
-		case MenuIndex.ContinueGame:
-			Win_Main_Activate(MenuIndex.NameSelect,, Sound_Throw);
-			Selector_Index_Main = global.UserIndex;
-			break;
-			
-		case MenuIndex.NewGame_Start:
-			Win_Main_Activate(global.Users[global.UserIndex].SaveData == -1 ? MenuIndex.NewGame : MenuIndex.ContinueGame,, Sound_Throw);
-			break;
-			
-		case MenuIndex.Stats:
-			Win_Main_Activate(global.Users[global.UserIndex].SaveData == -1 ? MenuIndex.NewGame : MenuIndex.ContinueGame,, Sound_Throw);
-			break;
-			
-		case MenuIndex.Character:
-			Menu_ActiveIndex = MenuIndex.NewGame_Start;
-			MenuWin_Options_MenuIndex = MenuIndex.NewGame_Start;
-			Selector_Index_Options = 0;
-			audio_play_sound(Sound_TextDone, 1, false);
-			break;
-			
-		case MenuIndex.Gear:
-			Menu_ActiveIndex = MenuIndex.NewGame_Start;
-			MenuWin_Options_MenuIndex = MenuIndex.NewGame_Start;
-			global.StartingGear = Selector_Index_Options;
-			Selector_Index_Options = 0;
-			audio_play_sound(Sound_TextDone, 1, false);	
-			break;
-			
-		case MenuIndex.Challenges:
-			Menu_ActiveIndex = MenuIndex.NewGame_Start;
-			MenuWin_Options_MenuIndex = MenuIndex.NewGame_Start;
-			Selector_Index_Options = 0;
-			audio_play_sound(Sound_Throw, 1, false);
-			break;
-			
-		case MenuIndex.Options:
-			Win_Main_Activate(global.Users[global.UserIndex].SaveData == -1 ? MenuIndex.NewGame : MenuIndex.ContinueGame,, Sound_Throw);
-			break;
-			
-		case MenuIndex.Settings:
-		case MenuIndex.Controls:
-		case MenuIndex.User:
-			if(Menu_ActiveIndex == MenuIndex.Settings && Settings_Dirty){ Settings_Dirty = false; Settings_SaveIni(); }
-			Win_Main_Activate(MenuIndex.Options, false, Sound_Throw);
-			break;
-			
-		case MenuIndex.Controls_Gamepad:
-		case MenuIndex.Controls_Keyboard:
-			Win_Main_Activate(MenuIndex.Controls, false, Sound_Throw);
-			break;
-			
-		case MenuIndex.UserDelete:
-			Win_Main_Activate(MenuIndex.User, false, Sound_Throw);
-			break;
-				
-	}
-		
-}
-		

@@ -1250,7 +1250,7 @@ function Item_Consume(_ItemClass, _ItemIndex = 0, _Amount = 1){
 			if(Curse_Check(CurseEffects.RupeesNoValue) && !global.CurseTreasure_Rupees) RupeeAmount = 0;			
 			global.CurseTreasure_Rupees = false;
 			
-			oHUD.AddRupees += RupeeAmount; 
+			RupeesAdd(RupeeAmount);
 					
 			global.StatsToAdd[Stat.Rupees] += RupeeAmount;
 					
@@ -1303,7 +1303,11 @@ function Item_Consume(_ItemClass, _ItemIndex = 0, _Amount = 1){
 		//	_Bombs.Amount[0] = min(_Bombs.Amount[0] + _Amount, _MaxAmount);
 		//	break;
 					
-		case ItemClass.Key: 
+		case ItemClass.Key:
+			// Inf. Keys cheat
+			if (Cheat_On("Cheat_Inf_Keys"))
+				break;
+			
 			var _Keys = global.Inventory.ItemData[ItemClass.Key];
 			_Keys.Amount += _Amount;
 			if(_Keys.Amount > MaxKeys) _Keys.Amount = MaxKeys;
@@ -1820,6 +1824,9 @@ function Item_CheckFloorLevelSwitch(){
 }
 
 function HealthAdd(Amount, Checks = true){
+	if (Cheat_On("Cheat_Inf_Health")) {
+		Amount = 0;
+	}
 	
 	if(Checks && Amount > 0 && !global.CurseTreasure_HeartPiece){	
 		if(Curse_Check(CurseEffects.HealthNoValue)) return 0;
@@ -1870,6 +1877,10 @@ function HealthCheckSound(){
 }
 
 function MagicAdd(Amount){
+	if (Cheat_On("Cheat_Inf_Magic")){
+		if (Amount < 0)
+			exit;
+	}
 
 	if(Curse_Check(CurseEffects.MagicNoValue)) exit;
 	
@@ -1883,16 +1894,39 @@ function MagicAdd(Amount){
 }
 
 function MagicUse(Amount){
-	
+
 	if(Pendant_Check(Pendant.Magic)) Amount *= 0.75;
 	if(Curse_Check(CurseEffects.MagicUsesDouble)) Amount *= 2;	
 	
 	var _Magic = global.Inventory.ItemData[ItemClass.Magic];
 	if(Amount > _Magic.Amount) return 0;
 	
-	_Magic.Amount -= Amount;
+	// Inf. Magic cheat
+	// The item still works, but won't cost anything
+	if(!Cheat_On("Cheat_Inf_Magic")) _Magic.Amount -= Amount;
 	return Amount;
 		
+}
+
+/// Every rupee gain or loss goes through here.
+/// @param {Real} _Amount Amount of rupees to gain or lose.
+/// @param {Bool} _Roll If true, the HUD counts the total towards the change (pickups, shops). Otherwise, the total changes at once (arcade bets, theft).
+function RupeesAdd(_Amount, _Roll = true){
+	
+	// Inf. Rupees cheat
+	// Whatever was bought/won/lost still happens, but the total doesn't move
+	if(Cheat_On("Cheat_Inf_Rupees")){
+		global.Inventory.ItemData[ItemClass.Rupee].Amount = CHEAT_INF_RUPEES;
+		return;
+	}
+	
+	if(_Roll){
+		oHUD.AddRupees += _Amount;
+	}else{
+		var _Rupees = global.Inventory.ItemData[ItemClass.Rupee];
+		_Rupees.Amount = max(_Rupees.Amount + _Amount, 0);
+	}
+	
 }
 
 function HeartPieceAdd(){

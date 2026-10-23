@@ -10,7 +10,7 @@
   "compression":0,
   "compressionQuality":4,
   "conversionMode":0,
-  "duration":0.21551,
+  "duration":0.2155102,
   "exportDir":"",
   "name":"Sound_ItemGet",
   "parent":{

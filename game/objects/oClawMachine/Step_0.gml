@@ -197,7 +197,7 @@ if(DB_Started){
 
 			//HoldUpItem(_Inst);
 
-			oHUD.AddRupees = -ClawMachineCost;
+			RupeesAdd(-ClawMachineCost);
 
 		}
 		DB_Started = false;

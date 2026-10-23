@@ -19,7 +19,7 @@ if(DB_Started){
 
 			HoldUpItem(_Inst);
 
-			oHUD.AddRupees = -PopMachineCost;
+			RupeesAdd(-PopMachineCost);
 			
 			Cans--;
 			

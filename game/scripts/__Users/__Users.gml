@@ -36,6 +36,9 @@ function User_Create() constructor {
 	
 	Stats = array_create(global.StatCount);
 
+	Cheats = {};
+	Init_Cheats_Struct(self);
+
 	SaveData = -1;
 
 	DungeonSeq = array_create(DungeonClasses - 1);
@@ -141,6 +144,10 @@ function User_VerifyIntegrity(){
 	
 	if(!variable_struct_exists(User, "UsedFortuneTellerReadings")) variable_struct_set(User, "UsedFortuneTellerReadings", []);
 	if(!variable_struct_exists(User, "UsedCatacombGraveHeadings")) variable_struct_set(User, "UsedCatacombGraveHeadings", []);
+	
+	
+	// Cheats initialization
+	Init_Cheats_Struct(User);
 	
 	User_Save();
 	
@@ -271,6 +278,10 @@ function User_LoadGame(){
 	
 	Link_UpdateAttackDefence();
 	
+	// Apply cheats, if applicable, regardless if we're starting a new game or not
+	Init_Gameplay_Cheats();
+	Inventory_Update();
+	
 }
 
 function User_DelSaveData(){
@@ -386,103 +397,12 @@ function User_Delete(){
 	User_Save();
 }
 
+// Volume sliders replaced the old Music/SFX on/off prefs (Pref.SFX / Pref.Music); a volume of 0 is muted
 function User_UpdateMusicSFX(){
 	
-	var _Music = global.Users[global.UserIndex].Prefs[Pref.Music];
-	var _SFX = global.Users[global.UserIndex].Prefs[Pref.SFX];
-	audio_group_set_gain(audiogroup_Music, _Music ? global.MusicVol : 0, 0);
-	audio_group_set_gain(audiogroup_SFX, _SFX ? global.SFXVol : 0, 0);
+	audio_group_set_gain(audiogroup_Music, global.MusicVol, 0);
+	audio_group_set_gain(audiogroup_SFX, global.SFXVol, 0);
 
-}
-
-//settings page
-#macro SETTINGS_VISIBLE_ROWS 7
-
-enum SettingsRow{
-	Back,
-	Music,
-	Sound,
-	Fullscreen,
-	Gore,
-	Lighting,
-	AltTabPause,
-	StairPause,
-	SaveVersionCheck,
-	SkipIntro,
-	StickSensitivity
-}
-
-//keep the selected row visible and lay the rows out from the top
-function Settings_UpdateScroll(){
-	var _Count = Menu_Count[MenuIndex.Settings];
-	if(Selector_Index_Options < Settings_Scroll) Settings_Scroll = Selector_Index_Options;
-	if(Selector_Index_Options >= Settings_Scroll + SETTINGS_VISIBLE_ROWS) Settings_Scroll = Selector_Index_Options - SETTINGS_VISIBLE_ROWS + 1;
-	Settings_Scroll = clamp(Settings_Scroll, 0, max(0, _Count - SETTINGS_VISIBLE_ROWS));
-	for(var i = 0; i < _Count; i++) Menu_Y[MenuIndex.Settings][i] = 70 + ((i - Settings_Scroll) * 16);
-}
-
-function Settings_IsSlider(_Row){ return _Row == SettingsRow.Music || _Row == SettingsRow.Sound || _Row == SettingsRow.StickSensitivity; }
-
-function Settings_Value(_Row){
-	switch(_Row){
-		case SettingsRow.Music: return string(round(global.MusicVol * 100)) + "%";
-		case SettingsRow.Sound: return string(round(global.SFXVol * 100)) + "%";
-		case SettingsRow.Fullscreen: return global.Fullscreen ? "On" : "Off";
-		case SettingsRow.Gore: return global.Gore ? "On" : "Off";
-		case SettingsRow.Lighting: return global.GlobalLighting ? "On" : "Off";
-		case SettingsRow.AltTabPause: return global.AltTabPause ? "On" : "Off";
-		case SettingsRow.StairPause: return global.StairPause ? "On" : "Off";
-		case SettingsRow.SaveVersionCheck: return global.SaveVersionCheck ? "On" : "Off";
-		case SettingsRow.SkipIntro: return global.CanSkipTitle ? "On" : "Off";
-		case SettingsRow.StickSensitivity: return string(round(global.Gamepad_AnalogueThreshold * 100)) + "%";
-	}
-	return "";
-}
-
-//slider position, 0 to 1
-function Settings_Fraction(_Row){
-	switch(_Row){
-		case SettingsRow.Music: return global.MusicVol;
-		case SettingsRow.Sound: return global.SFXVol;
-		case SettingsRow.StickSensitivity: return (global.Gamepad_AnalogueThreshold - 0.05) / 0.9;
-	}
-	return 0;
-}
-
-function Settings_Change(_Row, _Dir){
-	if(_Row <= 0) return;
-	switch(_Row){
-		case SettingsRow.Music:
-			global.MusicVol = clamp(round((global.MusicVol + (_Dir * 0.01)) * 100) / 100, 0, 1);
-			User_UpdateMusicSFX();
-			break;
-		case SettingsRow.Sound:
-			var _Old = global.SFXVol;
-			global.SFXVol = clamp(round((global.SFXVol + (_Dir * 0.01)) * 100) / 100, 0, 1);
-			User_UpdateMusicSFX();
-			if(global.SFXVol == _Old) return;
-			break;
-		case SettingsRow.Fullscreen:
-			global.Fullscreen = !global.Fullscreen;
-			window_set_fullscreen(global.Fullscreen);
-			break;
-		case SettingsRow.Gore: global.Gore = !global.Gore; break;
-		case SettingsRow.Lighting: global.GlobalLighting = !global.GlobalLighting; break;
-		case SettingsRow.AltTabPause: global.AltTabPause = !global.AltTabPause; break;
-		case SettingsRow.StairPause: global.StairPause = !global.StairPause; break;
-		case SettingsRow.SaveVersionCheck: global.SaveVersionCheck = !global.SaveVersionCheck; break;
-		case SettingsRow.SkipIntro: global.CanSkipTitle = !global.CanSkipTitle; break;
-		case SettingsRow.StickSensitivity:
-			global.Gamepad_AnalogueThreshold = clamp(round((global.Gamepad_AnalogueThreshold + (_Dir * 0.01)) * 100) / 100, 0.05, 0.95);
-			break;
-	}
-	if(Settings_IsSlider(_Row)){
-		if(_Row == SettingsRow.Sound && (current_time - (variable_global_exists("Settings_LastBlip") ? global.Settings_LastBlip : 0)) > 150){ audio_play_sound(Sound_Text, 1, false); global.Settings_LastBlip = current_time; }
-		Settings_Dirty = true;
-	}else{
-		audio_play_sound(Sound_Text, 1, false);
-		Settings_SaveIni();
-	}
 }
 
 //writes the settings to options.ini (saved in the appdata folder, not next to the exe)

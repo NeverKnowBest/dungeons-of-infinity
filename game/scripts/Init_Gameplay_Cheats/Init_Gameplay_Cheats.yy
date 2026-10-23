@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Init_Gameplay_Cheats",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Init_Gameplay_Cheats",
+  "parent":{
+    "name":"Link",
+    "path":"folders/Objects/Characters/Link.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

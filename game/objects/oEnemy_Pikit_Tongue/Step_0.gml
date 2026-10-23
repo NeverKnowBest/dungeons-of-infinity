@@ -30,8 +30,9 @@ var ItemChoices_Index = 0;
 var ItemChoices_Amount = 1;
 
 var _RupeesAllowed = global.Inventory.ItemData[ItemClass.Rupee].Amount > 0;
-var _BombsAllowed = global.Inventory.ItemData[ItemClass.Bombs].Amount[0] > 0;
-var _ArrowsAllowed = global.Inventory.ItemData[ItemClass.Arrows].Amount[0] > 0;
+// Inf. Bombs / Inf. Arrows cheats
+var _BombsAllowed = global.Inventory.ItemData[ItemClass.Bombs].Amount[0] > 0 && !Cheat_On("Cheat_Inf_Bombs");
+var _ArrowsAllowed = global.Inventory.ItemData[ItemClass.Arrows].Amount[0] > 0 && !Cheat_On("Cheat_Inf_Arrows");
 	
 		
 var TookInventoryItem = false;
@@ -56,6 +57,10 @@ for(var _BagIndex = 0; _BagIndex < Inventory_Bags; _BagIndex++){
 			case ItemClass.Lamp:
 			case ItemClass.Tunic:
 				continue;
+			case ItemClass.Bombs:
+			case ItemClass.Arrows:
+				if(Cheat_On(_Slot.ItemClass == ItemClass.Bombs ? "Cheat_Inf_Bombs" : "Cheat_Inf_Arrows")) continue;
+				break;
 				
 		}
 			
@@ -145,7 +150,7 @@ switch(global.ItemData[ItemChoices_Class].Type){
 				with(ItemInst){
 					Setup = false;
 					Rupee_Init(Amount);
-					global.Inventory.ItemData[ItemClass.Rupee].Amount -= Amount;
+					RupeesAdd(-Amount, false);
 				}					
 				break;	
 					
