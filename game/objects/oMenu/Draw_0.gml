@@ -361,11 +361,7 @@ if(MenuWinInst_Options.visible){
 				InfArrowsEnabledStr = global.Users[global.UserIndex].Cheats.Inf_Arrows == false ? "OFF" : "ON";
 			} catch (_exception) {
 				// Cheat settings were not defined: Re-initialize all of them
-				global.Users[global.UserIndex].Cheats.Inf_Health = false;
-				global.Users[global.UserIndex].Cheats.Inf_Magic = false;
-				global.Users[global.UserIndex].Cheats.Inf_Rupees = false;
-				global.Users[global.UserIndex].Cheats.Inf_Keys = false;
-				global.Users[global.UserIndex].Cheats.Inf_Arrows = false;
+				Init_Cheats_Struct();
 			}
 			
 			draw_text(PosX, PosY, InfHealthEnabledStr); PosY+=16;

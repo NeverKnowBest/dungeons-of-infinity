@@ -149,6 +149,10 @@ function User_VerifyIntegrity(){
 	if(!variable_struct_exists(User, "UsedFortuneTellerReadings")) variable_struct_set(User, "UsedFortuneTellerReadings", []);
 	if(!variable_struct_exists(User, "UsedCatacombGraveHeadings")) variable_struct_set(User, "UsedCatacombGraveHeadings", []);
 	
+	
+	// Cheats initialization
+	Init_Cheats_Struct();
+	
 	User_Save();
 	
 	return _ErrorCode

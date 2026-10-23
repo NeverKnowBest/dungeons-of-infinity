@@ -300,7 +300,7 @@ function Link_SetStartingItems(){
 		
 	}
 	
-	New_Game_Cheats_Init();
+	Init_Gameplay_Cheats();
 	
 	Inventory_Update();	
 
