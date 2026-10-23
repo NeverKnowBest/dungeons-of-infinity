@@ -796,7 +796,7 @@ function Enemy_PixelRender(_Pal = false, _PalSpr = noone, _PalIndex = 0, _DoLigh
 
 function SpawnBoss(_RoomIndex){
 	
-	//if(DEBUG) exit;
+	//if(global.DebugEnabled) exit;
 	
 	if(!global.Level.IsBossLevel || _RoomIndex != global.Level.RoomIndex_Boss) exit;
 	

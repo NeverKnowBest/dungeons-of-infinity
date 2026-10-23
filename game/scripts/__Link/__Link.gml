@@ -64,7 +64,7 @@ enum LinkWeaponClass{
 
 function Link_SetStartingItems(){
 
-	if(DEBUG){
+	if(global.DebugEnabled){
 
 		global.Inventory.ItemData[ItemClass.Rupee].Amount = 200;
 		global.Inventory.ItemData[ItemClass.HeartPiece].Amount = 12;//ChallengeMax_StartingHearts;
@@ -1101,7 +1101,7 @@ function CheckMoveAssist(){
 
 function CheckRoomTransition(){
 	
-	if(DEBUG){
+	if(global.DebugEnabled){
 		if(global.Clip) exit;
 	}
 	

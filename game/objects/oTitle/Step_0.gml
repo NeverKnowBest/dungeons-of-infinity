@@ -2,7 +2,7 @@ AltTabCheck();
 
 if(global.AltTab) alarm[6]++;
 
-if(AllowStart || DEBUG || global.CanSkipTitle){
+if(AllowStart || global.DebugEnabled || global.CanSkipTitle){
 	if(!instance_exists(oCredits) && !keyboard_check(vk_alt) && input_check_pressed("menu_input")){
 		audio_stop_all();
 		//instance_destroy(id);
@@ -11,7 +11,7 @@ if(AllowStart || DEBUG || global.CanSkipTitle){
 	}
 }
 
-if(DEBUG){
+if(global.DebugEnabled){
 	if(keyboard_check_pressed(vk_escape)) game_end();
 }
 

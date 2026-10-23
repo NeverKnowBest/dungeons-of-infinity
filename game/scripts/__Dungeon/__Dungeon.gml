@@ -172,7 +172,7 @@ function Dungeon_CreateStruct_Level(_LevelIndex) constructor{
 	
 	Class = Dungeon_PickClass(_LevelIndex);
 	
-	if(DEBUG){
+	if(global.DebugEnabled){
 		
 		//if(Index == DungeonLevel.MoldormsLair && !global.SaveLevel){
 			//Transformation = ObjTransformation.None;
@@ -215,7 +215,7 @@ function Dungeon_CreateStruct_Level(_LevelIndex) constructor{
 	SwitchBlock_Colors = 2;
 	SwitchBlock_ActiveColor = SwitchBlockColor.Red; //color that the crystal is showing, SBs with this color are lowered/active
 	
-	if(DEBUG){ //Often I edit these, make sure I don't forget to reset them by only modifying the debug versions
+	if(global.DebugEnabled){ //Often I edit these, make sure I don't forget to reset them by only modifying the debug versions
 		MaxBonusTreasures = 99;//ceil(RoomCount / 14);
 		MaxShops = ceil(RoomCount / 14);
 	}else{
@@ -819,7 +819,7 @@ function Dungeon_InitLevel(_LevelIndex){
 		if(Room.Template == -1){
 			//continue;
 			
-			if(DEBUG){
+			if(global.DebugEnabled){
 				Error("Room index " + string(_RoomIndex) + " doesn't have a suitable template for dungeon index " + string(global.Level.DungeonTemplate_Index) + "  with transformation " + TransformationStr(global.Level.Transformation), true);
 			}else{
 				Error("Error: Cannot generate level", true);
@@ -895,7 +895,7 @@ function Dungeon_InitLevel(_LevelIndex){
 
 		Dungeon_Draw_SpecialObjs_Forced(_RoomIndex);
 		
-		if(DEBUG){
+		if(global.DebugEnabled){
 			SpawnBoss(_RoomIndex);
 		}else{
 			SpawnBoss(_RoomIndex);
@@ -903,7 +903,7 @@ function Dungeon_InitLevel(_LevelIndex){
 			
 		var SpawnedSpecialObs = Dungeon_Draw_SpecialObjs(_RoomIndex);
 					
-		if(!DEBUG && !SpawnedSpecialObs){
+		if(!global.DebugEnabled && !SpawnedSpecialObs){
 						
 			//important special objects couldn't spawn, so clear room and try another template
 						
@@ -939,7 +939,7 @@ function Dungeon_InitLevel(_LevelIndex){
 		} 
 
 		
-		if(DEBUG){
+		if(global.DebugEnabled){
 			if(!SpawnedSpecialObs){
 				Error("No suitable room template for special objs for dungeon index " + string(global.Level.DungeonTemplate_Index) + ", Room index " + string(_RoomIndex) + ", template id " + string(Room.Template[$ "id"]), true);
 				exit;
@@ -953,7 +953,7 @@ function Dungeon_InitLevel(_LevelIndex){
 			switch(_RoomIndex){
 				case 0:	
 				
-					if(DEBUG){
+					if(global.DebugEnabled){
 						instance_create_layer(Room.x + 93, Room.y + 60, "Objs_Upper", oFinalBossGate);
 						instance_create_layer(Room.x, Room.y, "ObjsFloor_Upper", oCrystalEnd);	
 						DrawTileBlock(global.TMID_Decor_Upper, Room.x + 88, Room.y + 16, 74, 0, 3, 4);
@@ -1024,9 +1024,9 @@ function Dungeon_InitLevel(_LevelIndex){
 	
 	input_clear_momentary(true);
 	
-	if(DEBUG) InitPreviewCam();
+	if(global.DebugEnabled) InitPreviewCam();
 	
-	if(DEBUG){
+	if(global.DebugEnabled){
 		if(global.Level.Index == DungeonLevel.Village){
 			Music_Play(SongIndex.Village);	
 		}else{
@@ -1080,7 +1080,7 @@ function Dungeon_InitSaveLevel(_LevelIndex){
 	
 	input_clear_momentary(true);
 	
-	if(DEBUG) InitPreviewCam();
+	if(global.DebugEnabled) InitPreviewCam();
 	
 }
 
@@ -1224,7 +1224,7 @@ function Dungeon_DestroyLevel(){
 
 function Dungeon_RoomActivate(_RoomIndex){
 	
-	if(DEBUG){
+	if(global.DebugEnabled){
 		if(!global.DeactivateObjs) exit;
 	}
 	
@@ -1235,7 +1235,7 @@ function Dungeon_RoomActivate(_RoomIndex){
 
 function Dungeon_RoomDeActivate(_RoomIndex){
 	
-	if(DEBUG){
+	if(global.DebugEnabled){
 		if(!global.DeactivateObjs) exit;
 	}
 	

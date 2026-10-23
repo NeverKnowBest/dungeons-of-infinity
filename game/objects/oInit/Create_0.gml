@@ -1,3 +1,5 @@
+global.DebugEnabled = false;
+
 global.Font_Blue = font_add_sprite(sFont_Blue, ord(" "), true, 0);
 global.Font_Small = font_add_sprite_ext(sFont_Small, " .,!?':;-+*=<>()[]\\/_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", true, 1);
 global.FontNumbers = font_add_sprite_ext(sHUD_Numbers, "0123456789", false, 0);

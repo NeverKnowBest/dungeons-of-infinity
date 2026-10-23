@@ -1,5 +1,5 @@
 
-if(DEBUG){
+if(global.DebugEnabled){
 	
 	if(global.ShowUsedSpaces){
 		draw_set_color(#FFFFFF);
