@@ -13,7 +13,8 @@ enum MenuIndex{
 	Challenges,
 	Controls,
 	Controls_Gamepad,
-	Controls_Keyboard
+	Controls_Keyboard,
+	Settings
 }
 
 
@@ -42,8 +43,9 @@ enum MenuSelection_NewGame_Start{
 
 enum MenuSelection_Options{
 	Back,
+	Settings,
 	Controls,
-	User	
+	User
 }
 
 enum MenuSelection_Options_Controls{

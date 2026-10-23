@@ -116,6 +116,9 @@ global.Challenges = array_create(ChallengeCount, false);
 
 Selector_Index_Main = 0;
 Selector_Index_Options = 0;
+Settings_HoldFrames = 0;
+Settings_Dirty = false;
+Settings_Scroll = 0;
 Selector_Frame = 0;
 alarm[0] = 8;
 
@@ -174,7 +177,8 @@ Menu_Create(MenuIndex.Challenges, "Enable Challenges", 18,,10,	"BACK",
 																"WALL MASTER");
 																
 																
-Menu_Create(MenuIndex.Options, "Options",,,, "Back", "{s}Controls", "{s}User");
+Menu_Create(MenuIndex.Options, "Options",,,, "Back", "{s}Settings", "{s}Controls", "{s}User");
+Menu_Create(MenuIndex.Settings, "Settings", 32, true, 16, "Back", "Music Volume", "Sound Volume", "Fullscreen", "Gore", "Lighting", "Alt-Tab Pause", "Stair Pause", "Save Version Check", "Skip Intro", "Stick Sens.");
 Menu_Create(MenuIndex.Controls, "Controls", 30,,, "Back", "{s}Gamepad", "{s}Keyboard");
 Menu_Create(MenuIndex.Controls_Gamepad, "Remap Gamepad", 25,,, "Back", "Remap", "Default");
 Menu_Create(MenuIndex.Controls_Keyboard, "Remap Keyboard", 25,,, "Back", "Remap", "Default");

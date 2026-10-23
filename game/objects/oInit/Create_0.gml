@@ -13,6 +13,7 @@ LinkSprites_Load();
 ini_open("options.ini");
 
 Borderless = ini_read_real("Screen", "Borderless", false);
+global.Fullscreen = ini_read_real("Screen", "Fullscreen", 1) == 1 ? true : false;
 global.MusicVol = ini_read_real("Audio", "MusicVol", 0.7);
 global.SFXVol = ini_read_real("Audio", "SFXVol", 1.0);
 
