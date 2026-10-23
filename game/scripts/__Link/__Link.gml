@@ -259,7 +259,6 @@ function Link_SetStartingItems(){
 		
 	}
 	else{
-		
 		global.Inventory.ItemData[ItemClass.Rupee].Amount = 0;
 		global.Inventory.ItemData[ItemClass.HeartPiece].Amount = ChallengeMax_StartingHearts;
 		global.Inventory.ItemData[ItemClass.Magic].Amount = 0;
@@ -300,6 +299,8 @@ function Link_SetStartingItems(){
 		LinkHealth = global.Inventory.ItemData[ItemClass.HeartPiece].Amount;
 		
 	}
+	
+	New_Game_Cheats_Init();
 	
 	Inventory_Update();	
 

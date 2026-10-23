@@ -1303,7 +1303,11 @@ function Item_Consume(_ItemClass, _ItemIndex = 0, _Amount = 1){
 		//	_Bombs.Amount[0] = min(_Bombs.Amount[0] + _Amount, _MaxAmount);
 		//	break;
 					
-		case ItemClass.Key: 
+		case ItemClass.Key:
+			// Inf. Keys cheat
+			if (global.Users[global.UserIndex].Cheats.Inf_Keys)
+				break;
+			
 			var _Keys = global.Inventory.ItemData[ItemClass.Key];
 			_Keys.Amount += _Amount;
 			if(_Keys.Amount > MaxKeys) _Keys.Amount = MaxKeys;
@@ -1820,6 +1824,9 @@ function Item_CheckFloorLevelSwitch(){
 }
 
 function HealthAdd(Amount, Checks = true){
+	if (global.Users[global.UserIndex].Cheats.Inf_Health) {
+		Amount = 0;
+	}
 	
 	if(Checks && Amount > 0 && !global.CurseTreasure_HeartPiece){	
 		if(Curse_Check(CurseEffects.HealthNoValue)) return 0;
@@ -1870,6 +1877,10 @@ function HealthCheckSound(){
 }
 
 function MagicAdd(Amount){
+	if (global.Users[global.UserIndex].Cheats.Inf_Magic){
+		if (Amount < 0)
+			exit;
+	}
 
 	if(Curse_Check(CurseEffects.MagicNoValue)) exit;
 	
@@ -1883,6 +1894,10 @@ function MagicAdd(Amount){
 }
 
 function MagicUse(Amount){
+	if (global.Users[global.UserIndex].Cheats.Inf_Magic){
+		if (Amount < 0)
+			exit;
+	}
 	
 	if(Pendant_Check(Pendant.Magic)) Amount *= 0.75;
 	if(Curse_Check(CurseEffects.MagicUsesDouble)) Amount *= 2;	

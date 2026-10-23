@@ -56,6 +56,7 @@ enum MenuSelection_Cheats{
 	InfHealth,
 	InfMagic,
 	InfRupees,
+	InfKeys,
 	Max
 }
 

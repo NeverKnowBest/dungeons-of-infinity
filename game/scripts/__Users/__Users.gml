@@ -40,6 +40,7 @@ function User_Create() constructor {
 		Inf_Health: false,
 		Inf_Magic: false,
 		Inf_Rupees: false,
+		Inf_Keys: false,
 	};
 
 	SaveData = -1;

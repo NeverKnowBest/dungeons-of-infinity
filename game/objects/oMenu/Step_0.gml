@@ -491,6 +491,9 @@ if(_Input_MenuInput){
 				case MenuSelection_Cheats.InfRupees:
 					global.Users[global.UserIndex].Cheats.Inf_Rupees = !global.Users[global.UserIndex].Cheats.Inf_Rupees;
 					break;
+				case MenuSelection_Cheats.InfKeys:
+					global.Users[global.UserIndex].Cheats.Inf_Keys = !global.Users[global.UserIndex].Cheats.Inf_Keys;
+					break;
 			}
 			
 			break;	
