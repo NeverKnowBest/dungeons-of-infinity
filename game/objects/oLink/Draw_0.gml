@@ -134,7 +134,7 @@ if(State == LinkState.Descending){
 
 shader_reset();
 
-if(DEBUG){
+if(global.DebugEnabled){
 	
 	if(global.ShowLinkMask) DrawMask(,0.5);
 	

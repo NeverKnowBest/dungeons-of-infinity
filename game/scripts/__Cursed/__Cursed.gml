@@ -104,7 +104,7 @@ function GenerateCurse(){
 	
 	ds_list_shuffle(_CurseEffectList);
 
-	if(DEBUG){
+	if(global.DebugEnabled){
 		global.CurseEffect = _CurseEffectList[| 0];
 	}else{
 		global.CurseEffect = _CurseEffectList[| 0];
@@ -132,7 +132,7 @@ function GenerateCurse(){
 	}
 	
 	ds_list_shuffle(_CurseTaskList);
-	if(DEBUG){
+	if(global.DebugEnabled){
 		global.CurseTask = _CurseTaskList[| 0];
 	}else{
 		global.CurseTask = _CurseTaskList[| 0];

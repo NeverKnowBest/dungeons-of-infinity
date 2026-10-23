@@ -87,7 +87,7 @@
 
 function Lighting_GetRoomStatus(_RoomIndex){
 
-	//if(DEBUG) return true
+	//if(global.DebugEnabled) return true
 	
 	if(!global.GlobalLighting) return false
 	

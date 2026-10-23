@@ -15,7 +15,7 @@ global.Swordless = false;
 
 global.ShopkeeperJustin = false;
 
-if(DEBUG){
+if(global.DebugEnabled){
 	
 	global.TestGame = false;
 	
@@ -45,14 +45,14 @@ if(global.Continue){
 	Dungeon_InitSaveLevel(global.ContinueLevel);
 	oRender.FadeIn();
 }else{
-	if(DEBUG){		
+	if(global.DebugEnabled){		
 		Dungeon_InitLevel(DungeonLevel.Aghanim2);
 	}else{
 		Dungeon_InitLevel(DungeonLevel.Start);
 	}
 }
 
-if(!DEBUG) User_DelSaveData();
+if(!global.DebugEnabled) User_DelSaveData();
 
 
 

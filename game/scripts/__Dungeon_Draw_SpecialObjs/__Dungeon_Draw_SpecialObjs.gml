@@ -165,7 +165,7 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 					//only use a switch or enemy to reveal treasure if section id = 0
 					//ds_list_add(SpawnMethodList_Key, SpawnMethod_Key.Treasure_Switch); //bugged, creates soft locks sometimes
 					
-					if(DEBUG){
+					if(global.DebugEnabled){
 						if(!global.TestGame) ds_list_add(SpawnMethodList_Key, SpawnMethod_Key.Enemy);
 					}else{
 						ds_list_add(SpawnMethodList_Key, SpawnMethod_Key.Enemy);
@@ -223,7 +223,7 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 			ds_list_destroy(SpawnMethodList_Key);
 			
 			if(!_KeySpawned){
-				if(DEBUG) Error_Spawn(_RoomIndex, "key", false);	
+				if(global.DebugEnabled) Error_Spawn(_RoomIndex, "key", false);	
 				return false;
 			}
 			
@@ -305,7 +305,7 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 			ds_list_destroy(SpawnMethodList_Obj);
 			
 			if(!_ObjSpawned){
-				if(DEBUG) Error_Spawn(_RoomIndex, "Crystal or Warp", false);	
+				if(global.DebugEnabled) Error_Spawn(_RoomIndex, "Crystal or Warp", false);	
 				return false;
 			}
 
@@ -315,7 +315,7 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 		case SpecialDungeonObj.DoorSwitch:
 			global.Switch_Spawned = SpawnSwitch(_RoomIndex, SwitchAction.OpenDoors);
 			if(global.Switch_Spawned == SpawnSwitch_ReturnCode.AddSwitchFail){
-				if(DEBUG) Error_Spawn(_RoomIndex, "door switch", false);
+				if(global.DebugEnabled) Error_Spawn(_RoomIndex, "door switch", false);
 				return false;
 			}
 			break;
@@ -354,7 +354,7 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 	if(Room.WarpDest && !Room.WarpDest_Created){
 		var SpawnedWarpDest = SpawnWarpDest(_RoomIndex);
 		if(!SpawnedWarpDest){
-			if(DEBUG) Error_Spawn(_RoomIndex, "warp dest", false);
+			if(global.DebugEnabled) Error_Spawn(_RoomIndex, "warp dest", false);
 			return false;
 		}
 	}
@@ -1585,7 +1585,7 @@ function SpawnSwitchBlocks(_RoomIndex){
 
 function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 	
-	if(DEBUG){
+	if(global.DebugEnabled){
 		if(global.TestGame) return false		
 	}
 	

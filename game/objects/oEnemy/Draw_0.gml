@@ -6,4 +6,4 @@ shader_reset();
 
 Obj_DrawInWater();
 
-//if(DEBUG) draw_text(x, y, string(Energy));
+//if(global.DebugEnabled) draw_text(x, y, string(Energy));

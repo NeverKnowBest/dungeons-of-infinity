@@ -249,7 +249,7 @@ function Items_InitData(){
 			ItemClass.Tunic,ItemClass.Tunic,ItemClass.Tunic,ItemClass.Tunic
 		)
 		
-		//if(DEBUG){
+		//if(global.DebugEnabled){
 		//	repeat(500){ds_list_add(global.PossibleItemLists[ItemFrom.Shop], ItemClass.Lamp)};
 		//}
 		

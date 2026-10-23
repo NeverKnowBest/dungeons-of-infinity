@@ -1,5 +1,5 @@
 
-if(DEBUG){
+if(global.DebugEnabled){
 	
 	if(++FPS_UpdateCounter mod 30 == 0){
 		FPS_Real = fps_real;
