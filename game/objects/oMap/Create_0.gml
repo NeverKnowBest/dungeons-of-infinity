@@ -22,7 +22,7 @@ if(!surface_exists(global.MapSurface)) global.MapSurface = surface_create(256, 2
 surface_set_target(global.MapSurface);
 draw_clear_alpha(c_black, 0.0);
 
-var _DirectionPendant = Pendant_Check(Pendant.Direction);
+var _DirectionPendant = Map_DirectionPendantActive();
 var _MapOwned = global.Inventory.ItemData[ItemClass.Map].Owns[0] || _DirectionPendant || oLink.StandingOnMap;
 var _CompassOwned = global.Inventory.ItemData[ItemClass.Compass].Owns[0] || _DirectionPendant || oLink.StandingOnCompass;
 

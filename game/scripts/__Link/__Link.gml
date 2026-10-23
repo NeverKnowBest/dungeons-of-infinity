@@ -541,7 +541,7 @@ function UpdateState(NewState, var1 = undefined){
 			var _ConsumedArrowAmount = -1;
 			
 			// Inf. Arrows Cheat
-			if (global.Users[global.UserIndex].Cheats.Inf_Arrows)
+			if (Cheat_On("Cheat_Inf_Arrows"))
 				_ConsumedArrowAmount = 0;
 			
 			ObjSetImageSpeed(1);
@@ -2250,7 +2250,7 @@ function CheckItems(){
 					HoldUpItem(ItemInst,, false, false);
 					HoldBossCrystal = true;
 					var _MusicLen = audio_sound_length(Music_Boss_Defeated);
-					alarm[10] = global.Users[global.UserIndex].Prefs[Pref.Music] && _MusicLen != -1 ? _MusicLen * 60 : 180; //hold delay
+					alarm[10] = global.MusicVol > 0 && _MusicLen != -1? _MusicLen * 60 : 180; //hold delay
 					break;
 			}
 			

@@ -20,30 +20,12 @@ enum MenuIndex{
 	FirstGenerated	// Pages built from data at runtime, from Menu_NewPageIndex
 }
 
-enum MenuSelection_GameMenuID{
+// Pages of the in-game pause menu (oMenu_Game)
+enum GameMenuPage{
 	Main,
 	Options,
+	Cheats,
 	Quit
-}
-enum MenuSelection_GameMenu{
-	Resume,
-	NewGame,
-	Options,
-	QuitTitle,
-	QuitDesktop
-}
-enum MenuSelection_GameMenuOptions{
-	Back,
-	SFX,
-	Music,
-	HUD,
-	CRT,
-	ItemMsg
-}
-
-enum MenuSelection_GameMenuQuit{
-	Cancel,
-	OK
 }
 
 
@@ -174,7 +156,7 @@ function Menu_UserHome(){
 	they were (the Back row reads "Discard" while there are unsaved changes), and only Save keeps them.
 */
 
-#macro MENU_TOP_Y 70				// y of the first row of every page
+#macro MENU_TOP_Y 70				// y of the first row of a title menu page
 #macro MENU_VISIBLE_ROWS 7			// rows that fit in a window at 16px spacing; longer pages scroll
 #macro MENU_SLIDER_W 40
 #macro MENU_SLIDER_STEP 0.01
@@ -299,6 +281,8 @@ function Menu_SaveItem(_Label = "Save"){
 ///  Parent						main-window page that Back returns to (selector kept)
 ///  OnBack(sound)				called on Back/Save instead, when there is no Parent; sound is the one to play
 ///  OnSave()					called by the Save row to write the page's values to disk
+///  Top (MENU_TOP_Y)			y of the first row
+///  Anything else is kept in Menu_Config for the menu object's own use (e.g. the pause menu's Centered/TitleY)
 function Menu_Create(_MenuIndex, _Title, _Items, _Config = {}){
 
 	var _Count = array_length(_Items);
@@ -316,10 +300,11 @@ function Menu_Create(_MenuIndex, _Title, _Items, _Config = {}){
 	Menu_OnSave[_MenuIndex] = Menu_Bind(_Config[$ "OnSave"]);
 	Menu_Snapshot[_MenuIndex] = undefined;
 	Menu_Scroll[_MenuIndex] = 0;
+	Menu_Config[_MenuIndex] = _Config;
 
 	// Unscrolled row positions; Menu_RowY applies the scroll
 	var _YSpace = _Config[$ "YSpace"] ?? 16;
-	var _Y = MENU_TOP_Y;
+	var _Y = _Config[$ "Top"] ?? MENU_TOP_Y;
 	Menu_Y[_MenuIndex] = array_create(_Count);
 	for(var i = 0; i < _Count; i++){
 		if(i > 0) _Y += _YSpace + (_Items[i].Gap ? 8 : 0);
@@ -335,7 +320,7 @@ function Menu_NewPageIndex(){
 }
 
 function Menu_RowY(_MenuIndex, _Row){
-	return Menu_Y[_MenuIndex][_Row] - (Menu_Y[_MenuIndex][Menu_Scroll[_MenuIndex]] - MENU_TOP_Y);
+	return Menu_Y[_MenuIndex][_Row] - (Menu_Y[_MenuIndex][Menu_Scroll[_MenuIndex]] - Menu_Y[_MenuIndex][0]);
 }
 
 function Menu_IsRowVisible(_MenuIndex, _Row){
@@ -453,12 +438,12 @@ function Menu_Back(){
 	Menu_Leave();
 }
 
-// Writes the active page's values, then leaves it. The save also becomes the new baseline for any parent
-// page still open (e.g. Cheats under one of its group sub-pages), since it wrote their values too.
+// Saves the active page and every page it was opened from (e.g. pause menu Options > Cheats saves both),
+// makes the saved values their new baseline, then leaves the active page
 function Menu_Save(){
-	var _OnSave = Menu_OnSave[Menu_ActiveIndex];
-	if(_OnSave != undefined) _OnSave();
 	for(var i = 0; i < array_length(Menu_Snapshot); i++){
+		if(Menu_Snapshot[i] == undefined && i != Menu_ActiveIndex) continue;
+		if(Menu_OnSave[i] != undefined) Menu_OnSave[i]();
 		if(Menu_Snapshot[i] != undefined) Menu_TakeSnapshot(i);
 	}
 	Menu_Leave(Sound_ItemGet);
@@ -478,32 +463,33 @@ function Menu_RowLabel(_Row, _HasChanges){
 	return (_Row.IsBack && _HasChanges) ? "Discard" : _Row.Label;
 }
 
-// Draws a row's value right-aligned in its window, with a slider bar to its left for sliders
-function Menu_DrawRowValue(_Row, _WinX, _WinW, _Y){
-	var _Right = _WinX + _WinW - 16;
+// Draws a row's value right-aligned at _Right. Sliders also get a bar between the value and the label's end
+// (_LabelRight), up to MENU_SLIDER_W wide, so they shrink to fit narrow windows like the pause menu.
+function Menu_DrawRowValue(_Row, _LabelRight, _Right, _Y){
 	draw_set_halign(fa_right);
 	draw_text(_Right, _Y, Menu_RowValueText(_Row));
 	draw_set_halign(fa_left);
-
+	
 	if(!_Row.Slider) return;
-	var _BX = _Right - 80;
+	var _BarRight = _Right - string_width("100%") - 6;
+	var _BarW = min(MENU_SLIDER_W, _BarRight - _LabelRight - 6);
+	if(_BarW < 8) return;
+	var _BX = _BarRight - _BarW;
 	var _BY = _Y + 6;
-	var _Fill = round(MENU_SLIDER_W * Menu_RowFraction(_Row));
+	var _Fill = round(_BarW * Menu_RowFraction(_Row));
 	draw_set_color(c_dkgray);
-	draw_rectangle(_BX, _BY, _BX + MENU_SLIDER_W, _BY + 3, false);
+	draw_rectangle(_BX, _BY, _BX + _BarW, _BY + 3, false);
 	draw_set_color(c_white);
 	draw_rectangle(_BX, _BY, _BX + _Fill, _BY + 3, false);
 	draw_rectangle(_BX + _Fill - 1, _BY - 2, _BX + _Fill + 1, _BY + 5, false);
 }
 
-// Up/down arrows in a window's right edge when its page has rows scrolled out of view
-function Menu_DrawScrollArrows(_MenuIndex, _WinInst){
+// Up/down arrows at _X when a page has rows scrolled out of view: one pointing up above _TopY, one pointing down below _BottomY
+function Menu_DrawScrollArrows(_MenuIndex, _X, _TopY, _BottomY){
 	var _Scroll = Menu_Scroll[_MenuIndex];
-	var _X = _WinInst.x + _WinInst.W - 16;
-	var _Bottom = _WinInst.y + _WinInst.H;
 	draw_set_color(c_white);
-	if(_Scroll > 0) draw_triangle(_X - 4, MENU_TOP_Y - 4, _X + 4, MENU_TOP_Y - 4, _X, MENU_TOP_Y - 10, false);
-	if(_Scroll + Menu_VisibleRows[_MenuIndex] < Menu_Count[_MenuIndex]) draw_triangle(_X - 4, _Bottom - 22, _X + 4, _Bottom - 22, _X, _Bottom - 16, false);
+	if(_Scroll > 0) draw_triangle(_X - 4, _TopY - 4, _X + 4, _TopY - 4, _X, _TopY - 10, false);
+	if(_Scroll + Menu_VisibleRows[_MenuIndex] < Menu_Count[_MenuIndex]) draw_triangle(_X - 4, _BottomY, _X + 4, _BottomY, _X, _BottomY + 6, false);
 }
 
 #endregion
@@ -699,6 +685,86 @@ function Menu_SetCheat(_Value, _Row){
 }
 
 #endregion
+
+
+
+#region Pause menu (oMenu_Game)
+
+/// @description Opens a pause menu page, resets its selector and scroll position, resizes and centers the frame to match the page's width, and plays the opening sound.
+/// @param {Real} _Page Index of the pause menu page to open.
+/// @param {Asset.GMSound} [_Sound] Sound to play when opening the page. Defaults to Sound_TextDone.
+function GameMenu_Open(_Page, _Sound = Sound_TextDone){
+	Menu_ActiveIndex = _Page;
+	SelectorPos = 0;
+	Menu_Scroll[_Page] = 0;
+	Menu_HoldFrames = 0;
+	FrameW = Menu_TileW[_Page] * 8;
+	FrameX = oCamera.X + ((CAM_W - FrameW) / 2);
+	FrameCentre = FrameX + (FrameW / 2);
+	audio_play_sound(_Sound, 1, false);
+}
+
+/// @description Creates a menu row that opens another pause menu page and starts its edit session by taking a snapshot of the page's values.
+/// @param {String} _Label Text displayed on the menu row.
+/// @param {Real} _Page Index of the pause menu page to open.
+/// @param {Struct} [_Fields] Optional additional row fields, including custom properties used by the row callback.
+/// @returns {Struct} The menu row created by Menu_Item.
+function GameMenu_Link(_Label, _Page, _Fields = {}){
+	_Fields.Target = _Page;
+	return Menu_Item(_Label, function(_Row){
+		GameMenu_Open(_Row.Target);
+		Menu_TakeSnapshot(_Row.Target);
+	}, _Fields);
+}
+
+/// @description Closes the pause menu, begins fading the music, and plays the closing sound.
+function GameMenu_Close(){
+	Close = true;
+	Music_Fade(1, 6);
+	audio_play_sound(Sound_Throw, 1, false);
+}
+
+/// @description Opens the quit confirmation page using the destination and prompt specified by the selected menu row.
+/// @param {Struct} _Row Menu row containing the QuitTo destination and Prompt text.
+function GameMenu_AskQuit(_Row){
+	// QuitTo is passed on to oQuit; Prompt is shown above Cancel/OK.
+	QuitTo = _Row.QuitTo;
+	Menu_Title[GameMenuPage.Quit] = _Row.Prompt;
+	GameMenu_Open(GameMenuPage.Quit);
+}
+
+/// @description Stops all music and audio, plays the confirmation sound, and schedules the game to quit after QuitDelay frames.
+function GameMenu_Quit(){
+	Music_Stop();
+	audio_stop_all();
+	audio_play_sound(Sound_TextDone, 1, false);
+	Quitting = true;
+	alarm[0] = QuitDelay;
+}
+
+/// @description Returns the current user's value for the preference referenced by the menu row.
+/// @param {Struct} _Row Menu row containing the Pref key.
+function Menu_GetPref(_Row){
+	return global.Users[global.UserIndex].Prefs[_Row.Pref];
+}
+
+/// @description Updates the current user's value for the preference referenced by the menu row.
+/// @param {*} _Value New value to assign to the preference.
+/// @param {Struct} _Row Menu row containing the Pref key.
+function Menu_SetPref(_Value, _Row){
+	global.Users[global.UserIndex].Prefs[_Row.Pref] = _Value;
+}
+
+/// @description Saves the current user data, applies enabled gameplay cheats to the current game, and updates the inventory to reflect any changes.
+function GameMenu_SaveCheats(){
+	User_Save();
+	Init_Gameplay_Cheats();
+	Inventory_Update();
+}
+
+#endregion
+
+
 
 function LetterGrid_Init(){
 	LetterGridX = MenuWinInst_Options.x + 14;

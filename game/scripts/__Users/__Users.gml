@@ -278,6 +278,10 @@ function User_LoadGame(){
 	
 	Link_UpdateAttackDefence();
 	
+	// Apply cheats, if applicable, regardless if we're starting a new game or not
+	Init_Gameplay_Cheats();
+	Inventory_Update();
+	
 }
 
 function User_DelSaveData(){
@@ -393,12 +397,11 @@ function User_Delete(){
 	User_Save();
 }
 
+// Volume sliders replaced the old Music/SFX on/off prefs (Pref.SFX / Pref.Music); a volume of 0 is muted
 function User_UpdateMusicSFX(){
 	
-	var _Music = global.Users[global.UserIndex].Prefs[Pref.Music];
-	var _SFX = global.Users[global.UserIndex].Prefs[Pref.SFX];
-	audio_group_set_gain(audiogroup_Music, _Music ? global.MusicVol : 0, 0);
-	audio_group_set_gain(audiogroup_SFX, _SFX ? global.SFXVol : 0, 0);
+	audio_group_set_gain(audiogroup_Music, global.MusicVol, 0);
+	audio_group_set_gain(audiogroup_SFX, global.SFXVol, 0);
 
 }
 

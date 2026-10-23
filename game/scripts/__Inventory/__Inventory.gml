@@ -897,7 +897,7 @@ function Inventory_UseItem(_Slot, _FromInventory){
 						break;
 				}
 				
-				if(_Error) global.Inventory.ItemData[ItemClass.Magic].Amount += _MagicUsed;
+				if(_Error) global.Inventory.ItemData[ItemClass.Magic].Amount = min(global.Inventory.ItemData[ItemClass.Magic].Amount + _MagicUsed, MAGICAMOUNT_MAX);
 				
 			}
 			
@@ -956,7 +956,8 @@ function Inventory_UseItem(_Slot, _FromInventory){
 				
 			}
 
-			Inventory_Add(_ItemClass, _ItemIndex, -1, _Slot);
+			// Inf. Bombs cheat
+			if(!(_ItemClass == ItemClass.Bombs && Cheat_On("Cheat_Inf_Bombs"))) Inventory_Add(_ItemClass, _ItemIndex, -1, _Slot);
 
 			if(oLink.State == LinkState.PickUp) break;
 			

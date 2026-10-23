@@ -1305,7 +1305,7 @@ function Item_Consume(_ItemClass, _ItemIndex = 0, _Amount = 1){
 					
 		case ItemClass.Key:
 			// Inf. Keys cheat
-			if (global.Users[global.UserIndex].Cheats.Inf_Keys)
+			if (Cheat_On("Cheat_Inf_Keys"))
 				break;
 			
 			var _Keys = global.Inventory.ItemData[ItemClass.Key];
@@ -1824,7 +1824,7 @@ function Item_CheckFloorLevelSwitch(){
 }
 
 function HealthAdd(Amount, Checks = true){
-	if (global.Users[global.UserIndex].Cheats.Inf_Health) {
+	if (Cheat_On("Cheat_Inf_Health")) {
 		Amount = 0;
 	}
 	
@@ -1877,7 +1877,7 @@ function HealthCheckSound(){
 }
 
 function MagicAdd(Amount){
-	if (global.Users[global.UserIndex].Cheats.Inf_Magic){
+	if (Cheat_On("Cheat_Inf_Magic")){
 		if (Amount < 0)
 			exit;
 	}
@@ -1894,19 +1894,16 @@ function MagicAdd(Amount){
 }
 
 function MagicUse(Amount){
-	if (global.Users[global.UserIndex].Cheats.Inf_Magic){
-		if (Amount < 0)
-		if (Amount > 0)
-			exit;
-	}
-	
+
 	if(Pendant_Check(Pendant.Magic)) Amount *= 0.75;
 	if(Curse_Check(CurseEffects.MagicUsesDouble)) Amount *= 2;	
 	
 	var _Magic = global.Inventory.ItemData[ItemClass.Magic];
 	if(Amount > _Magic.Amount) return 0;
 	
-	_Magic.Amount -= Amount;
+	// Inf. Magic cheat
+	// The item still works, but won't cost anything
+	if(!Cheat_On("Cheat_Inf_Magic")) _Magic.Amount -= Amount;
 	return Amount;
 		
 }
