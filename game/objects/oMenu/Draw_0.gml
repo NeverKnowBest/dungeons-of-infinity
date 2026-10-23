@@ -428,8 +428,6 @@ if(MenuWinInst_Options.visible){
 if(Menu_Selector[MenuWin_Main_MenuIndex]) draw_sprite(MenuWin_Main_Active ? sMenu_Selector_Active : sMenu_Selector_Innactive, Selector_Frame, MenuWinInst_Main.x + 12, Menu_Y[MenuWin_Main_MenuIndex][Selector_Index_Main]);
 if(Menu_Active && MenuWin_Options_Active && Menu_Selector[MenuWin_Options_MenuIndex]) draw_sprite(sMenu_Selector_Active, Selector_Frame, MenuWinInst_Options.x + 12, Menu_Y[MenuWin_Options_MenuIndex][Selector_Index_Options]);
 
-
-
 draw_set_halign(fa_center);
 draw_set_font(MenuWin_Main_Active ? global.MenuFont : global.MenuFont_Innactive);
 draw_text(MenuWinInst_Title1.x + (MenuWinInst_Title1.W / 2), MenuWinInst_Title1.y + 8.5, _MainTitle);

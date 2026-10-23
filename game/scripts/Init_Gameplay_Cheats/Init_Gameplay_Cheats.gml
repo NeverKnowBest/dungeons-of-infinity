@@ -2,8 +2,10 @@ function Init_Gameplay_Cheats(){
 	/// Cheats initialization
 	
 	// Inf. Health
-	global.Inventory.ItemData[ItemClass.HeartPiece].Amount = 16;
-	LinkHealth = global.Inventory.ItemData[ItemClass.HeartPiece].Amount;
+	if (global.Users[global.UserIndex].Cheats.Inf_Health){
+		global.Inventory.ItemData[ItemClass.HeartPiece].Amount = 16;
+		LinkHealth = global.Inventory.ItemData[ItemClass.HeartPiece].Amount;
+	}
 	
 	// Inf. Magic
 	if (global.Users[global.UserIndex].Cheats.Inf_Magic){
