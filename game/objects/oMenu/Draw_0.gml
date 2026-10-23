@@ -119,7 +119,7 @@ if(MenuWinInst_Options.visible){
 			
 			PosX = MenuWinInst_Options.x + 112;
 			PosY = MenuWinInst_Options.y + 14;
-			var Stats = User.Stats;
+			var Stats = global.Users[global.UserIndex].Stats;
 			
 			draw_text(PosX, PosY, "Games Played:"); PosY+=16;
 			draw_text(PosX, PosY, "Games Won:"); PosY+=16;
