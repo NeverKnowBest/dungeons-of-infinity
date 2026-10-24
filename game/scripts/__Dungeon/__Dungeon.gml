@@ -389,9 +389,9 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 	TemplateIndex = 0;
 	TemplateName = "";
 
-	MapSpr = 0;
-	MapSpr_Visited = 0;
-	MapSpr_Doors = 0;
+	MapSpr = -1;
+	MapSpr_Visited = -1;
+	MapSpr_Doors = -1;
 	MapX = GridX * 32;
 	MapY = GridY * 32;
 	MapW = GridW * 32;

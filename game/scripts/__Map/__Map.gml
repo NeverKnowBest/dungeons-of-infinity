@@ -9,6 +9,12 @@ global.MapSurface = 0;
 #macro MapColor_WallsUpper #005582
 #macro MapColor_ExtraCeilings #005582
 
+//Room map sprites are created at runtime, so they never use index 0 (that's a sprite asset).
+//Rooms that never got a map sprite keep -1 (or 0 in older saves).
+function Map_SpriteValid(_Spr){
+	return (is_numeric(_Spr) && _Spr > 0 && sprite_exists(_Spr));
+}
+
 function Map_GenerateRoomSprite(_RoomIndex){
 	
 	if(!global.Level.IsBossLevel && TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Boss)) exit;
@@ -34,10 +40,10 @@ function Map_GenerateRoomSprite(_RoomIndex){
 		}			
 	}
 	
-	if(sprite_exists(Room.MapSpr)) sprite_delete(Room.MapSpr);
-	Room.MapSpr = sprite_create_from_surface(RoomSprSurface, 0, 0, Room.MapW, Room.MapH, false, false, 0, 0);
+	surface_reset_target(); //flush the drawing before copying the surface, otherwise the sprite can get uninitialized pixels (noise on the map)
 	
-	surface_reset_target();
+	if(Map_SpriteValid(Room.MapSpr)) sprite_delete(Room.MapSpr);
+	Room.MapSpr = sprite_create_from_surface(RoomSprSurface, 0, 0, Room.MapW, Room.MapH, false, false, 0, 0);
 	surface_free(RoomSprSurface);
 		
 	surface_set_target(RoomSprSurface_Visited);
@@ -55,10 +61,10 @@ function Map_GenerateRoomSprite(_RoomIndex){
 		}			
 	}
 	
-	if(sprite_exists(Room.MapSpr_Visited)) sprite_delete(Room.MapSpr_Visited);
-	Room.MapSpr_Visited = sprite_create_from_surface(RoomSprSurface_Visited, 0, 0, Room.MapW, Room.MapH, false, false, 0, 0);
-	
 	surface_reset_target();
+	
+	if(Map_SpriteValid(Room.MapSpr_Visited)) sprite_delete(Room.MapSpr_Visited);
+	Room.MapSpr_Visited = sprite_create_from_surface(RoomSprSurface_Visited, 0, 0, Room.MapW, Room.MapH, false, false, 0, 0);
 	surface_free(RoomSprSurface_Visited);
 	
 }
@@ -127,16 +133,18 @@ function Map_Init(){
 			continue; //if it's a secret or house Room, don't draw it
 		}		
 		
-		if(sprite_exists(Room.MapSpr)) draw_sprite(Room.MapSpr, 0, Room.MapX, Room.MapY); 
+		if(Map_SpriteValid(Room.MapSpr)) draw_sprite(Room.MapSpr, 0, Room.MapX, Room.MapY); 
 		
 	}
 	
+	surface_reset_target();
 	if(sprite_exists(global.Level.Map_Sprite_All)) sprite_delete(global.Level.Map_Sprite_All);
 	global.Level.Map_Sprite_All = sprite_create_from_surface(global.MapSurface, 0, 0, 256, 256, false, false, 0, 0);
 
 
 	//predraw full door map
 
+	surface_set_target(global.MapSurface);
 	draw_clear_alpha(c_black, 0.0);
 
 	for(var _RoomIndex = 0; _RoomIndex < _Rooms; _RoomIndex++){
@@ -146,16 +154,15 @@ function Map_Init(){
 		
 		if(_House || _BossRoom) continue;	
 
-		if(sprite_exists(Room.MapSpr_Doors))
+		if(Map_SpriteValid(Room.MapSpr_Doors))
 			draw_sprite(Room.MapSpr_Doors, 0, Room.MapX, Room.MapY); 
 		//if(sprite_exists(global.MapSpriteGrid_DoorsSecret[# _x, _y])) draw_sprite(global.MapSpriteGrid_DoorsSecret[# _x, _y], 0, Room.MapX, Room.MapY); 
 		
 	}
 	
+	surface_reset_target();
 	if(sprite_exists(global.Level.Map_Sprite_Doors_All)) sprite_delete(global.Level.Map_Sprite_Doors_All);
 	global.Level.Map_Sprite_Doors_All = sprite_create_from_surface(global.MapSurface, 0, 0, 256, 256, false, false, 0, 0);
-
-	surface_reset_target();
 	
 }
 
@@ -177,7 +184,7 @@ function Map_UpdateExploredRooms(){
 			if(TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.House) || TemplateCheck(_RoomIndex, RoomTemplateClass.Mines, RoomTemplateClass_Mines.House)) continue;
 		}
 			
-		draw_sprite(Room.MapSpr_Visited, 0, Room.MapX, Room.MapY); 
+		if(Map_SpriteValid(Room.MapSpr_Visited)) draw_sprite(Room.MapSpr_Visited, 0, Room.MapX, Room.MapY); 
 		
 		global.Level.RoomsVisted++;	
 		
@@ -185,12 +192,14 @@ function Map_UpdateExploredRooms(){
 	
 	global.Level.RoomsVistedPercent = global.Level.RoomsVisted / global.Level.RoomCount;
 	
+	surface_reset_target();
 	if(sprite_exists(global.Level.Map_Sprite_Explored)) sprite_delete(global.Level.Map_Sprite_Explored);
 	global.Level.Map_Sprite_Explored = sprite_create_from_surface(global.MapSurface, 0, 0, 256, 256, false, false, 0, 0);
 	
 
 	//Doors Explored
 	
+	surface_set_target(global.MapSurface);
 	draw_clear_alpha(c_black, 0.0);
 
 	//draw all explored Rooms on surface
@@ -198,14 +207,13 @@ function Map_UpdateExploredRooms(){
 		
 		if(!Room.Visited) continue;
 
-		if(sprite_exists(Room.MapSpr_Doors)) draw_sprite(Room.MapSpr_Doors, 0, Room.MapX, Room.MapY); 
+		if(Map_SpriteValid(Room.MapSpr_Doors)) draw_sprite(Room.MapSpr_Doors, 0, Room.MapX, Room.MapY); 
 
 	}
 	
+	surface_reset_target();
 	if(sprite_exists(global.Level.Map_Sprite_Doors_Explored)) sprite_delete(global.Level.Map_Sprite_Doors_Explored);
 	global.Level.Map_Sprite_Doors_Explored = sprite_create_from_surface(global.MapSurface, 0, 0, 256, 256, false, false, 0, 0);
-	
-	surface_reset_target();
 	
 }
 
@@ -219,9 +227,9 @@ function Map_Clear(){
 		if(sprite_exists(global.Level.Map_Sprite_Doors_Explored)) sprite_delete(global.Level.Map_Sprite_Doors_Explored);
 		
 		for(var _RoomIndex = 0; _RoomIndex < global.Level.RoomCount; _RoomIndex++){
-			if(sprite_exists(Room.MapSpr)) sprite_delete(Room.MapSpr);
-			if(sprite_exists(Room.MapSpr_Visited)) sprite_delete(Room.MapSpr_Visited);
-			if(sprite_exists(Room.MapSpr_Doors)) sprite_delete(Room.MapSpr_Doors);
+			if(Map_SpriteValid(Room.MapSpr)) sprite_delete(Room.MapSpr);
+			if(Map_SpriteValid(Room.MapSpr_Visited)) sprite_delete(Room.MapSpr_Visited);
+			if(Map_SpriteValid(Room.MapSpr_Doors)) sprite_delete(Room.MapSpr_Doors);
 		}
 		
 	}
