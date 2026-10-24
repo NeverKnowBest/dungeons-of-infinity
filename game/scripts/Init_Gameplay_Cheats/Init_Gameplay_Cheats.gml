@@ -40,6 +40,25 @@ function Cheat_On(_Key){
 	return global.Users[global.UserIndex].Cheats[$ _Key] == true;
 }
 
+/// @description Checks whether any cheats are enabled or not.
+/// @param {Bool} _IsMidGame Determines if we're checking cheats in the middle of a playthrough or not
+/// @returns {Bool} Whether any cheat is enabled or not.
+function Cheats_Enabled(_IsMidGame) {
+	// If we're trying to turn off cheats mid-game and they're already enabled, cheats need to remain enabled.
+	if (_IsMidGame && global.CheatsEnabled)
+		return true;
+		
+	var _NumCheats = array_length(global.CheatList);
+	
+	for(var i = 0; i < _NumCheats; i++){
+		var _Cheat = global.CheatList[i].Key;
+		if (Cheat_On(_Cheat))
+			return true;
+	}
+	
+	return false;
+}
+
 /// @description Checks whether an item is a container that affects inventory organization, such as the arrow quiver or bomb bag.
 /// @param {ItemClass} _ItemClass Item class to check.
 /// @returns {Bool} Whether the item is a container.

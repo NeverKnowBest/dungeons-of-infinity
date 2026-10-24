@@ -106,3 +106,18 @@ function FadeOut(){
 	global.FadeRadiusV = 16;
 	global.FadeOut = true;
 }
+
+// Cheat watermark
+
+WinSizeMult = 4;
+CheatWatermarkSize = 16 * WinSizeMult;
+
+ScreenBoundaryLeft = 289;
+ScreenBoundaryRight = 289 + View1W - CheatWatermarkSize;
+ScreenBoundaryTop = 0;
+ScreenBoundaryBottom = 0 + View1H - CheatWatermarkSize;
+CheatWatermarkX = 0;
+CheatWatermarkY = 0;
+CheatWatermarkVsp = 1;
+CheatWatermarkHsp = 1;
+

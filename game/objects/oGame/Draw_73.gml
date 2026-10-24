@@ -4,4 +4,3 @@ if(DEBUG){
 		instance_activate_all(); 
 	}
 }
-

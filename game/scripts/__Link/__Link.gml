@@ -63,7 +63,6 @@ enum LinkWeaponClass{
 #macro LinkHealth global.Inventory.ItemData[ItemClass.Heart].Amount
 
 function Link_SetStartingItems(){
-
 	if(DEBUG){
 
 		global.Inventory.ItemData[ItemClass.Rupee].Amount = 200;
@@ -307,7 +306,11 @@ function Link_SetStartingItems(){
 }
 
 function Link_SetStartingPos(){
-
+	
+	// Check if cheats are enabled or not
+	global.CheatsEnabled = Cheats_Enabled(false);
+	show_debug_message(global.CheatsEnabled == true ? "[Log] CHEATS ARE ON" : "[Log] CHEATS ARE OFF");
+	
 	oCamera.SetCurrentRoom(global.Level.RoomIndex_Entrance);
 	
 	global.TransitionRoom = -1;

@@ -447,6 +447,8 @@ function Menu_Save(){
 		if(Menu_Snapshot[i] != undefined) Menu_TakeSnapshot(i);
 	}
 	Menu_Leave(Sound_ItemGet);
+	
+	global.CheatsEnabled = Cheats_Enabled(true);
 }
 
 // Goes to the active page's Parent, or runs its OnBack
