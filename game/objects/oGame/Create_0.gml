@@ -44,6 +44,10 @@ if(global.Continue){
 	User_LoadGame();
 	Dungeon_InitSaveLevel(global.ContinueLevel);
 	oRender.FadeIn();
+}else if(global.HubPending){
+	global.HubPending = false;
+	Dungeon_InitHubLevel();
+	oRender.FadeIn();
 }else{
 	if(DEBUG){		
 		Dungeon_InitLevel(DungeonLevel.Aghanim2);

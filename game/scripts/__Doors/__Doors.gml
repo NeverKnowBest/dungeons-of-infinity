@@ -430,7 +430,7 @@ function Door_DrawTiles(Inst){
 		
 			case "Bottom":
 				
-				if(Status == DoorStatus.Entrance && global.Level.Index == DungeonLevel.Castle){
+				if(Status == DoorStatus.Entrance && global.Level.Index == DungeonLevel.Castle && !global.HubLevel){
 					
 					//draw entrance
 					

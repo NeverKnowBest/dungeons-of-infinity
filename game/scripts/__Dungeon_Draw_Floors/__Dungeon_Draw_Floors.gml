@@ -51,7 +51,7 @@ function Dungeon_Draw_Floors(_RoomIndex){
 	}
 
 	
-	if(Room.TemplateClass == RoomTemplateClass.Special || TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "TMNT") || global.SaveLevel) _FloorDecor = false;
+	if(Room.TemplateClass == RoomTemplateClass.Special || TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "TMNT") || global.SaveLevel || global.HubLevel) _FloorDecor = false;
 
 	
 	if(global.Level.Index == DungeonLevel.Start){

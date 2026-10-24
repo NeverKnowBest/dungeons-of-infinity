@@ -1,6 +1,13 @@
 
 //only load new dungeon here since the activate_all needs to wait until the Step event is done to process
 
+//Leaving the Sanctuary through the exit passage starts a new run
+if(InitNewDungeon && global.HubLevel){
+	InitNewDungeon = false;
+	Hub_StartRun();
+	exit;
+}
+
 if(InitNewDungeon){
 	
 	Time_PauseStart();

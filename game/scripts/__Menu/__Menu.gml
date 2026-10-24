@@ -41,6 +41,7 @@ global.MenuFont_Innactive2 = font_add_sprite(sFont_Black, ord(" "), true, 0);
 function Menu_StartGame(){
 	audio_stop_all();
 	audio_play_sound(Sound_TextDone, 1, false);
+	global.HubPending = true; //wake up in the Sanctuary, the run starts from there
 	room_goto(Room_Dungeon);
 
 }

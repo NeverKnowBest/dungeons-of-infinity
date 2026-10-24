@@ -62,8 +62,11 @@ function Data_InitGlobals(){
 	InitGemPrizes();
 	
 	global.Continue = false;
-	global.SaveLevel = false;	
+	global.SaveLevel = false;
 	global.ContinueLevel = 0;
+
+	global.HubLevel = false;	// true while Link is in the Sanctuary hub
+	global.HubPending = false;	// when set, the next Room_Dungeon start builds the hub instead of a new run
 	
 	global.CrashSoundID = 0;
 	

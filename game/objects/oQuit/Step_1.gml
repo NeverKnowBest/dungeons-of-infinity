@@ -15,9 +15,11 @@ instance_destroy(self);
 gc_collect();
 
 global.SaveLevel = false;
+global.HubLevel = false;
 
 switch(QuitTo){
 	case 0:
+		global.HubPending = true; //"New Game" goes back to the Sanctuary
 		room_goto(Room_Dungeon);
 		break;
 	case 1:

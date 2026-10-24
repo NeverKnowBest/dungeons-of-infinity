@@ -464,6 +464,13 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 		TemplateSubClass = RoomTemplateClass_Other.Save;
 	}
 	
+	if(global.HubLevel){
+		TemplateClass = RoomTemplateClass.Other;
+		TemplateSubClass = RoomTemplateClass_Other.Unique;
+		TemplateName = Hub_RoomTemplateName(GridX, GridY);
+		exit;
+	}
+	
 	switch(SpecialObject){
 		
 		case SpecialDungeonObj.SpecialRoom:
@@ -1311,12 +1318,14 @@ function Dungeon_DestroyUnimportantObjs(_RoomIndex = -1){
 
 function Dungeon_IsBossLevel(_Level){
 	
-	if(global.SaveLevel) return false
+	if(global.SaveLevel || global.HubLevel) return false
 	
 	return (_Level == DungeonLevel.CastleJails || _Level == DungeonLevel.LanmolasLair || _Level == DungeonLevel.MoldormsLair || _Level == DungeonLevel.Aghanim2)
 }
 
 function Dungeon_StartDir(_Level){
+	
+	if(global.HubLevel) return UP
 	
 	if(global.SaveLevel) return DOWN
 	
@@ -1335,7 +1344,7 @@ function Dungeon_GetRoomIndex(_x, _y){
 
 function Dungeon_PickClass(_Level){
 	
-	if(global.SaveLevel) return DungeonClass.Special
+	if(global.SaveLevel || global.HubLevel) return DungeonClass.Special
 	
 	switch(_Level){
 
@@ -1374,6 +1383,8 @@ function Dungeon_PickClass(_Level){
 function Dungeon_PickTemplateIndex(_LevelIndex, _Class, _Transformation){
 	
 	if(_Class == DungeonClass.Special){
+		
+		if(global.HubLevel) return HUB_DUNGEON_TEMPLATE
 		
 		if(global.SaveLevel) return 4
 		
@@ -1435,7 +1446,7 @@ function Dungeon_PickTemplateIndex(_LevelIndex, _Class, _Transformation){
 
 function Dungeon_PickTemplateTransformation(_Level){
 	
-	if(global.SaveLevel) return ObjTransformation.None
+	if(global.SaveLevel || global.HubLevel) return ObjTransformation.None
 	
 	switch(_Level){
 			

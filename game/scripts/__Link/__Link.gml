@@ -343,6 +343,8 @@ function Link_SetStartingPos(){
 	oLink.x = EntranceDoorX + 16;
 	oLink.y = EntranceDoorY + 16;
 	
+	if(global.HubLevel) Hub_SetStartingPos(RoomX, RoomY, EntranceDoorX, EntranceDoorY);
+	
 	oLink.HitBox.x = oLink.x;
 	oLink.HitBox.y = oLink.y;
 	
@@ -363,7 +365,7 @@ function Link_SetStartingPos(){
 	
 	with(oHUD){
 		DungeonLinkY = HUD_DungeonLinkY();
-		if(!global.SaveLevel) ShowLevelName = true;
+		if(!global.SaveLevel && !global.HubLevel) ShowLevelName = true;
 	}
 	
 
@@ -401,7 +403,7 @@ function Link_SetStartingPos(){
 	
 	Dungeon_RoomActivate(global.CurrentRoomIndex);
 	
-	if(global.Level.Index == DungeonLevel.Castle){
+	if(global.Level.Index == DungeonLevel.Castle && !global.HubLevel){
 		with(oLink){
 			Link_SetAutoMove(0, global.Level.StartDir == UP ? -1 : 1, 0.5, 28);
 			var _Leaves = irandom_range(6,7);
@@ -442,7 +444,7 @@ function Link_SetStartingPos(){
 				
 			default:
 					
-				if(global.SaveLevel) break;
+				if(global.SaveLevel || global.HubLevel) break;
 					
 				var _PosY = (oLink.Facing == UP ? oLink.y + 16 : oLink.y - 16);
 			
