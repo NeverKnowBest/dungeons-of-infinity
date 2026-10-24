@@ -1,3 +1,6 @@
+// Whether the current playthrough used cheats. Set when a run starts (Link_SetStartingPos) and when menus are saved.
+global.CheatsEnabled = false;
+
 // Every cheat available in the cheats menu. Adding an entry here adds it to both the menu and to user saves.
 // Entries with a Group go on a sub-page named after it, linked under the ungrouped cheats in the order groups first appear here.
 // Entries with an Item are given to Link when a new game starts (Index defaults to the highest level for upgradeable items like
