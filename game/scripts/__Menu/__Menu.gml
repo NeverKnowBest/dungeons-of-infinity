@@ -449,7 +449,7 @@ function Menu_Save(){
 	Menu_Leave(Sound_ItemGet);
 	
 	// Mid-game (pause menu) cheats can't be turned back off for this run; on the title menu they can
-	global.CheatsEnabled = Cheats_Enabled(room == Room_Dungeon || room == Room_Outside);
+	global.CheatsEnabled = Cheats_Enabled(room == Room_Dungeon);
 }
 
 // Goes to the active page's Parent, or runs its OnBack

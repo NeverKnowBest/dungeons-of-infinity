@@ -9,10 +9,12 @@ global.MapSurface = 0;
 #macro MapColor_WallsUpper #005582
 #macro MapColor_ExtraCeilings #005582
 
-//Room map sprites are created at runtime, so they never use index 0 (that's a sprite asset).
-//Rooms that never got a map sprite keep -1 (or 0 in older saves).
+//Room map sprites start as -1. Sprites made with sprite_create_from_surface are "ref" handles,
+//while plain numbers can be -1 (no sprite) or 0 from older saves (0 is a real sprite asset, not a map sprite).
 function Map_SpriteValid(_Spr){
-	return (is_numeric(_Spr) && _Spr > 0 && sprite_exists(_Spr));
+	if(is_undefined(_Spr)) return false;
+	if(is_numeric(_Spr) && _Spr <= 0) return false;
+	return sprite_exists(_Spr);
 }
 
 function Map_GenerateRoomSprite(_RoomIndex){
