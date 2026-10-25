@@ -18,7 +18,16 @@
 
 /// Room template used by each room of the hub layout.
 function Hub_RoomTemplateName(_GridX, _GridY){
+	if(_GridX >= 5) return "HallOfFame";
 	return "Sanctuary";
+}
+
+/// Index of the hub room built from a template, or -1
+function Hub_FindRoom(_TemplateName){
+	for(var _RoomIndex = 0; _RoomIndex < global.Level.RoomCount; _RoomIndex++){
+		if(Room.TemplateName == _TemplateName) return _RoomIndex;
+	}
+	return -1;
 }
 
 /// Builds the hub. Called from oGame when global.HubPending is set.
@@ -104,7 +113,7 @@ function Dungeon_InitHubLevel(){
 
 }
 
-/// Picture, collision and exit of a hub room.
+/// Picture, collision, doors and statues of a hub room.
 function Hub_CreateScenery(_RoomIndex){
 	
 	switch(Room.TemplateName){
@@ -113,23 +122,126 @@ function Hub_CreateScenery(_RoomIndex){
 			
 			instance_create_layer(Room.x, Room.y, "ObjsFloor_Upper", oHubBackdrop, {sprite_index : sHub_Sanctuary});
 			instance_create_layer(Room.x, Room.y, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_Sanctuary_Over});
-			
-			//animated fire on the two altar lamps (animated tiles in the original game)
-			instance_create_layer(Room.x + 200, Room.y + 128, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_SanctuaryFlame});
-			instance_create_layer(Room.x + 296, Room.y + 128, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_SanctuaryFlame});
-			
-			var _Walls = Hub_SanctuaryWalls();
-			for(var i = 0; i < array_length(_Walls); i++){
-				var _Wall = _Walls[i];
-				WallObj_Create("Objs_Upper", Room.x + _Wall[0], Room.y + _Wall[1], _Wall[2], _Wall[3]);
-			}
+			Hub_CreateAltarFlames(Room.x, Room.y);
+			Hub_CreateWalls(Room.x, Room.y, Hub_SanctuaryWalls());
 			
 			//front door, Link leaves when he reaches this line
 			instance_create_layer(Room.x + 256, Room.y + 472, "System", oHubExit);
+			
+			//side door to the Hall of Fame (the hall is the next room in the layout)
+			instance_create_layer(Room.x + 360, Room.y + 280, "System", oHubDoor, {
+				TrigW: 40, TrigH: 32, DestTemplate: "HallOfFame", DestX: 76, DestY: 136, DestFacing: RIGHT
+			});
+			break;
+			
+		case "HallOfFame":
+			
+			instance_create_layer(Room.x, Room.y, "ObjsFloor_Upper", oHubBackdrop, {sprite_index : sHub_Hall});
+			Hub_CreateWalls(Room.x, Room.y, Hub_HallWalls());
+			
+			//fire on the two lamps at the ends of the hall
+			instance_create_layer(Room.x + 72, Room.y + 64, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_SanctuaryFlame});
+			instance_create_layer(Room.x + 424, Room.y + 64, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_SanctuaryFlame});
+			
+			//door back to the Sanctuary, on the left wall
+			instance_create_layer(Room.x + 12, Room.y + 112, "System", oHubDoor, {
+				TrigW: 40, TrigH: 32, DestTemplate: "Sanctuary", DestX: 336, DestY: 300, DestFacing: LEFT
+			});
+			
+			//the statues along the top wall, bronze to gold; talking to one opens the gallery on it
+			for(var i = 0; i < array_length(global.Statues); i++){
+				Hub_CreateStatue(Room.x + 136 + (i * 80), Room.y + 118, i);
+			}
 			break;
 			
 	}
 	
+}
+
+/// Animated fire on the two altar lamps (animated tiles in the original game)
+function Hub_CreateAltarFlames(_RoomX, _RoomY){
+	instance_create_layer(_RoomX + 200, _RoomY + 128, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_SanctuaryFlame});
+	instance_create_layer(_RoomX + 296, _RoomY + 128, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_SanctuaryFlame});
+}
+
+/// _Walls: [x, y, width in tiles, height in tiles] relative to the room
+function Hub_CreateWalls(_RoomX, _RoomY, _Walls){
+	for(var i = 0; i < array_length(_Walls); i++){
+		var _Wall = _Walls[i];
+		WallObj_Create("Objs_Upper", _RoomX + _Wall[0], _RoomY + _Wall[1], _Wall[2], _Wall[3]);
+	}
+}
+
+/// Figure of a statue, without its pedestal: frame 0 revealed (bronze, silver or gold), frame 1 silhouette with a "?".
+/// Origin at the bottom centre. The pedestals are sHall_Pedestal (one frame per tier).
+function Statue_Figure(_StatueKey){
+	switch(_StatueKey){
+		case "Armos":	return sHall_Statue_Armos;
+		case "Lanmola":	return sHall_Statue_Lanmola;
+		case "Moldorm":	return sHall_Statue_Moldorm;
+		case "Agahnim":	return sHall_Statue_Agahnim;
+	}
+	return sHall_Statue_Armos;
+}
+
+/// A statue of the Hall of Fame. (_X, _Y) is the bottom centre of its pedestal.
+/// oHallStatue draws the pedestal and the bottom of the figure under Link, oHallStatueTop the rest over him,
+/// so he can walk behind it.
+function Hub_CreateStatue(_X, _Y, _Index){
+	var _Statue = instance_create_layer(_X, _Y, "ObjsFloor_Upper", oHallStatue, {Index : _Index});
+	instance_create_layer(_X, _Y, "ObjsHigher_Upper", oHallStatueTop, {Owner : _Statue});
+	WallObj_Create("Objs_Upper", _X - 16, _Y - 24, 4, 3);
+}
+
+/// Draws the part of a statue figure above (_Upper) or below _SplitY. (_X, _Bottom) is the figure's bottom centre.
+function Statue_DrawFigurePart(_Index, _X, _Bottom, _SplitY, _Upper){
+	var _Statue = global.Statues[_Index];
+	var _Spr = Statue_Figure(_Statue.Key);
+	var _Frame = Statue_IsRevealed(_Statue.Key) ? 0 : 1;
+	var _W = sprite_get_width(_Spr);
+	var _H = sprite_get_height(_Spr);
+	var _Top = _Bottom - _H;
+	var _SplitRow = clamp(_SplitY - _Top, 0, _H);
+	var _Row0 = _Upper ? 0 : _SplitRow;
+	var _Rows = _Upper ? _SplitRow : _H - _SplitRow;
+	if(_Rows <= 0) return;
+	draw_sprite_part(_Spr, _Frame, 0, _Row0, _W, _Rows, _X - (_W / 2), _Top + _Row0);
+}
+
+/// Achievements of one statue, in list order
+function Gallery_Achievements(_StatueKey){
+	var _List = [];
+	for(var i = 0; i < array_length(global.AchievementList); i++){
+		if(global.AchievementList[i].Statue == _StatueKey) array_push(_List, global.AchievementList[i]);
+	}
+	return _List;
+}
+
+/// "New look: Fox", "Bonus item: Shield"..., or "" when it only counts for its statue
+function Achievement_RewardText(_Ach){
+	if(_Ach.Skin != -1) return "Reward: " + global.SkinNames[_Ach.Skin] + " look";
+	if(_Ach.Gear != -1) return "Reward: " + global.GearInfo[_Ach.Gear].Label + " bonus item";
+	return "";
+}
+
+/// Moves Link to another hub room (used by oHubTravel while the screen is black)
+function Hub_MoveLinkTo(_RoomIndex, _X, _Y, _Facing){
+	with(oLink){
+		x = _X;
+		y = _Y;
+		Facing = _Facing;
+		HitBox.x = x;
+		HitBox.y = y;
+		FallSpawnX = x;
+		FallSpawnY = y;
+		FallSpawnFacing = _Facing;
+		UpdateSprites();
+		Dungeon_DestroyUnimportantObjs();
+		oCamera.SetToRoomIndex(_RoomIndex, true, false, x - 128, y - 128);
+		global.Level.Rooms[_RoomIndex].Visited = true;
+		Map_UpdateExploredRooms();
+	}
+	with(oCamera) Cam_UpdatePos();
 }
 
 /// Collision boxes of the Sanctuary (ALttP room 0x12): [x, y, width in tiles, height in tiles], 8px tiles.
@@ -141,7 +253,9 @@ function Hub_SanctuaryWalls(){
 		[0, 80, 20, 54],
 		[192, 80, 1, 11],
 		[312, 80, 1, 11],
-		[352, 80, 20, 54],
+		[352, 80, 20, 25],	// right wall, above the door to the Hall of Fame
+		[352, 312, 20, 25],	// right wall, below it
+		[376, 280, 17, 4],	// back of that doorway
 		[200, 136, 2, 4],
 		[296, 136, 2, 4],
 		[232, 152, 1, 2],
@@ -152,13 +266,29 @@ function Hub_SanctuaryWalls(){
 		[288, 200, 6, 3],
 		[176, 240, 6, 3],
 		[288, 240, 6, 3],
-		[160, 240, 2, 3],	// keg above the Flute Boy's corner
+		[160, 240, 2, 3],	// flower pot above the Flute Boy's corner
 		[160, 264, 5, 10],	// Flute Boy's corner: side counter against the left wall, he stands between the two
-		[288, 280, 6, 3],
 		[160, 344, 6, 21],
 		[304, 344, 6, 21],
 		[208, 448, 4, 8],
 		[272, 448, 4, 8]
+	];
+}
+
+/// Collision boxes of the Hall of Fame (512x256): walls 48px thick, door on the left wall (opening y 112..144),
+/// lamps at both ends. The statues add their own.
+function Hub_HallWalls(){
+	return [
+		[0, 0, 64, 6],		// top wall
+		[0, 208, 64, 6],	// bottom wall
+		[0, 48, 6, 8],		// left wall, above the door
+		[0, 144, 6, 8],		// left wall, below it
+		[0, 112, 3, 4],		// back of the doorway
+		[464, 48, 6, 20],	// right wall
+		[72, 48, 2, 6],		// lamps
+		[424, 48, 2, 6],
+		[60, 184, 2, 3],	// flower pots
+		[436, 184, 2, 3]
 	];
 }
 
@@ -378,6 +508,54 @@ function HubMenu_BuildCharacterPreviews(){
 		else sprite_add_from_surface(CharPreview, _Surf, 0, 0, _W, _H, false, false);
 	}
 	surface_free(_Surf);
+}
+
+#endregion
+
+
+#region Title intro skip (oTitle)
+
+/// True on the frame any key, mouse button or gamepad button is pressed
+function Title_AnyButtonPressed(){
+	if(keyboard_check_pressed(vk_anykey) || mouse_check_button_pressed(mb_any)) return true;
+	static _Buttons = [gp_face1, gp_face2, gp_face3, gp_face4, gp_shoulderl, gp_shoulderr, gp_shoulderlb, gp_shoulderrb,
+		gp_select, gp_start, gp_stickl, gp_stickr, gp_padu, gp_padd, gp_padl, gp_padr];
+	for(var _Pad = 0; _Pad < gamepad_get_device_count(); _Pad++){
+		if(!gamepad_is_connected(_Pad)) continue;
+		for(var i = 0; i < array_length(_Buttons); i++){
+			if(gamepad_button_check_pressed(_Pad, _Buttons[i])) return true;
+		}
+	}
+	return false;
+}
+
+/// Puts the title screen in the state it reaches at the end of the intro: logo sequence at its last frame,
+/// background shown, main theme playing, sparkles running and Start allowed. Runs inside oTitle.
+function Title_SkipIntro(){
+	
+	// pending intro steps
+	for(var i = 0; i <= 4; i++) alarm[i] = -1;
+	
+	if(!variable_instance_exists(id, "TitleSeq")) TitleSeq = layer_sequence_create("Instances", 0, 0, seqTitle);
+	layer_sequence_headpos(TitleSeq, layer_sequence_get_length(TitleSeq) - 1);
+	
+	if(Music != noone) audio_stop_sound(Music);
+	audio_stop_sound(Music_Title_Intro);
+	if(!audio_is_playing(Music_Title_Main)) Music = audio_play_sound(Music_Title_Main, 1, false);
+	
+	ShowBG = false;
+	_Contrast = 1;
+	_Brightness = 1;
+	fx_set_parameter(FX_Contrast, "g_ContrastIntensity", _Contrast);
+	fx_set_parameter(FX_Contrast, "g_ContrastBrightness", _Brightness);
+	
+	if(alarm[5] < 0 || alarm[5] > SparkleDelay) alarm[5] = SparkleDelay;
+	
+	AllowStart = true;
+	SkipCooldown = 20;
+	
+	input_clear_momentary(true);
+	
 }
 
 #endregion

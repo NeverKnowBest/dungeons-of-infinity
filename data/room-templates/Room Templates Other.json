@@ -158,13 +158,24 @@
                 }, 
                 {
                  "height":512,
-                 "id":39930,
+                 "id":39932,
                  "name":"Sanctuary",
                  "rotation":0,
                  "type":"Unique",
                  "visible":true,
                  "width":512,
                  "x":1176,
+                 "y":1176
+                }, 
+                {
+                 "height":256,
+                 "id":39934,
+                 "name":"HallOfFame",
+                 "rotation":0,
+                 "type":"Unique",
+                 "visible":true,
+                 "width":512,
+                 "x":600,
                  "y":1176
                 }],
          "opacity":1,
@@ -10503,7 +10514,7 @@
                 {
                  "gid":209,
                  "height":24,
-                 "id":39931,
+                 "id":39933,
                  "name":"Villager_FluteBoy",
                  "properties":[
                         {
@@ -10519,7 +10530,7 @@
                         {
                          "name":"Room",
                          "type":"object",
-                         "value":39930
+                         "value":39932
                         }],
                  "rotation":0,
                  "type":"Sitting",
@@ -11053,7 +11064,7 @@
          "y":0
         }],
  "nextlayerid":1698,
- "nextobjectid":39932,
+ "nextobjectid":39935,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.1",

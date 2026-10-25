@@ -2,6 +2,18 @@ AltTabCheck();
 
 if(global.AltTab) alarm[6]++;
 
+// Any key or button during the intro jumps straight to the finished title screen
+if(!AllowStart && !keyboard_check(vk_alt) && Title_AnyButtonPressed()){
+	Title_SkipIntro();
+	exit;
+}
+
+// the press that skipped the intro must not also start the game
+if(variable_instance_exists(id, "SkipCooldown") && SkipCooldown > 0){
+	SkipCooldown--;
+	exit;
+}
+
 if(AllowStart || DEBUG || global.CanSkipTitle){
 	if(!instance_exists(oCredits) && !keyboard_check(vk_alt) && input_check_pressed("menu_input")){
 		audio_stop_all();

@@ -32,6 +32,9 @@ if(_Title != ""){
 	draw_text(FrameCentre, FrameY + (_Config[$ "TitleY"] ?? 8), _Changed ? _Title + " (unsaved)" : _Title);
 }
 
+// Extra drawing for the whole page (e.g. a statue's tier and progress)
+if(variable_struct_exists(_Config, "OnDrawPage")) _Config.OnDrawPage();
+
 var _LastRowY = FrameY;
 for(var i = 0; i < Menu_Count[_Page]; i++){
 
@@ -99,8 +102,10 @@ draw_set_font(global.Font_Small);
 draw_set_halign(fa_center);
 draw_set_color(#AAAAAA);
 if(Mode == "Pause"){
-	draw_text(FrameCentre, PlayTimeY, "PLAYING TIME");
-	draw_text(FrameCentre, PlayTimeY + 8, TimePlayed);
+	if(!global.HubLevel){
+		draw_text(FrameCentre, PlayTimeY, "PLAYING TIME");
+		draw_text(FrameCentre, PlayTimeY + 8, TimePlayed);
+	}
 }else{
 	// Sanctuary menus: a hint about the selected row (what unlocks it, what it does)
 	var _Sel = Menu[_Page][SelectorPos];

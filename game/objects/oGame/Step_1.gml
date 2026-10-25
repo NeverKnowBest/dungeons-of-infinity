@@ -57,7 +57,7 @@ if(NormalLinkState){// && !global.FinalBoss){
 if(NormalLinkState){
 	if(input_check_pressed("menu_access") || global.AltTab){
 		if(!instance_exists(oDialogueBox) && !instance_exists(oInventory) && !instance_exists(oMap) && oCamera.RoomTransition == NONE){
-			if(!instance_exists(oMenu_Game)){
+			if(!instance_exists(oMenu_Game) && !instance_exists(oHallGallery) && !instance_exists(oHubTravel)){
 				global.MenuInst = instance_create_layer(0, 0, layer, oMenu_Game);
 				with(oLink) UpdateState(LinkState.Inventory);
 			}

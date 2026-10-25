@@ -1,3 +1,4 @@
+// Feather disable GM2064
 if(!instance_exists(oLink)) exit;
 
 switch(State){
