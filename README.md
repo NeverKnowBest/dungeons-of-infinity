@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/readme/poster.png" alt="Zelda: Dungeons of Infinity poster" width="448">
+  <img src="docs/readme/title.gif" alt="Zelda: Dungeons of Infinity title screen" width="512">
 </p>
 
 <h1 align="center">Zelda: Dungeons of Infinity</h1>
@@ -54,6 +54,7 @@ This fork continues the 1.2.1 source with bug fixes and new content.
 * Fixed noise in the minimap on unexplored rooms after picking up the map
 * Fixed the crash when saving the cheats menu before starting a run
 * Fixed the dungeon map turning empty with cheats on
+* New: the Sanctuary hub. Every run starts in the Sanctuary, with its original look and music
 
 ## Layout
 

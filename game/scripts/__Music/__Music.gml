@@ -20,7 +20,8 @@ enum SongIndex{
 	TMNT,
 	Boss,
 	Boss_Final_Hallway,
-	Boss_Final
+	Boss_Final,
+	Sanctuary
 }
 
 enum MusicState{
@@ -58,6 +59,7 @@ function Music_InitData(){
 	global.Music_SongAsset[SongIndex.Boss] =				{Intro: Music_Boss_Intro,		Main : Music_Boss_Main};
 	global.Music_SongAsset[SongIndex.Boss_Final_Hallway] =	{Intro: noone,					Main : Music_Boss_Final_Hallway};
 	global.Music_SongAsset[SongIndex.Boss_Final] =			{Intro: Music_Boss_Final_Intro, Main : Music_Boss_Final_Main};
+	global.Music_SongAsset[SongIndex.Sanctuary] =			{Intro: Music_Sanctuary_Intro,	Main : Music_Sanctuary_Main};
 
 	
 	global.Music_LevelSongIndex = [ SongIndex.Start,

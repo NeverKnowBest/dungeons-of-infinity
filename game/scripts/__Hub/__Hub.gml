@@ -2,15 +2,19 @@
 
 // The Sanctuary hub.
 // After picking "Start" in the menu (and after "New Game" from the pause or game over menus) Link wakes up in the
-// Sanctuary instead of going straight into a run. Walking through the passage behind the altar starts the run.
+// Sanctuary instead of going straight into a run. Walking out through the front door starts the run.
 //
 // The hub is built like the save tent level: a fixed dungeon layout (data_d, Special class) whose rooms use
-// Other/Unique room templates (data_r). global.Level.Index stays on DungeonLevel.Castle so the castle tiles,
-// palettes and music tables are used, and global.HubLevel tells the rest of the code that this is not a real level.
+// Other/Unique room templates (data_r) for their NPCs and objects. global.Level.Index stays on DungeonLevel.Castle
+// so the level tables stay valid, and global.HubLevel tells the rest of the code that this is not a real level.
+//
+// Unlike dungeon rooms, hub rooms are not drawn with the tileset: each one is a pre-rendered picture of the original
+// A Link to the Past room (oHubBackdrop, one sprite under Link and one over him) with oWall collision boxes
+// taken from that room's tile attributes.
 
 #macro HUB_DUNGEON_TEMPLATE 5	// index of the hub layout in the Special dungeon templates (data_d)
 #macro HUB_LEVEL_INDEX DungeonLevel.Castle
-#macro HUB_SONG SongIndex.Fairy
+#macro HUB_SONG SongIndex.Sanctuary
 
 /// Room template used by each room of the hub layout.
 function Hub_RoomTemplateName(_GridX, _GridY){
@@ -72,17 +76,11 @@ function Dungeon_InitHubLevel(){
 
 		Dungeon_Draw_Floors(_RoomIndex);
 
-		Dungeon_Draw_Walls(_RoomIndex);
-
-		Dungeon_Draw_Ceiling(GetTileID(8, LevelTilesY + 2), Room.TileX, Room.TileY, Room.TileX, Room.TileY, Room.TileX + Room.TileW, Room.TileY + Room.TileH);
-
-		Dungeon_Draw_ExtraCeilings(_RoomIndex);
-
 		Dungeon_CreateDoors(_RoomIndex);
 
-		Dungeon_Draw_FloorObjs(_RoomIndex);
-
 		Dungeon_Draw_SpecialObjs_Forced(_RoomIndex);
+
+		Hub_CreateScenery(_RoomIndex);
 
 	}
 
@@ -98,13 +96,67 @@ function Dungeon_InitHubLevel(){
 
 }
 
-/// Places Link inside the Sanctuary, just past the front door, and keeps that door shut.
+/// Picture, collision and exit of a hub room.
+function Hub_CreateScenery(_RoomIndex){
+	
+	switch(Room.TemplateName){
+		
+		case "Sanctuary":
+			
+			instance_create_layer(Room.x, Room.y, "ObjsFloor_Upper", oHubBackdrop, {sprite_index : sHub_Sanctuary});
+			instance_create_layer(Room.x, Room.y, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_Sanctuary_Over});
+			
+			var _Walls = Hub_SanctuaryWalls();
+			for(var i = 0; i < array_length(_Walls); i++){
+				var _Wall = _Walls[i];
+				WallObj_Create("Objs_Upper", Room.x + _Wall[0], Room.y + _Wall[1], _Wall[2], _Wall[3]);
+			}
+			
+			//front door, Link leaves when he reaches this line
+			instance_create_layer(Room.x + 256, Room.y + 472, "System", oHubExit);
+			break;
+			
+	}
+	
+}
+
+/// Collision boxes of the Sanctuary (ALttP room 0x12): [x, y, width in tiles, height in tiles], 8px tiles.
+/// Generated from the room's tile attributes; the passage behind the altar is closed for now and the
+/// front doorway is 4 tiles wide (instead of 2) so Link does not have to line up exactly to walk out.
+function Hub_SanctuaryWalls(){
+	return [
+		[0, 0, 64, 10],
+		[0, 80, 20, 54],
+		[192, 80, 1, 11],
+		[224, 80, 2, 2],
+		[312, 80, 1, 11],
+		[352, 80, 20, 54],
+		[200, 136, 2, 4],
+		[296, 136, 2, 4],
+		[232, 152, 1, 2],
+		[272, 152, 1, 2],
+		[216, 160, 2, 1],
+		[280, 160, 2, 1],
+		[176, 200, 6, 3],
+		[288, 200, 6, 3],
+		[176, 240, 6, 3],
+		[288, 240, 6, 3],
+		[176, 280, 6, 3],
+		[288, 280, 6, 3],
+		[160, 344, 6, 21],
+		[304, 344, 6, 21],
+		[208, 448, 4, 8],
+		[272, 448, 4, 8]
+	];
+}
+
+/// Places Link inside the Sanctuary, just past the front door.
 /// Called from Link_SetStartingPos while global.HubLevel is true.
 function Hub_SetStartingPos(_RoomX, _RoomY, _EntranceDoorX, _EntranceDoorY){
 
 	with(oLink){
 		x = _EntranceDoorX + 16;
-		y = _EntranceDoorY - 16;
+		y = _EntranceDoorY - 32;
 		Facing = UP;
 		HitBox.x = x;
 		HitBox.y = y;
