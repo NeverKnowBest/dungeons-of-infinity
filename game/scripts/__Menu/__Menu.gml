@@ -703,7 +703,10 @@ function GameMenu_Open(_Page, _Sound = Sound_TextDone){
 	Menu_Scroll[_Page] = 0;
 	Menu_HoldFrames = 0;
 	FrameW = Menu_TileW[_Page] * 8;
+	FrameH = Menu_Config[_Page][$ "FrameH"] ?? 154;	// a page can ask for a taller frame
 	FrameX = oCamera.X + ((CAM_W - FrameW) / 2);
+	FrameY = oCamera.Y + ((CAM_H - FrameH) / 2);
+	PlayTimeY = FrameY + FrameH - 25;
 	FrameCentre = FrameX + (FrameW / 2);
 	audio_play_sound(_Sound, 1, false);
 }

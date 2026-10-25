@@ -152,7 +152,8 @@ function Hub_SanctuaryWalls(){
 		[288, 200, 6, 3],
 		[176, 240, 6, 3],
 		[288, 240, 6, 3],
-		[160, 264, 8, 6],	// Flute Boy's counter (he stands behind it)
+		[160, 240, 2, 3],	// keg above the Flute Boy's corner
+		[160, 264, 5, 10],	// Flute Boy's corner: side counter against the left wall, he stands between the two
 		[288, 280, 6, 3],
 		[160, 344, 6, 21],
 		[304, 344, 6, 21],
@@ -257,19 +258,18 @@ function HubMenu_Create(_Mode){
 			}
 			Menu_Create(HubMenuPage.Gear, "Bonus Item", _GearRows, { TileW: 26, Top: 28, TitleY: 8, YSpace: 16, VisibleRows: 6, OnBack: _BackToMain });
 			
-			// Challenges: same options as before, picked here instead of in the title menu
-			var _ChallengeRows = [Menu_BackItem()];
+			// Challenges: the title menu's page as it was (small font, level bars and checkboxes; the page title shows the selected level)
+			var _ChallengeRows = [Menu_BackItem("BACK")];
 			for(var i = 0; i < array_length(global.ChallengeOptionInfo); i++){
-				array_push(_ChallengeRows, Menu_Item(global.ChallengeOptionInfo[i].Label, Menu_CycleChallengeOption, { Option: i, ValueFn: Menu_ChallengeOptionTitle }));
+				array_push(_ChallengeRows, Menu_Item(global.ChallengeOptionInfo[i].Label, Menu_CycleChallengeOption, { Option: i, Title: Menu_ChallengeOptionTitle, OnDraw: Menu_DrawChallengeOption }));
 			}
 			for(var i = 0; i < array_length(global.ChallengeInfo); i++){
-				array_push(_ChallengeRows, Menu_Item(global.ChallengeInfo[i].Label, Menu_ToggleChallenge, {
-					Challenge: i,
-					ValueFn: function(_Row){ return global.Challenges[_Row.Challenge] ? "On" : "Off"; },
-					HintFn: Menu_ChallengeTitle
-				}));
+				array_push(_ChallengeRows, Menu_Item(global.ChallengeInfo[i].Label, Menu_ToggleChallenge, { Challenge: i, Title: Menu_ChallengeTitle, OnDraw: Menu_DrawChallengeCheckbox }));
 			}
-			Menu_Create(HubMenuPage.Challenges, "Challenges", _ChallengeRows, { TileW: 30, Top: 28, TitleY: 8, YSpace: 16, VisibleRows: 6, OnBack: _BackToMain });
+			Menu_Create(HubMenuPage.Challenges, "Challenges", _ChallengeRows, {
+				TileW: 19, FrameH: 176, Top: 28, TitleY: 8, YSpace: 10, LabelX: 24,
+				Font: global.Font_Small, TextOffsetY: 4, OnBack: _BackToMain
+			});
 			
 			GameMenu_Open(HubMenuPage.Main);
 			break;

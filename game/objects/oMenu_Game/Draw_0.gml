@@ -15,8 +15,17 @@ var _Changed = Menu_HasChanges(_Page);
 // The frame's border is 15px on every side (nine-slice), so values and scroll arrows stay a few pixels inside it
 var _ValueRight = FrameX + FrameW - 20;
 
-// Page title (the quit prompt, "Options", "Cheats"...), flagged while there are unsaved changes
+// Pages can use the title menu's small row font (the Sanctuary challenges page), with labels at LabelX
+var _RowFont = Menu_Font[_Page];
+var _SmallRows = _RowFont != global.MenuFont;
+var _LabelX = _Config[$ "LabelX"] ?? 20;
+var _TextOffY = Menu_TextOffsetY[_Page];
+
+// Page title (the quit prompt, "Options", "Cheats"...), flagged while there are unsaved changes.
+// A selected row with a Title function replaces it (e.g. "3 hearts" on the challenges page)
 var _Title = Menu_Title[_Page];
+var _SelRow = Menu_Count[_Page] > 0 ? Menu[_Page][SelectorPos] : undefined;
+if(_SelRow != undefined && _SelRow.Title != undefined) _Title = _SelRow.Title(_SelRow);
 if(_Title != ""){
 	draw_set_font(global.MenuFont);
 	draw_set_halign(fa_center);
@@ -36,7 +45,7 @@ for(var i = 0; i < Menu_Count[_Page]; i++){
 	var _TextY = FrameY + Menu_RowY(_Page, i);
 	_LastRowY = _TextY;
 
-	draw_set_font(global.MenuFont_Innactive);
+	draw_set_font(_SmallRows ? _RowFont : global.MenuFont_Innactive);
 	var _TextW = string_width(_Text);
 	var _TextH = string_height(_Text);
 
@@ -47,18 +56,19 @@ for(var i = 0; i < Menu_Count[_Page]; i++){
 		_SelectorX = FrameCentre - (_TextW / 2) - 2;
 	}else{
 		draw_set_halign(fa_left);
-		_TextX = FrameX + 20;
-		_SelectorX = FrameX + 18;
+		_TextX = FrameX + _LabelX;
+		_SelectorX = FrameX + _LabelX - 2;
 	}
 
 	if(i == SelectorPos){
 		draw_set_color(#284028);
-		draw_set_font(global.MenuFont);
-		draw_rectangle(_SelectorX, _TextY - 2, _SelectorX + _TextW + 3, _TextY + _TextH, false);
+		if(!_SmallRows) draw_set_font(global.MenuFont);
+		draw_rectangle(_SelectorX, _TextY + _TextOffY - 2, _SelectorX + _TextW + 3, _TextY + _TextOffY + _TextH - (_SmallRows ? 2 : 0), false);
 	}
 
 	draw_set_color(_Locked ? #707070 : #FFFFFF);
-	draw_text(_TextX, _TextY, _Text);
+	draw_text(_TextX, _TextY + _TextOffY, _Text);
+	draw_set_font(global.MenuFont);
 	draw_set_halign(fa_left);
 	draw_set_color(#FFFFFF);
 	
