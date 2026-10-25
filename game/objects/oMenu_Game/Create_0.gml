@@ -1,3 +1,6 @@
+// Mode: "Pause" (the pause menu), or one of the Sanctuary menus: "Depart" (bonus item and challenges before a run)
+// and "Wardrobe" (skins, from the Flute Boy). Hub modes are created with { Mode: ... }.
+if(!variable_instance_exists(id, "Mode")) Mode = "Pause";
 
 Time_PauseStart();
 TimePlayed = Time_Str(Time_PlayingTotal());
@@ -29,12 +32,13 @@ Menu_HoldFrames = 0;
 Menu_LastBlip = 0;
 
 #region Menu pages
+if(Mode == "Pause"){
 // Same page/row system as the title menu (see Menu_Create / Menu_Item in __Menu). Positions here are relative to FrameY.
 // Extra page settings used by this menu: Centered (labels centred, no values) and TitleY (where the page title is drawn).
 
 Menu_Create(GameMenuPage.Main, "", [
 	Menu_Item("Resume Game", GameMenu_Close),
-	Menu_Item("New Game", GameMenu_AskQuit, { QuitTo: 0, Prompt: "New Game?" }),
+	Menu_Item("Give Up", GameMenu_AskQuit, { QuitTo: 0, Prompt: "Give up the run?" }),
 	GameMenu_Link("Options", GameMenuPage.Options),
 	Menu_Item("Quit to Title", GameMenu_AskQuit, { QuitTo: 1, Prompt: "Quit to Title?" }),
 	Menu_Item("Quit to Desktop", GameMenu_AskQuit, { QuitTo: 2, Prompt: "Quit to Desktop?" })
@@ -82,6 +86,12 @@ Menu_Create(GameMenuPage.Quit, "", [
 ], { TileW: 16, Top: 48, TitleY: 24, YSpace: 20, Centered: true, OnBack: _BackToMain });
 
 Menu_ActiveIndex = GameMenuPage.Main;
+
+}else{
+	// Sanctuary menus (see __Hub)
+	HubMenu_Create(Mode);
+}
+
 
 #endregion
 

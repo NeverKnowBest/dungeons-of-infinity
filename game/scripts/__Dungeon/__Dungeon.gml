@@ -1012,6 +1012,8 @@ function Dungeon_InitLevel(_LevelIndex){
 	
 	Link_SetStartingPos();
 
+	Achievements_OnLevelStart(global.Level.Index);
+
 	
 	switch(global.Level.Index){
 		

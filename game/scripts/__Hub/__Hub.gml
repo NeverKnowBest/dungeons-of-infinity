@@ -28,6 +28,14 @@ function Dungeon_InitHubLevel(){
 
 	global.HubLevel = true;
 	global.SaveLevel = false;
+	
+	// the skin and bonus item this user picked last time (only unlocked ones)
+	global.LinkCharacterIndex = User_GetSkin();
+	global.StartingGear = User_GetBonusItem();
+	with(oLink){
+		Link_LoadCharacterIndex();
+		UpdateSprites();
+	}
 
 	global.Level = new Dungeon_CreateStruct_Level(HUB_LEVEL_INDEX);
 
@@ -144,7 +152,7 @@ function Hub_SanctuaryWalls(){
 		[288, 200, 6, 3],
 		[176, 240, 6, 3],
 		[288, 240, 6, 3],
-		[176, 280, 6, 3],
+		[160, 264, 8, 6],	// Flute Boy's counter (he stands behind it)
 		[288, 280, 6, 3],
 		[160, 344, 6, 21],
 		[304, 344, 6, 21],
@@ -186,6 +194,9 @@ function Hub_StartRun(){
 	Inventory_ClearAll();
 
 	TreasureLimiter_Reset();
+	
+	if(!Gear_IsUnlocked(global.StartingGear)) global.StartingGear = StartingGear.None;
+	if(!Skin_IsUnlocked(global.LinkCharacterIndex)) global.LinkCharacterIndex = LinkCharacter.Link;
 
 	global.HubLevel = false;
 	global.HubPending = false;
@@ -194,3 +205,179 @@ function Hub_StartRun(){
 	room_goto(Room_Dungeon);
 
 }
+
+
+#region Sanctuary menus (oMenu_Game with Mode "Depart" or "Wardrobe")
+
+// States of the front door (oHubExit)
+enum HubExitState{
+	Idle,		// waiting for Link to reach the door
+	Menu,		// Depart menu open
+	Back,		// Link chose to stay, waiting for him to step away from the door
+	Leaving		// walking out and fading to black
+}
+
+enum HubMenuPage{
+	Main,
+	Gear,
+	Challenges,
+	Wardrobe
+}
+
+/// Builds the pages of a Sanctuary menu. Runs inside oMenu_Game's Create event.
+function HubMenu_Create(_Mode){
+	
+	var _Close = function(_Sound){ GameMenu_Close(); };
+	var _BackToMain = function(_Sound){ GameMenu_Open(HubMenuPage.Main, _Sound); };
+	
+	switch(_Mode){
+		
+		case "Depart":
+			
+			global.HubDepart = false;
+			
+			Menu_Create(HubMenuPage.Main, "Leave the Sanctuary?", [
+				Menu_Item("Set out", HubMenu_Depart),
+				Menu_Item("Bonus Item", function(){ GameMenu_Open(HubMenuPage.Gear); }, { ValueFn: function(){ return global.GearInfo[global.StartingGear].Label; } }),
+				Menu_Item("Challenges", function(){ GameMenu_Open(HubMenuPage.Challenges); }, { ValueFn: function(){ return Achievements_AnyChallengeActive() ? "On" : "Off"; } }),
+				Menu_BackItem("{s}Stay")
+			], { TileW: 26, Top: 30, TitleY: 10, YSpace: 20, OnBack: _Close });
+			
+			// Bonus items: locked ones read "???" and say what unlocks them
+			var _GearRows = [Menu_BackItem()];
+			for(var i = 0; i < array_length(global.GearInfo); i++){
+				array_push(_GearRows, Menu_Item("", HubMenu_PickGear, {
+					Gear: i,
+					LabelFn: function(_Row){ return Gear_IsUnlocked(_Row.Gear) ? global.GearInfo[_Row.Gear].Label : "???"; },
+					LockedFn: function(_Row){ return !Gear_IsUnlocked(_Row.Gear); },
+					ValueFn: function(_Row){ return global.StartingGear == _Row.Gear ? "*" : ""; },
+					HintFn: HubMenu_GearHint,
+					OnDraw: HubMenu_DrawGearIcon
+				}));
+			}
+			Menu_Create(HubMenuPage.Gear, "Bonus Item", _GearRows, { TileW: 26, Top: 28, TitleY: 8, YSpace: 16, VisibleRows: 6, OnBack: _BackToMain });
+			
+			// Challenges: same options as before, picked here instead of in the title menu
+			var _ChallengeRows = [Menu_BackItem()];
+			for(var i = 0; i < array_length(global.ChallengeOptionInfo); i++){
+				array_push(_ChallengeRows, Menu_Item(global.ChallengeOptionInfo[i].Label, Menu_CycleChallengeOption, { Option: i, ValueFn: Menu_ChallengeOptionTitle }));
+			}
+			for(var i = 0; i < array_length(global.ChallengeInfo); i++){
+				array_push(_ChallengeRows, Menu_Item(global.ChallengeInfo[i].Label, Menu_ToggleChallenge, {
+					Challenge: i,
+					ValueFn: function(_Row){ return global.Challenges[_Row.Challenge] ? "On" : "Off"; },
+					HintFn: Menu_ChallengeTitle
+				}));
+			}
+			Menu_Create(HubMenuPage.Challenges, "Challenges", _ChallengeRows, { TileW: 30, Top: 28, TitleY: 8, YSpace: 16, VisibleRows: 6, OnBack: _BackToMain });
+			
+			GameMenu_Open(HubMenuPage.Main);
+			break;
+			
+		case "Wardrobe":
+			
+			HubMenu_BuildCharacterPreviews();
+			
+			var _SkinRows = [Menu_BackItem()];
+			for(var i = 0; i < LinkCharacters; i++){
+				array_push(_SkinRows, Menu_Item("", HubMenu_PickSkin, {
+					Skin: i,
+					LabelFn: function(_Row){ return Skin_IsUnlocked(_Row.Skin) ? global.SkinNames[_Row.Skin] : "???"; },
+					LockedFn: function(_Row){ return !Skin_IsUnlocked(_Row.Skin); },
+					HintFn: HubMenu_SkinHint,
+					OnDraw: HubMenu_DrawSkinPreview
+				}));
+			}
+			Menu_Create(HubMenuPage.Wardrobe, "New Look", _SkinRows, { TileW: 24, Top: 28, TitleY: 8, YSpace: 16, VisibleRows: 6, OnBack: _Close });
+			
+			GameMenu_Open(HubMenuPage.Wardrobe);
+			break;
+	}
+	
+}
+
+function HubMenu_Depart(){
+	global.HubDepart = true;
+	GameMenu_Close();
+}
+
+function HubMenu_PickGear(_Row){
+	if(!Gear_IsUnlocked(_Row.Gear)){
+		audio_play_sound(Sound_Error, 1, false);
+		return;
+	}
+	Gear_Set(_Row.Gear);
+	GameMenu_Open(HubMenuPage.Main);
+}
+
+function HubMenu_GearHint(_Row){
+	if(Gear_IsUnlocked(_Row.Gear)) return "";
+	var _Ach = Gear_UnlockAchievement(_Row.Gear);
+	return _Ach == undefined ? "" : "Unlock: " + _Ach.Desc;
+}
+
+function HubMenu_DrawGearIcon(_Row, _FrameX, _Y, _Right){
+	if(!Gear_IsUnlocked(_Row.Gear) || _Row.Gear == StartingGear.None) return;
+	var _Gear = global.GearInfo[_Row.Gear];
+	Menu_DrawGear(_Row.Gear, _Right - 22 + _Gear.OffsetX, _Y + 17 + _Gear.OffsetY);
+}
+
+function HubMenu_PickSkin(_Row){
+	if(!Skin_IsUnlocked(_Row.Skin)){
+		audio_play_sound(Sound_Error, 1, false);
+		return;
+	}
+	Skin_Set(_Row.Skin);
+	audio_play_sound(Sound_ItemGet, 1, false);
+	GameMenu_Close();
+}
+
+function HubMenu_SkinHint(_Row){
+	if(Skin_IsUnlocked(_Row.Skin)) return "";
+	var _Ach = Skin_UnlockAchievement(_Row.Skin);
+	return _Ach == undefined ? "" : "Unlock: " + _Ach.Desc;
+}
+
+/// Big preview of the selected skin on the right of the frame (a black silhouette while locked)
+function HubMenu_DrawSkinPreview(_Row, _FrameX, _Y, _Right){
+	if(Menu[Menu_ActiveIndex][SelectorPos] != _Row) return;
+	if(!sprite_exists(CharPreview)) return;
+	var _X = _Right - 40;
+	var _PY = FrameY + 40;
+	var _Col = Skin_IsUnlocked(_Row.Skin) ? c_white : c_black;
+	draw_sprite_ext(CharPreview, _Row.Skin, _X, _PY, 2, 2, 0, _Col, draw_get_alpha());
+	if(Skin_IsUnlocked(_Row.Skin)){
+		draw_set_font(global.Font_Small);
+		draw_set_halign(fa_center);
+		draw_set_color(#AAAAAA);
+		draw_text(_X + 16, _PY + 52, global.LinkCharacterIndex == _Row.Skin ? "WEARING" : "TRY ON");
+		draw_set_halign(fa_left);
+		draw_set_color(#FFFFFF);
+		draw_set_font(global.MenuFont);
+	}else{
+		draw_set_font(global.MenuFont);
+		draw_set_halign(fa_center);
+		draw_text(_X + 16, _PY + 16, "?");
+		draw_set_halign(fa_left);
+	}
+}
+
+/// Front-facing picture of every skin (same as the old character select), kept in CharPreview
+function HubMenu_BuildCharacterPreviews(){
+	var _W = 16;
+	var _H = 24;
+	var _Surf = surface_create(_W, _H);
+	CharPreview = -1;
+	for(var i = 0; i < LinkCharacters; i++){
+		surface_set_target(_Surf);
+		draw_clear_alpha(c_black, 0.0);
+		draw_sprite_part(global.LinkCharacterSpr[i], 0, 48, 16, 16, 16, 0, 8);	//body
+		draw_sprite_part(global.LinkCharacterSpr[i], 0, 16, 0, 16, 16, 0, 0);	//head
+		surface_reset_target();
+		if(i == 0) CharPreview = sprite_create_from_surface(_Surf, 0, 0, _W, _H, false, false, 0, 0);
+		else sprite_add_from_surface(CharPreview, _Surf, 0, 0, _W, _H, false, false);
+	}
+	surface_free(_Surf);
+}
+
+#endregion

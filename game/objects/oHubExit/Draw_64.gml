@@ -1,4 +1,4 @@
-if(!Leaving) exit;
+if(State != HubExitState.Leaving) exit;
 
 draw_set_alpha(FadeAlpha);
 draw_set_color(c_black);

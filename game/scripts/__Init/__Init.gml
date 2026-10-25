@@ -67,6 +67,7 @@ function Data_InitGlobals(){
 
 	global.HubLevel = false;	// true while Link is in the Sanctuary hub
 	global.HubPending = false;	// when set, the next Room_Dungeon start builds the hub instead of a new run
+	global.HubDepart = false;	// set by the Depart menu's "Set out" row, read by oHubExit
 	
 	global.CrashSoundID = 0;
 	

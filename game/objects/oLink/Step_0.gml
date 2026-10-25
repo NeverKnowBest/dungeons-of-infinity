@@ -98,6 +98,7 @@ switch(State){
 			instance_destroy(ItemHolding);
 			ItemHolding = noone;
 			oHUD.BossesDefeated++;
+			Achievements_OnBossDefeated(global.Level.Index);
 			UpdateState(LinkState.Standing);
 			with(oDoor){
 				if(RoomIndex == global.CurrentRoomIndex && Location == "Top"){

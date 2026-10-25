@@ -30,6 +30,9 @@ for(var i = 0; i < Menu_Count[_Page]; i++){
 
 	var _Row = Menu[_Page][i];
 	var _Text = Menu_RowLabel(_Row, _Changed);
+	// Sanctuary menu rows can compute their label (e.g. "???" while locked) and gray themselves out
+	if(variable_struct_exists(_Row, "LabelFn")) _Text = _Row.LabelFn(_Row);
+	var _Locked = variable_struct_exists(_Row, "LockedFn") && _Row.LockedFn(_Row);
 	var _TextY = FrameY + Menu_RowY(_Page, i);
 	_LastRowY = _TextY;
 
@@ -54,9 +57,18 @@ for(var i = 0; i < Menu_Count[_Page]; i++){
 		draw_rectangle(_SelectorX, _TextY - 2, _SelectorX + _TextW + 3, _TextY + _TextH, false);
 	}
 
-	draw_set_color(#FFFFFF);
+	draw_set_color(_Locked ? #707070 : #FFFFFF);
 	draw_text(_TextX, _TextY, _Text);
 	draw_set_halign(fa_left);
+	draw_set_color(#FFFFFF);
+	
+	// Value text on the right edge (e.g. a challenge level), and any extra drawing of the row (icons, previews)
+	if(variable_struct_exists(_Row, "ValueFn")){
+		draw_set_halign(fa_right);
+		draw_text(_ValueRight, _TextY, _Row.ValueFn(_Row));
+		draw_set_halign(fa_left);
+	}
+	if(_Row.OnDraw != undefined) _Row.OnDraw(_Row, FrameX, _TextY, _ValueRight);
 
 	// Toggles and sliders: value on the right edge, greyed out when off
 	if(Menu_RowHasValue(_Row)){
@@ -76,8 +88,14 @@ Menu_DrawScrollArrows(_Page, _ValueRight - 4, FrameY + Menu_RowY(_Page, Menu_Scr
 draw_set_font(global.Font_Small);
 draw_set_halign(fa_center);
 draw_set_color(#AAAAAA);
-draw_text(FrameCentre, PlayTimeY, "PLAYING TIME");
-draw_text(FrameCentre, PlayTimeY + 8, TimePlayed);
+if(Mode == "Pause"){
+	draw_text(FrameCentre, PlayTimeY, "PLAYING TIME");
+	draw_text(FrameCentre, PlayTimeY + 8, TimePlayed);
+}else{
+	// Sanctuary menus: a hint about the selected row (what unlocks it, what it does)
+	var _Sel = Menu[_Page][SelectorPos];
+	if(variable_struct_exists(_Sel, "HintFn")) draw_text_ext(FrameCentre, PlayTimeY - 4, string_upper(_Sel.HintFn(_Sel)), 9, FrameW - 32);
+}
 draw_set_halign(fa_left);
 
 draw_set_color(#FFFFFF);

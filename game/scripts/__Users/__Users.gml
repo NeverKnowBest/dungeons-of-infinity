@@ -93,6 +93,11 @@ function User_VerifyIntegrity(){
 		variable_struct_set(User, "Stats", array_create(global.StatCount));
 	}
 	
+	// Sanctuary unlocks: finished achievements, chosen skin and chosen bonus item
+	if(!variable_struct_exists(User, "Achievements") || !is_struct(User.Achievements)) variable_struct_set(User, "Achievements", {});
+	if(!variable_struct_exists(User, "Skin")) variable_struct_set(User, "Skin", 0);
+	if(!variable_struct_exists(User, "BonusItem")) variable_struct_set(User, "BonusItem", 0);
+	
 	if(variable_struct_exists(User, "SaveData")){
 		
 		if(is_struct(User.SaveData)){
@@ -371,6 +376,8 @@ function User_UpdateStats(){
 	}
 	
 	global.StatsToAdd = 0; global.StatsToAdd = array_create(global.StatCount); 
+	
+	Achievements_CheckStats();
 	
 }
 

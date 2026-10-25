@@ -100,6 +100,7 @@ if(State != EnemyState.Killed && Energy <= 0){
 	
 	global.StatsToAdd[Stat.GamesWon]++;
 	global.StatsToAdd[Stat.Monsters]++;	
+	Achievements_OnGameWon();
 	
 	
 }

@@ -152,14 +152,14 @@ var _BackToUsers = function(){
 	Selector_Index_Main = global.UserIndex;
 };
 Menu_Create(MenuIndex.NewGame, "", [
-	Menu_LinkSide("New Game", MenuIndex.NewGame_Start),
+	Menu_Item("Start", Menu_StartGame),	// runs, bonus items, skins and challenges are picked in the Sanctuary
 	Menu_LinkMain("{s}Options", MenuIndex.Options),
 	Menu_LinkSide("{s}Stats", MenuIndex.Stats),
 	Menu_BackItem("{s}Back")
 ], { OnBack: _BackToUsers });
 Menu_Create(MenuIndex.ContinueGame, "", [
 	Menu_Item("Continue", Menu_TryContinue),
-	Menu_LinkSide("{s}New Game", MenuIndex.NewGame_Start),
+	Menu_Item("{s}Start", Menu_StartGame),
 	Menu_LinkMain("{s}Options", MenuIndex.Options),
 	Menu_LinkSide("{s}Stats", MenuIndex.Stats),
 	Menu_BackItem("{s}Back")
@@ -168,6 +168,7 @@ Menu_Create(MenuIndex.ContinueGame, "", [
 var _BackToUserHome = function(){ Win_Main_Activate(Menu_UserHome(),, Sound_Throw); };
 var _BackToStartGame = function(){ Win_Options_Swap(MenuIndex.NewGame_Start); };
 
+// Old character / bonus item / challenge pages, no longer linked from the title menu (the Sanctuary has its own)
 Menu_Create(MenuIndex.NewGame_Start, "Start Game", [
 	Menu_Item("Start", Menu_StartGame),
 	Menu_LinkSwap("{s}Character", MenuIndex.Character, { OnDraw: Menu_DrawCharacterPreview }),
