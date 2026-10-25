@@ -158,7 +158,7 @@
                 }, 
                 {
                  "height":512,
-                 "id":39924,
+                 "id":39926,
                  "name":"Sanctuary",
                  "rotation":0,
                  "type":"Unique",
@@ -10503,7 +10503,7 @@
                 {
                  "gid":209,
                  "height":24,
-                 "id":39925,
+                 "id":39927,
                  "name":"Villager_Sage",
                  "properties":[
                         {
@@ -10514,7 +10514,7 @@
                         {
                          "name":"Room",
                          "type":"object",
-                         "value":39924
+                         "value":39926
                         }],
                  "rotation":0,
                  "type":"Sitting",
@@ -10522,6 +10522,52 @@
                  "width":16,
                  "x":1424,
                  "y":1260
+                }, 
+                {
+                 "gid":265,
+                 "height":16,
+                 "id":39928,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"Lit",
+                         "type":"string",
+                         "value":""
+                        }, 
+                        {
+                         "name":"Room",
+                         "type":"object",
+                         "value":39926
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1376,
+                 "y":1304
+                }, 
+                {
+                 "gid":265,
+                 "height":16,
+                 "id":39929,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"Lit",
+                         "type":"string",
+                         "value":""
+                        }, 
+                        {
+                         "name":"Room",
+                         "type":"object",
+                         "value":39926
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":1472,
+                 "y":1304
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -11048,7 +11094,7 @@
          "y":0
         }],
  "nextlayerid":1698,
- "nextobjectid":39926,
+ "nextobjectid":39930,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.1",

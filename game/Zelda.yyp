@@ -2908,6 +2908,7 @@
     {"id":{"name":"sZora","path":"sprites/sZora/sZora.yy",},},
     {"id":{"name":"sHub_Sanctuary","path":"sprites/sHub_Sanctuary/sHub_Sanctuary.yy",},},
     {"id":{"name":"sHub_Sanctuary_Over","path":"sprites/sHub_Sanctuary_Over/sHub_Sanctuary_Over.yy",},},
+    {"id":{"name":"sHub_SanctuaryFlame","path":"sprites/sHub_SanctuaryFlame/sHub_SanctuaryFlame.yy",},},
     {"id":{"name":"Tileset","path":"tilesets/Tileset/Tileset.yy",},},
   ],
   "resourceType":"GMProject",

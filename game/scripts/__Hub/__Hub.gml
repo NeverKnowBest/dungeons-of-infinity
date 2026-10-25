@@ -106,6 +106,10 @@ function Hub_CreateScenery(_RoomIndex){
 			instance_create_layer(Room.x, Room.y, "ObjsFloor_Upper", oHubBackdrop, {sprite_index : sHub_Sanctuary});
 			instance_create_layer(Room.x, Room.y, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_Sanctuary_Over});
 			
+			//animated fire on the two altar lamps (animated tiles in the original game)
+			instance_create_layer(Room.x + 200, Room.y + 128, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_SanctuaryFlame});
+			instance_create_layer(Room.x + 296, Room.y + 128, "ObjsHigher_Upper", oHubBackdrop, {sprite_index : sHub_SanctuaryFlame});
+			
 			var _Walls = Hub_SanctuaryWalls();
 			for(var i = 0; i < array_length(_Walls); i++){
 				var _Wall = _Walls[i];
@@ -121,14 +125,13 @@ function Hub_CreateScenery(_RoomIndex){
 }
 
 /// Collision boxes of the Sanctuary (ALttP room 0x12): [x, y, width in tiles, height in tiles], 8px tiles.
-/// Generated from the room's tile attributes; the passage behind the altar is closed for now and the
+/// Generated from the room's tile attributes (minus the chest on the altar); the passage behind the altar is closed for now and the
 /// front doorway is 4 tiles wide (instead of 2) so Link does not have to line up exactly to walk out.
 function Hub_SanctuaryWalls(){
 	return [
 		[0, 0, 64, 10],
 		[0, 80, 20, 54],
 		[192, 80, 1, 11],
-		[224, 80, 2, 2],
 		[312, 80, 1, 11],
 		[352, 80, 20, 54],
 		[200, 136, 2, 4],
