@@ -145,7 +145,7 @@ Os soldados escolhem cor, energia e ataque pelo nível, no `Create` do objeto (o
 
 ### No projeto, sem dados
 
-Estes objetos estão no `Zelda.yyp` mas não têm entrada em `Enemies_InitData`, então nunca são sorteados: `oEnemy_Delavant`, `oEnemy_Kyune`, `oEnemy_Lynel`, `oEnemy_Pirugusu`, `oEnemy_Soldier_Slasher`. Kyune e Pirugusu têm a linha comentada. Antes de usar um deles, confira se o código está completo.
+Estes objetos estão no `Zelda.yyp` mas não têm entrada em `Enemies_InitData`, então nunca são sorteados: `oEnemy_Delavant`, `oEnemy_Kyune`, `oEnemy_Lynel`, `oEnemy_Pirugusu`, `oEnemy_Soldier_Slasher`. Os cinco têm a linha de `EnemyDataInit` comentada em `__Enemies.gml`. Antes de usar um deles, confira se o código está completo.
 
 ## Chefes
 
