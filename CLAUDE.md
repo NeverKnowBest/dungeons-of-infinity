@@ -9,6 +9,8 @@ Leia antes de começar qualquer tarefa:
 3. `docs/dev/engine-notes.md`: como o motor funciona.
 4. `docs/dev/receitas.md`: passo a passo das tarefas que se repetem.
 
+Quando a tarefa envolver inimigos, chefes, itens ou uma região, leia também `docs/ref/` (fichas com os números do ALttP e do que já existe no DoI) e a especificação da região em `docs/regioes/` (modelo em `docs/regioes/_modelo.md`).
+
 ## Regras de trabalho
 
 * Respostas em português, sem setas (→) e sem travessões (—) em listas e explicações. Textos dentro do jogo em inglês.
@@ -56,6 +58,6 @@ O Guilherme diz se está no PC de casa (vinculado ao chat) ou no do trabalho, e 
 
 ## Ferramentas
 
-* `tools/check/validate.py`: validador estático do projeto (veja `tools/README.md`). `--orphans` lista os recursos que estão no disco mas não no projeto.
+* `tools/check/validate.py`: validador estático do projeto (veja `tools/README.md`). `--orphans` lista os recursos que estão no disco mas não no projeto. Também confere as especificações de região (seções do modelo, estado, assets citados).
 * `tools/hub/`: scripts Python que geram as salas do hub, sprites e dados (`data_r`, `data_d`, Tiled). Veja `tools/README.md`.
 * `tools/alttp/`: utilitários em C que usam o código do zelda3 (reimplementação de ALttP) para extrair salas, sprites e músicas da ROM. A ROM nunca vai para o repositório.

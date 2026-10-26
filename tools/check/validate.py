@@ -18,6 +18,9 @@ Checks:
     global.Font_Small)
   * data: data_r, data_d and the Tiled room templates parse as JSON
   * docs: no arrows or em dashes in the Portuguese docs (house style)
+  * region specs (docs/regioes/*.md): every section of _modelo.md is there,
+    a valid Estado, and the assets and docs they cite exist; the reference
+    sheets (docs/ref/*.md) are checked for assets too
 """
 import json
 import os
@@ -39,6 +42,16 @@ EVENT_NAMES = {0: 'Create', 1: 'Destroy', 2: 'Alarm', 3: 'Step', 4: 'Collision',
                10: 'KeyRelease', 12: 'CleanUp', 13: 'Gesture'}
 
 PT_DOCS = ['CLAUDE.md', 'docs/roadmap.md', 'docs/design/direcao.md', 'docs/dev/receitas.md']
+PT_DOC_DIRS = ['docs/ref', 'docs/regioes']  # every .md inside is Portuguese too
+
+REGION_DIR = 'docs/regioes'
+REGION_MODEL = '_modelo.md'
+REGION_STATES = ('ideia', 'especificada', 'em produção', 'pronta')
+REF_DIR = 'docs/ref'
+# a whole `code span` that looks like a GameMaker asset name
+ASSET_SPAN = re.compile(r'`((?:o|s)[A-Z]\w*|(?:Sound|Music)_\w+)`')
+DOC_SPAN = re.compile(r'`(docs/[\w./-]+\.md)`')
+NEW_MARKERS = ('(novo)', 'órfão')  # lines that may cite assets that do not exist
 
 
 class Report:
@@ -301,8 +314,17 @@ def check_data(rep):
                 rep.error('data/room-templates/%s has repeated object ids' % f)
 
 
+def pt_docs():
+    docs = list(PT_DOCS)
+    for d in PT_DOC_DIRS:
+        full = os.path.join(REPO, d)
+        if os.path.isdir(full):
+            docs += ['%s/%s' % (d, f) for f in sorted(os.listdir(full)) if f.endswith('.md')]
+    return docs
+
+
 def check_docs(rep):
-    for d in PT_DOCS:
+    for d in pt_docs():
         p = os.path.join(REPO, d)
         if not os.path.exists(p):
             continue
@@ -310,6 +332,49 @@ def check_docs(rep):
             line = line.replace('(→)', '').replace('(—)', '')  # the rule itself
             if '→' in line or '—' in line:
                 rep.warn('%s:%d uses an arrow or em dash (house style)' % (d, i))
+
+
+def check_doc_refs(rep, path, registered, as_error):
+    names = {n for (_, n) in registered}
+    for i, line in enumerate(open(os.path.join(REPO, path), encoding='utf-8'), 1):
+        if any(m in line for m in NEW_MARKERS):
+            continue
+        for a in ASSET_SPAN.findall(line):
+            if a not in names and a != 'oEnemy_Exemplo':
+                msg = '%s:%d cites %s, which is not in Zelda.yyp (write "(novo)" on the line if it is still to be made)' % (path, i, a)
+                (rep.error if as_error else rep.warn)(msg)
+        for d in DOC_SPAN.findall(line):
+            if not os.path.exists(os.path.join(REPO, d)):
+                rep.warn('%s:%d cites %s, which does not exist' % (path, i, d))
+
+
+def check_regions(rep, registered):
+    rdir = os.path.join(REPO, REGION_DIR)
+    model = os.path.join(rdir, REGION_MODEL)
+    if not os.path.exists(model):
+        rep.error('missing %s/%s (the region spec model)' % (REGION_DIR, REGION_MODEL))
+        return
+    sections = [l[3:].strip() for l in open(model, encoding='utf-8') if l.startswith('## ')]
+    for f in sorted(os.listdir(rdir)):
+        if not f.endswith('.md') or f.startswith('_') or f == 'README.md':
+            continue
+        path = '%s/%s' % (REGION_DIR, f)
+        text = open(os.path.join(rdir, f), encoding='utf-8').read()
+        have = {l[3:].strip() for l in text.splitlines() if l.startswith('## ')}
+        for sec in sections:
+            if sec not in have:
+                rep.error('%s is missing the section "## %s" (see %s)' % (path, sec, REGION_MODEL))
+        m = re.search(r'\*\*Estado:\*\*\s*(.+)', text)
+        if not m:
+            rep.error('%s has no "**Estado:**" line' % path)
+        elif m.group(1).strip().lower() not in REGION_STATES:
+            rep.error('%s: Estado "%s" is not one of: %s' % (path, m.group(1).strip(), ', '.join(REGION_STATES)))
+        check_doc_refs(rep, path, registered, as_error=True)
+    ref = os.path.join(REPO, REF_DIR)
+    if os.path.isdir(ref):
+        for f in sorted(os.listdir(ref)):
+            if f.endswith('.md'):
+                check_doc_refs(rep, '%s/%s' % (REF_DIR, f), registered, as_error=False)
 
 
 # ---------------------------------------------------------------- main
@@ -326,6 +391,7 @@ def main():
     check_gml(rep, registered, orphans, object_gml)
     check_data(rep)
     check_docs(rep)
+    check_regions(rep, registered)
 
     if CASE_MISMATCH:
         rep.note('paths that only match ignoring letter case: %d (fine on Windows, break on Linux/macOS)'

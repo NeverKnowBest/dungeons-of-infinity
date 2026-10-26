@@ -68,7 +68,11 @@ python tools/check/validate.py --strict   # warnings also fail
 | Array literal starting with `#RRGGBB` | error |
 | Lower case text drawn with `global.Font_Small` | warning |
 | `data_r`, `data_d` and the Tiled templates parse as JSON (LFS pointers are skipped) | error |
-| Arrows or em dashes in the Portuguese docs | warning |
+| Arrows or em dashes in the Portuguese docs (including `docs/ref/` and `docs/regioes/`) | warning |
+| Region spec (`docs/regioes/*.md`) has every `##` section of `_modelo.md` and a valid `**Estado:**` | error |
+| Region spec cites an asset (`oX`, `sX`, `Sound_X`, `Music_X` in backticks) that is not in `Zelda.yyp`, unless the line says "(novo)" | error |
+| Reference sheet (`docs/ref/*.md`) cites an asset that is not in `Zelda.yyp` | warning |
+| A cited `docs/...md` file does not exist | warning |
 
 When a new GML or data trap is found, add a check here.
 

@@ -45,6 +45,15 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 2. Ache o ponto de loop com `loopfind.py`, corte em `Intro` e `Main`.
 3. `gm_assets.sound(...)`, depois acrescente em `SongIndex` e na tabela de músicas (`__Music.gml`).
 
+## Especificação de região
+
+1. Copie `docs/regioes/_modelo.md` para `docs/regioes/<nome>.md` e preencha todas as seções. Estado começa em "ideia" ou "especificada".
+2. Números de inimigos, chefes e itens: tire de `docs/ref/` (ALttP em `alttp.md`, o que já existe em `doi.md`). Se faltar um jogo ou um inimigo, pesquise uma vez e acrescente a ficha lá (veja `docs/ref/README.md`), não na spec.
+3. Cite os assets entre crases (`oEnemy_Rat`, `Sound_Rain`). Para os que ainda vão ser criados, escreva "(novo)" na linha.
+4. Rode `python tools/check/validate.py`: ele acusa seção faltando, estado inválido e asset inexistente.
+5. Mostre a spec ao Guilherme antes de construir; o que ele decidir vai na seção Decisões.
+6. Ao avançar, atualize o Estado (em produção, pronta).
+
 ## Estágio alternativo (ex.: topo do castelo no nível 2)
 
 Como os níveis são montados hoje:
@@ -57,7 +66,7 @@ Passos:
 1. Novo valor em `DungeonLevel` (ou uma variante sorteada no lugar do nível 2) e o caso em `Dungeon_PickClass`, `Dungeon_StartDir`, `Dungeon_IsBossLevel` e tabelas por nível.
 2. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.
 3. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `data_r` pelo `editors/room-template-parser`. Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
-4. Clima: a chuva do começo da run é `oRainController` (gotas e respingos); relâmpago seria um flash de tela com som, no mesmo controlador.
+4. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). O `oRainController` que existe no disco é órfão e não compila. Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
 5. Inimigos: reaproveite os do castelo; só a tabela do nível muda.
 
 ## Conteúdo de outro Zelda (ex.: Minish Cap)

@@ -16,8 +16,22 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 * Only resources listed in `game/Zelda.yyp` are compiled. The repo also has hundreds of folders that are not in it (old scripts such as `_Enemies` next to the live `__Enemies`, old `Init` and `Dungeon_Init`, unused sprites and objects). They never run; `tools/check/validate.py --orphans` lists them. Search results often hit both versions, so check the `.yyp` first.
 * An object's `.gml` files only run if the event is in the object's `eventList` in its `.yy`. Several objects have leftover event files that never run (the validator warns about them).
 * Some resource folders differ from the `.yyp` only in letter case (`objects/ocape` for `oCape`). Windows does not care; Linux tools do.
+* `data_r`, `data_d` and the manuals and references in `docs/` (PDF, DOCX, MHTML) are Git LFS files. Claude's cloud sandbox clones the repo anonymously and cannot fetch LFS objects, so there they are only pointers (the validator skips them). Work that needs their contents is done on the home PC or with the files attached.
 * The live game reads no command line parameters. The `-t` and `-d` handling in `InitScreen` is in the dead `Init` script.
 * Level specific rules are spread through the code as `switch(global.Level.Index)` and `== DungeonLevel.X` checks (Mines: doors, decor, shop, waterfall colour, chance tables...). A new level means finding all of them until the level table (roadmap F4) exists.
+
+## Enemies (`scripts/__Enemies`)
+
+* `Enemies_InitData` registers every enemy with `EnemyDataInit(object, energy index, attack, special item, item, pack points, [weapon effects], [weight per level])`. An enemy object with no entry is never placed by the room generator (several exist: Delavant, Kyune, Lynel, Pirugusu, Soldier_Slasher).
+* Energy index means hits to kill, through `global.EnemyHitsToKill[attack points][index]`. Attack points are `ATTACK()` = sword index + 1 + glove index (minus the curse). Damage to Link is `Attack` in hearts minus 0.25 per defense point, at least 1/8 (`Enemy_Attack`).
+* Many enemies override the table's energy and attack in their own `Create`, by level: soldiers, Poe, Wizzrobe, Beamos (`switch(global.Level.Index)`), and Bari, Bubble, Gibdo, Guru, Keese, Kodongo, Octorok, Ropa, SnapDragon (`Type` from a level comparison), Wallmaster (formula). Fortress soldiers set theirs in `Step_1` from the random head. `docs/ref/doi.md` lists them all; check the object before trusting the table.
+* The level columns in `EnemyDataInit` stop at Aghanim1 (13 columns for 14 levels).
+* Numbers for every enemy are collected in `docs/ref/doi.md`.
+
+## Weather
+
+* Rain and lightning only exist in `oIntro` (level `Start`): `oRainDrop`, `oRainSplash`, `Sound_Rain` kept in `global.RainSound` (still playing in the castle). Lightning: alarm 1 sets `global.GlobalLighting = false` for 2 or 3 frames (alarm 2), every 30 to 180 frames; the `Draw` paints the white flash. No thunder sound in the project.
+* `objects/oRainController` is an orphan (not in `Zelda.yyp`).
 
 ## NPCs
 

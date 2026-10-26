@@ -12,6 +12,7 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 * **Menu de título:** só Start (e Continue). A intro pula com qualquer tecla e para na tela de título.
 * **README:** GIF da tela de título com brilho na espada e no logo.
 * **Validador estático** (`tools/check/validate.py`): confere o projeto sem GameMaker (recursos do `.yyp`, eventos dos objetos, imagens e sons, funções duplicadas, assets inexistentes no GML, armadilhas conhecidas, dados e estilo das docs). Rodar antes de toda entrega. Etapa F2 do plano de ferramentas.
+* **Fichas de referência e especificação de região** (etapa F9): `docs/ref/alttp.md` (inimigos, chefes e itens do ALttP com vida, dano, velocidade, arquétipo e a função do zelda3), `docs/ref/doi.md` (tudo o que o jogo já tem, com energia, ataque, pesos por nível, soldados por nível, níveis, chefes e clima), `docs/regioes/_modelo.md` (modelo de região) e a primeira spec, `docs/regioes/topo-do-castelo.md` (o piloto). O validador confere as specs.
 
 ## Decisões (não desfazer sem conversar)
 
@@ -65,24 +66,27 @@ Objetivo: deixar o projeto pronto para que uma região inteira (fase com salas, 
 **F8. Conversão de salas de referência**
 * Sala do ALttP (dump do `roomdump.c`) para template do Tiled com colisão, portas e posições de objetos, como ponto de partida para salas recombinadas. Depois o mesmo para o Minish Cap a partir da decompilação da comunidade.
 
-**F9. Referências e especificação de região**
+**F9. Referências e especificação de região** (pronto)
 * `docs/ref/<jogo>.md`: fichas de inimigos, chefes e itens (vida, velocidade, padrão de ataque, sons), pesquisadas uma vez.
 * `docs/regioes/<nome>.md`: modelo que descreve uma região (origem, salas, inimigos, chefe, item, música, clima).
 
 **F10. Skill "nova região"**
 * Juntar o fluxo inteiro (especificação, importação, ficha de fase, templates, inimigos, validador, teste) numa skill do Claude com checklist. Prompt esperado: "nova região X, gráficos em `incoming/x`, spec em `docs/regioes/x.md`".
 
-**Piloto:** topo do Castelo de Hyrule (item 3 abaixo), feito pelo fluxo novo. Reaproveita inimigos existentes, então testa as ferramentas sem o risco de mecânicas novas.
+**Piloto:** topo do Castelo de Hyrule (item 1 abaixo, spec em `docs/regioes/topo-do-castelo.md`), feito pelo fluxo novo. Reaproveita inimigos existentes, então testa as ferramentas sem o risco de mecânicas novas.
 
 Expectativa: região com inimigos reaproveitados ou de arquétipo sai de um prompt já testada; região com chefe de mecânica inédita sai quase pronta e pede uma ou duas rodadas de ajuste no chefe.
 
 ## Próximos passos de conteúdo (depois do plano de ferramentas)
 
-1. Estágio alternativo do nível 2: topo do Castelo de Hyrule. Mesmos inimigos do castelo, salas novas com o tema do castelo, chuva e relâmpagos como no começo da run. Veja `docs/dev/receitas.md`. É o piloto do plano de ferramentas.
+1. Estágio alternativo do nível 2: topo do Castelo de Hyrule. Mesmos inimigos do castelo, salas novas com o tema do castelo, chuva e relâmpagos como no começo da run. Spec em `docs/regioes/topo-do-castelo.md`; veja também `docs/dev/receitas.md`. É o piloto do plano de ferramentas.
 2. Novos NPCs e funções no Santuário, conforme as ideias do Guilherme.
 3. Mais conquistas e recompensas quando houver conteúdo novo para premiar.
 4. Atualizações maiores com conteúdo de outros Zeldas (ex.: um estágio do Minish Cap), com inimigos, chefes e itens novos portados a partir dos sprites e do código originais.
 
 ## Ideias soltas
 
+* Ficha do Minish Cap (`docs/ref/minish-cap.md`) a partir da decompilação `zeldaret/tmc`, quando a região do Minish Cap for planejada.
+* Harness em `tools/alttp/` que imprima a tabela de vulnerabilidade por arma do ALttP (`enemy_damage_data`, nos assets da ROM) para completar `docs/ref/alttp.md` (PC de casa).
+* Topo do castelo: vento nas passarelas e buraco no telhado que leva ao porão (fora da primeira versão).
 * (anote aqui ideias que ainda não viraram etapa)
