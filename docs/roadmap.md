@@ -11,6 +11,7 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 * **Hall of Fame:** sala à direita da igreja, com as 4 estátuas na parede de cima. Cada estátua fica em silhueta com "?" até completar as conquistas dela. Falando com uma estátua, abre a galeria dela com as conquistas e o que cada uma pede.
 * **Menu de título:** só Start (e Continue). A intro pula com qualquer tecla e para na tela de título.
 * **README:** GIF da tela de título com brilho na espada e no logo.
+* **Validador estático** (`tools/check/validate.py`): confere o projeto sem GameMaker (recursos do `.yyp`, eventos dos objetos, imagens e sons, funções duplicadas, assets inexistentes no GML, armadilhas conhecidas, dados e estilo das docs). Rodar antes de toda entrega. Etapa F2 do plano de ferramentas.
 
 ## Decisões (não desfazer sem conversar)
 
@@ -22,12 +23,64 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 * A decoração do Flute Boy é comemorativa, não de loja e nem de Natal.
 * O tempo de jogo só conta a partir da saída do Santuário. No Santuário, a pausa não mostra o tempo nem "Give Up".
 * Jogo em janela no PC de casa (QoL), via `options.ini`.
+* Antes de conteúdo novo grande, investir nas ferramentas do "Plano de ferramentas" abaixo (aprovado em out/2026). Meta: uma região inteira a partir de um prompt, com os gráficos entregues pelo Guilherme numa pasta.
+* O código morto pode ser apagado sem backup extra: a faxina vai num commit só dela, que pode ser revertido no GitHub Desktop, e o código 1.2.1 original está no archive.org.
 
-## Próximos passos (sugestão de ordem)
+## Plano de ferramentas (fazer antes do conteúdo novo)
 
-1. Novos NPCs e funções no Santuário, conforme as ideias do Guilherme.
-2. Mais conquistas e recompensas quando houver conteúdo novo para premiar.
-3. Estágio alternativo do nível 2: topo do Castelo de Hyrule. Mesmos inimigos do castelo, salas novas com o tema do castelo, chuva e relâmpagos como no começo da run. Veja `docs/dev/receitas.md`.
+Objetivo: deixar o projeto pronto para que uma região inteira (fase com salas, inimigos, chefe, música e clima) saia de um único prompt. Um chat por etapa, na ordem abaixo. Ao terminar uma etapa, marque como pronta aqui e mova o resumo para "Pronto".
+
+**F1. Faxina do código morto** (PC de casa)
+* Apagar os recursos que estão no disco mas não no `Zelda.yyp` (424 pastas: 91 scripts, 87 objetos, 219 sprites, 20 sons e outros). A lista sai de `python tools/check/validate.py --orphans`. Eles nem compilam, mas aparecem em toda busca e confundem (ex.: `_Enemies` e `__Enemies` com `EnemyDataInit` de assinaturas diferentes).
+* Apagar também os `.gml` de eventos que o objeto não tem (o validador avisa: "is not an event of the object"); eles nunca rodam.
+* Acertar os 48 caminhos que diferem do `.yyp` só em maiúsculas e minúsculas (funciona no Windows, quebra no Linux).
+* Pronto quando: o validador não lista órfãos e o jogo roda igual (hub, uma run até o nível 2). Commit só com a faxina.
+
+**F2. Validador estático** (pronto)
+* `tools/check/validate.py`. Crescer junto com o projeto: toda armadilha nova do GML ou dos dados vira uma checagem.
+
+**F3. Teste automatizado** (PC de casa)
+* Compilar pela linha de comando (o compilador que o IDE usa por baixo), com os erros em texto, sem abrir o IDE. Registrar o comando em `engine-notes.md`.
+* Modo de teste no jogo: `-test cenario.json` com nível, semente, itens, cheats, sala inicial e uma sequência de comandos (andar, atacar, esperar). O jogo grava um log em texto (sala carregada, inimigo morto, dano, erros) e prints em pontos marcados, e fecha sozinho. Atenção: o jogo atual não lê parâmetros (o `InitScreen` com `-t` e `-d` está num script morto); a leitura precisa ser criada no código vivo.
+* Folha de contato: gerar N fases de um nível com sementes diferentes e montar todas as salas num PNG só.
+* Cheats de debug: ir para um nível ou sala e criar um inimigo na frente do Link.
+* Pronto quando: um cenário de teste roda do começo ao fim sem ninguém tocar no teclado e o Claude lê o resultado em texto.
+
+**F4. Ficha de fase** (precisa da F3)
+* Trocar os `switch`/`case DungeonLevel.X` espalhados (ex.: Mines aparece em 28 arquivos, nas portas, decoração, loja, cachoeira, sorteios) por uma estrutura `global.LevelDefs[nível]` com tudo da fase: classe de dungeon, tema de tiles, piso e decoração, água, música, clima, chefe, regras especiais.
+* Inverter a tabela de inimigos: hoje cada `EnemyDataInit` tem um array com uma coluna por nível; passa a ser cada fase listando seus inimigos com peso.
+* Pronto quando: todas as fases atuais saem da ficha, o jogo se comporta igual (conferido pelos cenários da F3) e criar uma fase é acrescentar uma entrada.
+
+**F5. Conversor de templates em Python** (pode ser no PC do trabalho)
+* Reescrever o `editors/room-template-parser` (hoje um projeto GameMaker) em Python, gerando `data_r` a partir dos mapas do Tiled. O jogo continua no GameMaker; só a conversão sai dele.
+* Dividir o `data_r` (46 MB) em arquivos por classe, para caber na transferência para o PC e deixar os diffs menores (exige mudar o carregamento no jogo; testar na F3).
+
+**F6. Kit de importação de gráficos**
+* Convenção: o Guilherme coloca os gráficos em `incoming/<regiao>/` (sprites com nomes no padrão ou folhas com um `manifest.json`: tamanho do quadro, fps, origem; mais tileset e música).
+* `import_region.py` gera os sprites do GameMaker, registra no `.yyp`, ajusta a paleta às regras do `direcao.md` (canais em passos de 8, contorno escuro, limite de cores) e monta uma prévia. Reaproveita o `tools/hub/gm_assets.py`.
+
+**F7. Inimigos por arquétipo**
+* Objeto base parametrizado para os padrões comuns de Zelda 2D (anda aleatório, persegue, atira, pula, voa em onda, se esconde). Inimigo simples vira dados (velocidade, padrão, projétil, sprites). Chefes e mecânicas únicas continuam com código próprio.
+
+**F8. Conversão de salas de referência**
+* Sala do ALttP (dump do `roomdump.c`) para template do Tiled com colisão, portas e posições de objetos, como ponto de partida para salas recombinadas. Depois o mesmo para o Minish Cap a partir da decompilação da comunidade.
+
+**F9. Referências e especificação de região**
+* `docs/ref/<jogo>.md`: fichas de inimigos, chefes e itens (vida, velocidade, padrão de ataque, sons), pesquisadas uma vez.
+* `docs/regioes/<nome>.md`: modelo que descreve uma região (origem, salas, inimigos, chefe, item, música, clima).
+
+**F10. Skill "nova região"**
+* Juntar o fluxo inteiro (especificação, importação, ficha de fase, templates, inimigos, validador, teste) numa skill do Claude com checklist. Prompt esperado: "nova região X, gráficos em `incoming/x`, spec em `docs/regioes/x.md`".
+
+**Piloto:** topo do Castelo de Hyrule (item 3 abaixo), feito pelo fluxo novo. Reaproveita inimigos existentes, então testa as ferramentas sem o risco de mecânicas novas.
+
+Expectativa: região com inimigos reaproveitados ou de arquétipo sai de um prompt já testada; região com chefe de mecânica inédita sai quase pronta e pede uma ou duas rodadas de ajuste no chefe.
+
+## Próximos passos de conteúdo (depois do plano de ferramentas)
+
+1. Estágio alternativo do nível 2: topo do Castelo de Hyrule. Mesmos inimigos do castelo, salas novas com o tema do castelo, chuva e relâmpagos como no começo da run. Veja `docs/dev/receitas.md`. É o piloto do plano de ferramentas.
+2. Novos NPCs e funções no Santuário, conforme as ideias do Guilherme.
+3. Mais conquistas e recompensas quando houver conteúdo novo para premiar.
 4. Atualizações maiores com conteúdo de outros Zeldas (ex.: um estágio do Minish Cap), com inimigos, chefes e itens novos portados a partir dos sprites e do código originais.
 
 ## Ideias soltas

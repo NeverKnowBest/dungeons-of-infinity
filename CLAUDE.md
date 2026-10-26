@@ -17,6 +17,7 @@ Leia antes de começar qualquer tarefa:
 * Quando não der para gravar direto, entregue um zip com só os arquivos alterados, dentro de uma pasta `dungeons-of-infinity/` com a mesma estrutura do repositório.
 * No fim de cada entrega, passe o **título e a descrição do commit** (em inglês). O Guilherme faz o commit.
 * Mantenha uma lista de tarefas durante o trabalho.
+* **Rode `python tools/check/validate.py` antes de toda entrega** e corrija os erros. Ele funciona sem GameMaker, inclusive no ambiente do Claude.
 * Ele dá liberdade artística: decida os detalhes seguindo `docs/design/direcao.md` e pergunte só quando algo fugir dela ou for difícil de desfazer.
 * Prints não são necessários na resposta; mostre imagens só quando ajudarem a decidir algo.
 * **Alimente a documentação sempre.** É ela que substitui o histórico do chat, então todo chat deixa a base melhor do que encontrou:
@@ -29,7 +30,7 @@ Leia antes de começar qualquer tarefa:
 
 ## Começo de um chat novo
 
-O Guilherme diz se está no PC de casa (vinculado ao chat) ou no do trabalho, e qual é a etapa. Leia os documentos acima, confira no `git log` o estado do repositório e comece. Se o pedido for vago, decida pela direção de design; se for grande e visual, mostre uma prévia antes.
+O Guilherme diz se está no PC de casa (vinculado ao chat) ou no do trabalho, e qual é a etapa. Leia os documentos acima, confira no `git log` o estado do repositório e comece. Se ele disser só "próxima etapa", é a primeira etapa ainda não pronta do "Plano de ferramentas" no `docs/roadmap.md`. Se o pedido for vago, decida pela direção de design; se for grande e visual, mostre uma prévia antes.
 
 ## Git
 
@@ -55,5 +56,6 @@ O Guilherme diz se está no PC de casa (vinculado ao chat) ou no do trabalho, e 
 
 ## Ferramentas
 
+* `tools/check/validate.py`: validador estático do projeto (veja `tools/README.md`). `--orphans` lista os recursos que estão no disco mas não no projeto.
 * `tools/hub/`: scripts Python que geram as salas do hub, sprites e dados (`data_r`, `data_d`, Tiled). Veja `tools/README.md`.
 * `tools/alttp/`: utilitários em C que usam o código do zelda3 (reimplementação de ALttP) para extrair salas, sprites e músicas da ROM. A ROM nunca vai para o repositório.

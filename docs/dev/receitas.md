@@ -6,6 +6,8 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 
 * Os dados do jogo (`game/datafiles/data/data_r` e `data_d`) estão no Git LFS. Garanta os arquivos reais antes de editar (no clone sem LFS eles são só ponteiros de texto).
 * O código GML não pode ser testado no ambiente do Claude (não há GameMaker). Teste no PC de casa (veja `CLAUDE.md`).
+* Rode `python tools/check/validate.py` antes de entregar. Ele pega recursos faltando, eventos sem arquivo, assets inexistentes no GML e as armadilhas abaixo.
+* Muitos scripts e sprites no disco não fazem parte do projeto (código morto da versão original). Antes de ler ou editar um script, confira que ele está no `Zelda.yyp` (o validador lista os que não estão com `--orphans`).
 * GML que já deu problema: um array literal não pode começar com cor `#RRGGBB` (`[#` é acessor de ds_grid); use `make_colour_rgb`. `global.Font_Small` só tem letras maiúsculas.
 
 ## Sala nova no hub

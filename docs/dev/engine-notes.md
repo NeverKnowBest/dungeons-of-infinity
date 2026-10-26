@@ -11,6 +11,14 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 * Instance layers by depth: `ObjsHigher_Upper` 400, `Objs_Upper` 600, `ObjsDoors_Upper` 700, `ObjsFloor_Upper` 800, tile floors 1400. Anything drawn with `PixelRender_Normal()` needs a `FloorLevel` variable.
 * `data_r` and `data_d` are stored with Git LFS.
 
+## Project files
+
+* Only resources listed in `game/Zelda.yyp` are compiled. The repo also has hundreds of folders that are not in it (old scripts such as `_Enemies` next to the live `__Enemies`, old `Init` and `Dungeon_Init`, unused sprites and objects). They never run; `tools/check/validate.py --orphans` lists them. Search results often hit both versions, so check the `.yyp` first.
+* An object's `.gml` files only run if the event is in the object's `eventList` in its `.yy`. Several objects have leftover event files that never run (the validator warns about them).
+* Some resource folders differ from the `.yyp` only in letter case (`objects/ocape` for `oCape`). Windows does not care; Linux tools do.
+* The live game reads no command line parameters. The `-t` and `-d` handling in `InitScreen` is in the dead `Init` script.
+* Level specific rules are spread through the code as `switch(global.Level.Index)` and `== DungeonLevel.X` checks (Mines: doors, decor, shop, waterfall colour, chance tables...). A new level means finding all of them until the level table (roadmap F4) exists.
+
 ## NPCs
 
 * Template object gid 209 (NPC) creates the object `"o" + name`. Properties: `Dialogue` (lines split by `\n`, one line per talk; a `?` prefix makes it a yes/no question), `Response`, `NoWall` (any value: no collision box).

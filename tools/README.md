@@ -45,6 +45,33 @@ protocol.
 
 ## Scripts added in this fork
 
+### `check/` (Python 3, standard library only)
+
+`validate.py` checks the project without GameMaker. Run it before every delivery:
+
+```
+python tools/check/validate.py            # report; exit code 1 on errors
+python tools/check/validate.py --orphans  # list folders on disk that Zelda.yyp does not register
+python tools/check/validate.py --strict   # warnings also fail
+```
+
+| Check | Level |
+|-------|-------|
+| Every resource in `Zelda.yyp` exists on disk (ignoring letter case, like Windows) | error |
+| Asset name used by two resources | error |
+| Object parent, sprite, mask and collision objects are in the project | error |
+| Every event in an object's `eventList` has its `.gml` file | error |
+| `.gml` file that is not an event of the object (never runs) | warning |
+| Sprite frame images and sound files exist | error |
+| Global function defined in two scripts | error |
+| Asset style name (`sX`, `oX`, `Sound_X`, `Music_X`) used in GML that does not exist | warning (error if it only exists as an orphan) |
+| Array literal starting with `#RRGGBB` | error |
+| Lower case text drawn with `global.Font_Small` | warning |
+| `data_r`, `data_d` and the Tiled templates parse as JSON (LFS pointers are skipped) | error |
+| Arrows or em dashes in the Portuguese docs | warning |
+
+When a new GML or data trap is found, add a check here.
+
 ### `hub/` (Python 3, Pillow, numpy)
 
 Builds the Sanctuary hub: room pictures, sprites, objects and data. Paths are relative to the repo, so run them from anywhere.
