@@ -1,23 +1,26 @@
 switch(State){
 	
 	case 0:
-		Alpha = min(1, Alpha + 0.1);
-		if(Alpha >= 1){
-			Hub_MoveLinkTo(DestRoom, DestX, DestY, DestFacing);
-			Hold = 8;
+		// scroll at the dungeon transition speed (4px per frame on each axis)
+		with(oCamera){
+			var _X = X + clamp(other.CamTargetX - X, -4, 4);
+			var _Y = Y + clamp(other.CamTargetY - Y, -4, 4);
+			Cam_SetPos(_X, _Y);
+		}
+		if(oCamera.X == CamTargetX && oCamera.Y == CamTargetY){
+			oCamera.Override = false;
+			Dungeon_RoomDeActivate(FromRoom);
+			global.Paused = false;
+			var _Dir = (DestFacing == RIGHT) ? 1 : -1;
+			with(oLink) Link_SetAutoMove(_Dir, 0, WalkSpeed, 14);
 			State = 1;
 		}
 		break;
 		
 	case 1:
-		Hold--;
-		if(Hold <= 0) State = 2;
-		break;
-		
-	case 2:
-		Alpha = max(0, Alpha - 0.1);
-		if(Alpha <= 0){
-			with(oLink) UpdateState(LinkState.Standing);
+		Frames++;
+		if(Frames > 16){
+			with(oLink) if(State == LinkState.AutoMove) UpdateState(LinkState.Standing);
 			instance_destroy();
 		}
 		break;

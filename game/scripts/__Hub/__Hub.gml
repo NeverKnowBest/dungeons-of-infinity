@@ -130,7 +130,7 @@ function Hub_CreateScenery(_RoomIndex){
 			
 			//side door to the Hall of Fame (the hall is the next room in the layout)
 			instance_create_layer(Room.x + 360, Room.y + 280, "System", oHubDoor, {
-				TrigW: 40, TrigH: 32, DestTemplate: "HallOfFame", DestX: 76, DestY: 136, DestFacing: RIGHT
+				TrigW: 40, TrigH: 32, DestTemplate: "HallOfFame", DestX: 50, DestY: 136, DestFacing: RIGHT
 			});
 			break;
 			
@@ -145,7 +145,7 @@ function Hub_CreateScenery(_RoomIndex){
 			
 			//door back to the Sanctuary, on the left wall
 			instance_create_layer(Room.x + 12, Room.y + 112, "System", oHubDoor, {
-				TrigW: 40, TrigH: 32, DestTemplate: "Sanctuary", DestX: 336, DestY: 300, DestFacing: LEFT
+				TrigW: 40, TrigH: 32, DestTemplate: "Sanctuary", DestX: 362, DestY: 300, DestFacing: LEFT
 			});
 			
 			//the statues along the top wall, bronze to gold; talking to one opens the gallery on it
@@ -190,7 +190,7 @@ function Statue_Figure(_StatueKey){
 function Hub_CreateStatue(_X, _Y, _Index){
 	var _Statue = instance_create_layer(_X, _Y, "ObjsFloor_Upper", oHallStatue, {Index : _Index});
 	instance_create_layer(_X, _Y, "ObjsHigher_Upper", oHallStatueTop, {Owner : _Statue});
-	WallObj_Create("Objs_Upper", _X - 16, _Y - 24, 4, 3);
+	WallObj_Create("Objs_Upper", _X - 16, _Y - 72, 4, 9);	// pedestal and the space behind it, up to the wall
 }
 
 /// Draws the part of a statue figure above (_Upper) or below _SplitY. (_X, _Bottom) is the figure's bottom centre.
@@ -224,8 +224,10 @@ function Achievement_RewardText(_Ach){
 	return "";
 }
 
-/// Moves Link to another hub room (used by oHubTravel while the screen is black)
+/// Starts moving Link to another hub room (called by oHubTravel): activates the room, puts Link at the doorway and
+/// returns [camera x, camera y] for that room, so oHubTravel can scroll the camera there like a dungeon room change.
 function Hub_MoveLinkTo(_RoomIndex, _X, _Y, _Facing){
+	Dungeon_RoomActivate(_RoomIndex);
 	with(oLink){
 		x = _X;
 		y = _Y;
@@ -236,12 +238,19 @@ function Hub_MoveLinkTo(_RoomIndex, _X, _Y, _Facing){
 		FallSpawnY = y;
 		FallSpawnFacing = _Facing;
 		UpdateSprites();
-		Dungeon_DestroyUnimportantObjs();
-		oCamera.SetToRoomIndex(_RoomIndex, true, false, x - 128, y - 128);
-		global.Level.Rooms[_RoomIndex].Visited = true;
-		Map_UpdateExploredRooms();
 	}
-	with(oCamera) Cam_UpdatePos();
+	Dungeon_DestroyUnimportantObjs();
+	var _Target = [0, 0];
+	with(oCamera){
+		var _OldX = X, _OldY = Y;
+		SetCurrentRoom(_RoomIndex);
+		Cam_UpdatePos();
+		_Target = [X, Y];
+		Cam_SetPos(_OldX, _OldY);
+	}
+	global.Level.Rooms[_RoomIndex].Visited = true;
+	Map_UpdateExploredRooms();
+	return _Target;
 }
 
 /// Collision boxes of the Sanctuary (ALttP room 0x12): [x, y, width in tiles, height in tiles], 8px tiles.
@@ -440,10 +449,9 @@ function HubMenu_PickGear(_Row){
 	GameMenu_Open(HubMenuPage.Main);
 }
 
+/// Locked bonus items stay a secret: no hint about what unlocks them
 function HubMenu_GearHint(_Row){
-	if(Gear_IsUnlocked(_Row.Gear)) return "";
-	var _Ach = Gear_UnlockAchievement(_Row.Gear);
-	return _Ach == undefined ? "" : "Unlock: " + _Ach.Desc;
+	return "";
 }
 
 function HubMenu_DrawGearIcon(_Row, _FrameX, _Y, _Right){
@@ -462,10 +470,9 @@ function HubMenu_PickSkin(_Row){
 	GameMenu_Close();
 }
 
+/// Locked looks stay a secret: no hint about what unlocks them
 function HubMenu_SkinHint(_Row){
-	if(Skin_IsUnlocked(_Row.Skin)) return "";
-	var _Ach = Skin_UnlockAchievement(_Row.Skin);
-	return _Ach == undefined ? "" : "Unlock: " + _Ach.Desc;
+	return "";
 }
 
 /// Big preview of the selected skin on the right of the frame (a black silhouette while locked)
