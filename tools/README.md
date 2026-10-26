@@ -42,3 +42,40 @@ Our own AutoIt scripts that let the game talk to `Stockfish.exe` over the UCI
 protocol. The game writes command files (`Command`), and `SF.au3` relays them to
 Stockfish and writes the responses back. `UCI notes.txt` has quick notes on the
 protocol.
+
+## Scripts added in this fork
+
+### `hub/` (Python 3, Pillow, numpy)
+
+Builds the Sanctuary hub: room pictures, sprites, objects and data. Paths are relative to the repo, so run them from anywhere.
+
+| Script | What it does |
+|--------|--------------|
+| `gm_assets.py` | Writes GameMaker 2024 sprites (multi frame, fps, origin), sounds and objects, and registers them in `Zelda.yyp`. Re-running a sprite keeps its frame ids, so files overwrite in place |
+| `tiledjson.py` | Serializes objects the way Tiled writes `data/room-templates/*.json` |
+| `gids.py` | Tiled gid of each template object type, read from `__RoomTemplates.gml` |
+| `build2.py` | Shared helpers: load/save `data_r` and `data_d`, remove objects from the Tiled map |
+| `build3.py` | Writes the hub rooms (Sanctuary 2x2, Hall of Fame 2x1) into the Tiled map, `data_r` (Other/Unique templates) and `data_d` (Special template 5). Edit `ROOMS` to add a room or an NPC |
+| `festive_draw.py` | The Flute Boy's counter decor over `sanct_base4.png` (writes `sanct_base6.png`) |
+| `build_pics.py` | Church picture with the side door (`church_base.png`) |
+| `build_hall3.py` | Hall of Fame picture (`hall3_base.png`) |
+| `statues.py` | Statue figures and pedestals (metal recolor of boss sprites, silhouettes) |
+| `z3room.py`, `objrender.py` | Render a zelda3 room dump (BG layers, animated tiles) and OBJ tiles |
+| `loopfind.py`, `envloop.py` | Find loop points in rendered SPC music |
+
+Order for the hub pictures: `festive_draw.py`, `build_pics.py`, `build_hall3.py`, `statues.py`, then copy the PNGs into the sprites with `gm_assets.sprite(...)`. Previews go to `hub/preview/` (ignored by git).
+
+`data_r`, `data_d` are Git LFS files. Make sure the real files are checked out (`git lfs pull`) before running `build3.py`.
+
+### `alttp/` (C, needs the zelda3 source and your own ROM)
+
+Small harnesses compiled against [zelda3](https://github.com/snesrev/zelda3) (the C reimplementation of ALttP). They load the game's assets (`zelda3_assets.dat`, built from your ROM by zelda3's own asset script) and dump data:
+
+| File | Dumps |
+|------|-------|
+| `roomdump.c` | A dungeon room: VRAM, palettes, BG1/BG2 tilemaps and tile attributes (render it with `hub/z3room.py`). `ANIMFRAME=n` copies animated tile frame n first |
+| `sprdump.c` | OBJ VRAM and palettes of an overworld area, plus sprite OAM flags (for extracting NPC sprites) |
+| `musicdump.c` | A song rendered to PCM through the SPC emulator (`TRACE=1` prints the song pointer) |
+| `entm.c` | The entrance to music table |
+
+Build them like zelda3's own `main.c`: compile the file together with zelda3's `src/*.c` and `snes/*.c` (minus `src/main.c`), with zelda3's include paths.
