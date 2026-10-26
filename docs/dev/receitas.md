@@ -18,6 +18,14 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 4. Porta entre salas do hub: um `oHubDoor` no vão da porta (caixa de gatilho) com `DestTemplate`, `DestX`, `DestY` (posição de chegada, já no vão da outra porta) e `DestFacing`. A troca de sala rola a câmera como nas dungeons (`oHubTravel`).
 5. Teste: andar por todas as bordas, passar pelas portas nos dois sentidos, conferir que o Link não entra em paredes nem fica atrás de objetos que deveriam cobri-lo.
 
+## Template de sala no Tiled
+
+1. Abra o mapa da classe em `data/room-templates/` (`Room Templates <Classe>.json`) no Tiled 1.10 ou mais novo.
+2. Desenhe o retângulo da sala na camada `Rooms` (tamanho em múltiplos de 256; meia sala de 256x128 só nas classes Main) e preencha `type` com a subclasse quando a classe for por tipo (Special, Other, Village, Mines, Obstacles). Os objetos vão nas camadas de mesmo nome, sempre com a propriedade `Room` apontando para o retângulo.
+3. Gere o `data_r`: `python tools/templates/convert.py --summary`. Ele avisa camada desconhecida, objeto sem `Room`, tamanho de sala inválido e porta fora das posições de porta.
+4. Antes de gravar por cima do `data_r` do jogo pela primeira vez (até a comparação da F5 ser feita), gere em outro lugar com `-o` e confira com `python tools/templates/compare.py game/datafiles/data/data_r <novo>`: a diferença deve ser só a sala nova.
+5. Rode o validador e teste no jogo (no PC de casa).
+
 ## Imagem de sala a partir do ALttP
 
 1. Descubra o número da sala no ALttP (wikis e o próprio zelda3 ajudam).
@@ -65,7 +73,7 @@ Passos:
 
 1. Novo valor em `DungeonLevel` (ou uma variante sorteada no lugar do nível 2) e o caso em `Dungeon_PickClass`, `Dungeon_StartDir`, `Dungeon_IsBossLevel` e tabelas por nível.
 2. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.
-3. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `data_r` pelo `editors/room-template-parser`. Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
+3. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `data_r` com `tools/templates/convert.py` (veja "Template de sala no Tiled"). Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
 4. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
 5. Inimigos: reaproveite os do castelo; só a tabela do nível muda.
 

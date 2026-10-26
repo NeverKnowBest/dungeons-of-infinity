@@ -16,7 +16,7 @@ blocks the common extensions.
 
 | Tool | Version used | Used for |
 |------|--------------|----------|
-| GameMaker | IDE 2024.13.1.193 / Runtime 2024.13.1.242 (Template Editor: 2023.11.0.121 / 2023.11.0.157). See the root README | Opening `game/` and the projects under `editors/` |
+| GameMaker | IDE 2024.13.1.193 / Runtime 2024.13.1.242 (Template Editor: 2023.11.0.121 / 2023.11.0.157). See the root README | Opening `game/` and `editors/dungeon-editor`. `editors/room-template-parser` is being replaced by `templates/convert.py` (roadmap F5) |
 | [Tiled](https://www.mapeditor.org/) | 1.11.2 | Editing room templates in `data/room-templates/` |
 | Aseprite | n/a | Editing the `.aseprite` / `.ase` art sources in `art/` |
 | xzip (xgasoft GameMaker extension) | 1.0.2 | Zip support in the game. Already imported into `game/`, so you only need it again to update the extension |
@@ -77,6 +77,25 @@ python tools/check/validate.py --strict   # warnings also fail
 | A cited `docs/...md` file does not exist | warning |
 
 When a new GML or data trap is found, add a check here.
+
+### `templates/` (Python 3, standard library only)
+
+Room template conversion, ported from the GameMaker project `editors/room-template-parser`:
+
+```
+python tools/templates/convert.py                  # Tiled maps in data/room-templates -> game/datafiles/data/data_r
+python tools/templates/convert.py -o out/data_r    # write somewhere else
+python tools/templates/convert.py --summary        # also print the template count per class and subclass
+python tools/templates/compare.py OLD NEW          # compare two data_r files by content (exit code 1 if they differ)
+```
+
+| File | What it does |
+|------|--------------|
+| `convert.py` | Reads the ten `Room Templates <Class>.json` maps, makes positions relative to each room, joins the Main Upper/Lower halves, computes door and zone codes and writes `data_r` (about 7 s). How the data works: `docs/dev/engine-notes.md`, "Room templates" |
+| `rt_tables.py` | Transform tables (gid, door position, section id, rotation, pot and switch block directions), generated once from the GML `GetTransformed*` functions. Gid names resolve through the `TemplateObjGID` enum in the game's `__RoomTemplates.gml` |
+| `compare.py` | Content comparison of two `data_r` files, ignoring key order and int versus float. Template order inside a subclass counts (it changes what a seed builds) |
+
+Until the comparison with the real `data_r` is done on the home PC (roadmap F5), write to another file with `-o` instead of over the game's `data_r`.
 
 ### `hub/` (Python 3, Pillow, numpy)
 

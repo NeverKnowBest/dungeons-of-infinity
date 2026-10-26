@@ -11,6 +11,18 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 * Instance layers by depth: `ObjsHigher_Upper` 400, `Objs_Upper` 600, `ObjsDoors_Upper` 700, `ObjsFloor_Upper` 800, tile floors 1400. Anything drawn with `PixelRender_Normal()` needs a `FloorLevel` variable.
 * `data_r` and `data_d` are stored with Git LFS.
 
+## Room templates (`data_r`)
+
+* `tools/templates/convert.py` builds `data_r` from the Tiled maps (one per class: `Room Templates <Class>.json`). It is a port of `editors/room-template-parser` (GameMaker); `game/scripts/__RoomTemplates` and `__Transformations` hold the same enums and transform tables on the game side.
+* `data_r` is `global.Templates_Room[class][subclass][template]`. Class order: Main_Upper, Main_Lower, Stairs, Jails, Village, Mines, Obstacles, Sections, Special, Other. The subclass is the room size (1x1, 1x2, 2x1) for the size based classes, or the Tiled room `type` (Obstacles: Blocks, MovingFloors, SpikeBlocks; Special: Fairy, Shop, GemPond, Treasure, TreasureLarge, Rupee, Gem, Kinstone; Other: Boss, Start, Unique, Save; Village: Main, House, Maze, Exit; Mines: Main, House).
+* A Tiled map has a `Rooms` layer (one rectangle per template, with `type` and properties such as `Symetry` and `Split_MainSectionIDs`), one object layer per object type of the class, and for some classes a `Sections` group (Main_Upper has 5 sub groups: Main, 1-3-6-8, 2-4-5-7, 9-...-16, 17-20; the others only Main). Every object has a `Room` property pointing to its room rectangle. The lists of layers per class are in `convert.py` (`OBJ_TYPES`, `SECTION_OBJ_TYPES`) and in `RoomTemplates_Load`.
+* Object positions become relative to the room; a rotated Tiled object (90, -90, 180) is turned into a plain box first (`RoomTemplates_FixObjRotation`).
+* Main_Upper and Main_Lower templates are half rooms (256x128 or 256x256). The converter joins every pair whose `SplitConnections` match: the second half is flipped vertically (and also flipped both ways when both halves have `Symetry` 0) and placed under the first. Then touching side walls are joined, duplicated doors removed and carpet door lists merged. That is why 46 Main_Upper halves become 273 rooms. Template 11115 joined with itself unflipped is skipped on purpose (bad zones).
+* `DoorCode`: one number per transform (None, FlipH, FlipV, FlipHV, RotateCW, RotateCCW, FlipHRotateCW, FlipHRotateCCW); bit n-1 is set when there is a door at position n (1..24, the coordinates are in `DOOR_XY` / `Data_InitDoorCoordinates`) after that transform. `ZoneCodes[transform][section][zone]` is the same per zone. Doors get `Position` and `Location`. Village, Mines and Other get no codes and allow no transform.
+* Numbers are written as floats (`16.0`), like GameMaker writes its reals; the file ends with a zero byte (GameMaker `buffer_string`). The game does not care about either.
+* Carpet `DoorsFrom` and `DoorsTo` are strings in Tiled. The GML transform split them with `CSVToList` (strings) and still worked in game, so the converter treats them as numbers. If the comparison with the real `data_r` shows carpet door differences, this is the first place to look.
+* The old parser ended with `RoomTemplates_GenerateImageSheet` (a debug PNG that read a `RoomMapSpr` nobody set); the converter does not port it.
+
 ## Project files
 
 * Only resources listed in `game/Zelda.yyp` are compiled. The 424 folders that were on disk but not in it (old scripts such as `_Enemies`, `Init` and `Dungeon_Init`, unused sprites and objects) were deleted in the F1 cleanup (oct/2026); the original 1.2.1 code is on archive.org if one is ever needed. The validator warns about any new orphan folder (`--orphans` lists them).

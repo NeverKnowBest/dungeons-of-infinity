@@ -12,6 +12,8 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 * **Menu de título:** só Start (e Continue). A intro pula com qualquer tecla e para na tela de título.
 * **README:** GIF da tela de título com brilho na espada e no logo.
 * **Validador estático** (`tools/check/validate.py`): confere o projeto sem GameMaker (recursos do `.yyp`, eventos dos objetos, imagens e sons, funções duplicadas, assets inexistentes no GML, armadilhas conhecidas, dados e estilo das docs). Rodar antes de toda entrega. Etapa F2 do plano de ferramentas.
+* **Faxina do código morto** (etapa F1): apagadas as 424 pastas de recursos fora do `Zelda.yyp`, os `.gml` de eventos que os objetos não têm e acertados os 48 caminhos com maiúsculas e minúsculas diferentes. O validador não lista mais órfãos.
+* **Conversor de templates em Python** (etapa F5, primeira parte): `tools/templates/convert.py` gera o `data_r` a partir dos mapas do Tiled em `data/room-templates/`, para substituir o projeto GameMaker `editors/room-template-parser`. Roda em uns 7 s, sem GameMaker. `tools/templates/compare.py` compara dois `data_r` pelo conteúdo. Ainda não adotado: falta a comparação com o `data_r` real (veja F5).
 * **Fichas de referência e especificação de região** (etapa F9): `docs/ref/alttp.md` (inimigos, chefes e itens do ALttP com vida, dano, velocidade, arquétipo e a função do zelda3), `docs/ref/doi.md` (tudo o que o jogo já tem, com energia, ataque, pesos por nível, soldados por nível, níveis, chefes e clima), `docs/regioes/_modelo.md` (modelo de região) e a primeira spec, `docs/regioes/topo-do-castelo.md` (o piloto). O validador confere as specs.
 
 ## Decisões (não desfazer sem conversar)
@@ -31,7 +33,7 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 
 Objetivo: deixar o projeto pronto para que uma região inteira (fase com salas, inimigos, chefe, música e clima) saia de um único prompt. Um chat por etapa, na ordem abaixo. Ao terminar uma etapa, marque como pronta aqui e mova o resumo para "Pronto".
 
-**F1. Faxina do código morto** (PC de casa)
+**F1. Faxina do código morto** (pronto)
 * Apagar os recursos que estão no disco mas não no `Zelda.yyp` (424 pastas: 91 scripts, 87 objetos, 219 sprites, 20 sons e outros). A lista sai de `python tools/check/validate.py --orphans`. Eles nem compilam, mas aparecem em toda busca e confundem (ex.: `_Enemies` e `__Enemies` com `EnemyDataInit` de assinaturas diferentes).
 * Apagar também os `.gml` de eventos que o objeto não tem (o validador avisa: "is not an event of the object"); eles nunca rodam.
 * Acertar os 48 caminhos que diferem do `.yyp` só em maiúsculas e minúsculas (funciona no Windows, quebra no Linux).
@@ -52,9 +54,11 @@ Objetivo: deixar o projeto pronto para que uma região inteira (fase com salas, 
 * Inverter a tabela de inimigos: hoje cada `EnemyDataInit` tem um array com uma coluna por nível; passa a ser cada fase listando seus inimigos com peso.
 * Pronto quando: todas as fases atuais saem da ficha, o jogo se comporta igual (conferido pelos cenários da F3) e criar uma fase é acrescentar uma entrada.
 
-**F5. Conversor de templates em Python** (pode ser no PC do trabalho)
-* Reescrever o `editors/room-template-parser` (hoje um projeto GameMaker) em Python, gerando `data_r` a partir dos mapas do Tiled. O jogo continua no GameMaker; só a conversão sai dele.
-* Dividir o `data_r` (46 MB) em arquivos por classe, para caber na transferência para o PC e deixar os diffs menores (exige mudar o carregamento no jogo; testar na F3).
+**F5. Conversor de templates em Python** (conversor pronto; falta a parte do PC de casa)
+* Reescrever o `editors/room-template-parser` (hoje um projeto GameMaker) em Python, gerando `data_r` a partir dos mapas do Tiled. O jogo continua no GameMaker; só a conversão sai dele. **Pronto:** `tools/templates/convert.py` (feito no PC do trabalho, sem o `data_r` real à mão: a saída tem 46.881.229 bytes contra 46.871.155 do atual).
+* **Falta (PC de casa):** comparar com o `data_r` real antes de trocar: `python tools/templates/convert.py -o novo_data_r` e `python tools/templates/compare.py game/datafiles/data/data_r novo_data_r`. Se houver diferença, corrigir o conversor (onde olhar primeiro: `docs/dev/engine-notes.md`, "Room templates"). Só depois disso gravar por cima do `data_r` e rodar uma run até o nível 2.
+* **Falta (PC de casa):** dividir o `data_r` (46 MB) em arquivos por classe, para caber na transferência para o PC e deixar os diffs menores (exige mudar o carregamento no jogo, `RoomTemplates_Load`, e o `convert.py`; testar no jogo e, quando existir, pelos cenários da F3).
+* Depois da troca: aposentar o `editors/room-template-parser` (apagar ou deixar só como referência) e fazer o `tools/hub/build3.py` chamar o conversor em vez de editar o `data_r` à mão.
 
 **F6. Kit de importação de gráficos**
 * Convenção: o Guilherme coloca os gráficos em `incoming/<regiao>/` (sprites com nomes no padrão ou folhas com um `manifest.json`: tamanho do quadro, fps, origem; mais tileset e música).

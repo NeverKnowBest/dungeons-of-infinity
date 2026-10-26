@@ -59,5 +59,6 @@ O Guilherme diz se está no PC de casa (vinculado ao chat) ou no do trabalho, e 
 ## Ferramentas
 
 * `tools/check/validate.py`: validador estático do projeto (veja `tools/README.md`). `--orphans` lista os recursos que estão no disco mas não no projeto. Também confere as especificações de região (seções do modelo, estado, assets citados).
+* `tools/templates/`: `convert.py` gera o `data_r` a partir dos mapas do Tiled (vai substituir o `editors/room-template-parser` depois da comparação da F5); `compare.py` compara dois `data_r`.
 * `tools/hub/`: scripts Python que geram as salas do hub, sprites e dados (`data_r`, `data_d`, Tiled). Veja `tools/README.md`.
 * `tools/alttp/`: utilitários em C que usam o código do zelda3 (reimplementação de ALttP) para extrair salas, sprites e músicas da ROM. A ROM nunca vai para o repositório.
