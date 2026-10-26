@@ -1,1 +1,0 @@
-if(global.PauseAll)	PauseObj(self);	

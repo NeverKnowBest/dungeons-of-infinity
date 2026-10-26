@@ -24,3 +24,6 @@ editors/template-editor/Template Editor/
 # Large archives
 *.7z
 *.rar
+
+# Python caches
+__pycache__/

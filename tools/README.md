@@ -58,6 +58,8 @@ python tools/check/validate.py --strict   # warnings also fail
 | Check | Level |
 |-------|-------|
 | Every resource in `Zelda.yyp` exists on disk (ignoring letter case, like Windows) | error |
+| Resource path only matches ignoring letter case (breaks on Linux and macOS) | warning |
+| Resource folder on disk that `Zelda.yyp` does not register (orphan) | warning |
 | Asset name used by two resources | error |
 | Object parent, sprite, mask and collision objects are in the project | error |
 | Every event in an object's `eventList` has its `.gml` file | error |

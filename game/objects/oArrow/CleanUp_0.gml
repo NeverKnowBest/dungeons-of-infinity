@@ -1,1 +1,0 @@
-Lighting_DestroyLight(LightIndex);

@@ -1,2 +1,0 @@
-FloorLevel = oLink.FloorLevel;
-

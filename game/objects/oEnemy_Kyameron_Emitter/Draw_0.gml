@@ -1,1 +1,0 @@
-if(!Hidden) event_inherited();

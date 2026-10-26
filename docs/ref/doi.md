@@ -161,4 +161,3 @@ Sons próprios dos chefes: `Sound_Boss_Hit`, `Sound_Boss_Destroy`, `Sound_Moldor
 ## Clima e efeitos que já existem
 
 * **Chuva e relâmpago:** `oIntro` (só no nível `Start`). Gotas `oRainDrop` e respingos `oRainSplash`, som `Sound_Rain` guardado em `global.RainSound`. O relâmpago é um flash branco da tela que liga de 30 a 180 quadros e dura 2 ou 3 (alarmes 1 e 2 do `oIntro`, desenho no `Draw`). O som da chuva continua tocando no castelo (`Dungeon_InitLevel`). Não há som de trovão.
-* `oRainController` é um objeto órfão (fora do `Zelda.yyp`); não use.

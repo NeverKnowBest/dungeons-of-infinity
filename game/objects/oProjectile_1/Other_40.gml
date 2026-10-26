@@ -1,1 +1,0 @@
-if(OutsideViewDestroy) instance_destroy(self);

@@ -394,14 +394,14 @@ def main():
     check_regions(rep, registered)
 
     if CASE_MISMATCH:
-        rep.note('paths that only match ignoring letter case: %d (fine on Windows, break on Linux/macOS)'
-                 % len(set(CASE_MISMATCH)))
+        for p in sorted(set(CASE_MISMATCH)):
+            rep.warn('path only matches ignoring letter case (breaks on Linux/macOS): %s' % p)
 
     by_dir = {}
     for o in orphans:
         by_dir[o.split('/')[1]] = by_dir.get(o.split('/')[1], 0) + 1
     if orphans:
-        rep.note('unregistered (orphan) resources on disk: %d (%s); list them with --orphans'
+        rep.warn('unregistered (orphan) resources on disk: %d (%s); list them with --orphans'
                  % (len(orphans), ', '.join('%s %d' % kv for kv in sorted(by_dir.items()))))
 
     for title, items in (('ERRORS', rep.errors), ('WARNINGS', rep.warnings), ('NOTES', rep.notes)):

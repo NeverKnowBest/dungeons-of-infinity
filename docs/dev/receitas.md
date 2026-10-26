@@ -7,7 +7,7 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 * Os dados do jogo (`game/datafiles/data/data_r` e `data_d`) estão no Git LFS. Garanta os arquivos reais antes de editar (no clone sem LFS eles são só ponteiros de texto).
 * O código GML não pode ser testado no ambiente do Claude (não há GameMaker). Teste no PC de casa (veja `CLAUDE.md`).
 * Rode `python tools/check/validate.py` antes de entregar. Ele pega recursos faltando, eventos sem arquivo, assets inexistentes no GML e as armadilhas abaixo.
-* Muitos scripts e sprites no disco não fazem parte do projeto (código morto da versão original). Antes de ler ou editar um script, confira que ele está no `Zelda.yyp` (o validador lista os que não estão com `--orphans`).
+* Só compila o que está no `Zelda.yyp`. O código morto da versão original foi apagado na F1; se o validador acusar uma pasta órfã nova (por exemplo, um recurso removido no IDE, que deixa a pasta no disco), apague a pasta.
 * GML que já deu problema: um array literal não pode começar com cor `#RRGGBB` (`[#` é acessor de ds_grid); use `make_colour_rgb`. `global.Font_Small` só tem letras maiúsculas.
 
 ## Sala nova no hub
@@ -66,7 +66,7 @@ Passos:
 1. Novo valor em `DungeonLevel` (ou uma variante sorteada no lugar do nível 2) e o caso em `Dungeon_PickClass`, `Dungeon_StartDir`, `Dungeon_IsBossLevel` e tabelas por nível.
 2. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.
 3. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `data_r` pelo `editors/room-template-parser`. Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
-4. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). O `oRainController` que existe no disco é órfão e não compila. Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
+4. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
 5. Inimigos: reaproveite os do castelo; só a tabela do nível muda.
 
 ## Conteúdo de outro Zelda (ex.: Minish Cap)

@@ -42,7 +42,7 @@ Objetivo: deixar o projeto pronto para que uma região inteira (fase com salas, 
 
 **F3. Teste automatizado** (PC de casa)
 * Compilar pela linha de comando (o compilador que o IDE usa por baixo), com os erros em texto, sem abrir o IDE. Registrar o comando em `engine-notes.md`.
-* Modo de teste no jogo: `-test cenario.json` com nível, semente, itens, cheats, sala inicial e uma sequência de comandos (andar, atacar, esperar). O jogo grava um log em texto (sala carregada, inimigo morto, dano, erros) e prints em pontos marcados, e fecha sozinho. Atenção: o jogo atual não lê parâmetros (o `InitScreen` com `-t` e `-d` está num script morto); a leitura precisa ser criada no código vivo.
+* Modo de teste no jogo: `-test cenario.json` com nível, semente, itens, cheats, sala inicial e uma sequência de comandos (andar, atacar, esperar). O jogo grava um log em texto (sala carregada, inimigo morto, dano, erros) e prints em pontos marcados, e fecha sozinho. Atenção: o jogo atual não lê parâmetros (o `InitScreen` com `-t` e `-d` ficava num script morto, apagado na F1; está no código 1.2.1 do archive.org); a leitura precisa ser criada no código vivo.
 * Folha de contato: gerar N fases de um nível com sementes diferentes e montar todas as salas num PNG só.
 * Cheats de debug: ir para um nível ou sala e criar um inimigo na frente do Link.
 * Pronto quando: um cenário de teste roda do começo ao fim sem ninguém tocar no teclado e o Claude lê o resultado em texto.

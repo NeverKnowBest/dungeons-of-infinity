@@ -13,11 +13,12 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 
 ## Project files
 
-* Only resources listed in `game/Zelda.yyp` are compiled. The repo also has hundreds of folders that are not in it (old scripts such as `_Enemies` next to the live `__Enemies`, old `Init` and `Dungeon_Init`, unused sprites and objects). They never run; `tools/check/validate.py --orphans` lists them. Search results often hit both versions, so check the `.yyp` first.
-* An object's `.gml` files only run if the event is in the object's `eventList` in its `.yy`. Several objects have leftover event files that never run (the validator warns about them).
-* Some resource folders differ from the `.yyp` only in letter case (`objects/ocape` for `oCape`). Windows does not care; Linux tools do.
+* Only resources listed in `game/Zelda.yyp` are compiled. The 424 folders that were on disk but not in it (old scripts such as `_Enemies`, `Init` and `Dungeon_Init`, unused sprites and objects) were deleted in the F1 cleanup (oct/2026); the original 1.2.1 code is on archive.org if one is ever needed. The validator warns about any new orphan folder (`--orphans` lists them).
+* When a resource is removed from the project in the IDE, GameMaker leaves its folder on disk. Delete the folder too, or the validator flags it as an orphan.
+* An object's `.gml` files only run if the event is in the object's `eventList` in its `.yy`. The leftover event files of the original were deleted in F1; the validator warns about new ones.
+* Resource folder names must match the `.yyp` letter case exactly (`objects/oCape`, not `objects/ocape`); Windows does not care, Linux tools do. The 48 mismatches were fixed in F1 and the validator warns about new ones. On Windows a case only rename is not seen by Git with `core.ignorecase=true` (the default); use `git mv old tmp` then `git mv tmp New`.
 * `data_r`, `data_d` and the manuals and references in `docs/` (PDF, DOCX, MHTML) are Git LFS files. Claude's cloud sandbox clones the repo anonymously and cannot fetch LFS objects, so there they are only pointers (the validator skips them). Work that needs their contents is done on the home PC or with the files attached.
-* The live game reads no command line parameters. The `-t` and `-d` handling in `InitScreen` is in the dead `Init` script.
+* The live game reads no command line parameters. The original had `-t` and `-d` handling in `InitScreen` inside an old `Init` script that was not in the project (deleted in F1; see the 1.2.1 source on archive.org).
 * Level specific rules are spread through the code as `switch(global.Level.Index)` and `== DungeonLevel.X` checks (Mines: doors, decor, shop, waterfall colour, chance tables...). A new level means finding all of them until the level table (roadmap F4) exists.
 
 ## Enemies (`scripts/__Enemies`)
@@ -31,7 +32,6 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 ## Weather
 
 * Rain and lightning only exist in `oIntro` (level `Start`): `oRainDrop`, `oRainSplash`, `Sound_Rain` kept in `global.RainSound` (still playing in the castle). Lightning: alarm 1 sets `global.GlobalLighting = false` for 2 or 3 frames (alarm 2), every 30 to 180 frames; the `Draw` paints the white flash. No thunder sound in the project.
-* `objects/oRainController` is an orphan (not in `Zelda.yyp`).
 
 ## NPCs
 
