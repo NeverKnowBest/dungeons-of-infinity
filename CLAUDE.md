@@ -19,7 +19,22 @@ Leia antes de começar qualquer tarefa:
 * Mantenha uma lista de tarefas durante o trabalho.
 * Ele dá liberdade artística: decida os detalhes seguindo `docs/design/direcao.md` e pergunte só quando algo fugir dela ou for difícil de desfazer.
 * Prints não são necessários na resposta; mostre imagens só quando ajudarem a decidir algo.
-* No fim de cada etapa, atualize `docs/roadmap.md` (estado e decisões) e, se aprendeu algo do motor, `docs/dev/engine-notes.md` ou `docs/dev/receitas.md`. É isso que substitui o histórico do chat.
+* **Alimente a documentação sempre.** É ela que substitui o histórico do chat, então todo chat deixa a base melhor do que encontrou:
+  * Descobriu como algo do motor funciona, uma armadilha do GML ou do GameMaker, ou um jeito de testar: registre em `docs/dev/engine-notes.md` na hora.
+  * Fez uma tarefa que vai se repetir (sala, inimigo, item, extração da ROM): escreva ou melhore a receita em `docs/dev/receitas.md`.
+  * O Guilherme aprovou, recusou ou corrigiu algo de design ou de visual: registre em `docs/roadmap.md` (Decisões) e, se for uma regra geral, em `docs/design/direcao.md`.
+  * Criou ou mudou um script de ferramenta: atualize `tools/README.md`.
+  * No fim da etapa: atualize Pronto, Próximos passos e Ideias no `docs/roadmap.md`, e entregue a documentação junto com o código (no mesmo commit).
+* Se algum documento estiver errado ou desatualizado, corrija em vez de contornar.
+
+## Começo de um chat novo
+
+O Guilherme diz se está no PC de casa (vinculado ao chat) ou no do trabalho, e qual é a etapa. Leia os documentos acima, confira no `git log` o estado do repositório e comece. Se o pedido for vago, decida pela direção de design; se for grande e visual, mostre uma prévia antes.
+
+## Git
+
+* O Guilherme faz os commits (GitHub Desktop). Repositório: `github.com/NeverKnowBest/dungeons-of-infinity`.
+* Mudanças gravadas direto no PC de casa ficam pendentes até ele commitar. Se ele commitar o mesmo conteúdo de outro lugar, oriente a descartar as pendências antes do pull.
 
 ## Economia
 
