@@ -28,6 +28,9 @@ global.CanSkipTitle = ini_read_real("Preferences", "CanSkipTitle", 1) == 1 ? tru
 
 ini_close();
 
+// Automated test mode (scripts/__Test): always windowed
+if(Test_Init()) Borderless = false;
+
 Draw = false;
 Init = false;
 

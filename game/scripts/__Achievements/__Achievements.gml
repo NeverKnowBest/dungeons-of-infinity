@@ -198,6 +198,7 @@ function Achievements_OnLevelStart(_LevelIndex){
 
 /// Called when Link picks up a boss crystal
 function Achievements_OnBossDefeated(_LevelIndex){
+	Test_Event("boss defeated level=" + string(_LevelIndex));
 	switch(_LevelIndex){
 		case DungeonLevel.CastleJails:		Achievement_Unlock("BossArmos"); break;
 		case DungeonLevel.LanmolasLair:		Achievement_Unlock("BossLanmola"); break;

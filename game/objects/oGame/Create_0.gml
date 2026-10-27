@@ -48,6 +48,8 @@ if(global.Continue){
 	global.HubPending = false;
 	Dungeon_InitHubLevel();
 	oRender.FadeIn();
+}else if(global.TestMode){
+	Test_StartLevel();
 }else{
 	if(DEBUG){		
 		Dungeon_InitLevel(DungeonLevel.Aghanim2);

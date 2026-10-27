@@ -78,8 +78,58 @@ python tools/check/validate.py --strict   # warnings also fail
 | Region spec cites an asset (`oX`, `sX`, `Sound_X`, `Music_X` in backticks) that is not in `Zelda.yyp`, unless the line says "(novo)" | error |
 | Reference sheet (`docs/ref/*.md`) cites an asset that is not in `Zelda.yyp` | warning |
 | A cited `docs/...md` file does not exist | warning |
+| Test scenario (`test/scenarios/*.json`) with an unknown step, key, cheat, enemy object or enum name | error |
 
 When a new GML or data trap is found, add a check here.
+
+### `test/` (Python 3, standard library only; needs GameMaker installed)
+
+Automated test (roadmap F3): compiles the game with Igor, runs a scenario with nobody at the keyboard and prints the result as text. The game side is `game/scripts/__Test` (test mode) and the object `oTest`.
+
+```
+python tools/test/run.py smoke                       # a scenario in test/scenarios (or a path to a .json)
+python tools/test/run.py smoke --no-build            # run the last build again (8 s instead of about 80 s); only when no GML changed
+python tools/test/run.py --sheet Castle --seeds 4    # contact sheet: levels of seeds 1..4, every room in one PNG
+python tools/test/run.py --sheet Sewers --seeds 7,9  # chosen seeds
+python tools/test/run.py smoke --full                # also print the "step" lines of the log
+```
+
+* It finds the active runtime (`C:\ProgramData\GameMakerStudio2-LTS2026untime.json`) and the IDE user folder in `%APPDATA%` by itself, builds in `%TEMP%\doi-test` and passes the scenario through the environment variable `DOI_TEST` (the game also takes `-test <file>`). The file goes to `%LOCALAPPDATA%\Zelda	est\scenario.json`.
+* Results are copied to `tools/test/out/` (ignored by git): `log.txt` and the PNGs. The script prints compile and runtime errors from the run output, the log, and `RESULT: ok` (exit code 0) when the log ends with `end ok` and has no `FAIL` line. `--timeout` (default 600 s) stops a run that hangs.
+* The game window opens and runs by itself; it keeps going without focus and ignores the real keyboard. Sound is muted unless the scenario says `"sound": true`. Nothing is saved (user file, stats, achievements, options).
+* `scenario.py` reads and checks scenarios; the validator uses it too.
+
+Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value; `level` and `item` also take a bare name (`"Sewers"`, `"Shield"`).
+
+| Key | Meaning |
+|-----|---------|
+| `name` | Name in the log |
+| `seed` | Random seed (default 1). The same scenario on the same code always plays the same way |
+| `level` | First level (`DungeonLevel` name, default `Castle`), or `"Hub"` for the Sanctuary |
+| `cheats` | Cheat keys of `global.CheatList` turned on (`"Cheat_Inf_Health"`...) |
+| `items` | Items given at the start: `{"item": "Sword", "index": "Swords.Master", "amount": 1}` |
+| `max_frames` | The test fails with `timeout` after this many frames (default 36000) |
+| `speed` | Frames per second (default 60) |
+| `sound` | `true` to hear it |
+| `steps` | List of steps, run in order (below) |
+
+| Step | Keys | What it does |
+|------|------|--------------|
+| `wait` | `frames` | Waits |
+| `hold` | `keys` (list), `frames` | Holds the keys together. Keys: `up down left right sword action item map strafe inventory menu_access hud` |
+| `press` | `key`, `frames` (default 8) | Holds one key, then releases it for 4 frames |
+| `shot` | `name` | Screenshot of the game view at 1x (256x224, no HUD) to `<name>.png` |
+| `room` | `x`, `y` | Moves Link into the room at that grid position (0..7), just inside one of its doors |
+| `level` | `level`, `seed` | Builds a level (the next level of a run normally comes through the stairs) |
+| `spawn` | `enemy`, `dist` (default 48) | Creates an enemy object (`oEnemy_Rat`) in front of Link |
+| `give` | `item`, `index`, `amount` | Gives an item |
+| `state` | | Logs level, room, Link's position and health, enemies and kills |
+| `log` | `text` | Writes a note in the log |
+| `expect` | `alive`, `level`, `room` (`[x, y]`), `enemies`, `kills_min` | Checks; a mismatch is a `FAIL` line |
+| `sheet` | `level`, `seeds` | Contact sheet (what `--sheet` runs): `sheet_<level>_<seed>.png` per seed and `sheet_<level>.png` with all of them at half size |
+| `end` | | Ends the test (it also ends after the last step) |
+
+Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>`, `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `state`, `expect ok`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
 
 ### `templates/` (Python 3, standard library only)
 

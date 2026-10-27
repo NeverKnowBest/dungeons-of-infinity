@@ -1,0 +1,147 @@
+"""Test scenarios (roadmap F3): reading, checking and turning names into the numbers the game uses.
+
+A scenario is JSON (format in tools/README.md, "test/"). Any string "Enum.Member" is replaced by the enum's value,
+read from the GML enums in game/scripts. "level" and "item" also take a bare member name (DungeonLevel, ItemClass).
+Standard library only, so the validator can use it too.
+"""
+import glob
+import json
+import os
+import re
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.abspath(os.path.join(HERE, '..', '..'))
+SCRIPTS = os.path.join(REPO, 'game', 'scripts')
+
+VERBS = ['up', 'down', 'left', 'right', 'sword', 'action', 'item', 'map', 'strafe', 'inventory', 'menu_access', 'hud']
+
+# step name -> allowed keys (besides "do")
+STEPS = {
+    'wait': {'frames'},
+    'hold': {'keys', 'key', 'frames'},
+    'press': {'key', 'keys', 'frames'},
+    'shot': {'name'},
+    'room': {'x', 'y'},
+    'level': {'level', 'seed'},
+    'spawn': {'enemy', 'dist'},
+    'give': {'item', 'index', 'amount'},
+    'state': set(),
+    'log': {'text'},
+    'expect': {'alive', 'level', 'room', 'enemies', 'kills_min'},
+    'sheet': {'level', 'seeds'},
+    'end': set(),
+}
+TOP_KEYS = {'name', 'seed', 'level', 'cheats', 'items', 'steps', 'max_frames', 'sound', 'speed', 'comment'}
+
+_enums = None
+
+
+def enums():
+    """{EnumName: {Member: value}} from every enum in game/scripts."""
+    global _enums
+    if _enums is not None:
+        return _enums
+    _enums = {}
+    for path in glob.glob(os.path.join(SCRIPTS, '*', '*.gml')):
+        src = open(path, encoding='utf-8', errors='replace').read()
+        src = re.sub(r'/\*.*?\*/', '', src, flags=re.S)
+        src = re.sub(r'//[^\n]*', '', src)
+        for m in re.finditer(r'\benum\s+(\w+)\s*\{(.*?)\}', src, re.S):
+            members, value = {}, -1
+            for part in m.group(2).split(','):
+                part = part.strip()
+                if not part:
+                    continue
+                name, _, expr = part.partition('=')
+                name, expr = name.strip(), expr.strip()
+                if expr:
+                    try:
+                        value = int(expr, 0)
+                    except ValueError:
+                        ref = expr.split('.')
+                        value = members.get(expr, _enums.get(ref[0], {}).get(ref[-1], value + 1))
+                else:
+                    value += 1
+                members[name] = value
+            _enums[m.group(1)] = members
+    return _enums
+
+
+def _member(enum, name, errors, where):
+    value = enums().get(enum, {}).get(name)
+    if value is None:
+        errors.append('%s: unknown %s.%s' % (where, enum, name))
+        return 0
+    return value
+
+
+def _resolve(value, errors, where):
+    if isinstance(value, dict):
+        return {k: _resolve(v, errors, where) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_resolve(v, errors, where) for v in value]
+    if isinstance(value, str) and re.fullmatch(r'[A-Za-z_]\w*\.[A-Za-z_]\w*', value):
+        enum, name = value.split('.')
+        if enum in enums():
+            return _member(enum, name, errors, where)
+    return value
+
+
+def _named(value, enum, errors, where):
+    if isinstance(value, str) and '.' not in value:
+        return _member(enum, value, errors, where)
+    return value
+
+
+def resolve(scenario):
+    """Returns (scenario ready for the game, list of errors)."""
+    errors = []
+    if not isinstance(scenario, dict):
+        return scenario, ['the scenario must be a JSON object']
+    for key in scenario:
+        if key not in TOP_KEYS:
+            errors.append('unknown key "%s"' % key)
+    out = _resolve(scenario, errors, 'scenario')
+    if 'level' in out and out['level'] != 'Hub':
+        out['level'] = _named(out['level'], 'DungeonLevel', errors, 'level')
+    for i, item in enumerate(out.get('items', [])):
+        item['item'] = _named(item.get('item'), 'ItemClass', errors, 'items[%d]' % i)
+    cheats = cheat_keys()
+    for c in out.get('cheats', []):
+        if cheats and c not in cheats:
+            errors.append('unknown cheat "%s"' % c)
+    for i, step in enumerate(out.get('steps', [])):
+        where = 'steps[%d]' % i
+        do = step.get('do') if isinstance(step, dict) else None
+        if do not in STEPS:
+            errors.append('%s: unknown step "%s"' % (where, do))
+            continue
+        for key in step:
+            if key != 'do' and key not in STEPS[do]:
+                errors.append('%s: "%s" does not take "%s"' % (where, do, key))
+        for key in ([step['key']] if 'key' in step else []) + step.get('keys', []):
+            if key not in VERBS:
+                errors.append('%s: unknown key "%s" (use %s)' % (where, key, ', '.join(VERBS)))
+        if 'level' in step:
+            step['level'] = _named(step['level'], 'DungeonLevel', errors, where)
+        if do == 'give':
+            step['item'] = _named(step.get('item'), 'ItemClass', errors, where)
+        if do == 'spawn' and not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(step.get('enemy')))):
+            errors.append('%s: no object "%s"' % (where, step.get('enemy')))
+    return out, errors
+
+
+def cheat_keys():
+    path = os.path.join(SCRIPTS, 'Init_Gameplay_Cheats', 'Init_Gameplay_Cheats.gml')
+    if not os.path.exists(path):
+        return set()
+    return set(re.findall(r'Key:\s*"(\w+)"', open(path, encoding='utf-8').read()))
+
+
+def load(path):
+    """Reads and resolves a scenario file. Returns (scenario, errors)."""
+    try:
+        data = json.load(open(path, encoding='utf-8'))
+    except (OSError, ValueError) as e:
+        return None, ['%s: %s' % (path, e)]
+    return resolve(data)

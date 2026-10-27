@@ -15,7 +15,8 @@ Quando a tarefa envolver inimigos, chefes, itens ou uma região, leia também `d
 
 * Respostas em português, sem setas (→) e sem travessões (—) em listas e explicações. Textos dentro do jogo em inglês.
 * Os dois PCs (casa e trabalho) são iguais: o Claude Code abre direto na pasta do repositório, os dois têm GameMaker e Git LFS. Grave os arquivos lá. Não existe mais entrega por zip.
-* **Quem roda e joga o jogo é o Guilherme**, porque rodar o jogo pelo Claude consome muito. O Claude não compila, não abre o jogo e não tira prints por conta própria; só faz isso se o Guilherme pedir. Em vez disso, entrega um roteiro de teste curto (veja "Como testar").
+* **Quem joga o jogo é o Guilherme**, porque jogar pelo Claude (prints e teclas) consome muito. O Claude não abre o jogo pelo IDE nem tira prints de tela por conta própria; só faz isso se o Guilherme pedir. Em vez disso, entrega um roteiro de teste curto (veja "Como testar").
+* **Exceção aprovada (out/2026):** o Claude pode rodar `python tools/test/run.py` por conta própria (compilar, rodar cenários, folha de contato) e conferir o resultado pelo texto (log e `RESULT`). Sem prints de tela; olhar um PNG do `tools/test/out/` só quando ajudar a decidir algo. Mesmo assim, entrega o roteiro de teste para o Guilherme jogar.
 
   | PC | Repositório | GameMaker |
   |----|-------------|-----------|
@@ -64,7 +65,7 @@ O Guilherme diz qual é a etapa (e, se importar, em qual PC está). Leia os docu
 * GameMaker LTS 2026 (caminho de cada PC na tabela acima). O projeto é `game/Zelda.yyp`.
 * Ao gravar arquivos com o projeto aberto, o GameMaker mostra "Diretório do projeto modificado": clique em Recarregar. Ele volta à tela inicial; abra o projeto "Zelda" de novo em Projetos recentes.
 * Rodar: botão Executar (triângulo) na barra de ferramentas. A janela do jogo é o processo `Runner.exe` (precisa de permissão própria no controle do computador).
-* Rodar sem o IDE: o Igor (compilador do GameMaker) compila e abre o jogo pela linha de comando, com a saída do jogo no terminal. Comando e detalhes em `docs/dev/engine-notes.md`, "Building and running from the command line".
+* Rodar sem o IDE: `python tools/test/run.py <cenário>` compila com o Igor, roda um cenário de teste sozinho (sem teclado) e mostra os erros e o log em texto; `--sheet <fase>` monta a folha de contato. Formato em `tools/README.md` ("test/"), receita em `docs/dev/receitas.md`.
 * O jogo roda em janela por causa de `%LOCALAPPDATA%\Zelda\options.ini` (`Fullscreen="0"` em `[Screen]`, `AltTabPause="0"`). O Guilherme quer manter assim nos dois PCs. Se o arquivo não existir, o jogo abre em tela cheia: crie a partir de `game/datafiles/options.ini` com esses dois valores.
 * Scripts Python: o validador e o conversor só usam a biblioteca padrão; os de `tools/hub/` precisam de `python -m pip install --user pillow numpy`.
 * Teclas: setas movem, Alt fala/age, Ctrl espada, Enter abre menus e confirma, Esc pausa e volta. Para o jogo registrar a tecla, segure por cerca de 0.15 s em vez de um toque instantâneo.
@@ -73,6 +74,7 @@ O Guilherme diz qual é a etapa (e, se importar, em qual PC está). Leia os docu
 ## Ferramentas
 
 * `tools/check/validate.py`: validador estático do projeto (veja `tools/README.md`). `--orphans` lista os recursos que estão no disco mas não no projeto. Também confere as especificações de região (seções do modelo, estado, assets citados).
+* `tools/test/`: `run.py` (teste automatizado e folha de contato, precisa do GameMaker instalado) e os cenários em `scenarios/`. O jogo tem um modo de teste (`scripts/__Test`) que não grava nada no usuário.
 * `tools/templates/`: `convert.py` gera as salas do jogo (`game/datafiles/data/rooms/<Classe>.json`, um template por linha) a partir dos mapas do Tiled; `compare.py` compara duas versões pelo conteúdo. Nunca edite os arquivos de `rooms/` à mão.
 * `tools/hub/`: scripts Python que geram as salas do hub, sprites e dados (Tiled, `data_d`, e chamam o conversor). Veja `tools/README.md`.
 * `tools/alttp/`: utilitários em C que usam o código do zelda3 (reimplementação de ALttP) para extrair salas, sprites e músicas da ROM. A ROM nunca vai para o repositório.

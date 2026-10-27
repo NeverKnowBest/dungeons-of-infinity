@@ -5,10 +5,25 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 ## Antes de qualquer coisa
 
 * As salas do jogo ficam em `game/datafiles/data/rooms/` (um arquivo por classe, git normal) e são geradas pelo `tools/templates/convert.py`; não edite à mão. Os layouts (`data_d`) estão no Git LFS; os dois PCs têm o LFS, mas num clone sem LFS ele é só um ponteiro de texto.
-* Teste o GML no jogo, em qualquer um dos dois PCs: pelo IDE ou pela linha de comando (`docs/dev/engine-notes.md`, "Building and running from the command line").
+* Teste o GML no jogo, em qualquer um dos dois PCs: pelo IDE ou com um cenário de teste automático (`python tools/test/run.py`, receita "Teste automático" abaixo).
 * Rode `python tools/check/validate.py` antes de entregar. Ele pega recursos faltando, eventos sem arquivo, assets inexistentes no GML e as armadilhas abaixo.
 * Só compila o que está no `Zelda.yyp`. O código morto da versão original foi apagado na F1; se o validador acusar uma pasta órfã nova (por exemplo, um recurso removido no IDE, que deixa a pasta no disco), apague a pasta.
 * GML que já deu problema: um array literal não pode começar com cor `#RRGGBB` (`[#` é acessor de ds_grid); use `make_colour_rgb`. `global.Font_Small` só tem letras maiúsculas.
+
+## Teste automático (cenário)
+
+1. Comece pelo `boot` (`python tools/test/run.py boot`): ele compila, monta a primeira fase e fecha. Erro de compilação ou de GML aparece em texto na saída do script.
+2. Para testar uma mudança, copie `tools/test/scenarios/smoke.json` para um cenário com nome do assunto e escreva só os passos que provam a mudança: a fase (`level`), itens e cheats, os comandos (`hold`, `press`, `room`, `spawn`) e as checagens (`expect`, `state`, `shot` quando a imagem importa). Formato em `tools/README.md` ("test/").
+3. Ache as salas da fase pelo log: as linhas `room` e `sheet` mostram a posição no grid e o template de cada uma. Para ir direto a uma sala, `{"do": "room", "x": 4, "y": 4}`.
+4. Rode e leia o `RESULT` e o log. Para repetir sem mudar o GML (só o cenário), use `--no-build`.
+5. Se um passo falhar, olhe a linha `FAIL` ou `crash` e o print do momento antes de mexer no código. A mesma semente sempre joga igual, então o erro se repete.
+6. Cenário que prova algo que pode quebrar de novo fica em `tools/test/scenarios/` (o validador confere todos).
+
+## Folha de contato de uma fase
+
+1. `python tools/test/run.py --sheet <Fase> --seeds 4` (nomes do enum `DungeonLevel`: Castle, Sewers, Mines...). Para sementes escolhidas: `--seeds 7,9,12`.
+2. Saem `tools/test/out/sheet_<nível>_<semente>.png` (fase inteira em 1x) e `sheet_<nível>.png` (todas lado a lado, em meio tamanho). O log lista cada sala com grid e template.
+3. Serve para conferir salas novas e a variedade da geração sem jogar. Para comparar antes e depois de uma mudança, rode as mesmas sementes nas duas versões.
 
 ## Sala nova no hub
 

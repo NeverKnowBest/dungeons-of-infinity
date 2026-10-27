@@ -14,6 +14,7 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 * **Validador estático** (`tools/check/validate.py`): confere o projeto sem GameMaker (recursos do `.yyp`, eventos dos objetos, imagens e sons, funções duplicadas, assets inexistentes no GML, armadilhas conhecidas, dados e estilo das docs). Rodar antes de toda entrega. Etapa F2 do plano de ferramentas.
 * **Faxina do código morto** (etapa F1): apagadas as 424 pastas de recursos fora do `Zelda.yyp`, os `.gml` de eventos que os objetos não têm e acertados os 48 caminhos com maiúsculas e minúsculas diferentes. O validador não lista mais órfãos.
 * **Conversor de templates em Python** (etapa F5): `tools/templates/convert.py` gera as salas do jogo a partir dos mapas do Tiled em `data/room-templates/`, em uns 10 s, sem GameMaker. A saída é idêntica, pelo conteúdo, ao último `data_r` do projeto GameMaker `editors/room-template-parser`, que foi apagado. O `data_r` único de 46 MB (Git LFS) virou `game/datafiles/data/rooms/<Classe>.json`, um arquivo por classe com um template por linha, em git normal: o diff mostra quais salas mudaram. O jogo lê os dez arquivos (`RoomTemplates_Load`) e registra a contagem no log; o `tools/hub/build3.py` chama o conversor; o validador acusa quando o Tiled muda e as salas não foram geradas de novo. Testado no jogo: título, hub e começo da run.
+* **Teste automatizado** (etapa F3): `python tools/test/run.py <cenário>` compila o jogo com o Igor (acha o runtime e a pasta do usuário sozinho), roda um cenário JSON sem ninguém no teclado e mostra o resultado em texto: erros de compilação, o log do teste e `RESULT: ok` ou `FAILED`. O modo de teste do jogo (`scripts/__Test`, objeto `oTest`, ativado por `-test` ou `DOI_TEST`) pula título e menus, não grava nada, aplica semente, fase, itens e cheats, executa os passos (andar, atacar, esperar, ir a uma sala, trocar de fase, criar inimigo, conferir) e registra fase, sala, morte de inimigo, dano, prints e erros de GML com a pilha. Folha de contato: `--sheet Castle --seeds 4` monta todas as salas de N fases num PNG. Cenários `boot` e `smoke` em `tools/test/scenarios/` (o validador confere os cenários). Testado no PC do trabalho: `smoke` passa do começo ao fim e repete igual.
 * **Fichas de referência e especificação de região** (etapa F9): `docs/ref/alttp.md` (inimigos, chefes e itens do ALttP com vida, dano, velocidade, arquétipo e a função do zelda3), `docs/ref/doi.md` (tudo o que o jogo já tem, com energia, ataque, pesos por nível, soldados por nível, níveis, chefes e clima), `docs/regioes/_modelo.md` (modelo de região) e a primeira spec, `docs/regioes/topo-do-castelo.md` (o piloto). O validador confere as specs.
 
 ## Decisões (não desfazer sem conversar)
@@ -27,6 +28,7 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 * O tempo de jogo só conta a partir da saída do Santuário. No Santuário, a pausa não mostra o tempo nem "Give Up".
 * Jogo em janela nos dois PCs (QoL), via `options.ini`.
 * Antes de conteúdo novo grande, investir nas ferramentas do "Plano de ferramentas" abaixo (aprovado em out/2026). Meta: uma região inteira a partir de um prompt, com os gráficos entregues pelo Guilherme numa pasta.
+* O Claude pode rodar `tools/test/run.py` por conta própria e conferir pelo texto (log e `RESULT`), sem prints de tela (out/2026, regra no CLAUDE.md). Jogar continua com o Guilherme.
 * O código morto pode ser apagado sem backup extra: a faxina vai num commit só dela, que pode ser revertido no GitHub Desktop, e o código 1.2.1 original está no archive.org.
 
 ## Plano de ferramentas (fazer antes do conteúdo novo)
@@ -42,12 +44,10 @@ Objetivo: deixar o projeto pronto para que uma região inteira (fase com salas, 
 **F2. Validador estático** (pronto)
 * `tools/check/validate.py`. Crescer junto com o projeto: toda armadilha nova do GML ou dos dados vira uma checagem.
 
-**F3. Teste automatizado**
-* Compilar pela linha de comando (o compilador que o IDE usa por baixo), com os erros em texto, sem abrir o IDE. **Já descoberto na F5:** o Igor com o alvo `Run` compila e abre o jogo, e a saída do jogo vai para o terminal; comando em `docs/dev/engine-notes.md` ("Building and running from the command line"). Falta transformar isso num script (`tools/test/`) que acha o runtime e a pasta do usuário sozinho.
-* Modo de teste no jogo: `-test cenario.json` com nível, semente, itens, cheats, sala inicial e uma sequência de comandos (andar, atacar, esperar). O jogo grava um log em texto (sala carregada, inimigo morto, dano, erros) e prints em pontos marcados, e fecha sozinho. Atenção: o jogo atual não lê parâmetros (o `InitScreen` com `-t` e `-d` ficava num script morto, apagado na F1; está no código 1.2.1 do archive.org); a leitura precisa ser criada no código vivo.
-* Folha de contato: gerar N fases de um nível com sementes diferentes e montar todas as salas num PNG só.
-* Cheats de debug: ir para um nível ou sala e criar um inimigo na frente do Link.
-* Pronto quando: um cenário de teste roda do começo ao fim sem ninguém tocar no teclado e o Claude lê o resultado em texto.
+**F3. Teste automatizado** (pronto)
+* `tools/test/run.py`: compila com o Igor, roda um cenário e mostra o resultado em texto (`--no-build` repete sem compilar em 8 s). Modo de teste no jogo em `scripts/__Test` (`-test` ou `DOI_TEST`), com log em `tools/test/out/log.txt` e prints.
+* Folha de contato (`--sheet <fase> --seeds N`) e cheats de debug (`room`, `level`, `spawn`, `give`; em GML `Test_GotoRoom`, `Test_SpawnEnemy`, `Test_GiveItem`).
+* Conferido: `boot`, `smoke` (rato morto pela espada, andar, teleporte de sala, troca para os Esgotos, prints) e uma folha de contato do Castelo rodam do começo ao fim sem teclado, e o `smoke` repete igual quadro a quadro. Formato dos cenários em `tools/README.md`; detalhes e armadilhas em `docs/dev/engine-notes.md` ("Automated tests").
 
 **F4. Ficha de fase** (precisa da F3)
 * Trocar os `switch`/`case DungeonLevel.X` espalhados (ex.: Mines aparece em 28 arquivos, nas portas, decoração, loja, cachoeira, sorteios) por uma estrutura `global.LevelDefs[nível]` com tudo da fase: classe de dungeon, tema de tiles, piso e decoração, água, música, clima, chefe, regras especiais.
@@ -92,5 +92,9 @@ Expectativa: região com inimigos reaproveitados ou de arquétipo sai de um prom
 * Ficha do Minish Cap (`docs/ref/minish-cap.md`) a partir da decompilação `zeldaret/tmc`, quando a região do Minish Cap for planejada.
 * Harness em `tools/alttp/` que imprima a tabela de vulnerabilidade por arma do ALttP (`enemy_damage_data`, nos assets da ROM) para completar `docs/ref/alttp.md` (PC de casa).
 * Topo do castelo: vento nas passarelas e buraco no telhado que leva ao porão (fora da primeira versão).
-* Calar os avisos de som que enchem o log em toda partida (`oCredits` Step e `Intro_ShowLink` pedem um som que não existe), para os logs da F3 ficarem limpos.
+* Calar os avisos de som que enchem o log em toda partida (`oCredits` Step e `Intro_ShowLink` pedem um som que não existe). O `run.py` já os filtra, mas eles continuam na saída completa.
+* Teste: cenários de referência por fase (uma run curta em cada nível, com `expect` e prints) para conferir a F4 antes e depois da ficha de fase.
+* Teste: tornar a fase função só da semente também no meio de uma run (o gerador guarda estado entre fases: tesouros, prisioneiros, lojistas), se a comparação de fases precisar.
+* Folha de contato: as salas escuras saem escuras, como no jogo; uma opção para acender tudo ajudaria a ver o layout.
+* Teste: rodar o cenário no GitHub Actions não dá (precisa de GameMaker e de uma janela); ficaria só o validador.
 * (anote aqui ideias que ainda não viraram etapa)

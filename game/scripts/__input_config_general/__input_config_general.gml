@@ -28,7 +28,7 @@
 
 
 //Whether to allow input while game window is out of focus on desktop platforms
-#macro INPUT_ALLOW_OUT_OF_FOCUS  false
+#macro INPUT_ALLOW_OUT_OF_FOCUS  (variable_global_exists("TestMode") && global.TestMode) //true only in test mode (scripts/__Test), so a test runs in the background
 
 //Default setting for whether the debug overlay blocks input
 #macro INPUT_DEFAULT_DEBUG_OVERLAY_BLOCKS_INPUT  false

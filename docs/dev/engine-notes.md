@@ -31,12 +31,12 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 * An object's `.gml` files only run if the event is in the object's `eventList` in its `.yy`. The leftover event files of the original were deleted in F1; the validator warns about new ones.
 * Resource folder names must match the `.yyp` letter case exactly (`objects/oCape`, not `objects/ocape`); Windows does not care, Linux tools do. The 48 mismatches were fixed in F1 and the validator warns about new ones. On Windows a case only rename is not seen by Git with `core.ignorecase=true` (the default); use `git mv old tmp` then `git mv tmp New`.
 * `data_d`, the audio and the manuals and references in `docs/` (PDF, DOCX, MHTML) are Git LFS files. Both PCs (home and work) have Git LFS, so the real files are there. A clone without LFS (Claude's cloud sandbox, for example) only has pointers; the validator skips them.
-* The live game reads no command line parameters. The original had `-t` and `-d` handling in `InitScreen` inside an old `Init` script that was not in the project (deleted in F1; see the 1.2.1 source on archive.org).
+* The only command line parameter the game reads is `-test <file>` (test mode, below; the environment variable `DOI_TEST` does the same). The original had `-t` and `-d` handling in `InitScreen` inside an old `Init` script that was not in the project (deleted in F1; see the 1.2.1 source on archive.org).
 * Level specific rules are spread through the code as `switch(global.Level.Index)` and `== DungeonLevel.X` checks (Mines: doors, decor, shop, waterfall colour, chance tables...). A new level means finding all of them until the level table (roadmap F4) exists.
 
 ## Building and running from the command line
 
-Found while testing F5 on the work PC (oct/2026); it is the first piece of F3. Igor is the build tool the IDE runs:
+`tools/test/run.py` does all of this by itself (finds the runtime and the user folder, builds in `%TEMP%\doi-test`, runs a test scenario); see "Automated tests" below. Igor is the build tool the IDE runs:
 
 ```
 <runtime>\bin\igor\windows\x64\Igor.exe -j=8 --project="<repo>\game\Zelda.yyp" --user="%APPDATA%\GameMakerStudio2-LTS2026\<user folder>" --runtimePath="<runtime>" --runtime=VM --prefabs="C:\ProgramData\GameMakerStudio2-LTS2026\Prefabs" --cache="<temp>\cache" --temp="<temp>\temp" -- Windows Run
@@ -48,6 +48,20 @@ Found while testing F5 on the work PC (oct/2026); it is the first piece of F3. I
 * `PackageZip` (making an executable) fails with "Permission Error: Unable to obtain permission to execute" when nobody is signed in to the IDE; `Run` works anyway.
 * Screenshots and key presses during a test: PowerShell with `user32` (`SetForegroundWindow`, `GetWindowRect`, `keybd_event`) and `System.Drawing` (`CopyFromScreen`) on the `Runner` process window, holding each key about 0.15 s. Close the game with `Stop-Process -Name Runner`.
 * Known noise in the output, not errors of ours: `oCredits_Step_0 ... Index did not map to an existing sound instance` and `Intro_ShowLink ... existing audio asset`.
+* After a `Run` build the game data is `%TEMP%\doi-test\output\Zelda\Zelda.win`; `<runtime>\windowsd\Runner.exe -game <that file>` starts it again without compiling (8 s; `run.py --no-build`).
+
+## Automated tests (`scripts/__Test`, roadmap F3)
+
+* Test mode starts in `oInit`: `Test_Init` (Create) looks for `-test <file>` or `DOI_TEST`, reads the scenario from the save folder and creates `oTest` (persistent, at -10000,-10000 so room deactivation never reaches it). `Test_Begin` (instead of `room_goto_next` to the title) makes a throwaway user, turns on the scenario's cheats and goes to `Room_Dungeon`, where `oGame` calls `Test_StartLevel` instead of building the intro.
+* Nothing is written to disk in test mode: `User_Save`, `Settings_SaveIni` and the arcade high scores return early, and `Error()` logs a FAIL instead of opening a message box (a message box would hang the test). Unhandled GML errors go to `Test_OnCrash` (`exception_unhandled_handler`), which logs the message and the stack.
+* Input: steps call `input_verb_set` every frame. Two traps of the Input library (7.0.1): a player with no source (nobody pressed a key yet) does not update its verbs at all, so test mode sets the player to ghost (`input_player_ghost_set(true)`, which also ignores the real keyboard); and forced verbs are dropped while the window has no focus, so `INPUT_ALLOW_OUT_OF_FOCUS` is true in test mode only. `global.AltTabPause` is turned off too.
+* `oTest` runs the steps in its End Step, like `oLink` builds the next level there: room activation and level building must happen after the Step events.
+* Building a new level over another one: `Dungeon_Clear` only destroys active instances, so every room must be woken first with `instance_activate_all()`, and activation takes one event to process. The game does it in `oLink`'s Step (stairs) and builds in the End Step; `oTest` does the same (its Step activates, the next End Step builds). Skipping it leaves enemies of the old level alive, and they crash later with a room index out of range.
+* Screenshots: in Post Draw (`Draw_77`) `application_surface` holds the finished frame without the HUD (drawn later, in Draw GUI). The game view is view 1, drawn at 4x at port (288, 0, 1024x896); `Test_CaptureView` copies it back at 1x. Copy with alpha writes off over an opaque surface, or the PNG comes out partly transparent.
+* Contact sheet: `Test_SheetStart` hides Link, pauses the game (`global.Paused`) and drives `oCamera` with `Override` (the camera then keeps X/Y as set). Each room is activated in turn and pictured in 256x224 steps. `oLink` must stay active (re-activate him after deactivating a room): `oCamera`'s End Step exits when he does not exist.
+* Determinism: `Test_BuildLevel` sets the seed and reshuffles the user's dungeon layout order (`DungeonSeq_Init`, normally done once per new user). A scenario run from the start always plays the same way. But building the same level and seed again later in the same run gives a different level, because the generator keeps state between levels (treasure limiter, prisoners, shop keepers...). So compare levels between runs, not inside one.
+* Hooks in the game code: `Test_OnKill` in `Enemy_Destroy`, `Test_Event` in `Achievements_OnBossDefeated`. Both do nothing outside test mode. More events can be logged the same way.
+* Debug cheats that work outside tests too: `Test_GotoRoom(gridX, gridY)` (Link just inside one of the room's doors), `Test_SpawnEnemy(objectName, dist)` (in front of Link), `Test_GiveItem(class, index, amount)`.
 
 ## Enemies (`scripts/__Enemies`)
 

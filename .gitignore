@@ -27,3 +27,6 @@ editors/template-editor/Template Editor/
 
 # Python caches
 __pycache__/
+
+# Test results (tools/test/run.py)
+tools/test/out/

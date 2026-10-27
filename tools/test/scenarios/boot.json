@@ -1,0 +1,10 @@
+{
+  "comment": "Quickest check: the game compiles, builds the first level of a run and closes.",
+  "name": "boot",
+  "seed": 1,
+  "level": "Castle",
+  "steps": [
+    {"do": "wait", "frames": 30},
+    {"do": "state"}
+  ]
+}

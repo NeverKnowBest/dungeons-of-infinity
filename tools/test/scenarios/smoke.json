@@ -1,0 +1,31 @@
+{
+  "comment": "Start of a run: Castle, a rat in front of Link, sword, walk, move to another room, change level.",
+  "name": "smoke",
+  "seed": 1,
+  "level": "Castle",
+  "cheats": ["Cheat_Inf_Health"],
+  "items": [{"item": "Shield", "index": 0}],
+  "steps": [
+    {"do": "wait", "frames": 90},
+    {"do": "shot", "name": "start"},
+    {"do": "spawn", "enemy": "oEnemy_Rat", "dist": 24},
+    {"do": "press", "key": "sword"},
+    {"do": "press", "key": "sword"},
+    {"do": "press", "key": "sword"},
+    {"do": "wait", "frames": 20},
+    {"do": "state"},
+    {"do": "expect", "alive": true, "kills_min": 1},
+    {"do": "hold", "keys": ["left"], "frames": 40},
+    {"do": "shot", "name": "walked"},
+    {"do": "room", "x": 4, "y": 4},
+    {"do": "wait", "frames": 20},
+    {"do": "expect", "room": [4, 4]},
+    {"do": "shot", "name": "room_4_4"},
+    {"do": "state"},
+    {"do": "level", "level": "Sewers", "seed": 2},
+    {"do": "wait", "frames": 30},
+    {"do": "expect", "level": "Sewers"},
+    {"do": "shot", "name": "sewers"},
+    {"do": "state"}
+  ]
+}

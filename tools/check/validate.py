@@ -23,6 +23,8 @@ Checks:
   * region specs (docs/regioes/*.md): every section of _modelo.md is there,
     a valid Estado, and the assets and docs they cite exist; the reference
     sheets (docs/ref/*.md) are checked for assets too
+  * test scenarios (tools/test/scenarios/*.json): known steps, keys, cheats,
+    enemies and enum names (the same check tools/test/run.py does)
 """
 import json
 import os
@@ -408,6 +410,19 @@ def check_regions(rep, registered):
                 check_doc_refs(rep, '%s/%s' % (REF_DIR, f), registered, as_error=False)
 
 
+def check_scenarios(rep):
+    sys.path.insert(0, os.path.join(REPO, 'tools', 'test'))
+    import scenario
+    sdir = os.path.join(REPO, 'tools', 'test', 'scenarios')
+    if not os.path.isdir(sdir):
+        return
+    for f in sorted(os.listdir(sdir)):
+        if f.endswith('.json'):
+            _, errors = scenario.load(os.path.join(sdir, f))
+            for e in errors:
+                rep.error('tools/test/scenarios/%s: %s' % (f, e))
+
+
 # ---------------------------------------------------------------- main
 
 def main():
@@ -423,6 +438,7 @@ def main():
     check_data(rep)
     check_docs(rep)
     check_regions(rep, registered)
+    check_scenarios(rep)
 
     if CASE_MISMATCH:
         for p in sorted(set(CASE_MISMATCH)):

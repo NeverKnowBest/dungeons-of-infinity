@@ -333,6 +333,8 @@ function User_DefaultPref(){
 
 function User_Save(){
 	
+	if(global.TestMode) exit; //test runs never touch the user file
+	
 	var Buffer = EncodeDataToBuffer(global.Users);
 	
 	if(file_exists("Users_Temp")){
@@ -414,6 +416,7 @@ function User_UpdateMusicSFX(){
 
 //writes the settings to options.ini (saved in the appdata folder, not next to the exe)
 function Settings_SaveIni(){
+	if(global.TestMode) exit;
 	try{
 		ini_open("options.ini");
 		ini_write_real("Screen", "Fullscreen", global.Fullscreen ? 1 : 0);

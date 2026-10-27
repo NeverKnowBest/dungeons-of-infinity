@@ -1,5 +1,11 @@
 function Error(_msg, _GameEnd){
 	
+	if(global.TestMode){ //no message box in a test, it would wait for a click
+		Test_Fail("error " + _msg);
+		if(_GameEnd) Test_Finish("error");
+		exit;
+	}
+	
 	show_message(_msg);
 	show_debug_message(_msg);
 	if(_GameEnd) game_end();

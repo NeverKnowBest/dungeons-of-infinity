@@ -118,6 +118,7 @@ function Arcade_Hiscore_Check(_GameIndex){
 		
 		Highscores[_GameIndex] = Hiscore;
 		
+		if(global.TestMode) return true;
 		var _Buffer = EncodeDataToBuffer(Highscores);
 		xzip_write(USERSFILE, _Buffer, XZIPFILE_ARCADES);
 		buffer_delete(_Buffer);

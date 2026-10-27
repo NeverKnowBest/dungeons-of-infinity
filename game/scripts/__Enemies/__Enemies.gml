@@ -630,6 +630,7 @@ function Enemy_Destroy(){
 	Destroyed = true;
 	Curse_CheckTask(CurseTasks.Kill);
 	global.StatsToAdd[Stat.Monsters]++;	
+	Test_OnKill();
 }
 
 function Enemy_DestroySpawnItem(_ItemClass, _Size, _SpawnType = ItemSpawnType.DropShort, _ItemExplosionAllowed = true){
