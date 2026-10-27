@@ -3,7 +3,7 @@ FloorLevel = UPPER;
 
 sprite_index = asset_get_index("sCurtain_" + Location);
 
-switch(global.Level.Index){
+switch(LevelDef.Theme){
 	case DungeonLevel.Castle: LevelIndex = 0; 	break;
 	case DungeonLevel.CastleJails: LevelIndex = 1; break;
 	case DungeonLevel.Sewers: 

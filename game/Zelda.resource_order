@@ -821,6 +821,7 @@
     {"name":"__Items","order":1,"path":"scripts/__Items/__Items.yy",},
     {"name":"__Kinstones","order":4,"path":"scripts/__Kinstones/__Kinstones.yy",},
     {"name":"__Leever","order":5,"path":"scripts/__Leever/__Leever.yy",},
+    {"name":"__Levels","order":22,"path":"scripts/__Levels/__Levels.yy",},
     {"name":"__Link","order":3,"path":"scripts/__Link/__Link.yy",},
     {"name":"__LinkSprites","order":7,"path":"scripts/__LinkSprites/__LinkSprites.yy",},
     {"name":"__Menu","order":3,"path":"scripts/__Menu/__Menu.yy",},

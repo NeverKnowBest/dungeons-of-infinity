@@ -1,6 +1,6 @@
 event_inherited();
 
-switch(global.Level.Index){
+switch(LevelDef.EnemyStats){
 
 	default:
 		Index = 0;

@@ -2,7 +2,7 @@ event_inherited();
 
 Size = EnemySize.Small;
 
-Type = (global.Level.Index == DungeonLevel.Aghanim1 ? 1 : 0);
+Type = (LevelDef.EnemyStats == DungeonLevel.Aghanim1 ? 1 : 0);
 
 switch(Type){
 	case 0: //blue

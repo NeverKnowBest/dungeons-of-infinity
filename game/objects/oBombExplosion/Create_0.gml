@@ -8,7 +8,7 @@ Exploded_Doors = false;
 
 BlastRadius_Doors = 16;
 BlastRadius_Link = 24;
-BlastRadius_Enemies = (global.Level.Index == DungeonLevel.Aghanim2 ? 24 : 32); //small radius for Aghanim bombs
+BlastRadius_Enemies = (LevelDef.Special == LevelSpecial.FinalBoss ? 24 : 32); //small radius for Aghanim bombs
 BlastRadius_PickupObjs = 32;
 
 MaxDamage = 2;

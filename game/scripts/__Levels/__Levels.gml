@@ -1,0 +1,316 @@
+// Level sheet (roadmap F4): what makes each level of a run different, in one place.
+// global.LevelDefs[DungeonLevel.X] holds one struct per level; the code reads the current level's entry through the
+// macro LevelDef. A new level is a new DungeonLevel member and an entry here (recipe in docs/dev/receitas.md).
+//
+// Three fields point at another level on purpose, so a new level can borrow from an existing one:
+//   Theme		whose art it uses: the tile rows of the tileset (LevelTilesY) and every decoration rule that depends on
+//				those tiles (floors and floor decor, monuments, cracks, curtains, carpets, wall decor, pots, palettes).
+//				The decoration rules are the switch(LevelDef.Theme) blocks in the scripts __Dungeon_Draw_* and __Decor.
+//   BaseTheme	whose door frames, holes, floor trims and stairs it uses (LevelTilesY_Base); Agahnim borrows the fortress ones
+//   EnemyStats	whose stats the enemies take (soldier colours and energy, Poe, Wizzrobe, Beamos, the Type of Bari, Keese...)
+// Depth is how far into the run the level is (1 = Hyrule Castle); difficulty formulas use it.
+
+#macro LevelDef global.LevelDefs[global.Level.Index]
+#macro LevelTilesY (4 + ((LevelDef.Theme - 1) * 6))
+#macro LevelTilesY_Base (4 + ((LevelDef.BaseTheme - 1) * 6))	// door frames, holes, floor trims and stairs
+
+enum LevelSpecial{
+	None,
+	Intro,		// the rainy night outside the castle (oIntro), start of every run
+	Village,	// Rebel Village: fixed layout, houses, village NPCs
+	Mines,		// Dwarven Mining Town: fixed layout, houses, mine caves
+	FinalBoss	// Agahnim: the hall and the final fight
+}
+
+enum LevelDark{
+	Never,		// rooms are never dark
+	Low,		// dark only with the Darkness challenge
+	Normal,		// 25% (+ DarkBonus, + the Darkness challenge)
+	Always
+}
+
+enum LevelWater{
+	None,
+	WetBandits,	// only the rooms with the Wet Bandits, all of their water
+	Random,		// WaterChance per room, random parts of the template's water
+	Always		// all the water of every template
+}
+
+/// Level of an index, or undefined past the last level
+function Level_Get(_Level){
+	return (_Level >= 0 && _Level < array_length(global.LevelDefs)) ? global.LevelDefs[_Level] : undefined;
+}
+
+function Level_Depth(_Level){
+	return global.LevelDefs[_Level].Depth;
+}
+
+/// How likely an enemy is to be picked for a room of the current level (0 = never)
+function Level_EnemyWeight(_ObjIndex){
+	var _W = LevelDef.EnemyWeights;
+	return _ObjIndex < array_length(_W) ? _W[_ObjIndex] : 0;
+}
+
+/// Default entry: a normal dungeon level. Levels_Init overrides what differs.
+function Level_Create(_Index, _Name) constructor{
+	Index = _Index;
+	Name = _Name;
+	Depth = _Index;
+	Next = _Index + 1;
+	Theme = _Index;
+	BaseTheme = _Index;
+	EnemyStats = _Index;
+	Special = LevelSpecial.None;
+
+	// Layout
+	Class = DungeonClass.Castle;		// dungeon template class (global.Templates_Dungeon)
+	Template = -1;						// for DungeonClass.Special: index of the fixed layout
+	Transform = true;					// dungeon template may be flipped and rotated
+	StartDir = (_Index mod 2 == 1) ? UP : DOWN;	// Link comes in from the bottom (UP) or the top (DOWN)
+	SaveBefore = false;					// a save level (rest stop) comes before this level
+	RunStart = false;					// first level of a run: front door and entrance wall, falling leaves, a sure bonus treasure, no kinstones, counts a game played
+	Ceiling = true;						// rooms get the ceiling tiles around them
+	FairyRooms = true;					// fairy and gem pond rooms may appear
+	TMNTRoom = false;					// the TMNT secret room may appear
+	Jails = false;						// rooms may get jail cells with prisoners
+	Spikes = true;						// spike floors may be spawned in rooms
+	ShopBesideBoss = true;				// a shop may be in the room next to the boss room
+	ShopKeeperSprite = -1;				// sprite of every shop keeper, -1 for the usual random ones
+	JustinShop = false;					// the first shop keeper of the level is Justin (once per run)
+	Curses = true;						// treasures may be cursed
+	Obstacles = [RoomObstacle.Holes];	// obstacle templates, picked at random (repeat one to make it more likely)
+	MovingFloors = [];					// added to Obstacles in rooms without special objects
+
+	// Boss
+	Boss = false;
+	BossSpawn = undefined;				// {Obj, X, Y, Layer}: boss object created in the boss room (offset from its corner)
+	BossRoomTemplate = "Default";		// Other/Boss room template
+	BossDoorFrame = 48;					// tile x of the boss door frame (40 Armos, 44 Lanmola, 48 Moldorm)
+	BossAchievement = "";
+	ReachAchievement = "";
+
+	// Mood
+	Song = SongIndex.Dungeon1;
+	Dark = LevelDark.Normal;
+	DarkBonus = 0;
+	Water = LevelWater.None;
+	WaterChance = 0.75;
+	WaterNeedsGore = false;				// the water is blood: none when gore is off
+	WaterTileX = 86;
+	InWaterSprite = sInWater;
+	SecretDoorType = -1;				// SecretDoor type of every secret door, -1 for the usual random one
+	PotStyle = 0;
+	GuruBarType = 0;
+
+	// Enemies: [object, weight] (weight = how many tickets in the draw), and pack points that differ from the enemy's
+	Enemies = [];
+	PackPoints = {};
+	EnemyWeights = [];
+}
+
+function Levels_Init(){
+	var _L = [];
+	_L[DungeonLevel.Start] = new Level_Create(DungeonLevel.Start, "Destroy Agahnim");
+	_L[DungeonLevel.Castle] = new Level_Create(DungeonLevel.Castle, "Hyrule Castle");
+	_L[DungeonLevel.CastleBasement] = new Level_Create(DungeonLevel.CastleBasement, "Castle Basement");
+	_L[DungeonLevel.CastleJails] = new Level_Create(DungeonLevel.CastleJails, "Castle Prison");
+	_L[DungeonLevel.Catacombs] = new Level_Create(DungeonLevel.Catacombs, "Catacombs");
+	_L[DungeonLevel.Sewers] = new Level_Create(DungeonLevel.Sewers, "Sewers");
+	_L[DungeonLevel.Village] = new Level_Create(DungeonLevel.Village, "Rebel Village");
+	_L[DungeonLevel.LanmolasLair] = new Level_Create(DungeonLevel.LanmolasLair, "Lanmola's Lair");
+	_L[DungeonLevel.Ruins] = new Level_Create(DungeonLevel.Ruins, "Ancient Ruins");
+	_L[DungeonLevel.WaterTemple] = new Level_Create(DungeonLevel.WaterTemple, "Water Temple");
+	_L[DungeonLevel.Mines] = new Level_Create(DungeonLevel.Mines, "Dwarven Mining Town");
+	_L[DungeonLevel.MoldormsLair] = new Level_Create(DungeonLevel.MoldormsLair, "Moldorm's Lair");
+	_L[DungeonLevel.Aghanim1] = new Level_Create(DungeonLevel.Aghanim1, "Agahnim's Fortress");
+	_L[DungeonLevel.Aghanim2] = new Level_Create(DungeonLevel.Aghanim2, "Agahnim");
+	global.LevelDefs = _L;
+
+	with(_L[DungeonLevel.Start]){
+		Special = LevelSpecial.Intro;
+		Class = DungeonClass.Special;
+		Template = 0;
+		Transform = false;
+		StartDir = UP;
+		Ceiling = false;
+		Song = SongIndex.Start;
+		Dark = LevelDark.Never;
+	}
+
+	with(_L[DungeonLevel.Castle]){
+		Class = DungeonClass.Castle;
+		RunStart = true;
+		Spikes = false;
+		Curses = false;
+		FairyRooms = false;
+		Song = SongIndex.Castle;
+		Dark = LevelDark.Low;
+		SecretDoorType = SecretDoor.Crack;
+		Enemies = [[oEnemy_Soldier_Advanced, 2], [oEnemy_Soldier_Simple, 3]];
+	}
+
+	with(_L[DungeonLevel.CastleBasement]){
+		Class = DungeonClass.CastleBasement;
+		Spikes = false;
+		Song = SongIndex.Castle;
+		DarkBonus = 0.1;
+		Enemies = [[oEnemy_Keese, 1], [oEnemy_Rat, 2], [oEnemy_Rope, 1], [oEnemy_Soldier_Advanced, 3], [oEnemy_Soldier_Simple, 3]];
+	}
+
+	with(_L[DungeonLevel.CastleJails]){
+		Class = DungeonClass.CastleJails;
+		Boss = true;
+		BossSpawn = {Obj: oBoss_Armos_C, X: 20, Y: 20, Layer: "System"};
+		BossDoorFrame = 40;
+		BossAchievement = "BossArmos";
+		Jails = true;
+		Spikes = false;
+		Obstacles = [RoomObstacle.Blocks];
+		Song = SongIndex.Castle;
+		DarkBonus = 0.1;
+		Water = LevelWater.WetBandits;
+		Enemies = [[oEnemy_Keese, 1], [oEnemy_Rat, 1], [oEnemy_Rope, 1], [oEnemy_Soldier_Advanced, 3], [oEnemy_Soldier_Simple, 2], [oEnemy_Soldier_Mace, 1]];
+	}
+
+	with(_L[DungeonLevel.Catacombs]){
+		Class = DungeonClass.CatacombsSewers;
+		SaveBefore = true;
+		ReachAchievement = "ReachCatacombs";
+		Obstacles = [RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Spikes];
+		Dark = LevelDark.Always;
+		PotStyle = 1;
+		Enemies = [[oEnemy_Keese, 2], [oEnemy_Poe, 2], [oEnemy_Rat, 1], [oEnemy_Rope, 1], [oEnemy_Skeleton, 2], [oEnemy_Gibdo, 2], [oEnemy_Guru_Bar, 1], [oEnemy_Soldier_Advanced, 2]];
+	}
+
+	with(_L[DungeonLevel.Sewers]){
+		Class = DungeonClass.CatacombsSewers;
+		TMNTRoom = true;
+		Spikes = false;
+		Obstacles = [RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes];
+		DarkBonus = 0.15;
+		Water = LevelWater.Random;
+		Enemies = [[oEnemy_Buzz, 1], [oEnemy_Hover, 3], [oEnemy_Keese, 1], [oEnemy_Rat, 2], [oEnemy_Rope, 1], [oEnemy_Bari, 2], [oEnemy_Zol, 2], [oEnemy_BuzzBlob, 1], [oEnemy_Pikit, 2], [oEnemy_Popo, 3], [oEnemy_Crab, 2], [oEnemy_Cannon, 1], [oEnemy_Kyameron_Emitter, 2]];
+		PackPoints = {oEnemy_Rat: 1, oEnemy_Buzz: 2};	// infested with rats (normally 2), fewer Buzz (normally 1)
+	}
+
+	with(_L[DungeonLevel.Village]){
+		Special = LevelSpecial.Village;
+		Class = DungeonClass.Special;
+		Template = 2;
+		Transform = false;
+		SaveBefore = true;
+		FairyRooms = false;
+		Curses = false;
+		ReachAchievement = "ReachVillage";
+		Song = SongIndex.Village_Cave;
+		Water = LevelWater.Always;
+		SecretDoorType = SecretDoor.Blank;
+	}
+
+	with(_L[DungeonLevel.LanmolasLair]){
+		Class = DungeonClass.BossesRuins;
+		Boss = true;
+		BossSpawn = {Obj: oBoss_Lanmola_C, X: 20, Y: 20, Layer: "System"};
+		BossDoorFrame = 44;
+		BossAchievement = "BossLanmola";
+		Obstacles = [RoomObstacle.Blocks, RoomObstacle.Spikes, RoomObstacle.SpikeBlocks];
+		Song = SongIndex.Dungeon2;
+		PotStyle = 1;
+		Enemies = [[oEnemy_Bubble, 2], [oEnemy_Buzz, 2], [oEnemy_Hoarder, 1], [oEnemy_BuzzBlob, 1], [oEnemy_Pikit, 1], [oEnemy_Crab, 1], [oEnemy_Gibdo, 3], [oEnemy_Leever, 2], [oEnemy_Octorok, 2], [oEnemy_Ropa, 2], [oEnemy_SnapDragon, 1], [oEnemy_Geldman, 2], [oEnemy_Beamos, 3], [oEnemy_Cannon, 1], [oEnemy_Guru_Bar, 1], [oEnemy_Medusa, 2], [oEnemy_RollingSpike, 1], [oEnemy_MovingSpikeBlock, 1]];
+	}
+
+	with(_L[DungeonLevel.Ruins]){
+		Class = DungeonClass.BossesRuins;
+		SaveBefore = true;
+		Obstacles = [RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Spikes, RoomObstacle.Spikes, RoomObstacle.Spikes];
+		DarkBonus = 0.2;
+		Enemies = [[oEnemy_Bubble, 1], [oEnemy_Buzz, 1], [oEnemy_Hoarder, 2], [oEnemy_Keese, 2], [oEnemy_Poe, 2], [oEnemy_Rat, 1], [oEnemy_BuzzBlob, 1], [oEnemy_Helmasaur, 2], [oEnemy_Kodongo, 2], [oEnemy_Goriya, 3], [oEnemy_Zirro, 2], [oEnemy_Beamos, 3], [oEnemy_Cannon, 1], [oEnemy_Guru_Bar, 1], [oEnemy_Medusa, 1], [oEnemy_RollingSpike, 1], [oEnemy_MovingSpikeBlock, 1]];
+	}
+
+	with(_L[DungeonLevel.WaterTemple]){
+		Class = DungeonClass.BossesRuins;
+		Spikes = false;
+		Obstacles = [RoomObstacle.Blocks, RoomObstacle.Holes];
+		MovingFloors = [RoomObstacle.MovingFloorsHoles, RoomObstacle.MovingFloorsHoles, RoomObstacle.MovingFloorsHoles];
+		DarkBonus = 0.15;
+		Water = LevelWater.Random;
+		GuruBarType = 1;
+		Enemies = [[oEnemy_Bubble, 1], [oEnemy_Hover, 2], [oEnemy_Keese, 2], [oEnemy_Poe, 1], [oEnemy_Bari, 1], [oEnemy_Zol, 1], [oEnemy_Wizzrobe, 3], [oEnemy_HardhatBeetle, 3], [oEnemy_Zazak, 2], [oEnemy_Eyegore, 3], [oEnemy_Beamos, 3], [oEnemy_Cannon, 1], [oEnemy_Guru_Bar, 2], [oEnemy_Kyameron_Emitter, 2], [oEnemy_Medusa, 1], [oEnemy_RollingSpike, 1], [oEnemy_MovingSpikeBlock, 1], [oEnemy_Soldier_Advanced, 2]];
+	}
+
+	with(_L[DungeonLevel.Mines]){
+		Special = LevelSpecial.Mines;
+		Class = DungeonClass.Special;
+		Template = 3;
+		Transform = false;
+		SaveBefore = true;
+		FairyRooms = false;
+		Curses = false;
+		ShopKeeperSprite = sShopKeeper_Mines;
+		ReachAchievement = "ReachMines";
+		Song = SongIndex.Mines;
+		Water = LevelWater.Always;
+		WaterTileX = 92;
+		InWaterSprite = sInMineWater;
+		SecretDoorType = SecretDoor.Blank;
+	}
+
+	with(_L[DungeonLevel.MoldormsLair]){
+		Class = DungeonClass.BossesRuins;
+		Boss = true;
+		BossSpawn = {Obj: oBoss_Moldorm, X: 128, Y: 80, Layer: "ObjsHigher_Upper"};
+		BossRoomTemplate = "Moldorm";
+		BossAchievement = "BossMoldorm";
+		Obstacles = [RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Spikes, RoomObstacle.Spikes, RoomObstacle.SpikeBlocks, RoomObstacle.SpikeBlocks, RoomObstacle.SpikeBlocks];
+		MovingFloors = [RoomObstacle.MovingFloorsHoles, RoomObstacle.MovingFloorsSpikes, RoomObstacle.MovingFloorsSpikeBlocks];
+		Song = SongIndex.Dungeon2;
+		Dark = LevelDark.Always;
+		PotStyle = 1;
+		GuruBarType = 2;
+		Enemies = [[oEnemy_Bubble, 1], [oEnemy_Hoarder, 3], [oEnemy_BuzzBlob, 1], [oEnemy_Kodongo, 3], [oEnemy_Moldorm, 4], [oEnemy_Octorok, 2], [oEnemy_Ropa, 3], [oEnemy_Tektite, 2], [oEnemy_Cannon, 1], [oEnemy_Guru_Bar, 1], [oEnemy_Medusa, 1], [oEnemy_RollingSpike, 1], [oEnemy_MovingSpikeBlock, 1]];
+	}
+
+	with(_L[DungeonLevel.Aghanim1]){
+		Class = DungeonClass.Aghanim;
+		SaveBefore = true;
+		ShopBesideBoss = false;
+		JustinShop = true;
+		Obstacles = [RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Spikes, RoomObstacle.SpikeBlocks, RoomObstacle.SpikeBlocks];
+		MovingFloors = [RoomObstacle.MovingFloorsHoles, RoomObstacle.MovingFloorsSpikes, RoomObstacle.MovingFloorsSpikeBlocks];
+		Song = SongIndex.Dungeon3;
+		DarkBonus = 0.15;
+		Water = LevelWater.Random;
+		WaterChance = 0.55;
+		WaterNeedsGore = true;
+		WaterTileX = 98;
+		InWaterSprite = sInBlood;
+		PotStyle = 1;
+		GuruBarType = 2;
+		Enemies = [[oEnemy_Bubble, 1], [oEnemy_Poe, 2], [oEnemy_Bari, 2], [oEnemy_Kodongo, 1], [oEnemy_Ropa, 1], [oEnemy_Wizzrobe, 2], [oEnemy_SnapDragon, 2], [oEnemy_Zirro, 1], [oEnemy_Tektite, 2], [oEnemy_Armos, 3], [oEnemy_Hinox, 5], [oEnemy_Beamos, 4], [oEnemy_Cannon, 1], [oEnemy_Guru_Bar, 1], [oEnemy_Medusa, 1], [oEnemy_RollingSpike, 1], [oEnemy_MovingSpikeBlock, 1], [oEnemy_Soldier_Advanced, 5], [oEnemy_Soldier_Mace, 2]];
+		PackPoints = {oEnemy_Bari: 1.75};	// more Baris (normally 3)
+	}
+
+	with(_L[DungeonLevel.Aghanim2]){
+		Special = LevelSpecial.FinalBoss;
+		Class = DungeonClass.Special;
+		Template = 1;
+		Transform = false;
+		Next = -1;
+		BaseTheme = DungeonLevel.Aghanim1;
+		Boss = true;
+		Ceiling = false;
+		Song = SongIndex.Boss_Final_Hallway;
+		Dark = LevelDark.Never;
+	}
+
+	// Enemy weights by object index, for Level_EnemyWeight
+	for(var _Level = 0; _Level < array_length(_L); _Level++){
+		var _Def = _L[_Level];
+		_Def.EnemyWeights = array_create(array_length(global.EnemyData), 0);
+		for(var j = 0; j < array_length(_Def.Enemies); j++){
+			var _Obj = _Def.Enemies[j][0];
+			if(_Obj >= array_length(_Def.EnemyWeights)) array_resize(_Def.EnemyWeights, _Obj + 1);
+			_Def.EnemyWeights[_Obj] = _Def.Enemies[j][1];
+		}
+	}
+}

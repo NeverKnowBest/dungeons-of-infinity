@@ -11,7 +11,7 @@ function Dungeon_Draw_Carpets(_RoomIndex){
 	
 	if(!variable_struct_exists(Room.Template, "Carpets")) exit;
 	
-	switch(global.Level.Index){
+	switch(LevelDef.Theme){
 		
 		default:
 			exit;
@@ -268,7 +268,7 @@ function Dungeon_Draw_CarpetsFull(_RoomIndex){
 	
 	if(Room.Section_ID != 0) exit;
 	
-	if(global.Level.Index != DungeonLevel.Castle && global.Level.Index != DungeonLevel.WaterTemple) exit;
+	if(LevelDef.Theme != DungeonLevel.Castle && LevelDef.Theme != DungeonLevel.WaterTemple) exit;
 	
 	var FullCarpets = Prob(Chance_Decor_CarpetsFull) || Room.GridW == 2 || Room.GridH == 2;
 	
@@ -348,7 +348,7 @@ function Dungeon_Draw_CarpetsFull(_RoomIndex){
 }
 
 function Carpet_InvalidDoor(_DoorStatus){
-	return (_DoorStatus == DoorStatus.Secret_Closed || _DoorStatus == DoorStatus.Secret_Open || (global.Level.Index == DungeonLevel.Castle && _DoorStatus == DoorStatus.Entrance))		
+	return (_DoorStatus == DoorStatus.Secret_Closed || _DoorStatus == DoorStatus.Secret_Open || (LevelDef.RunStart && _DoorStatus == DoorStatus.Entrance))		
 }
 
 function Carpet_Draw_H(_CornerX, _CornerY, _TileW, _TileH, _TMID){

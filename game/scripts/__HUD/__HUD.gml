@@ -129,6 +129,6 @@ function HUD_SetPositions(_MainSide){
 
 function HUD_DungeonLinkY(){
 	
-	return DungeonY + 23 + (max(global.Level.Index - 1, 0) * 10) + (global.SaveLevel ? 4 : 0) + (global.Level.Index == DungeonLevel.Aghanim2 ? 5 : 0) 
+	return DungeonY + 23 + (max(LevelDef.Depth - 1, 0) * 10) + (global.SaveLevel ? 4 : 0) + (LevelDef.Special == LevelSpecial.FinalBoss ? 5 : 0) 
 	
 }

@@ -1,7 +1,7 @@
 // Feather disable GM2064
 #macro Room global.Level.Rooms[_RoomIndex]
 #macro DungeonRoom global.Level.DungeonTemplate.Rooms[_RoomIndex]
-#macro StartingRoom (global.Level.Index == DungeonLevel.Castle && _RoomIndex == global.Level.RoomIndex_Entrance)
+#macro StartingRoom (LevelDef.RunStart && _RoomIndex == global.Level.RoomIndex_Entrance)
 #macro DungeonGridW 8
 #macro DungeonW (256 * DungeonGridW)
 #macro SectionIndex (Room.TemplateClass == RoomTemplateClass.Main_Upper ? Room.Section_ID : 0)
@@ -244,11 +244,13 @@ function Dungeon_CreateStruct_Level(_LevelIndex) constructor{
 	TMNTRoom = false; 
 	LargeTreasureRoom = false;
 	
-	Stars = Prob(Chance_LevelHasStar) && Index > DungeonLevel.Castle;
-	MinEnemiesForStars = 6 + floor(Index / 3);
+	var _Depth = global.LevelDefs[Index].Depth;
 	
-	MaxRollingSpikes = irandom_range(1 + floor(Index / 6), 2 + floor(Index / 4));
-	MaxGuruBars = irandom_range(1 + floor(Index / 6), 2 + floor(Index / 4));
+	Stars = Prob(Chance_LevelHasStar) && _Depth > Level_Depth(DungeonLevel.Castle);
+	MinEnemiesForStars = 6 + floor(_Depth / 3);
+	
+	MaxRollingSpikes = irandom_range(1 + floor(_Depth / 6), 2 + floor(_Depth / 4));
+	MaxGuruBars = irandom_range(1 + floor(_Depth / 6), 2 + floor(_Depth / 4));
 	
 	//keep track of items that should only be created once on a level for shops
 	ShopBagSlotsCreated = 0;
@@ -260,7 +262,7 @@ function Dungeon_CreateStruct_Level(_LevelIndex) constructor{
 	ShopOrbsCreated = 0;
 	ShopPopsCreated = 0;
 
-	PotStyle = (Index == DungeonLevel.Catacombs || Index == DungeonLevel.LanmolasLair || Index == DungeonLevel.MoldormsLair || Index == DungeonLevel.Aghanim1) ? 1 : 0;
+	PotStyle = global.LevelDefs[Index].PotStyle;
 	
 	
 }
@@ -319,7 +321,7 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 	
 	BonusTreasure = Prob(Chance_BonusTreasure);
 	
-	ShopPriceMultiplier = random_range(1, min(1.4 + (global.Level.Index * 0.1), 2)); //for each room, pick a multiplier for the base prices
+	ShopPriceMultiplier = random_range(1, min(1.4 + (LevelDef.Depth * 0.1), 2)); //for each room, pick a multiplier for the base prices
 	
 	WetBandits = false;
 	
@@ -334,7 +336,7 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 	WarpDest_X = 0;
 	WarpDest_Y = 0;
 
-	RoomSongIndex = global.Music_LevelSongIndex[global.Level.Index];
+	RoomSongIndex = LevelDef.Song;
 	
 	DoorCode = 0;
 	
@@ -399,12 +401,12 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 
 	TemplateObjGrid = {WallsUpper : Array_Create2D(MapW, MapH, false), OutOfBounds : Array_Create2D(MapW, MapH, false), ExtraCeilings : Array_Create2D(MapW, MapH, false)};
 	
-	switch(global.Level.Index){
-		case DungeonLevel.Start:
+	switch(LevelDef.Special){
+		case LevelSpecial.Intro:
 			TemplateClass = RoomTemplateClass.Other;
 			TemplateSubClass = RoomTemplateClass_Other.Start;
 			break;
-		case DungeonLevel.Village:
+		case LevelSpecial.Village:
 			
 			if(_RoomIndex >= 0 && _RoomIndex <= 5){
 				TemplateClass = RoomTemplateClass.Village;
@@ -443,7 +445,7 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 			}
 			break;
 		
-		case DungeonLevel.Mines:
+		case LevelSpecial.Mines:
 			
 			if(global.MainTemplates_Mine[GridY][GridX] != -1){
 				TemplateClass = RoomTemplateClass.Mines;
@@ -451,7 +453,7 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 			}
 			break;
 			
-		case DungeonLevel.Aghanim2:
+		case LevelSpecial.FinalBoss:
 			TemplateClass = RoomTemplateClass.Other;
 			TemplateSubClass = RoomTemplateClass_Other.Unique;
 			if(GridX == 3 && GridY == 4) TemplateName = "FinalBossHall";
@@ -475,14 +477,14 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 		
 		case SpecialDungeonObj.SpecialRoom:
 		
-			if(global.Level.Index == DungeonLevel.Village && GridX == 3 && GridY == 0){
+			if(LevelDef.Special == LevelSpecial.Village && GridX == 3 && GridY == 0){
 				TemplateClass = RoomTemplateClass.Other;
 				TemplateSubClass = RoomTemplateClass_Other.Unique;
 				TemplateName = "TreasureRoom";
 				break;
 			}
 			
-			if(global.Level.Index == DungeonLevel.Mines && GridX == 3 && GridY == 0){
+			if(LevelDef.Special == LevelSpecial.Mines && GridX == 3 && GridY == 0){
 				TemplateClass = RoomTemplateClass.Other;
 				TemplateSubClass = RoomTemplateClass_Other.Unique;
 				TemplateName = "WishRoom";
@@ -501,13 +503,13 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 			
 		case SpecialDungeonObj.House:
 			
-			switch(global.Level.Index){
-				case DungeonLevel.Village:
+			switch(LevelDef.Special){
+				case LevelSpecial.Village:
 					TemplateClass = RoomTemplateClass.Village;
 					TemplateSubClass = RoomTemplateClass_Village.House;					
 					break;
 					
-				case DungeonLevel.Mines:
+				case LevelSpecial.Mines:
 					TemplateClass = RoomTemplateClass.Mines;
 					TemplateSubClass = RoomTemplateClass_Mines.House;							
 					break;
@@ -556,50 +558,9 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 
 			
 			var _AllowMovingFloors = (SpecialObject == SpecialDungeonObj.None && !WarpDest);
-			switch(global.Level.Index){
-				
-				
-				default:
-					ds_list_add(_ObstacleList, RoomObstacle.Holes);
-					break;
-
-				case DungeonLevel.CastleJails:
-					ds_list_add(_ObstacleList, RoomObstacle.Blocks);
-					break;
-					
-				case DungeonLevel.Catacombs:
-					ds_list_add(_ObstacleList, RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Spikes);
-					break;
-					
-				case DungeonLevel.Sewers:
-					ds_list_add(_ObstacleList, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes);
-					break;
-				
-				case DungeonLevel.LanmolasLair:
-					ds_list_add(_ObstacleList, RoomObstacle.Blocks, RoomObstacle.Spikes, RoomObstacle.SpikeBlocks);
-					break;
-					
-				case DungeonLevel.Ruins:
-					ds_list_add(_ObstacleList, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Spikes, RoomObstacle.Spikes, RoomObstacle.Spikes);
-					break;
-					
-				case DungeonLevel.WaterTemple:
-					ds_list_add(_ObstacleList, RoomObstacle.Blocks, RoomObstacle.Holes);
-					if(_AllowMovingFloors)
-						ds_list_add(_ObstacleList, RoomObstacle.MovingFloorsHoles, RoomObstacle.MovingFloorsHoles,RoomObstacle.MovingFloorsHoles);
-					break;
-					
-				case DungeonLevel.MoldormsLair:
-					ds_list_add(_ObstacleList, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Holes, RoomObstacle.Spikes, RoomObstacle.Spikes, RoomObstacle.SpikeBlocks, RoomObstacle.SpikeBlocks, RoomObstacle.SpikeBlocks);
-					if(_AllowMovingFloors)
-						ds_list_add(_ObstacleList, RoomObstacle.MovingFloorsHoles, RoomObstacle.MovingFloorsSpikes, RoomObstacle.MovingFloorsSpikeBlocks);
-					break;
-					
-				case DungeonLevel.Aghanim1:
-					ds_list_add(_ObstacleList, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Blocks, RoomObstacle.Holes, RoomObstacle.Spikes, RoomObstacle.SpikeBlocks, RoomObstacle.SpikeBlocks);
-					if(_AllowMovingFloors)
-						ds_list_add(_ObstacleList, RoomObstacle.MovingFloorsHoles, RoomObstacle.MovingFloorsSpikes, RoomObstacle.MovingFloorsSpikeBlocks);
-					break;
+			for(var i = 0; i < array_length(LevelDef.Obstacles); i++) ds_list_add(_ObstacleList, LevelDef.Obstacles[i]);
+			if(_AllowMovingFloors){
+				for(var i = 0; i < array_length(LevelDef.MovingFloors); i++) ds_list_add(_ObstacleList, LevelDef.MovingFloors[i]);
 			}
 			
 			ds_list_shuffle(_ObstacleList);
@@ -719,7 +680,7 @@ function Dungeon_InitLevel(_LevelIndex){
 		}
 		
 		//special case for Aghanim's lair
-		if(global.Level.Index == DungeonLevel.Aghanim2 && DungeonRoom.GridW == 1 && DungeonRoom.GridH == 1){
+		if(LevelDef.Special == LevelSpecial.FinalBoss && DungeonRoom.GridW == 1 && DungeonRoom.GridH == 1){
 			global.Level.RoomIndex_Boss = _RoomIndex;
 		}
 		
@@ -734,22 +695,22 @@ function Dungeon_InitLevel(_LevelIndex){
 
 			var _DoorPos = DungeonRoom.Doors[0].Position;
 
-			if(global.Level.Index == DungeonLevel.Sewers && _DoorPos == 18 && Prob(Chance_TMNT)){
+			if(LevelDef.TMNTRoom && _DoorPos == 18 && Prob(Chance_TMNT)){
 				Room.TemplateClass = RoomTemplateClass.Other;
 				Room.TemplateSubClass = RoomTemplateClass_Other.Unique;
 				Room.TemplateName = "TMNT";
 				global.Level.TMNTRoom = true;
-			}else if(global.Level.Index == DungeonLevel.Village && Room.GridX == 6 && Room.GridY == 1){
+			}else if(LevelDef.Special == LevelSpecial.Village && Room.GridX == 6 && Room.GridY == 1){
 				Room.TemplateClass = RoomTemplateClass.Other;
 				Room.TemplateSubClass = RoomTemplateClass_Other.Unique;
 				Room.TemplateName = "Zora";
 				continue;
-			}else if(global.Level.Index == DungeonLevel.Mines && Room.GridX == 7 && Room.GridY == 1){
+			}else if(LevelDef.Special == LevelSpecial.Mines && Room.GridX == 7 && Room.GridY == 1){
 				Room.TemplateClass = RoomTemplateClass.Other;
 				Room.TemplateSubClass = RoomTemplateClass_Other.Unique;
 				Room.TemplateName = "Zora";
 				continue;				
-			}else if((!global.Level.FairyRoom || !global.Level.GemPondRoom) && global.Level.Index != DungeonLevel.Castle && global.Level.Index != DungeonLevel.Village && global.Level.Index != DungeonLevel.Mines && (_DoorPos == 6 || _DoorPos == 18)){
+			}else if((!global.Level.FairyRoom || !global.Level.GemPondRoom) && LevelDef.FairyRooms && (_DoorPos == 6 || _DoorPos == 18)){
 				if(Prob(Chance_SpecialRoomFairyOrGemPond)){
 					Room.FairyOrGemPond = true;
 					continue;
@@ -761,11 +722,11 @@ function Dungeon_InitLevel(_LevelIndex){
 			//This is the prob that a Special Room will be hidden with secret doors. Otherwise the special Room will have regular doors
 			//Use only secret_closed doors for village
 			
-			if(Prob(Chance_SecretDoor) || global.Level.Index == DungeonLevel.Village ||  global.Level.Index == DungeonLevel.Mines || Room.TemplateName = "TMNT"){ 
+			if(Prob(Chance_SecretDoor) || LevelDef.Special == LevelSpecial.Village || LevelDef.Special == LevelSpecial.Mines || Room.TemplateName = "TMNT"){ 
 				
 				Room.Secret = 1;
 				
-				if(global.Level.Index == DungeonLevel.Village && Room.GridX == 3 && Room.GridY == 0) continue; //special locked door with special Room, so don't make door secret
+				if(LevelDef.Special == LevelSpecial.Village && Room.GridX == 3 && Room.GridY == 0) continue; //special locked door with special Room, so don't make door secret
 				
 				Room.Doors[0].Status = DoorStatus.Secret_Closed; //special Rooms should always only have 1 door into them, so we can index at 0
 				
@@ -854,8 +815,8 @@ function Dungeon_InitLevel(_LevelIndex){
 		if(TemplateCheck(_RoomIndex, RoomTemplateClass.Special, RoomTemplateClass_Special.GemPond) || TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "Zora")) Room.RoomSongIndex = SongIndex.GemPond;
 		if(TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "TMNT")) Room.RoomSongIndex = SongIndex.TMNT;
 
-		switch(global.Level.Index){
-			case DungeonLevel.Village:
+		switch(LevelDef.Special){
+			case LevelSpecial.Village:
 				if(TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.Main) || TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.House)) Room.RoomSongIndex = SongIndex.Village;
 				if(TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.Exit, "Exit")) Room.RoomSongIndex = SongIndex.Village_Cave;
 				if(TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.House, "Arcade")) Room.RoomSongIndex = SongIndex.Village_Arcade;
@@ -863,7 +824,7 @@ function Dungeon_InitLevel(_LevelIndex){
 				if(TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.House, "Pub")) Room.RoomSongIndex = SongIndex.Village_Pub;
 				break;
 					
-			case DungeonLevel.Mines:
+			case LevelSpecial.Mines:
 				if(TemplateCheck(_RoomIndex, RoomTemplateClass.Mines, RoomTemplateClass_Mines.House, "Store")) Room.RoomSongIndex = SongIndex.Village_Store;
 				if(global.MainTemplates_Mine[Room.GridY][Room.GridX] == 1 || global.MainTemplates_Mine[Room.GridY][Room.GridX] == 5 || global.MainTemplates_Mine[Room.GridY][Room.GridX] >= 8) Room.RoomSongIndex = SongIndex.Village_Cave;
 				break;
@@ -874,7 +835,7 @@ function Dungeon_InitLevel(_LevelIndex){
 		
 		Dungeon_Draw_Walls(_RoomIndex);
 		
-		if(global.Level.Index != DungeonLevel.Start && !TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.Main) && global.Level.Index != DungeonLevel.Aghanim2){
+		if(LevelDef.Ceiling && !TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.Main)){
 			Dungeon_Draw_Ceiling(GetTileID(8, LevelTilesY + 2), Room.TileX, Room.TileY, Room.TileX, Room.TileY, Room.TileX + Room.TileW, Room.TileY + Room.TileH);
 		}
 		
@@ -955,7 +916,7 @@ function Dungeon_InitLevel(_LevelIndex){
 		
 		Dungeon_Draw_WallDecor(_RoomIndex);
 		
-		if(global.Level.Index == DungeonLevel.Aghanim2){
+		if(LevelDef.Special == LevelSpecial.FinalBoss){
 
 			switch(_RoomIndex){
 				case 0:	
@@ -1009,26 +970,23 @@ function Dungeon_InitLevel(_LevelIndex){
 
 	ds_list_destroy(ShuffledRoomIndexesList);
 
-	
+	Test_OnLevelBuilt();	// test mode only: dump of the level while every room is still awake
+
 	Link_SetStartingPos();
 
 	Achievements_OnLevelStart(global.Level.Index);
 
 	
-	switch(global.Level.Index){
-		
-		case DungeonLevel.Start:
-			var _inst = instance_create_layer(-100, -100, "System", oIntro);		
-			break;
-
-		case DungeonLevel.Castle:
-			if(audio_is_playing(global.RainSound)){
-				audio_sound_gain(global.RainSound, 0.3, 200)
-			}
-			global.StatsToAdd[Stat.GamesPlayed]++;
-			oRender.FadeIn();
-			break;
-
+	if(LevelDef.Special == LevelSpecial.Intro){
+		var _inst = instance_create_layer(-100, -100, "System", oIntro);		
+	}
+	
+	if(LevelDef.RunStart){
+		if(audio_is_playing(global.RainSound)){
+			audio_sound_gain(global.RainSound, 0.3, 200)
+		}
+		global.StatsToAdd[Stat.GamesPlayed]++;
+		oRender.FadeIn();
 	}
 	
 	input_clear_momentary(true);
@@ -1036,13 +994,13 @@ function Dungeon_InitLevel(_LevelIndex){
 	if(DEBUG) InitPreviewCam();
 	
 	if(DEBUG){
-		if(global.Level.Index == DungeonLevel.Village){
+		if(LevelDef.Special == LevelSpecial.Village){
 			Music_Play(SongIndex.Village);	
 		}else{
-			if(global.Level.Index > DungeonLevel.Start) Music_Play(global.Music_LevelSongIndex[global.Level.Index]);	
+			if(LevelDef.Special != LevelSpecial.Intro) Music_Play(LevelDef.Song);	
 		}
 	}else{
-		if(global.Level.Index > DungeonLevel.Start) Music_Play(global.Music_LevelSongIndex[global.Level.Index]);	
+		if(LevelDef.Special != LevelSpecial.Intro) Music_Play(LevelDef.Song);	
 	}
 	
 }
@@ -1322,7 +1280,7 @@ function Dungeon_IsBossLevel(_Level){
 	
 	if(global.SaveLevel || global.HubLevel) return false
 	
-	return (_Level == DungeonLevel.CastleJails || _Level == DungeonLevel.LanmolasLair || _Level == DungeonLevel.MoldormsLair || _Level == DungeonLevel.Aghanim2)
+	return global.LevelDefs[_Level].Boss
 }
 
 function Dungeon_StartDir(_Level){
@@ -1331,7 +1289,7 @@ function Dungeon_StartDir(_Level){
 	
 	if(global.SaveLevel) return DOWN
 	
-	return _Level mod 2 == 1 || _Level == DungeonLevel.Start ? UP : DOWN
+	return global.LevelDefs[_Level].StartDir
 }
 
 function Dungeon_GetRoomIndex(_x, _y){
@@ -1348,37 +1306,7 @@ function Dungeon_PickClass(_Level){
 	
 	if(global.SaveLevel || global.HubLevel) return DungeonClass.Special
 	
-	switch(_Level){
-
-		case DungeonLevel.Castle:
-			return DungeonClass.Castle
-			
-		case DungeonLevel.CastleBasement:
-			return DungeonClass.CastleBasement
-		
-		case DungeonLevel.CastleJails:
-			return DungeonClass.CastleJails
-			
-		case DungeonLevel.Catacombs:
-		case DungeonLevel.Sewers:
-			return DungeonClass.CatacombsSewers;
-		
-		case DungeonLevel.LanmolasLair:
-		case DungeonLevel.Ruins:
-		case DungeonLevel.WaterTemple:
-		case DungeonLevel.MoldormsLair:
-			return DungeonClass.BossesRuins;
-		
-		case DungeonLevel.Aghanim1:
-			return DungeonClass.Aghanim;
-			
-		case DungeonLevel.Start:
-		case DungeonLevel.Village:
-		case DungeonLevel.Mines:
-		case DungeonLevel.Aghanim2:
-			return DungeonClass.Special;
-		
-	}
+	return global.LevelDefs[_Level].Class
 	
 }
 
@@ -1390,12 +1318,7 @@ function Dungeon_PickTemplateIndex(_LevelIndex, _Class, _Transformation){
 		
 		if(global.SaveLevel) return 4
 		
-		switch(_LevelIndex){
-			case DungeonLevel.Start: return 0
-			case DungeonLevel.Aghanim2: return 1
-			case DungeonLevel.Village: return 2
-			case DungeonLevel.Mines: return 3
-		}
+		return global.LevelDefs[_LevelIndex].Template
 	}
 	
 	var _Templates = array_length(global.Templates_Dungeon[_Class][0]);
@@ -1450,40 +1373,23 @@ function Dungeon_PickTemplateTransformation(_Level){
 	
 	if(global.SaveLevel || global.HubLevel) return ObjTransformation.None
 	
-	switch(_Level){
-			
-		case DungeonLevel.Start:
-		case DungeonLevel.Village:
-		case DungeonLevel.Mines: 
-		case DungeonLevel.Aghanim2: 
-			return ObjTransformation.None
-		
-		default:
-			
-			var _StartDir = Dungeon_StartDir(_Level);
-			
-			if(_StartDir == UP){
-				return choose(ObjTransformation.None, ObjTransformation.FlipH, ObjTransformation.RotateCW, ObjTransformation.RotateCCW, ObjTransformation.FlipHRotateCW, ObjTransformation.FlipHRotateCCW)
+	if(!global.LevelDefs[_Level].Transform) return ObjTransformation.None
+	
+	var _StartDir = Dungeon_StartDir(_Level);
+	
+	if(_StartDir == UP){
+		return choose(ObjTransformation.None, ObjTransformation.FlipH, ObjTransformation.RotateCW, ObjTransformation.RotateCCW, ObjTransformation.FlipHRotateCW, ObjTransformation.FlipHRotateCCW)
 
-			}else{
-				return choose(ObjTransformation.FlipV, ObjTransformation.FlipHV, ObjTransformation.RotateCW, ObjTransformation.RotateCCW, ObjTransformation.FlipHRotateCW, ObjTransformation.FlipHRotateCCW)
-			}
-
+	}else{
+		return choose(ObjTransformation.FlipV, ObjTransformation.FlipHV, ObjTransformation.RotateCW, ObjTransformation.RotateCCW, ObjTransformation.FlipHRotateCW, ObjTransformation.FlipHRotateCCW)
 	}
 
 }
 
 function Dungeon_IsSaveLevel(_LevelIndex){
 	
-	switch(_LevelIndex){
-		case DungeonLevel.Catacombs:
-		case DungeonLevel.Village:
-		case DungeonLevel.Ruins:
-		case DungeonLevel.Mines:
-		case DungeonLevel.Aghanim1:
-			return true
-	}
-	
-	return false
+	//true when a save level comes before this level
+	var _Def = Level_Get(_LevelIndex);
+	return _Def != undefined && _Def.SaveBefore
 	
 }

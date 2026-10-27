@@ -67,9 +67,9 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 			case TemplateObjGID.Carpet_V:
 				
 				//don't draw carpets for certain levels
-				if(global.Level.Index == DungeonLevel.Catacombs || global.Level.Index == DungeonLevel.Sewers || global.Level.Index == DungeonLevel.MoldormsLair) break;
+				if(LevelDef.Theme == DungeonLevel.Catacombs || LevelDef.Theme == DungeonLevel.Sewers || LevelDef.Theme == DungeonLevel.MoldormsLair) break;
 				
-				TileY = global.Level.Index == DungeonLevel.Aghanim2 ? LevelTilesY_Aghanim2 : LevelTilesY;
+				TileY = LevelTilesY_Base;
 				
 				for(_y = 0; _y < ObjTileH; _y++){
 					for(_x = 0; _x < ObjTileW; _x++){
@@ -84,7 +84,7 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 			case TemplateObjGID.Rug:
 
 				//don't draw carpets for certain levels
-				if(global.Level.Index == DungeonLevel.Catacombs || global.Level.Index == DungeonLevel.Sewers || global.Level.Index == DungeonLevel.MoldormsLair) break;
+				if(LevelDef.Theme == DungeonLevel.Catacombs || LevelDef.Theme == DungeonLevel.Sewers || LevelDef.Theme == DungeonLevel.MoldormsLair) break;
 				
 				//TL Corner
 				DrawTileBlock(FloorTMID, ObjX, ObjY, 15, 0, 1, 1);
@@ -250,7 +250,7 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 			
 			case TemplateObjGID.Dirt_Edge1:
-				Tx = (global.Level.Index == DungeonLevel.Start ? 89 : 36);
+				Tx = (LevelDef.Theme == DungeonLevel.Start ? 89 : 36);
 				for(_y = 0; _y < ObjTileH; _y++){
 					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
@@ -269,7 +269,7 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Dirt_Edge2:
-				Tx = (global.Level.Index == DungeonLevel.Start ? 89 : 36);
+				Tx = (LevelDef.Theme == DungeonLevel.Start ? 89 : 36);
 				for(_y = 0; _y < ObjTileH; _y++){
 					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);
@@ -288,7 +288,7 @@ function Dungeon_Draw_FloorObjs(_RoomIndex){
 				break;
 
 			case TemplateObjGID.Dirt_Edge3:
-				Tx = (global.Level.Index == DungeonLevel.Start ? 88: 35);
+				Tx = (LevelDef.Theme == DungeonLevel.Start ? 88: 35);
 				for(_y = 0; _y < ObjTileH; _y++){
 					for(_x = 0; _x < ObjTileW; _x++){
 						var _TileX = ObjX + (_x * 8);

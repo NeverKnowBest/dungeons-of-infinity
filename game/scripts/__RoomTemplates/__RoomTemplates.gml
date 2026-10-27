@@ -486,17 +486,8 @@ function RoomTemplates_Pick(_RoomIndex){
 						
 					case RoomTemplateClass_Other.Boss:
 					
-						switch(global.Level.Index){
-
-							case DungeonLevel.MoldormsLair: 
-								_TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Boss, "Moldorm", "Boss");
-								return global.Templates_Room[RoomTemplateClass.Other][RoomTemplateClass_Other.Boss][_TemplateIndex]; 
-							
-							default:
-								_TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Boss, "Default", "Boss");
-								return global.Templates_Room[RoomTemplateClass.Other][RoomTemplateClass_Other.Boss][_TemplateIndex]; 
-							
-						}
+						_TemplateIndex = RoomTemplate_GetIndex(RoomTemplateClass.Other, RoomTemplateClass_Other.Boss, LevelDef.BossRoomTemplate, "Boss");
+						return global.Templates_Room[RoomTemplateClass.Other][RoomTemplateClass_Other.Boss][_TemplateIndex]; 
 	
 						
 					case RoomTemplateClass_Other.Unique:
@@ -777,7 +768,7 @@ function RoomTemplates_PickSpecial(_RoomIndex){
 	
 	var SubClassList = ds_list_create();
 	
-	switch(global.Level.Index){
+	switch(LevelDef.Special){
 		
 		default:
 
@@ -792,9 +783,9 @@ function RoomTemplates_PickSpecial(_RoomIndex){
 				if(!global.Level.LargeTreasureRoom) ds_list_add(SubClassList, RoomTemplateClass_Special.TreasureLarge,RoomTemplateClass_Special.TreasureLarge,RoomTemplateClass_Special.TreasureLarge);
 			}else{
 
-				if(global.Level.Index > DungeonLevel.Castle){
+				if(LevelDef.Depth > Level_Depth(DungeonLevel.Castle)){
 					ds_list_add(SubClassList, RoomTemplateClass_Special.Shop, RoomTemplateClass_Special.Shop, RoomTemplateClass_Special.Shop, RoomTemplateClass_Special.Shop);
-					if(global.Level.Index == DungeonLevel.CastleJails){
+					if(LevelDef.Jails){
 						ds_list_add(SubClassList, RoomTemplateClass_Special.Shop, RoomTemplateClass_Special.Shop, RoomTemplateClass_Special.Shop); //add a few more shops for jail level since they're harder to create with the limited space
 					}
 				}
@@ -804,15 +795,15 @@ function RoomTemplates_PickSpecial(_RoomIndex){
 				if(Prob(Chance_LargeTreasureRoomNonSecretDoor) && !global.Level.LargeTreasureRoom) ds_list_add(SubClassList, RoomTemplateClass_Special.TreasureLarge, RoomTemplateClass_Special.TreasureLarge, RoomTemplateClass_Special.TreasureLarge);
 			}
 			
-			if(global.Level.Index > DungeonLevel.Castle) ds_list_add(SubClassList, RoomTemplateClass_Special.Kinstone);
+			if(LevelDef.Depth > Level_Depth(DungeonLevel.Castle)) ds_list_add(SubClassList, RoomTemplateClass_Special.Kinstone);
 			
 			break;
 		
-		case DungeonLevel.Village:
+		case LevelSpecial.Village:
 			ds_list_add(SubClassList, RoomTemplateClass_Special.Treasure, RoomTemplateClass_Special.Rupee, RoomTemplateClass_Special.Gem);
 			break;
 			
-		case DungeonLevel.Mines:
+		case LevelSpecial.Mines:
 			ds_list_add(SubClassList, RoomTemplateClass_Special.Gem);
 			break;
 			

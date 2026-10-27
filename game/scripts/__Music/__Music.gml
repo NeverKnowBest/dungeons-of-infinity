@@ -62,21 +62,7 @@ function Music_InitData(){
 	global.Music_SongAsset[SongIndex.Sanctuary] =			{Intro: Music_Sanctuary_Intro,	Main : Music_Sanctuary_Main};
 
 	
-	global.Music_LevelSongIndex = [ SongIndex.Start,
-									SongIndex.Castle,
-									SongIndex.Castle,
-									SongIndex.Castle,
-									SongIndex.Dungeon1,
-									SongIndex.Dungeon1,
-									SongIndex.Village_Cave,
-									SongIndex.Dungeon2,
-									SongIndex.Dungeon1,
-									SongIndex.Dungeon1,
-									SongIndex.Mines,
-									SongIndex.Dungeon2,									
-									SongIndex.Dungeon3,
-									SongIndex.Boss_Final_Hallway
-								  ]	
+	// The song of each level is in the level sheet (scripts/__Levels, field Song)
 	
 
 	

@@ -67,12 +67,12 @@ function Dungeon_Draw_Walls(_RoomIndex){
 		TilesThemeY = LevelTilesY;
 		
 		//some templates have a forced level tileset for walls and floors
-		switch(global.Level.Index){
+		switch(LevelDef.Theme){
 			case DungeonLevel.Start:
 				TilesThemeY = 4; //can't be LevelTilesY for Start since that's -1, so set it to Level 0's tileY which is 4;
 				break;
 			case DungeonLevel.Aghanim2:
-				FloorTrimTileY = LevelTilesY_Aghanim2;
+				FloorTrimTileY = LevelTilesY_Base;
 				TilesThemeX = 118;
 				TilesThemeY = LevelTilesY + 12;
 				break;
@@ -428,7 +428,7 @@ function Dungeon_Draw_Walls(_RoomIndex){
 				case TemplateObjGID.Block:
 				case TemplateObjGID.SpikeBlock:
 					
-					var SpikeBlocks = ObstacleClassCheck(_RoomIndex, RoomObstacleClass.SpikeBlocks) || global.Level.Index == DungeonLevel.Aghanim2;
+					var SpikeBlocks = ObstacleClassCheck(_RoomIndex, RoomObstacleClass.SpikeBlocks) || LevelDef.Special == LevelSpecial.FinalBoss;
 					
 					if(Wall.gid == TemplateObjGID.SpikeBlock && !SpikeBlocks) break;;
 					

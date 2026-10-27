@@ -45,7 +45,7 @@ function Rupee_PickAmount(_From){
 						)
 			
 			
-			if(global.Level.Index <= DungeonLevel.CastleBasement && _Amount > 150) _Amount = 150; //prevent super large rupees to appear on first level
+			if(LevelDef.Depth <= Level_Depth(DungeonLevel.CastleBasement) && _Amount > 150) _Amount = 150; //prevent super large rupees to appear on first level
 			break;
 			
 		case ItemFrom.LargeTreasure:

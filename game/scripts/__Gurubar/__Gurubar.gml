@@ -1,17 +1,6 @@
 function Gurus_GetType(){
 	
-	switch(global.Level.Index){
-
-		case DungeonLevel.WaterTemple:
-			return 1;
-			
-		case DungeonLevel.MoldormsLair:
-		case DungeonLevel.Aghanim1:
-			return 2;
-			
-	}
-	
-	return 0;
+	return LevelDef.GuruBarType;
 	
 }
 

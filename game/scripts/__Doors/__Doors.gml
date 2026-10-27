@@ -29,7 +29,7 @@ enum OpenDoorSprite{
 
 function Dungeon_CreateDoors(_RoomIndex){
 
-	if(global.Level.Index == DungeonLevel.Start) exit;
+	if(LevelDef.Special == LevelSpecial.Intro) exit;
 	
 	
 	//To draw sprite of all doors for oMapRoom
@@ -66,28 +66,12 @@ function Dungeon_CreateDoors(_RoomIndex){
 
 		if(_DoorInst.Status == DoorStatus.Secret_Closed){
 			
-			_DoorInst.SecretType = -1;
-			
 			//Secret door types for specific cases/levels
-			switch(global.Level.Index){
-				
-				case DungeonLevel.Castle:
+			_DoorInst.SecretType = LevelDef.SecretDoorType;
+			
+			if(	TemplateCheck(_DoorInst.ConnectedRoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "TMNT") || 
+				TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "TMNT")){
 					_DoorInst.SecretType = SecretDoor.Crack;
-					break;
-				
-				case DungeonLevel.Sewers:
-					if(	TemplateCheck(_DoorInst.ConnectedRoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "TMNT") || 
-						TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "TMNT")){
-							_DoorInst.SecretType = SecretDoor.Crack;
-						}
-					break;
-				
-				case DungeonLevel.Village:
-				case DungeonLevel.Mines:
-					_DoorInst.SecretType = SecretDoor.Blank;
-					break;
-
-					
 			}
 
 			if(_DoorInst.SecretType == -1){
@@ -103,7 +87,7 @@ function Dungeon_CreateDoors(_RoomIndex){
 			
 		}
 		
-		if(global.Level.Index == DungeonLevel.Mines){
+		if(LevelDef.Special == LevelSpecial.Mines){
 			if(	global.MainTemplates_Mine[Room.GridY][Room.GridX] == 1 || global.MainTemplates_Mine[Room.GridY][Room.GridX] >= 7){
 				_DoorInst.Status = DoorStatus.Secret_Closed;
 				_DoorInst.SecretType = SecretDoor.Blank;
@@ -131,7 +115,7 @@ function Dungeon_CreateDoors(_RoomIndex){
 
 		switch(_DoorInst.Location){
 			case "Top":
-				if(global.Level.Index == DungeonLevel.Aghanim2){
+				if(LevelDef.Special == LevelSpecial.FinalBoss){
 					//clear larger area for the large door frames
 					ClearTileBlock(TMID_Walls, TLCornerX, TLCornerY - 16, 4, 5);
 					//draw back ceiling on top left/right corners
@@ -215,7 +199,7 @@ function Dungeon_CreateDoors(_RoomIndex){
 		//Draw Map Doors onto MapRoomInst spr
 		if(_DoorInst.SecretType != -1) continue; //don't draw the door on the map if it connects to a secret Room
 		
-		if(global.Level.Index == DungeonLevel.Mines){
+		if(LevelDef.Special == LevelSpecial.Mines){
 			if(Room.GridX == 4 && Room.GridY == 4 && _DoorInst.Location != "Top" && _DoorInst.Location != "Right") continue; //secret doors in the mine caves entrance
 			if(Room.GridX == 6 && Room.GridY == 0 && _DoorInst.Location == "Left") continue; //secret door at the entrance to the treasure map
 		}
@@ -259,7 +243,7 @@ function Door_DrawTiles(Inst){
 		var TMID_Walls = (FloorLevel == UPPER ? global.TMID_Walls_Upper : global.TMID_Walls_Lower);
 		var TMID_Floor = (FloorLevel == UPPER ? global.TMID_Floor_Upper : global.TMID_Floor_Lower);
 		var WallLevel = (FloorLevel == UPPER ? 0 : 1);
-		var TilesY = global.Level.Rooms[RoomIndex].ForcedTheme != -1 && global.Level.Rooms[RoomIndex].ForcedTheme <= 11 ? 4 + (global.Level.Rooms[RoomIndex].ForcedTheme * 6) : (global.Level.Index == DungeonLevel.Aghanim2 ? LevelTilesY_Aghanim2 : LevelTilesY);
+		var TilesY = global.Level.Rooms[RoomIndex].ForcedTheme != -1 && global.Level.Rooms[RoomIndex].ForcedTheme <= 11 ? 4 + (global.Level.Rooms[RoomIndex].ForcedTheme * 6) : LevelTilesY_Base;
 		var TMID_Beam = (FloorLevel == UPPER ? global.TMID_Tiles_Highest : global.TMID_Walls_Upper);
 		
 		switch(Location){
@@ -267,7 +251,7 @@ function Door_DrawTiles(Inst){
 			case "Top":
 
 				//draw boss Room entrance
-				if(!global.SaveLevel && (global.Level.IsBossLevel && global.Level.Index != DungeonLevel.Aghanim2) && ConnectedRoomIndex == global.Level.RoomIndex_Boss){ 
+				if(!global.SaveLevel && (global.Level.IsBossLevel && LevelDef.Special != LevelSpecial.FinalBoss) && ConnectedRoomIndex == global.Level.RoomIndex_Boss){ 
 					
 
 					DrawTileBlock(TMID_Floor, x, y + 32, 52, 2, 2, 2);
@@ -283,7 +267,7 @@ function Door_DrawTiles(Inst){
 					DrawTileBlock(TMID_Decor, x, y + 40, 52, 0, 4, 2);
 						
 					//add door frames
-					var TileX = (global.Level.Index == DungeonLevel.CastleJails ? 40 : (global.Level.Index == DungeonLevel.LanmolasLair ? 44 : 48))
+					var TileX = LevelDef.BossDoorFrame;
 					DrawTileBlock(TMID_Decor, x - 16, y, TileX, 0, 2, 4);		
 					DrawTileBlock(TMID_Decor, x + 32, y, TileX + 2, 0, 2, 4);	
 						
@@ -430,7 +414,7 @@ function Door_DrawTiles(Inst){
 		
 			case "Bottom":
 				
-				if(Status == DoorStatus.Entrance && global.Level.Index == DungeonLevel.Castle && !global.HubLevel){
+				if(Status == DoorStatus.Entrance && LevelDef.RunStart && !global.HubLevel){
 					
 					//draw entrance
 					

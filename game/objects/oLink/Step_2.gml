@@ -12,12 +12,14 @@ if(InitNewDungeon){
 	
 	Time_PauseStart();
 	
-	if(Dungeon_IsSaveLevel(global.Level.Index + 1) && !global.SaveLevel){
+	var _NextLevel = LevelDef.Next;
+	if(Dungeon_IsSaveLevel(_NextLevel) && !global.SaveLevel){
 		global.SaveLevel = true;
 		Dungeon_InitSaveLevel(global.Level.Index);
 	}else{
 		global.SaveLevel = false;
-		Dungeon_InitLevel(++global.Level.Index);		
+		global.Level.Index = _NextLevel;
+		Dungeon_InitLevel(_NextLevel);		
 	}
 	
 	if(global.Level.StartDir == UP)
@@ -45,7 +47,7 @@ if(InitNewDungeon){
 				
 			case "Bottom":
 				
-				var _TilesY = (global.Level.Index == DungeonLevel.Aghanim2 ? LevelTilesY_Aghanim2 : LevelTilesY);
+				var _TilesY = LevelTilesY_Base;
 				
 				//Sides
 				DrawTileBlock(TMID, x, y, 72, _TilesY + 2, 1, 2);
@@ -82,7 +84,7 @@ if(AghanimTakingItems && Cape){
 
 //Lighting
 
-Lighting = (global.Level.Rooms[global.CurrentRoomIndex].TemplateName == "Arcade" || (global.Level.Index == DungeonLevel.Start && global.ChallengeOptions[ChallengeOption.Darkness] < ChallengeOption_Darkness.AllDark) || global.Level.Rooms[global.CurrentRoomIndex].Heat || global.Inventory.ItemData[ItemClass.Lamp].Index == -1);
+Lighting = (global.Level.Rooms[global.CurrentRoomIndex].TemplateName == "Arcade" || (LevelDef.Special == LevelSpecial.Intro && global.ChallengeOptions[ChallengeOption.Darkness] < ChallengeOption_Darkness.AllDark) || global.Level.Rooms[global.CurrentRoomIndex].Heat || global.Inventory.ItemData[ItemClass.Lamp].Index == -1);
 
 if( (Lighting && !global.Level.Rooms[global.CurrentRoomIndex].Heat) || global.Inventory.ItemData[ItemClass.Lamp].Index == -1){
 	Lighting_UpdateLinkLight(, 0.0, [0.0, 0.0, 0.0]);

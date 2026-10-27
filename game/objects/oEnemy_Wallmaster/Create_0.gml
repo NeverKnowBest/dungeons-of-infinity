@@ -7,9 +7,9 @@ StartRoomIndex = RoomIndex;
 Size = EnemySize.Large;
 
 
-Attack = 0.25 + (global.Level.Index * 0.25);
-Speed = min(0.475 + (global.Level.Index * 0.025), 0.75);
-IdleFrames = 41 - global.Level.Index;
+Attack = 0.25 + (LevelDef.Depth * 0.25);
+Speed = min(0.475 + (LevelDef.Depth * 0.025), 0.75);
+IdleFrames = 41 - LevelDef.Depth;
 
 IgnoreWalls = true;
 SpeedMod = 0.1;

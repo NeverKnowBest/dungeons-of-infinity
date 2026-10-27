@@ -374,7 +374,7 @@ function Link_SetStartingPos(){
 	
 	global.InWaterSprite = Link_GetInWaterSprite();	
 	
-	if(global.Level.Index == DungeonLevel.Start) exit;
+	if(LevelDef.Special == LevelSpecial.Intro) exit;
 
 	oLink.FallSpawnX = oLink.x;
 	oLink.FallSpawnY = oLink.y;
@@ -382,7 +382,7 @@ function Link_SetStartingPos(){
 	oLink.FallSpawnFacing = oLink.Facing;
 	
 	//precalculate hole tiles to speed up collision check
-	var _LevelTilesY = (global.Level.Index == DungeonLevel.Aghanim2 ? LevelTilesY_Aghanim2 : LevelTilesY)
+	var _LevelTilesY = LevelTilesY_Base;
 	global.HoleTileID_TL = GetTileID(102, _LevelTilesY + 4); 
 	global.HoleTileID_TM = GetTileID(104, _LevelTilesY + 4); 					
 	global.HoleTileID_TR = GetTileID(103, _LevelTilesY + 4); 
@@ -403,7 +403,7 @@ function Link_SetStartingPos(){
 	
 	Dungeon_RoomActivate(global.CurrentRoomIndex);
 	
-	if(global.Level.Index == DungeonLevel.Castle && !global.HubLevel){
+	if(LevelDef.RunStart && !global.HubLevel){
 		with(oLink){
 			Link_SetAutoMove(0, global.Level.StartDir == UP ? -1 : 1, 0.5, 28);
 			var _Leaves = irandom_range(6,7);
@@ -434,12 +434,12 @@ function Link_SetStartingPos(){
 
 	if(global.Challenges[Challenges.WallMaster]){
 			
-		switch(global.Level.Index){
+		switch(LevelDef.Special){
 				
-			case DungeonLevel.Start:
-			case DungeonLevel.Village:
-			case DungeonLevel.Mines:
-			case DungeonLevel.Aghanim2:
+			case LevelSpecial.Intro:
+			case LevelSpecial.Village:
+			case LevelSpecial.Mines:
+			case LevelSpecial.FinalBoss:
 				break;
 				
 			default:
@@ -705,7 +705,7 @@ function UpdateState(NewState, var1 = undefined){
 			x = floor(x); y = floor(y);
 			var snd = audio_play_sound(Sound_StairsFloorDown, 1, false);
 			audio_sound_gain(snd, 0, 2000);
-			var NextLevelSongIndex = global.Music_LevelSongIndex[global.Level.Index + 1];
+			var NextLevelSongIndex = global.LevelDefs[LevelDef.Next].Song;
 			if(oMusic.SongPlaying_Index != NextLevelSongIndex) Music_Fade(0, SongFadeLen_NextLevel, SongIndex.None);
 
 			if(audio_is_playing(global.RainSound)) audio_sound_gain(global.RainSound, 0, 1000);
@@ -1209,7 +1209,7 @@ function CheckDoors(){
 
 		//Check for locked doors					
 		if(DoorInst.Status == DoorStatus.Locked){
-			if(global.Level.Index == DungeonLevel.Village && oCamera.DungeonGridX == 3 && oCamera.DungeonGridY == 2){
+			if(LevelDef.Special == LevelSpecial.Village && oCamera.DungeonGridX == 3 && oCamera.DungeonGridY == 2){
 				if(Inventory_ItemExists(ItemClass.SpecialKey)) 
 					UnlockDoor(DoorInst, ItemClass.SpecialKey);
 			}else{
@@ -1448,7 +1448,7 @@ function CheckMovingFloor(){
 
 function CheckHoles(){
 	
-	if(RoomIndex == -1 && global.Level.Index != DungeonLevel.Aghanim2) return false
+	if(RoomIndex == -1 && LevelDef.Special != LevelSpecial.FinalBoss) return false
 	
 	var _TileUpper = tilemap_get_at_pixel(global.TMID_Floor_Upper, x, y);
 	var _TileLower = tilemap_get_at_pixel(global.TMID_Floor_Lower, x, y);
@@ -1705,7 +1705,7 @@ function Interact(){
 		if(_Pickup){
 			UpdateState(LinkState.PickUp, Inst);
 			if(Inst.object_index == oBomb){
-				if(global.Level.Index != DungeonLevel.Aghanim2 && !Inst.Red){ //for Aghanim fight, bombs must ignite even when picking up
+				if(LevelDef.Special != LevelSpecial.FinalBoss && !Inst.Red){ //for Aghanim fight, bombs must ignite even when picking up
 					Inst.alarm[0] = -1; //don't ignite it if picking up bomb item, it'll be ignited when thrown. This also cancels igniting a bomb if it wasn't ignited yet
 				}
 			}
@@ -1791,7 +1791,7 @@ function Interact(){
 	}
 
 	
-	if(global.Level.Index == DungeonLevel.Village){
+	if(LevelDef.Special == LevelSpecial.Village){
 			
 		//Old Lady NPC
 			
@@ -1861,7 +1861,7 @@ function Interact(){
 	}
 
 	//Prisoners
-	if(global.Level.Index == DungeonLevel.CastleJails){
+	if(LevelDef.Jails){
 		if(Facing == UP){
 			var PrisonerInst = collision_rectangle(x - 16, y - 48, x + 16, y, oPrisoner, false, true);
 			if(PrisonerInst != noone){
@@ -2272,7 +2272,7 @@ function CheckItems(){
 function CheckSpecialItems(){
 	
 	//1st level Entrance Wall
-	if(global.Level.Index <= DungeonLevel.Castle){
+	if(LevelDef.Depth <= Level_Depth(DungeonLevel.Castle)){
 		if(AllowCastleEntranceWallCollide){
 			var EntranceWallInst = instance_position(x, y + 4, Castle_EntranceWallInst);
 			if(EntranceWallInst != noone){
@@ -2424,13 +2424,13 @@ function Defense_GearPoints(){
 
 function AttackOrDefenseTooHigh(_AttackOrDefense){
 	
-	if(global.Level.Index == DungeonLevel.Village) return false; //ignore village level as Link can upgrade all he wants, he would just be denied upgrades in later levels if he's too high
+	if(LevelDef.Special == LevelSpecial.Village) return false; //ignore village level as Link can upgrade all he wants, he would just be denied upgrades in later levels if he's too high
 	
 	//checks if attack or defense value is too higher too early.
-	if( (_AttackOrDefense >= 3 && global.Level.Index <= DungeonLevel.CastleJails)	||
-		(_AttackOrDefense >= 4 && global.Level.Index <= DungeonLevel.Sewers)		||
-		(_AttackOrDefense >= 5 && global.Level.Index <= DungeonLevel.LanmolasLair)	||
-		(_AttackOrDefense >= 6 && global.Level.Index <= DungeonLevel.WaterTemple) )	{
+	if( (_AttackOrDefense >= 3 && LevelDef.Depth <= Level_Depth(DungeonLevel.CastleJails))	||
+		(_AttackOrDefense >= 4 && LevelDef.Depth <= Level_Depth(DungeonLevel.Sewers))		||
+		(_AttackOrDefense >= 5 && LevelDef.Depth <= Level_Depth(DungeonLevel.LanmolasLair))	||
+		(_AttackOrDefense >= 6 && LevelDef.Depth <= Level_Depth(DungeonLevel.WaterTemple)) )	{
 			return true;
 	}	
 }
@@ -2577,7 +2577,7 @@ function Link_PauseHitFlashingTimer(){
 
 function Link_PixelRender(){
 
-	if(global.Level.Index == DungeonLevel.Aghanim2){ //once Aghanim grabs items, don't draw tunic. Tunic from inventory will eventually be destroyed, so this only applies during the taking phase
+	if(LevelDef.Special == LevelSpecial.FinalBoss){ //once Aghanim grabs items, don't draw tunic. Tunic from inventory will eventually be destroyed, so this only applies during the taking phase
 		with(oBoss_Aghanim){
 			if(Intro && TakeItems && TakeItems_ShowBag){
 				PixelRender(other.Lighting, other.Lighting, false, noone, 0, false, []);
@@ -2644,13 +2644,7 @@ function Link_GetInWaterSprite(){
 	
 	if(TemplateCheck(global.CurrentRoomIndex, RoomTemplateClass.Special, RoomTemplateClass_Special.Fairy)) return sInWater;
 	
-	switch(global.Level.Index){
-		case DungeonLevel.Mines: return sInMineWater;
-		case DungeonLevel.Aghanim1: return sInBlood;
-		
-	}
-
-	return sInWater;
+	return LevelDef.InWaterSprite;
 	
 }
 

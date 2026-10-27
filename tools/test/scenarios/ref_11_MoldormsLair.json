@@ -1,0 +1,60 @@
+{
+ "comment": "Reference scenario for MoldormsLair (roadmap F4): dumps of three builds of the level, the level-dependent enemies of this level, a short walk and a contact sheet. tools/test/baseline.py runs every ref_* scenario and compares two versions of the code.",
+ "name": "ref_11_MoldormsLair",
+ "seed": 1,
+ "level": "MoldormsLair",
+ "dump": true,
+ "cheats": [
+  "Cheat_Inf_Health"
+ ],
+ "max_frames": 100000,
+ "steps": [
+  {
+   "do": "wait",
+   "frames": 60
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "shot",
+   "name": "start"
+  },
+  {
+   "do": "probe",
+   "enemies": [
+    "oEnemy_Bubble",
+    "oEnemy_Kodongo",
+    "oEnemy_Octorok",
+    "oEnemy_Ropa",
+    "oEnemy_Wallmaster"
+   ]
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 45
+  },
+  {
+   "do": "wait",
+   "frames": 15
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "shot",
+   "name": "walked"
+  },
+  {
+   "do": "sheet",
+   "level": "MoldormsLair",
+   "seeds": [
+    2,
+    3
+   ]
+  }
+ ]
+}

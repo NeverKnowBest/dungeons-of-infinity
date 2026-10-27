@@ -27,7 +27,7 @@ function Dungeon_Draw_Floors(_RoomIndex){
 	var IncreaseFloorDecor = BossRoom ? 5 : (Prob(0.1) ? choose(1.5,2,2.5) : 1);
 	
 	var _FloorDecor = false;
-	switch(global.Level.Index){
+	switch(LevelDef.Theme){
 		case DungeonLevel.Start:
 			_FloorDecor = true;
 			break;
@@ -54,7 +54,7 @@ function Dungeon_Draw_Floors(_RoomIndex){
 	if(Room.TemplateClass == RoomTemplateClass.Special || TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "TMNT") || global.SaveLevel || global.HubLevel) _FloorDecor = false;
 
 	
-	if(global.Level.Index == DungeonLevel.Start){
+	if(LevelDef.Theme == DungeonLevel.Start){
 		FloorTileX_Lower = 94;
 		FloorTileX_Upper = 94;
 		FloorTileY = VillageTilesY + 10;
@@ -99,7 +99,7 @@ function Dungeon_Draw_Floors(_RoomIndex){
 			
 				
 			if(_FloorDecor || BossRoom){
-				switch(global.Level.Index){
+				switch(LevelDef.Theme){
 					case DungeonLevel.Start:
 						if(Prob(0.16)) Dungeon_Draw_FloorDecor(PosX, PosY, FloorDecor.Grass);
 						break;

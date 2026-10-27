@@ -1489,6 +1489,7 @@
     {"id":{"name":"__Items","path":"scripts/__Items/__Items.yy",},},
     {"id":{"name":"__Kinstones","path":"scripts/__Kinstones/__Kinstones.yy",},},
     {"id":{"name":"__Leever","path":"scripts/__Leever/__Leever.yy",},},
+    {"id":{"name":"__Levels","path":"scripts/__Levels/__Levels.yy",},},
     {"id":{"name":"__Link","path":"scripts/__Link/__Link.yy",},},
     {"id":{"name":"__LinkSprites","path":"scripts/__LinkSprites/__LinkSprites.yy",},},
     {"id":{"name":"__Map","path":"scripts/__Map/__Map.yy",},},

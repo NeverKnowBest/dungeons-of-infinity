@@ -38,7 +38,7 @@ switch(Location){
 		break;
 }
 
-PaletteIndex = global.Level.Index;
+PaletteIndex = LevelDef.Theme;
 
 LastImageSpeed = image_speed;
 

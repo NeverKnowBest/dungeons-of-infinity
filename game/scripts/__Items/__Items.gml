@@ -948,7 +948,7 @@ function Item_Allowed(_ItemClass, _ItemIndex = -1, _From = ItemFrom.Anywhere){
 					
 				case ItemClass.Map:
 				case ItemClass.Compass:
-					if(global.Level.RoomsVistedPercent > 0.6 || global.Inventory.ItemData[ItemClass.Pendant].Owns[Pendant.Direction] || global.Challenges[Challenges.NoMap] || global.Level.Index == DungeonLevel.Village || global.Level.Index == DungeonLevel.Mines) return false;
+					if(global.Level.RoomsVistedPercent > 0.6 || global.Inventory.ItemData[ItemClass.Pendant].Owns[Pendant.Direction] || global.Challenges[Challenges.NoMap] || LevelDef.Special == LevelSpecial.Village || LevelDef.Special == LevelSpecial.Mines) return false;
 					break;
 					
 				case ItemClass.Lamp:
@@ -981,7 +981,7 @@ function Item_Allowed(_ItemClass, _ItemIndex = -1, _From = ItemFrom.Anywhere){
 								if(global.Challenges[Challenges.NoMap]) continue;
 								break;
 							case Pendant.Secrets:
-								if(!FromAnyStore(_From) || global.Level.Index < DungeonLevel.Village) continue; //only allow pendent of secrets in shops and in later levels, too overpowering otherwise
+								if(!FromAnyStore(_From) || LevelDef.Depth < Level_Depth(DungeonLevel.Village)) continue; //only allow pendent of secrets in shops and in later levels, too overpowering otherwise
 								break;
 							case Pendant.Immunity:
 								if(global.ChallengeOptions[ChallengeOption.Curses] > 0) continue; //no pendant of immunity for any curse challenge
@@ -2010,7 +2010,7 @@ function Probs_RandomItemClass_Pot(Force, SimpleItems = true){
 	
 	var _ItemClass = -1;
 	if(Force || Prob(Chance_PotHasItem)){
-		_ItemClass = Probs_RandomItemClass((SimpleItems || global.Level.Index == DungeonLevel.Village) ? ItemFrom.PotSimple : ItemFrom.Pot);
+		_ItemClass = Probs_RandomItemClass((SimpleItems || LevelDef.Special == LevelSpecial.Village) ? ItemFrom.PotSimple : ItemFrom.Pot);
 	}
 
 	if(global.Cursed){

@@ -37,7 +37,7 @@ switch(State){
 					FallSpawnY = y + (AutoMoveFrames * WalkSpeed * AutoMoveDirY);
 					FallSpawnFacing = StartDir;
 					FallSpawnFloorLevel = FloorLevel;
-					if(global.Level.Index != DungeonLevel.Start) GoingThruClosedDoor = true;
+					if(LevelDef.Special != LevelSpecial.Intro) GoingThruClosedDoor = true;
 					oHUD.CheckPendentSecret = true;
 					DescendingPhase = 0;
 						
@@ -314,7 +314,7 @@ switch(State){
 
 				instance_destroy(oIntro);
 				
-				Dungeon_InitLevel(DungeonLevel.Castle);
+				Dungeon_InitLevel(LevelDef.Next);
 
 				break;
 			}
@@ -546,11 +546,11 @@ StandingOnCompass = false;
 
 var _GravityBall = false;
 
-if(State != LinkState.Hit && global.Level.Index != DungeonLevel.Start){
+if(State != LinkState.Hit && LevelDef.Special != LevelSpecial.Intro){
 	
 	if(CheckHoles()) exit;
 	
-	if(global.Level.Index == DungeonLevel.Aghanim2){
+	if(LevelDef.Special == LevelSpecial.FinalBoss){
 		_GravityBall = CheckGravityBall();
 	}
 	

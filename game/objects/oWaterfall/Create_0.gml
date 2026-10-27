@@ -8,7 +8,7 @@ SoundPlaying = false;
 SoundFadeIn = false;
 LinkLeavingHouse = false;
 
-Color = (global.Level.Index == DungeonLevel.Mines ? 1 : 0)
+Color = (LevelDef.Theme == DungeonLevel.Mines ? 1 : 0)
 
 //clear ceiling
 for(var i = 0; i < W / 8; i++){

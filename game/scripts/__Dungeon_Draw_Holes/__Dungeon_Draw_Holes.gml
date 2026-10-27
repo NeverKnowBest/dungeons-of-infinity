@@ -19,7 +19,7 @@ function Dungeon_Draw_Holes(_RoomIndex){
 	
 	if(!variable_struct_exists(Room.Template, "Holes")) exit;
 	
-	if(global.Level.Index != DungeonLevel.Aghanim2 && global.Level.Index != DungeonLevel.Village && global.Level.Index != DungeonLevel.Mines && _RoomIndex == global.Level.RoomIndex_BossAdjacent) exit; //Don't draw if next to boss Room, since holes might take away entrance tiles
+	if(LevelDef.Special != LevelSpecial.FinalBoss && LevelDef.Special != LevelSpecial.Village && LevelDef.Special != LevelSpecial.Mines && _RoomIndex == global.Level.RoomIndex_BossAdjacent) exit; //Don't draw if next to boss Room, since holes might take away entrance tiles
 	if(Room.TemplateClass == RoomTemplateClass.Obstacles && Room.Obstacle != RoomObstacle.Holes && Room.Obstacle != RoomObstacle.MovingFloorsHoles) exit;
 	
 	var HoleArray = Room.Template.Holes;
@@ -122,7 +122,7 @@ function Dungeon_Draw_Holes(_RoomIndex){
 		
 	}		
 
-	var HoleTileY = (global.Level.Index == DungeonLevel.Aghanim2 ? LevelTilesY_Aghanim2 : LevelTilesY) + 4;
+	var HoleTileY = LevelTilesY_Base + 4;
 	
 	//draw tiles from hole grid
 	for(var _y = 0; _y < RoomTilesH; _y++){

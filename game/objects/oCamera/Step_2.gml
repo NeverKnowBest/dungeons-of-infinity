@@ -7,7 +7,7 @@ if(RoomTransition != NONE){
 				
 		Dungeon_RoomActivate(global.TransitionRoomIndex);
 		
-		if(global.Level.Index != DungeonLevel.Start){
+		if(LevelDef.Special != LevelSpecial.Intro){
 
 			if(global.Level.Rooms[global.TransitionRoomIndex].Secret == 2) audio_play_sound_stopall(Sound_Secret);
 		
@@ -86,7 +86,7 @@ if(RoomTransition != NONE){
 			
 			SetToRoomIndex(global.TransitionRoomIndex,false,false);			
 
-			if(global.Level.Index == DungeonLevel.Aghanim2){
+			if(LevelDef.Special == LevelSpecial.FinalBoss){
 				if(TemplateCheck(global.CurrentRoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "FinalBoss")){
 					global.FinalBoss = true;
 				}				

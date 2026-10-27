@@ -155,7 +155,7 @@ if(!DB_Started && !instance_exists(global.DB_Inst)){
 				MenuItemGrid[# 1, 1] = global.ItemData[ItemClassSelected].CanUse && Item_CanUse(ItemClassSelected, ItemIndexSelected);
 				
 				var _CanDrop = global.ItemData[ItemClassSelected].CanDrop && !oLink.InDoor_Facing;
-				MenuItemGrid[# 1, 2] = _CanDrop || (ItemClassSelected == ItemClass.Sword && global.Level.Index == DungeonLevel.Start);				
+				MenuItemGrid[# 1, 2] = _CanDrop || (ItemClassSelected == ItemClass.Sword && LevelDef.Special == LevelSpecial.Intro);				
 				
 				MenuSelectionIndex = 0;
 				while(!MenuItemGrid[# 1, MenuSelectionIndex]){

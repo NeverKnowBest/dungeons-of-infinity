@@ -24,6 +24,7 @@ STEPS = {
     'room': {'x', 'y'},
     'level': {'level', 'seed'},
     'spawn': {'enemy', 'dist'},
+    'probe': {'enemies', 'dist'},
     'give': {'item', 'index', 'amount'},
     'state': set(),
     'log': {'text'},
@@ -31,7 +32,7 @@ STEPS = {
     'sheet': {'level', 'seeds'},
     'end': set(),
 }
-TOP_KEYS = {'name', 'seed', 'level', 'cheats', 'items', 'steps', 'max_frames', 'sound', 'speed', 'comment'}
+TOP_KEYS = {'name', 'seed', 'level', 'cheats', 'items', 'steps', 'max_frames', 'sound', 'speed', 'comment', 'dump'}
 
 _enums = None
 
@@ -128,6 +129,9 @@ def resolve(scenario):
             step['item'] = _named(step.get('item'), 'ItemClass', errors, where)
         if do == 'spawn' and not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(step.get('enemy')))):
             errors.append('%s: no object "%s"' % (where, step.get('enemy')))
+        for enemy in (step.get('enemies', []) if do == 'probe' else []):
+            if not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(enemy))):
+                errors.append('%s: no object "%s"' % (where, enemy))
     return out, errors
 
 

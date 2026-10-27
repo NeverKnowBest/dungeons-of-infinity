@@ -27,11 +27,11 @@ if(ShopType == ShopTypes.Various){
 		
 	ShopKeeperInst = instance_create_layer(x + (ShopW / 2), y+21, "Objs_" + FloorLevelStr, oShopKeeper, {ShopType : ShopType});
 	
-	if(global.Level.Index == DungeonLevel.Mines){
+	if(LevelDef.ShopKeeperSprite != -1){
 		
-		ShopKeeperInst.sprite_index = sShopKeeper_Mines;
+		ShopKeeperInst.sprite_index = LevelDef.ShopKeeperSprite;
 	
-	}else if(global.Level.Index == DungeonLevel.Aghanim1 && !global.ShopkeeperJustin){
+	}else if(LevelDef.JustinShop && !global.ShopkeeperJustin){
 		
 		ShopKeeperInst.sprite_index = sShopKeeper_Justin;
 		global.ShopkeeperJustin = true;

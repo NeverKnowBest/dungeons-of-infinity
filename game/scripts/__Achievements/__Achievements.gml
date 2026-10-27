@@ -188,22 +188,16 @@ function Achievements_CheckStats(){
 
 /// Called when a new level starts
 function Achievements_OnLevelStart(_LevelIndex){
-	switch(_LevelIndex){
-		case DungeonLevel.Catacombs:	Achievement_Unlock("ReachCatacombs"); break;
-		case DungeonLevel.Village:		Achievement_Unlock("ReachVillage"); break;
-		case DungeonLevel.Mines:		Achievement_Unlock("ReachMines"); break;
-	}
+	var _Key = global.LevelDefs[_LevelIndex].ReachAchievement;
+	if(_Key != "") Achievement_Unlock(_Key);
 	Achievements_CheckStats();
 }
 
 /// Called when Link picks up a boss crystal
 function Achievements_OnBossDefeated(_LevelIndex){
 	Test_Event("boss defeated level=" + string(_LevelIndex));
-	switch(_LevelIndex){
-		case DungeonLevel.CastleJails:		Achievement_Unlock("BossArmos"); break;
-		case DungeonLevel.LanmolasLair:		Achievement_Unlock("BossLanmola"); break;
-		case DungeonLevel.MoldormsLair:		Achievement_Unlock("BossMoldorm"); break;
-	}
+	var _Key = global.LevelDefs[_LevelIndex].BossAchievement;
+	if(_Key != "") Achievement_Unlock(_Key);
 	Achievements_CheckStats();
 }
 

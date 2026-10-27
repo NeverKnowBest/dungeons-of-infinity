@@ -94,7 +94,7 @@ global.SpecialObjTemplateType[SpecialObj.Star][0] = "Crystals";
 	
 function Dungeon_Draw_SpecialObjs(_RoomIndex){
 	
-	if(global.Level.Index == DungeonLevel.Aghanim2) return true;
+	if(LevelDef.Special == LevelSpecial.FinalBoss) return true;
 	
 	//This sets up the altars, monuments, pots, treasures, crystals, etc, based on if the Room needs keys, treasures, crystals, etc
 	
@@ -137,7 +137,7 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 	//if you're in the entrance or adjacent boss Room, don't draw any special objects.
 	if( global.Level.IsBossLevel && _RoomIndex == global.Level.RoomIndex_BossAdjacent ) return true;	
 	
-	if(global.Level.Index == DungeonLevel.CastleJails){
+	if(LevelDef.Jails){
 		if(Prob(Chance_SpawnJail)) global.SpawnedJail = SpawnJail(_RoomIndex, Room.UnusedZone);
 	}
 	
@@ -159,7 +159,7 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 			
 			ds_list_add(SpawnMethodList_Key, SpawnMethod_Key.Pot, SpawnMethod_Key.Treasure, SpawnMethod_Key.Monument, SpawnMethod_Key.Altar);
 			
-			if(global.Level.Index > DungeonLevel.Castle){ //only add switches and enemy keys past castle level
+			if(LevelDef.Depth > Level_Depth(DungeonLevel.Castle)){ //only add switches and enemy keys past castle level
 				
 				if(Room.Section_ID == 0 && !(Room.SizeIndex == RoomSize._1x1 && Room.LowerDoors)){ //no enemy keys in cramped room, since there may be an issue with generating enough enemies
 					//only use a switch or enemy to reveal treasure if section id = 0
@@ -325,8 +325,8 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 		case SpecialDungeonObj.None: //only spawn these if there's no special items
 
 			//Shop
-			if(	global.Level.Index > DungeonLevel.Castle && 
-				!(global.Level.Index == DungeonLevel.Aghanim1 && _RoomIndex == global.Level.RoomIndex_BossAdjacent) &&
+			if(	LevelDef.Depth > Level_Depth(DungeonLevel.Castle) && 
+				!(!LevelDef.ShopBesideBoss && _RoomIndex == global.Level.RoomIndex_BossAdjacent) &&
 				Room.SizeIndex == RoomSize._1x1 && 
 				Room.Secret == -1 && 
 				global.Level.ShopCount < global.Level.MaxShops && 
@@ -367,7 +367,7 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 	//bonus treasures
 	global.SpawnedMonumentSpecialObj = false;
 	
-	if(global.Level.Index == DungeonLevel.Castle && global.Level.BonusTreasureCount == 0) Room.BonusTreasure = true; //always have at least 1 treasure in castle level
+	if(LevelDef.RunStart && global.Level.BonusTreasureCount == 0) Room.BonusTreasure = true; //always have at least 1 treasure in castle level
 	
 	if( (!global.SpawnedTreasure || ((Room.SpecialObject == SpecialDungeonObj.Key || Room.SpecialObject == SpecialDungeonObj.JailKey) && Room.Section_ID != 0)) && !StartingRoom && Room.BonusTreasure && global.Level.BonusTreasureCount < global.Level.MaxBonusTreasures && !global.SpawnedShop && !ObstacleClassCheck(_RoomIndex, RoomObstacleClass.MovingFloors)){
 		
@@ -407,11 +407,11 @@ function Dungeon_Draw_SpecialObjs(_RoomIndex){
 			switch(TreasureSpawnMethod){
 				
 				case SpawnMethod_Treasure.Normal:
-					if(Prob(Chance_HeartGuy) && global.Level.Index >= DungeonLevel.Catacombs){
+					if(Prob(Chance_HeartGuy) && LevelDef.Depth >= Level_Depth(DungeonLevel.Catacombs)){
 						global.SpawnedTreasure = SpawnObj(_RoomIndex, SpecialObj.HeartGuy, InSection, Room.UnusedZone, -1);
 					}
 
-					if(!global.SpawnedTreasure && Prob(Chance_DeadGuy) && global.Level.Index >= DungeonLevel.Catacombs && global.Level.Index != DungeonLevel.Village){
+					if(!global.SpawnedTreasure && Prob(Chance_DeadGuy) && LevelDef.Depth >= Level_Depth(DungeonLevel.Catacombs) && LevelDef.Special != LevelSpecial.Village){
 						global.SpawnedTreasure = SpawnObj(_RoomIndex, SpecialObj.DeadGuy, InSection, Room.UnusedZone, -1);
 					}
 					if(!global.SpawnedTreasure){
@@ -850,15 +850,7 @@ function SpawnSpikes(_RoomIndex){
 		if(!variable_struct_exists(Room.Template, "Spikes")) return false
 	
 		//skip these levels
-		switch(global.Level.Index){
-			case DungeonLevel.Castle:	
-			case DungeonLevel.CastleBasement:	
-			case DungeonLevel.CastleJails:	
-			case DungeonLevel.Sewers:	
-			case DungeonLevel.WaterTemple:
-				return false
-		
-		}
+		if(!LevelDef.Spikes) return false
 		
 		if(!Prob(Chance_SpawnSpikes)) return false
 		
@@ -1084,7 +1076,7 @@ function SpawnMonuments(_RoomIndex, InSection, UnusedZone, _ItemClass = -1, Forc
 			var Style = SpawnArrowTarget ? 1 : Decor_Monuments_AllowedStyle(MonumentX, MonumentY);
 			
 			//if an object has to be placed, make sure the style is not the grave
-			if(global.Level.Index == DungeonLevel.Catacombs && Style == 2 && !global.Level.CatacombGrave){
+			if(LevelDef.Theme == DungeonLevel.Catacombs && Style == 2 && !global.Level.CatacombGrave){
 				if(_ItemClass != -1 && _ItemClass != ItemClass.Key && !MainObjAdded){ //keys are fine since pots will be chosen if grave and key is needed
 					Style = 3;
 				}
@@ -1100,13 +1092,13 @@ function SpawnMonuments(_RoomIndex, InSection, UnusedZone, _ItemClass = -1, Forc
 			
 			//Extra items on top
 			var _ItemStyle = 0;
-			if(global.Level.Index == DungeonLevel.Catacombs && Style == 1 && Prob(0.3)){
+			if(LevelDef.Theme == DungeonLevel.Catacombs && Style == 1 && Prob(0.3)){
 				instance_create_layer(MonumentX + 16, MonumentY + 13, "ObjsFloor_" + FloorLevelStr, oTombSkeleton);		
 			}else{
 				_ItemStyle = Decor_MonumentItems(TMID_Decor, MonumentX, MonumentY, Style, _Mirrored);
 			}	
 			
-			var _Grave = (global.Level.Index == DungeonLevel.Catacombs && Style == 2 && _ItemStyle == 1);
+			var _Grave = (LevelDef.Theme == DungeonLevel.Catacombs && Style == 2 && _ItemStyle == 1);
 			
 			var WallInst1 = WallObj_Create("Objs_" + FloorLevelStr, MonumentX, MonumentY, 4, 3);
 			WallInst1.BlockProjectiles = true; 
@@ -1152,7 +1144,7 @@ function SpawnMonuments(_RoomIndex, InSection, UnusedZone, _ItemClass = -1, Forc
 						}else if(_ItemClass == ItemClass.Star){
 							global.SpawnedStarInst = instance_create_layer(MonumentX + 16, MonumentY + 48, "Objs_" + FloorLevelStr, oItem_Star, {From : ItemFrom.Anywhere});
 						}else{
-							if(_ItemClass != ItemClass.Key && !global.Switch_Add && global.Level.Index >= DungeonLevel.Catacombs && !_Grave && global.Level.Index != DungeonLevel.Village && global.Level.Index != DungeonLevel.Mines && Prob(Chance_Decor_Monuments_DeadguyTreasure)){
+							if(_ItemClass != ItemClass.Key && !global.Switch_Add && LevelDef.Depth >= Level_Depth(DungeonLevel.Catacombs) && !_Grave && LevelDef.Special != LevelSpecial.Village && LevelDef.Special != LevelSpecial.Mines && Prob(Chance_Decor_Monuments_DeadguyTreasure)){
 								instance_create_layer(ItemsX + 16, ItemsY + 16, "ObjsDoors_" + FloorLevelStr, oDeadGuy);									
 							}else{
 								var Items = (global.Switch_Add && Room.Switch.Action == SwitchAction.RevealHiddenObj ? 1 : choose(1,2));
@@ -1597,8 +1589,8 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 	
 	var RoomArea = (Room.GridW * Room.GridH); //larger Rooms should have more enemies, so multiply amount by a factor of RoomArea
 	
-	var PackPoints_Min = floor((4 + (global.Level.Index / 4)) * RoomArea); //Pack points are used up when an enemy is generated. Larger enemies use up more pack points that smaller ones.
-	var PackPoints_Max = floor((8 + global.Level.Index) * RoomArea); 
+	var PackPoints_Min = floor((4 + (LevelDef.Depth / 4)) * RoomArea); //Pack points are used up when an enemy is generated. Larger enemies use up more pack points that smaller ones.
+	var PackPoints_Max = floor((8 + LevelDef.Depth) * RoomArea); 
 	
 	//give smaller rooms less points
 	var _RoomSizeFactor = 1;
@@ -1652,12 +1644,10 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 			//don't add wall-type enemies to list
 			if(Enemy_IsWall(_ObjIndex) || Enemy_IsObstacle(_ObjIndex)) continue;
 			
-			if(global.Level.Index == DungeonLevel.LanmolasLair){
-				//if room doesn't have sand, or room has a crystal which they can get stuck in, don't use enemies that emerge from sand
-				if(Enemy_IsUnderground(_ObjIndex)){
-					if(!Room.Sand || Room.SpecialObject == SpecialDungeonObj.Crystal){
-						continue;
-					}
+			//if room doesn't have sand, or room has a crystal which they can get stuck in, don't use enemies that emerge from sand
+			if(Enemy_IsUnderground(_ObjIndex)){
+				if(!Room.Sand || Room.SpecialObject == SpecialDungeonObj.Crystal){
+					continue;
 				}
 			}
 			
@@ -1694,7 +1684,7 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 			var _Data = global.EnemyData[_ObjIndex];
 			if(!is_struct(_Data)) continue;
 		
-			var EnemyMultiple = _Data.Levels[global.Level.Index];
+			var EnemyMultiple = Level_EnemyWeight(_ObjIndex);
 			repeat(EnemyMultiple){ //add this amount to the list, higher values mean more likely it will get picked
 				ds_list_add(EnemyList, _ObjIndex);
 			}
@@ -1755,10 +1745,10 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 	var WallEnemiesList = ds_list_create();
 	if(!global.SpawnedRollingSpikes && Prob(Chance_SpawnWallEnemies)){
 		if( !((Room.TemplateClass == RoomTemplateClass.Main_Lower && Room.SizeIndex == RoomSize._1x1) || Room.TemplateClass == RoomTemplateClass.Stairs) ){
-			repeat(global.EnemyData[oEnemy_Beamos].Levels[global.Level.Index]){ds_list_add(WallEnemiesList, oEnemy_Beamos)};
-			repeat(global.EnemyData[oEnemy_Cannon].Levels[global.Level.Index]){ds_list_add(WallEnemiesList, oEnemy_Cannon)};
+			repeat(Level_EnemyWeight(oEnemy_Beamos)){ds_list_add(WallEnemiesList, oEnemy_Beamos)};
+			repeat(Level_EnemyWeight(oEnemy_Cannon)){ds_list_add(WallEnemiesList, oEnemy_Cannon)};
 		}
-		repeat(global.EnemyData[oEnemy_Medusa].Levels[global.Level.Index]){ds_list_add(WallEnemiesList, oEnemy_Medusa)};
+		repeat(Level_EnemyWeight(oEnemy_Medusa)){ds_list_add(WallEnemiesList, oEnemy_Medusa)};
 	}
 	
 	if(ds_list_size(WallEnemiesList) > 0){
@@ -1782,22 +1772,7 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 		}else{
 			ds_list_shuffle(EnemyChoiceList);
 			EnemyIndex = EnemyChoiceList[| 0];
-			PackPoints = global.EnemyData[EnemyIndex].PackPoints;
-			
-			switch(EnemyIndex){
-				case oEnemy_Rat:
-					if(global.Level.Index == DungeonLevel.Sewers) PackPoints = 1; //make sewers infested with rats, normally it's 2
-					break;
-				
-				case oEnemy_Buzz:
-					if(global.Level.Index == DungeonLevel.Sewers) PackPoints = 2; //spawn less in earlier levels, normally it's 1
-					break;
-				
-				case oEnemy_Bari:
-					if(global.Level.Index == DungeonLevel.Aghanim1) PackPoints = 1.75; //spawn more for Aghanim level, normally it's 3
-					break;
-				
-			}
+			PackPoints = LevelDef.PackPoints[$ object_get_name(EnemyIndex)] ?? global.EnemyData[EnemyIndex].PackPoints; //some levels change it (sewers infested with rats)
 			
 			
 			if(PackPoints > TotalPackPoints){
@@ -1989,7 +1964,7 @@ function SpawnRollingSpikes(_RoomIndex){
 	
 	if(Room.Section_ID != 0) return false;
 	
-	if(global.EnemyData[oEnemy_RollingSpike][$ "Levels"][global.Level.Index] == 0) return false;
+	if(Level_EnemyWeight(oEnemy_RollingSpike) == 0) return false;
 	
 	if(global.Level.MaxRollingSpikes == 0) return false;	
 	
@@ -2128,7 +2103,7 @@ function SpawnGuruBars(_RoomIndex){
 	
 	if(global.Level.MaxGuruBars == 0) return false;
 	
-	if(global.EnemyData[oEnemy_Guru_Bar][$ "Levels"][global.Level.Index] == 0) return false;
+	if(Level_EnemyWeight(oEnemy_Guru_Bar) == 0) return false;
 	
 	if(Room.Section_ID != 0) return false;	
 	
@@ -2191,7 +2166,7 @@ function SpawnGuruBars(_RoomIndex){
 
 function SpawnMovingSpikeBlocks(_RoomIndex){
 
-	if(global.EnemyData[oEnemy_MovingSpikeBlock][$ "Levels"][global.Level.Index] == 0) return false;
+	if(Level_EnemyWeight(oEnemy_MovingSpikeBlock) == 0) return false;
 	
 	if(_RoomIndex == global.Level.RoomIndex_Entrance) return false;
 	
@@ -2823,7 +2798,7 @@ function SpawnTreasureRow(_RoomIndex, X, Y, InSection, MainItemClass, Items){
 
 function SpawnKinstone(_RoomIndex, UnusedZone){
 	
-	if(global.Level.Index == DungeonLevel.Castle) return false;
+	if(LevelDef.RunStart) return false;
 	
 	if(ObstacleClassCheck(_RoomIndex, RoomObstacleClass.MovingFloors) || global.SpawnedRollingSpikes || global.SpawnedMovingSpikeBlocks) return false;
 	

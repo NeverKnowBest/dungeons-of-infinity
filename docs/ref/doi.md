@@ -1,6 +1,6 @@
 # Dungeons of Infinity (o que já existe)
 
-Fonte: código do jogo neste repositório (out/2026). A tabela principal é `Enemies_InitData` em `game/scripts/__Enemies/__Enemies.gml`; as velocidades vêm do `Create` de cada objeto. Para os números do original, veja `alttp.md`.
+Fonte: código do jogo neste repositório (out/2026). A tabela principal é `Enemies_InitData` em `game/scripts/__Enemies/__Enemies.gml`; onde cada inimigo aparece, e com que peso, está na lista `Enemies` de cada nível na ficha de fase (`game/scripts/__Levels/__Levels.gml`); as velocidades vêm do `Create` de cada objeto. Para os números do original, veja `alttp.md`.
 
 ## Como o DoI mede as coisas
 
@@ -48,7 +48,7 @@ Os índices 10, 11 e 12 são dos chefes, o 13 é do Moldorm com a maldição e o
 | 12 | `Aghanim1` | Agahnim's Fortress | `Aghanim` | `Dungeon3` | |
 | 13 | `Aghanim2` | Agahnim | Special 1 | `Boss_Final_Hallway` | Agahnim |
 
-Nomes em `__Init.gml` (`global.DungeonNames`), classes em `Dungeon_PickClass`, músicas em `global.Music_LevelSongIndex` (`__Music.gml`), chefes em `Dungeon_IsBossLevel`. No roadmap, "nível 2" é o castelo (o nível 1 é a entrada).
+Tudo na ficha de fase, `game/scripts/__Levels/__Levels.gml` (`Name`, `Class`, `Song`, `Boss`; inimigos por nível em `Enemies`). No roadmap, "nível 2" é o castelo (o nível 1 é a entrada).
 
 ## Inimigos
 
@@ -107,7 +107,7 @@ Velocidade em px por quadro. "Golpes" é com ataque 1 (espada Basic, sem luvas).
 
 ### Variantes por nível
 
-Estes objetos ignoram a energia e o ataque de `EnemyDataInit` (ou só o ataque) e escolhem pelo nível, no `Create` (variável `Type`). Os níveis estão em ordem de índice: "a partir de" inclui o próprio nível.
+Estes objetos ignoram a energia e o ataque de `EnemyDataInit` (ou só o ataque) e escolhem pelo nível, no `Create` (variável `Type`). O nível consultado é o `EnemyStats` da ficha de fase (hoje, o próprio nível). Os níveis estão em ordem de índice: "a partir de" inclui o próprio nível.
 
 | Objeto | Regra | Variante 0: energia (golpes), ataque | Variante 1 |
 |--------|-------|--------------------------------------|------------|

@@ -2,7 +2,7 @@ event_inherited();
 
 Size = EnemySize.Large;
 
-Type = (global.Level.Index > DungeonLevel.LanmolasLair ? 1 : 0);
+Type = (LevelDef.EnemyStats > DungeonLevel.LanmolasLair ? 1 : 0);
 
 switch(Type){
 	case 0 :

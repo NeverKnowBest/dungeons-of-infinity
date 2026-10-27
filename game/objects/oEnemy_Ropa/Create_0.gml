@@ -2,7 +2,7 @@ event_inherited();
 
 Size = EnemySize.Small;
 
-Type = (global.Level.Index >= DungeonLevel.MoldormsLair ? 1 : 0);
+Type = (LevelDef.EnemyStats >= DungeonLevel.MoldormsLair ? 1 : 0);
 
 switch(Type){
 	case 0: 

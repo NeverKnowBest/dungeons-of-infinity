@@ -32,7 +32,7 @@
 #macro Chance_DeadGuyIsHungryGuy 0.5
 #macro Chance_DeadGuyBonusItem 0.75 
 
-#macro Chance_CurseLevelIncrease (global.Level.Index * 0.005)
+#macro Chance_CurseLevelIncrease (LevelDef.Depth * 0.005)
 #macro Chance_Curse ( (0.04 + Chance_CurseLevelIncrease) * ChallengeMax_Curses)
 #macro Chance_Curse_DeadGuy (Chance_Curse + 0.15)
 
@@ -62,7 +62,7 @@
 #macro Chance_SpawnRodChargerSpecial 0.25 //if spawning a special room with kinstones, chance that one of them will be a rod charger
 
 #macro Chance_SpawnShopSword 0.04 //extra prob that sword will be spawned in shop
-#macro Chance_SpawnTreasureSword (min(0.05 + ((global.Level.Index - 1) * 0.05), 0.28)) //extra prob that sword will be spawned from treasure if you have index 0 sword
+#macro Chance_SpawnTreasureSword (min(0.05 + ((LevelDef.Depth - 1) * 0.05), 0.28)) //extra prob that sword will be spawned from treasure if you have index 0 sword
 
 #macro Chance_SpawnShopBowSwordless 0.12
 #macro Chance_SpawnTreasureBowSwordless 0.04
@@ -72,14 +72,14 @@
 
 #macro Chance_LevelHasStar 0.8
 
-#macro Chance_WaterInRoom (global.Level.Index == DungeonLevel.Aghanim1 ? 0.55 : 0.75)
+#macro Chance_WaterInRoom (LevelDef.WaterChance)
 
 #macro Chance_TMNT 0.18
 
-#macro Chance_SpawnSpikes (0.5 + (global.Level.Index / 30))
-#macro Chance_SpikeSection (0.4 + (global.Level.Index / 30))
+#macro Chance_SpawnSpikes (0.5 + (LevelDef.Depth / 30))
+#macro Chance_SpikeSection (0.4 + (LevelDef.Depth / 30))
 
-#macro Chance_ObstacleTemplate (0.15 + (global.Level.Index / 38))
+#macro Chance_ObstacleTemplate (0.15 + (LevelDef.Depth / 38))
 #macro Chance_SectionTemplate 0.2 //if Sections are <= 20, chance template will be one of the section templates. If section > 20, it will always be a section template
 
 #macro Chance_ChickenEgg 0.1
@@ -95,9 +95,9 @@ function Lighting_GetRoomStatus(_RoomIndex){
 	
 	if(global.ChallengeOptions[ChallengeOption.Darkness] >= ChallengeOption_Darkness.AllDark) return true
 	
-	if(global.Level.Index == DungeonLevel.Village) return global.VillageLightingMap[Room.GridY][Room.GridX]
+	if(LevelDef.Special == LevelSpecial.Village) return global.VillageLightingMap[Room.GridY][Room.GridX]
 	
-	if(global.Level.Index == DungeonLevel.Mines) return Room.TemplateSubClass != RoomTemplateClass_Mines.House
+	if(LevelDef.Special == LevelSpecial.Mines) return Room.TemplateSubClass != RoomTemplateClass_Mines.House
 
 	if(	TemplateCheck(_RoomIndex, RoomTemplateClass.Special, RoomTemplateClass_Special.Fairy) || 
 		TemplateCheck(_RoomIndex, RoomTemplateClass.Special, RoomTemplateClass_Special.GemPond) || 
@@ -112,33 +112,20 @@ function Lighting_GetRoomStatus(_RoomIndex){
 	
 	var P = 0.25 + (global.ChallengeOptions[ChallengeOption.Darkness] * 0.3);
 	
-	switch(global.Level.Index){
+	switch(LevelDef.Dark){
 		
-		case DungeonLevel.Start:
-		case DungeonLevel.Aghanim2:
+		case LevelDark.Never:
 			return false		
 		
-		case DungeonLevel.Castle:
+		case LevelDark.Low:
 			P = global.ChallengeOptions[ChallengeOption.Darkness] * 0.45;
 			break;
 			
-		case DungeonLevel.CastleBasement:
-		case DungeonLevel.CastleJails:
-			P += 0.1;
-			break;
-			
-		case DungeonLevel.Sewers:
-		case DungeonLevel.WaterTemple:
-		case DungeonLevel.Aghanim1:
-			P += 0.15;
-			break;			
-		
-		case DungeonLevel.Ruins:		
-			P += 0.2;
+		case LevelDark.Normal:
+			P += LevelDef.DarkBonus;
 			break;
 		
-		case DungeonLevel.Catacombs:
-		case DungeonLevel.MoldormsLair:
+		case LevelDark.Always:
 			return true;
 
 	}

@@ -296,7 +296,7 @@ function Decor_Monuments_AllowedStyle(_MonumentX, _MonumentY, _ForceSafe = false
 	//make sure certain styles aren't picked if monument is below a certain y coordinate (chairs, certain statues)
 	var _BottomSpaceCheck = (collision_rectangle(_MonumentX, _MonumentY + 32, _MonumentX + 31, _MonumentY + 71, oWall, false, true));
 	if(_BottomSpaceCheck || _ForceSafe){//remove any stlye from list that shouldn't be too far below or close to a wall (chairs)
-		switch(global.Level.Index){
+		switch(LevelDef.Theme){
 			case DungeonLevel.Castle: 
 				ds_list_finddelete(_StyleList, 0);
 				ds_list_finddelete(_StyleList, 1);
@@ -332,14 +332,14 @@ function Decor_Monuments_AllowedStyle(_MonumentX, _MonumentY, _ForceSafe = false
 		}
 	}
 	
-	if(global.Level.Index == DungeonLevel.Catacombs && !global.Level.CatacombGrave){
+	if(LevelDef.Theme == DungeonLevel.Catacombs && !global.Level.CatacombGrave){
 		if(ds_list_find_index(_StyleList, 2) != -1){
 			ds_list_destroy(_StyleList);
 			return 2 //force grave if available and not used in level, as it's only used once and we want it every time
 		}
 	}
 	
-	if(global.Level.Index == DungeonLevel.Aghanim1 && !global.Gore){
+	if(LevelDef.Theme == DungeonLevel.Aghanim1 && !global.Gore){
 		ds_list_finddelete(_StyleList, 3);
 		if(ds_list_size(_StyleList) == 0){
 			ds_list_add(_StyleList, 1, 2); //last resort, these are decent anywhere if none are available
@@ -358,7 +358,7 @@ function Cracks_MaxAmount(){
 	var _Amount = 0;
 	var _P = 0;
 	
-	switch(global.Level.Index){
+	switch(LevelDef.Theme){
 		
 		case DungeonLevel.CastleBasement:
 			_Amount = 1;
@@ -403,7 +403,7 @@ function Decor_MonumentItems(_TMID, _MonumentX, _MonumentY, _MonumentStyle, _Mir
 	var _TileW = 4;
 	var _ItemStyle = 0;
 	
-	switch(global.Level.Index){
+	switch(LevelDef.Theme){
 		
 		default: exit;
 		

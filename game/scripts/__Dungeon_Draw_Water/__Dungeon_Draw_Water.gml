@@ -8,32 +8,29 @@ function Dungeon_Draw_Water(_RoomIndex){
 	
 	Room.Water = false;
 	
-	if(!global.Gore && global.Level.Index == DungeonLevel.Aghanim1) exit;
+	if(!global.Gore && LevelDef.WaterNeedsGore) exit;
 	
 	var RandomWater = true; //if false then all the water in the template is used
 	
-	switch(global.Level.Index){
+	switch(LevelDef.Water){
 		
-		case DungeonLevel.CastleJails:
+		case LevelWater.WetBandits:
 			if(!Room.WetBandits) break;
 			Room.Water = true;
 			RandomWater = false;
 			break;
 			
-		case DungeonLevel.Sewers:
-		case DungeonLevel.WaterTemple:
-		case DungeonLevel.Aghanim1:
+		case LevelWater.Random:
 			Room.Water = Prob(Chance_WaterInRoom);
 			break;
 		
-		case DungeonLevel.Village:
-		case DungeonLevel.Mines:
+		case LevelWater.Always:
 			Room.Water = true;
 			RandomWater = false;
 			break;
 	}
 	
-	var _WaterTileS = WaterTileS;
+	var _WaterTileS = LevelDef.WaterTileX;
 	
 	if(TemplateCheck(_RoomIndex, RoomTemplateClass.Special, RoomTemplateClass_Special.Fairy)){
 		Room.Water = true;
@@ -123,7 +120,7 @@ function Dungeon_Draw_Water_Borders(_RoomIndex){
 		}
 	}	
 	
-	var _WaterTileS = (TemplateCheck(_RoomIndex, RoomTemplateClass.Special, RoomTemplateClass_Special.Fairy) ? 86 : WaterTileS);
+	var _WaterTileS = (TemplateCheck(_RoomIndex, RoomTemplateClass.Special, RoomTemplateClass_Special.Fairy) ? 86 : LevelDef.WaterTileX);
 	
 	for(var _y = 0; _y < RoomTilesH; _y++){
 		for(var _x = 0; _x < RoomTilesW; _x++){

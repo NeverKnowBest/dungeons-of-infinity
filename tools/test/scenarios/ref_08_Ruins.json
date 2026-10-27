@@ -1,0 +1,61 @@
+{
+ "comment": "Reference scenario for Ruins (roadmap F4): dumps of three builds of the level, the level-dependent enemies of this level, a short walk and a contact sheet. tools/test/baseline.py runs every ref_* scenario and compares two versions of the code.",
+ "name": "ref_08_Ruins",
+ "seed": 1,
+ "level": "Ruins",
+ "dump": true,
+ "cheats": [
+  "Cheat_Inf_Health"
+ ],
+ "max_frames": 100000,
+ "steps": [
+  {
+   "do": "wait",
+   "frames": 60
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "shot",
+   "name": "start"
+  },
+  {
+   "do": "probe",
+   "enemies": [
+    "oEnemy_Beamos",
+    "oEnemy_Bubble",
+    "oEnemy_Keese",
+    "oEnemy_Kodongo",
+    "oEnemy_Poe",
+    "oEnemy_Wallmaster"
+   ]
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 45
+  },
+  {
+   "do": "wait",
+   "frames": 15
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "shot",
+   "name": "walked"
+  },
+  {
+   "do": "sheet",
+   "level": "Ruins",
+   "seeds": [
+    2,
+    3
+   ]
+  }
+ ]
+}

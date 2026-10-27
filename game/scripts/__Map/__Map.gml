@@ -129,8 +129,8 @@ function Map_Init(){
 
 		var _House = TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.House) || TemplateCheck(_RoomIndex, RoomTemplateClass.Mines, RoomTemplateClass_Mines.House);
 		var _BossRoom = !global.Level.IsBossLevel && TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Boss);
-		var _MineCave = global.Level.Index == DungeonLevel.Mines && (Room.GridY >= 5 || (Room.GridY == 4 && Room.GridX != 4 && Room.GridX != 5));
-		var _MineMapRoom = global.Level.Index == DungeonLevel.Mines && Room.GridX == 5 && Room.GridY == 1;
+		var _MineCave = LevelDef.Special == LevelSpecial.Mines && (Room.GridY >= 5 || (Room.GridY == 4 && Room.GridX != 4 && Room.GridX != 5));
+		var _MineMapRoom = LevelDef.Special == LevelSpecial.Mines && Room.GridX == 5 && Room.GridY == 1;
 		if(Room.Secret != -1 || _House || _BossRoom || _MineCave || _MineMapRoom){
 			continue; //if it's a secret or house Room, don't draw it
 		}		
@@ -182,7 +182,7 @@ function Map_UpdateExploredRooms(){
 		//draw all explored Rooms on surface
 
 		if(!Room.Visited) continue;
-		if(global.Level.Index > DungeonLevel.Start){	
+		if(LevelDef.Special != LevelSpecial.Intro){	
 			if(TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.House) || TemplateCheck(_RoomIndex, RoomTemplateClass.Mines, RoomTemplateClass_Mines.House)) continue;
 		}
 			
@@ -243,7 +243,7 @@ function Map_Clear(){
 /// @description Checks whether the Pendant of Direction is active. The pendant reveals the whole map, but does not work in the starting area because its map was not designed to be revealed and the pendant is normally unobtainable there.
 /// @returns {Bool} Whether the Pendant of Direction is owned and the current level is not the starting area.
 function Map_DirectionPendantActive(){
-	return Pendant_Check(Pendant.Direction) && global.Level.Index != DungeonLevel.Start;
+	return Pendant_Check(Pendant.Direction) && LevelDef.Special != LevelSpecial.Intro;
 }
 
 function Map_GetCoordinate_Small(i){

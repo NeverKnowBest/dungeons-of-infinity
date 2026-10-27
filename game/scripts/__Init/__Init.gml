@@ -16,6 +16,8 @@ function INIT(){
 	Inventory_InitData();
 		
 	Enemies_InitData();	
+	
+	Levels_Init();	// after the enemies: the level sheet lists them
 
 	RupeePatterns_Init();
 	
@@ -73,21 +75,7 @@ function Data_InitGlobals(){
 	
 	global.InWaterSprite = sInWater;
 	
-	var i = 0;
-	global.DungeonNames[i++] = "Destroy Agahnim"; 
-	global.DungeonNames[i++] = "Hyrule Castle"; 
-	global.DungeonNames[i++] = "Castle Basement";
-	global.DungeonNames[i++] = "Castle Prison"; 
-	global.DungeonNames[i++] = "Catacombs";
-	global.DungeonNames[i++] = "Sewers"; 
-	global.DungeonNames[i++] = "Rebel Village"; 
-	global.DungeonNames[i++] = "Lanmola's Lair"; 
-	global.DungeonNames[i++] = "Ancient Ruins"; 
-	global.DungeonNames[i++] = "Water Temple"; 
-	global.DungeonNames[i++] = "Dwarven Mining Town"; 
-	global.DungeonNames[i++] = "Moldorm's Lair"; 
-	global.DungeonNames[i++] = "Agahnim's Fortress"; 
-	global.DungeonNames[i++] = "Agahnim"; 
+	// Level names: global.LevelDefs[...].Name (scripts/__Levels)
 	
 }
 

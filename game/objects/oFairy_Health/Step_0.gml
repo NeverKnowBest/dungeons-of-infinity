@@ -63,7 +63,7 @@ if(WaitForSoundEnd){
 		var i = ds_list_find_index(global.LargeMapItems, id);
 		if(i != -1) ds_list_delete(global.LargeMapItems, i);
 		//change music for room
-		global.Level.Rooms[global.CurrentRoomIndex].RoomSongIndex = global.Music_LevelSongIndex[global.Level.Index];
+		global.Level.Rooms[global.CurrentRoomIndex].RoomSongIndex = LevelDef.Song;
 		instance_destroy(id);	
 	}
 }

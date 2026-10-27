@@ -50,9 +50,7 @@
 
 #macro TilesetW 156
 #macro VillageTilesY 76
-#macro LevelTilesY (4 + ((global.Level.Index - 1) * 6))
-#macro LevelTilesY_Aghanim2 (4 + ((DungeonLevel.Aghanim1 - 1) * 6))
-#macro WaterTileS (global.Level.Index == DungeonLevel.Mines ? 92 : (global.Level.Index == DungeonLevel.Aghanim1 ? 98 : 86))
+// LevelTilesY and LevelTilesY_Base are in scripts/__Levels
 
 #macro CAM_W 256
 #macro CAM_H 224

@@ -112,83 +112,83 @@ function Enemies_InitData(){
 		global.LinkSwordDamage[0][_EnergyIndex] = global.LinkSwordDamage[1][_EnergyIndex];
 	}
 	
-									     //					Pack	Hit effects for link weapons. Values in brackets are the true/false values after testing a condition												Levels		   
-									     //Ene Atk SItm	Itm	Pts	[   SWORD   ,   POT     ,   ARROW   , BOOMERANG ,  HOOKSHOT ,   BOMB    ,   FIRE    ,     ICE   ,SWORD BEAM	,	STONE	,TRANSFORM ]	[St,Cas,Bsm,Jai,Cat,Sew,Vil,Lan,Rns,Wat,Min,Mol,Ag1]
-	EnemyDataInit(oBoss_Armos,			   10,	1,	0,	0,	0,	[[H_FF,H_ND],	H_ND	,[1.5,H_ND]	,	H_ND	,	H_ND	,[BombDmg/2,0],[2,H_ND]	,[2,H_ND]	,	H_ND	,[2,H_ND]	,[2,H_ND]	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oBoss_Lanmola,		   11,2.25,	0,	0,	0,	[	H_FF	,	H_ND	,	1.5		,	H_ND	,	H_ND	,	0		,	2		,	2		,	H_ND	,	2		,	2		],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oBoss_Moldorm,		   12,	0,	0,	0,	0,	[	0.5		,	H_ND	,	H_ND	,	H_ND	,	H_ND	,	0		,	H_ND	,	H_ND	,	H_ND	,	H_ND	,	H_ND	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oBoss_Moldorm_BodyL,	    0,	0,	0,	0,	0,	[	0		,	H_ND	,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oBoss_Moldorm_BodyS,	    0,	0,	0,	0,	0,	[	0		,	H_ND	,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oBoss_Moldorm_Tail,		0,	0,	0,	0,	0,	[	0.5		,	H_ND	,	0.5		,	H_ND	,	H_ND	,	0		,	0.5		,	0.5		,	H_ND	,	0.5		,	0.5		],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oBoss_Aghanim,		   12,1.75,	0,	0,	0,	[[H_Sh,0]	,	H_ND	,	H_ND	,	H_ND	,	H_ND	,[4,0]		,	H_ND	,	H_ND	,	H_ND	,	H_ND	,	0		],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
+									     //					Pack	Hit effects for link weapons. Values in brackets are the true/false values after testing a condition
+									     //Ene Atk SItm	Itm	Pts	[   SWORD   ,   POT     ,   ARROW   , BOOMERANG ,  HOOKSHOT ,   BOMB    ,   FIRE    ,     ICE   ,SWORD BEAM	,	STONE	,TRANSFORM ]
+	EnemyDataInit(oBoss_Armos,			   10,	1,	0,	0,	0,	[[H_FF,H_ND],	H_ND	,[1.5,H_ND]	,	H_ND	,	H_ND	,[BombDmg/2,0],[2,H_ND]	,[2,H_ND]	,	H_ND	,[2,H_ND]	,[2,H_ND]	]);
+	EnemyDataInit(oBoss_Lanmola,		   11,2.25,	0,	0,	0,	[	H_FF	,	H_ND	,	1.5		,	H_ND	,	H_ND	,	0		,	2		,	2		,	H_ND	,	2		,	2		]);
+	EnemyDataInit(oBoss_Moldorm,		   12,	0,	0,	0,	0,	[	0.5		,	H_ND	,	H_ND	,	H_ND	,	H_ND	,	0		,	H_ND	,	H_ND	,	H_ND	,	H_ND	,	H_ND	]);
+	EnemyDataInit(oBoss_Moldorm_BodyL,	    0,	0,	0,	0,	0,	[	0		,	H_ND	,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		]);
+	EnemyDataInit(oBoss_Moldorm_BodyS,	    0,	0,	0,	0,	0,	[	0		,	H_ND	,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		]);
+	EnemyDataInit(oBoss_Moldorm_Tail,		0,	0,	0,	0,	0,	[	0.5		,	H_ND	,	0.5		,	H_ND	,	H_ND	,	0		,	0.5		,	0.5		,	H_ND	,	0.5		,	0.5		]);
+	EnemyDataInit(oBoss_Aghanim,		   12,1.75,	0,	0,	0,	[[H_Sh,0]	,	H_ND	,	H_ND	,	H_ND	,	H_ND	,[4,0]		,	H_ND	,	H_ND	,	H_ND	,	H_ND	,	0		]);
 	
 	
-	EnemyDataInit(oEnemy_Bubble,		    0,	1,	0,	0,	5,	[[H_FF,0]	,	0		,	0		,	0		,	0		,	0		,	0		,	0		,[H_FF,0]	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	2,	1,	1,	0,	1,	1]); 
-	EnemyDataInit(oEnemy_Buzz,				0,0.75,	1,	1,	1,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	1,	0,	2,	1,	0,	0,	0,	0]); 
-	EnemyDataInit(oEnemy_Hoarder,			0,1.25,	1,	1,	1,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	1,	2,	0,	0,	3,	0]);
-	EnemyDataInit(oEnemy_Hover,				0,1.5,	1,	1,	3,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	3,	0,	0,	0,	2,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Keese,				0,0.25,	0,	0,	3,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	1,	1,	2,	1,	0,	0,	2,	2,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Kyameron_Moving,	0,0.75,	0,	0,	0,	[	H_FF	,	1		,	1		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Poe,				0,	1,	0,	0,	3,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	2,	0,	0,	0,	2,	1,	0,	0,	2]);
-	EnemyDataInit(oEnemy_Rat,				0,0.25,	1,	1,	2,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	2,	1,	1,	2,	0,	0,	1,	0,	0,	0,	0]);
-	//EnemyDataInit(oEnemy_Kyune,			0,	1,	0,	0,	3,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	//EnemyDataInit(oEnemy_Pirugusu,		0,	1,	0,	0,	4,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1]);
+	EnemyDataInit(oEnemy_Bubble,		    0,	1,	0,	0,	5,	[[H_FF,0]	,	0		,	0		,	0		,	0		,	0		,	0		,	0		,[H_FF,0]	,	H_ST	,	H_Tr	]); 
+	EnemyDataInit(oEnemy_Buzz,				0,0.75,	1,	1,	1,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]); 
+	EnemyDataInit(oEnemy_Hoarder,			0,1.25,	1,	1,	1,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Hover,				0,1.5,	1,	1,	3,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Keese,				0,0.25,	0,	0,	3,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Kyameron_Moving,	0,0.75,	0,	0,	0,	[	H_FF	,	1		,	1		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Poe,				0,	1,	0,	0,	3,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Rat,				0,0.25,	1,	1,	2,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	//EnemyDataInit(oEnemy_Kyune,			0,	1,	0,	0,	3,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	//EnemyDataInit(oEnemy_Pirugusu,		0,	1,	0,	0,	4,	[	H_FF	,	2		,	2		,	9		,	9		,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
 	
-	EnemyDataInit(oEnemy_Rope,				1,0.5,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	1,	1,	1,	1,	0,	0,	0,	0,	0,	0,	0]);	
+	EnemyDataInit(oEnemy_Rope,				1,0.5,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);	
 	
-	EnemyDataInit(oEnemy_Bari,				2,1.25,	1,	1, 	3,	[[H_FF,H_Sh],	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	2,	0,	0,	0,	1,	0,	0,	2]); 
-	EnemyDataInit(oEnemy_Zol,				2,1.25,	0,	1,	3,	[[H_FF,0]	,[2,0]		,[2,0]		,[H_St,0]	,[H_St,0]	,[BombDmg,0],[H_Fi,0]	,[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	],	[0,	0,	0,	0,	0,	2,	0,	0,	0,	1,	0,	0,	0]);
+	EnemyDataInit(oEnemy_Bari,				2,1.25,	1,	1, 	3,	[[H_FF,H_Sh],	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]); 
+	EnemyDataInit(oEnemy_Zol,				2,1.25,	0,	1,	3,	[[H_FF,0]	,[2,0]		,[2,0]		,[H_St,0]	,[H_St,0]	,[BombDmg,0],[H_Fi,0]	,[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	]);
 	
-	EnemyDataInit(oEnemy_BuzzBlob,			3,1.25,	0,	1,	3,	[[H_FF,H_Sh],	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	1,	0,	1,	1,	0,	0,	1,	0]); 
-	EnemyDataInit(oEnemy_Pikit,				3,1.25,	0,	0,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	2,	0,	1,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Popo,				3,1.5,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	3,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Skeleton,			3,	1,	1,	1,	4,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	2,	0,	0,	0,	0,	0,	0,	0,	0]);
-	//EnemyDataInit(oEnemy_Soldier_Slasher,	3,	1,	1,	1,	4,	[[H_FF,H_PB],	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1]);
+	EnemyDataInit(oEnemy_BuzzBlob,			3,1.25,	0,	1,	3,	[[H_FF,H_Sh],	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]); 
+	EnemyDataInit(oEnemy_Pikit,				3,1.25,	0,	0,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Popo,				3,1.5,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Skeleton,			3,	1,	1,	1,	4,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	//EnemyDataInit(oEnemy_Soldier_Slasher,	3,	1,	1,	1,	4,	[[H_FF,H_PB],	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
 	
-	EnemyDataInit(oEnemy_Crab,				4,1.25,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	2,	0,	1,	0,	0,	0,	0,	0]); 
-	EnemyDataInit(oEnemy_Gibdo,				4,1.25,	1,	1,	4,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	2,	0,	0,	3,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Helmasaur,			4,1.5,	1,	1,	3,	[[H_FF,H_PB],	H_ND	,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	2,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Kodongo,			4,1.75,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	2,	0,	0,	3,	1]);
-	EnemyDataInit(oEnemy_Leever,			4,1.75,	0,	1,	3,	[[H_FF,0]	,[2,H_ND]	,[2,0]		,[H_St,H_ND],[H_St,H_ND],[BombDmg,0],[H_Fi,H_ND],[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	],	[0,	0,	0,	0,	0,	0,	0,	2,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Moldorm,			4, 2  ,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	4,	0]);
-	EnemyDataInit(oEnemy_Octorok,			4,1.5,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg ,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	2,	0,	0,	0,	2,	0]);
-	EnemyDataInit(oEnemy_Ropa,				4,1.75,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	2,	0,	0,	0,	3,	1]);
-	EnemyDataInit(oEnemy_Wizzrobe,			4,2.5,	0,	1,	3,	[[H_FF,0]	,[2,0]		,[9,0]		,[H_St,0]	,[H_St,0]	,[BombDmg,0],[H_Fi,0]	,[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	3,	0,	0,	2]);
+	EnemyDataInit(oEnemy_Crab,				4,1.25,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]); 
+	EnemyDataInit(oEnemy_Gibdo,				4,1.25,	1,	1,	4,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Helmasaur,			4,1.5,	1,	1,	3,	[[H_FF,H_PB],	H_ND	,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Kodongo,			4,1.75,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Leever,			4,1.75,	0,	1,	3,	[[H_FF,0]	,[2,H_ND]	,[2,0]		,[H_St,H_ND],[H_St,H_ND],[BombDmg,0],[H_Fi,H_ND],[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	]);
+	EnemyDataInit(oEnemy_Moldorm,			4, 2  ,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Octorok,			4,1.5,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg ,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Ropa,				4,1.75,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Wizzrobe,			4,2.5,	0,	1,	3,	[[H_FF,0]	,[2,0]		,[9,0]		,[H_St,0]	,[H_St,0]	,[BombDmg,0],[H_Fi,0]	,[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	]);
 
 	
-	EnemyDataInit(oEnemy_HardhatBeetle,		5,2.25,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg ,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	3,	0,	0,	0]);
-	EnemyDataInit(oEnemy_SnapDragon,		5,  2,	1,	1,	4,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	0,	2]);
-	EnemyDataInit(oEnemy_Geldman,			5,	2,	0,	1,	5,	[[H_FF,0]	,[2,0]		,[2,0]		,[H_St,0]	,[H_St,0]	,[BombDmg,0],[H_Fi,0]	,[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	],	[0,	0,	0,	0,	0,	0,	0,	2,	0,	0,	0,	0,	0]);
+	EnemyDataInit(oEnemy_HardhatBeetle,		5,2.25,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg ,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_SnapDragon,		5,  2,	1,	1,	4,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Geldman,			5,	2,	0,	1,	5,	[[H_FF,0]	,[2,0]		,[2,0]		,[H_St,0]	,[H_St,0]	,[BombDmg,0],[H_Fi,0]	,[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	]);
 	
-	//EnemyDataInit(oEnemy_Delavant,			6,	2,	0,	1,	4,	[[H_FF,0]	,[2,0]	,[2,0]		,[H_St,0]	,[H_St,0]	,[BombDmg,0],[H_Fi,0]	,[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Goriya,			6,2.5,	1,	1,	5,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg ,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	3,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Zirro,				6,2.25,	0,	0,	5,	[	H_FF	,	2		,	9		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	2,	0,	0,	0,	1]); 
-	EnemyDataInit(oEnemy_Zazak,				6,2.75,	1,	1,	5,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	2,	0,	0,	0]); 
+	//EnemyDataInit(oEnemy_Delavant,			6,	2,	0,	1,	4,	[[H_FF,0]	,[2,0]	,[2,0]		,[H_St,0]	,[H_St,0]	,[BombDmg,0],[H_Fi,0]	,[H_Fr,0]	,[H_FF,0]	,[H_ST,0]	,[H_Tr,0]	]);
+	EnemyDataInit(oEnemy_Goriya,			6,2.5,	1,	1,	5,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg ,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Zirro,				6,2.25,	0,	0,	5,	[	H_FF	,	2		,	9		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]); 
+	EnemyDataInit(oEnemy_Zazak,				6,2.75,	1,	1,	5,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]); 
 	
-	EnemyDataInit(oEnemy_Eyegore,			7,  3,	1,	1,	6,	[[H_FF,H_ND],[2,H_ND]	,[4,H_ND]	,[H_St,H_ND],[H_St,H_ND],[BombDmg,0],[H_Fi,H_ND],[H_Fr,0]	,[H_FF,H_ND],[H_ST,0]	,[H_Tr,0]	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	3,	0,	0,	0]); 
+	EnemyDataInit(oEnemy_Eyegore,			7,  3,	1,	1,	6,	[[H_FF,H_ND],[2,H_ND]	,[4,H_ND]	,[H_St,H_ND],[H_St,H_ND],[BombDmg,0],[H_Fi,H_ND],[H_Fr,0]	,[H_FF,H_ND],[H_ST,0]	,[H_Tr,0]	]); 
 	
-	EnemyDataInit(oEnemy_Tektite,			8,	3,	1,	1,	5,	[	H_FF	,	2		,	9		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	2,	2]);
+	EnemyDataInit(oEnemy_Tektite,			8,	3,	1,	1,	5,	[	H_FF	,	2		,	9		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
 	
-	EnemyDataInit(oEnemy_Armos,				9,3.5,	1,	1, 	6,	[[H_FF,H_ND],[2,H_ND]	,[2,H_ND]	,	H_ND	,	H_ND	,[BombDmg,0],[H_Fi,H_ND],[H_Fr,0]	,[H_FF,H_ND],[H_ST,0]	,	[H_Tr,0]],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	3]); 
-	EnemyDataInit(oEnemy_Hinox,				9,3.75,	1,	1,	6,	[	H_FF	,	H_ND	,	H_ND	,	H_ND	,	H_ND	,	0		,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	5]);
-	//EnemyDataInit(oEnemy_Lynel,			9,	5,	1,	1,	5,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1]);
+	EnemyDataInit(oEnemy_Armos,				9,3.5,	1,	1, 	6,	[[H_FF,H_ND],[2,H_ND]	,[2,H_ND]	,	H_ND	,	H_ND	,[BombDmg,0],[H_Fi,H_ND],[H_Fr,0]	,[H_FF,H_ND],[H_ST,0]	,	[H_Tr,0]]); 
+	EnemyDataInit(oEnemy_Hinox,				9,3.75,	1,	1,	6,	[	H_FF	,	H_ND	,	H_ND	,	H_ND	,	H_ND	,	0		,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	//EnemyDataInit(oEnemy_Lynel,			9,	5,	1,	1,	5,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
 
-	EnemyDataInit(oEnemy_Beamos,		    0,  2,	0,	0,	0,	[	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	H_ST	,	0		],	[0,	0,	0,	0,	0,	0,	0,	3,	3,	3,	0,	0,	4]); 
-	EnemyDataInit(oEnemy_Cannon,		    0,	0,	0,	0,	0,	[[H_FF,0]	,	0		,	0		,	0		,	0		,	0		,	H_Fi	,	H_Fr	,[H_FF,0]	,	H_ST	,	0		],	[0,	0,	0,	0,	0,	1,	0,	1,	1,	1,	0,	1,	1]); 
-	EnemyDataInit(oEnemy_Guru,				0,	0,	0,	0,	0,	[	0		,	0		,	0		,	0		,	0		,	0		,[H_Fi,0]	,[H_Fr,0]	,	0		,	0		,	0		],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]); 
-	EnemyDataInit(oEnemy_Guru_Bar,		    0,	0,	0,	0,	0,	[	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		],	[0,	0,	0,	0,	1,	0,	0,	1,	1,	2,	0,	1,	1]);
-	EnemyDataInit(oEnemy_Kyameron_Emitter,  0,	0,	0,	0,	3,	[	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		],	[0,	0,	0,	0,	0,	2,	0,	0,	0,	2,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Medusa,		    0,	0,	0,	0,	0,	[[H_FF,0]	,	0		,	0		,	0		,	0		,	0		,	H_Fi	,	H_Fr	,[H_FF,0]	,	H_ST	,	0		],	[0,	0,	0,	0,	0,	0,	0,	2,	1,	1,	0,	1,	1]);
-	EnemyDataInit(oEnemy_RollingSpike,	    0,  2,	0,	0,	0,	[	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	H_ST	,	0		],	[0,	0,	0,	0,	0,	0,	0,	1,	1,	1,	0,	1,	1]);
-	EnemyDataInit(oEnemy_MovingSpikeBlock,  0,	2,	0,	0,	0,	[[H_FF,0]	,	0		,	0		,	0		,	0		,	0		,	0		,	0		,[H_FF,0]	,	H_ST	,	0		],	[0,	0,	0,	0,	0,	0,	0,	1,	1,	1,	0,	1,	1]);
+	EnemyDataInit(oEnemy_Beamos,		    0,  2,	0,	0,	0,	[	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	H_ST	,	0		]); 
+	EnemyDataInit(oEnemy_Cannon,		    0,	0,	0,	0,	0,	[[H_FF,0]	,	0		,	0		,	0		,	0		,	0		,	H_Fi	,	H_Fr	,[H_FF,0]	,	H_ST	,	0		]); 
+	EnemyDataInit(oEnemy_Guru,				0,	0,	0,	0,	0,	[	0		,	0		,	0		,	0		,	0		,	0		,[H_Fi,0]	,[H_Fr,0]	,	0		,	0		,	0		]); 
+	EnemyDataInit(oEnemy_Guru_Bar,		    0,	0,	0,	0,	0,	[	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		]);
+	EnemyDataInit(oEnemy_Kyameron_Emitter,  0,	0,	0,	0,	3,	[	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		]);
+	EnemyDataInit(oEnemy_Medusa,		    0,	0,	0,	0,	0,	[[H_FF,0]	,	0		,	0		,	0		,	0		,	0		,	H_Fi	,	H_Fr	,[H_FF,0]	,	H_ST	,	0		]);
+	EnemyDataInit(oEnemy_RollingSpike,	    0,  2,	0,	0,	0,	[	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	0		,	H_ST	,	0		]);
+	EnemyDataInit(oEnemy_MovingSpikeBlock,  0,	2,	0,	0,	0,	[[H_FF,0]	,	0		,	0		,	0		,	0		,	0		,	0		,	0		,[H_FF,0]	,	H_ST	,	0		]);
 	
-	EnemyDataInit(oEnemy_Soldier_Advanced,	0,	0,	1,	1,	4,	[[H_FF,H_PB],	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	2,	3,	3,	2,	0,	0,	0,	0,	2,	0,	0,	5]); 
-	EnemyDataInit(oEnemy_Soldier_Simple,	0,  0,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	3,	3,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Soldier_Mace,		0,	0,	1,	1,	6,	[	H_FF	,	2		,	2		,	H_ND	,	H_ND	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	2]);
+	EnemyDataInit(oEnemy_Soldier_Advanced,	0,	0,	1,	1,	4,	[[H_FF,H_PB],	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]); 
+	EnemyDataInit(oEnemy_Soldier_Simple,	0,  0,	1,	1,	3,	[	H_FF	,	2		,	2		,	H_St	,	H_St	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_Soldier_Mace,		0,	0,	1,	1,	6,	[	H_FF	,	2		,	2		,	H_ND	,	H_ND	,	BombDmg	,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
 	
-	EnemyDataInit(oEnemy_Chicken,		   14,	0,	0,	0,	0,	[	H_FF	,	1		,	1		,	1		,	1		,	1		,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_FootSoldier,	   14,	0,	0,	0,	0,	[	H_FF	,	1		,	1		,	1		,	1		,	1		,	H_ND	,	H_ND	,	H_FF	,	0		,	0		],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
-	EnemyDataInit(oEnemy_Wallmaster,	   14,	2,	0,	0,	0,	[	H_FF	,	1		,	1		,	1		,	1		,	1		,	1		,	1		,	H_FF	,	1		,	1		],	[0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0]);
+	EnemyDataInit(oEnemy_Chicken,		   14,	0,	0,	0,	0,	[	H_FF	,	1		,	1		,	1		,	1		,	1		,	H_Fi	,	H_Fr	,	H_FF	,	H_ST	,	H_Tr	]);
+	EnemyDataInit(oEnemy_FootSoldier,	   14,	0,	0,	0,	0,	[	H_FF	,	1		,	1		,	1		,	1		,	1		,	H_ND	,	H_ND	,	H_FF	,	0		,	0		]);
+	EnemyDataInit(oEnemy_Wallmaster,	   14,	2,	0,	0,	0,	[	H_FF	,	1		,	1		,	1		,	1		,	1		,	1		,	1		,	H_FF	,	1		,	1		]);
 	
 	global.KnockBackColors = array_create(0);
 	array_push(global.KnockBackColors, KB_R,KB_R,KB_G,KB_G,KB_In,KB_In,KB_B,KB_B,KB_Br,KB_Br,KB_In,KB_In,KB_R,KB_R,KB_G,KB_G,KB_In,KB_In,KB_B,KB_B,KB_Br,KB_Br,KB_In,KB_In);
@@ -196,7 +196,8 @@ function Enemies_InitData(){
 
 }
 
-function EnemyDataInit(_ObjIndex, _EnergyIndex, _Attack, _SpecialItem, _Item, _PackPoints, _LinkWeaponEffects, _Levels){
+/// Which levels an enemy appears in, and how often, is in the level sheet (scripts/__Levels, field Enemies)
+function EnemyDataInit(_ObjIndex, _EnergyIndex, _Attack, _SpecialItem, _Item, _PackPoints, _LinkWeaponEffects){
 
 	global.EnemyData[_ObjIndex] = {};
 	
@@ -209,11 +210,6 @@ function EnemyDataInit(_ObjIndex, _EnergyIndex, _Attack, _SpecialItem, _Item, _P
 	global.EnemyData[_ObjIndex][$ "LinkWeaponEffects"] = array_create(LinkWeapons);
 	for(var _WeaponIndex = 0; _WeaponIndex < LinkWeapons; _WeaponIndex++){
 		global.EnemyData[_ObjIndex][$ "LinkWeaponEffects"][_WeaponIndex] = _LinkWeaponEffects[_WeaponIndex];
-	}
-	
-	global.EnemyData[_ObjIndex][$ "Levels"] = array_create(DungeonLevels - 1);
-	for(var _LevelIndex = 0; _LevelIndex < DungeonLevels - 1; _LevelIndex++){
-		global.EnemyData[_ObjIndex][$ "Levels"][_LevelIndex] = _Levels[_LevelIndex];
 	}
 	
 }
@@ -803,22 +799,8 @@ function SpawnBoss(_RoomIndex){
 	
 	var VarStruct = {FloorLevel : UPPER, ItemHolding : -1, SectionID: 0, RoomIndex : _RoomIndex};
 	
-	var inst;
-	switch(global.Level.Index){
-		
-		case DungeonLevel.CastleJails:
-			inst = instance_create_layer(Room.x + 20, Room.y + 20, "System", oBoss_Armos_C, VarStruct); 				
-			break;
-				
-		case DungeonLevel.LanmolasLair:
-			inst = instance_create_layer(Room.x + 20, Room.y + 20, "System", oBoss_Lanmola_C, VarStruct);
-			break;
-				
-		case DungeonLevel.MoldormsLair:
-			inst = instance_create_layer(Room.x + 128, Room.y + 80, "ObjsHigher_Upper", oBoss_Moldorm, VarStruct);			
-			break;
-			
-	}
+	var _Boss = LevelDef.BossSpawn;
+	if(_Boss != undefined) instance_create_layer(Room.x + _Boss.X, Room.y + _Boss.Y, _Boss.Layer, _Boss.Obj, VarStruct);
 	
 }
 
@@ -2144,10 +2126,10 @@ function Enemy_UpdateSprite(_State){
 
 				case oEnemy_Rope:
 					switch(Dir){
-						case LEFT:	sprite_index = global.Level.Index == DungeonLevel.Catacombs ? sEnemy_Rope2_Left : sEnemy_Rope_Left; break;
-						case RIGHT:	sprite_index = global.Level.Index == DungeonLevel.Catacombs ? sEnemy_Rope2_Right : sEnemy_Rope_Right; break;
-						case UP:	sprite_index = global.Level.Index == DungeonLevel.Catacombs ? sEnemy_Rope2_Up : sEnemy_Rope_Up; break;
-						case DOWN:	sprite_index = global.Level.Index == DungeonLevel.Catacombs ? sEnemy_Rope2_Down : sEnemy_Rope_Down; break;
+						case LEFT:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Left : sEnemy_Rope_Left; break;
+						case RIGHT:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Right : sEnemy_Rope_Right; break;
+						case UP:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Up : sEnemy_Rope_Up; break;
+						case DOWN:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Down : sEnemy_Rope_Down; break;
 					}
 					break;
 
@@ -2238,10 +2220,10 @@ function Enemy_UpdateSprite(_State){
 					
 				case oEnemy_Rope:
 					switch(Dir){
-						case LEFT:	sprite_index = global.Level.Index == DungeonLevel.Catacombs ? sEnemy_Rope2_Left : sEnemy_Rope_Left; break;
-						case RIGHT:	sprite_index = global.Level.Index == DungeonLevel.Catacombs ? sEnemy_Rope2_Right : sEnemy_Rope_Right; break;
-						case UP:	sprite_index = global.Level.Index == DungeonLevel.Catacombs ? sEnemy_Rope2_Up : sEnemy_Rope_Up; break;
-						case DOWN:	sprite_index = global.Level.Index == DungeonLevel.Catacombs ? sEnemy_Rope2_Down : sEnemy_Rope_Down; break;
+						case LEFT:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Left : sEnemy_Rope_Left; break;
+						case RIGHT:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Right : sEnemy_Rope_Right; break;
+						case UP:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Up : sEnemy_Rope_Up; break;
+						case DOWN:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Down : sEnemy_Rope_Down; break;
 					}
 					break;				
 

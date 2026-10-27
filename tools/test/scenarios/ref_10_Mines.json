@@ -1,0 +1,43 @@
+{
+ "comment": "Reference scenario for Mines (roadmap F4): dumps of three builds of the level, the level-dependent enemies of this level, no walk (Link starts at the top edge of a fixed layout) and a contact sheet. tools/test/baseline.py runs every ref_* scenario and compares two versions of the code.",
+ "name": "ref_10_Mines",
+ "seed": 1,
+ "level": "Mines",
+ "dump": true,
+ "cheats": [
+  "Cheat_Inf_Health"
+ ],
+ "max_frames": 100000,
+ "steps": [
+  {
+   "do": "wait",
+   "frames": 60
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "shot",
+   "name": "start"
+  },
+  {
+   "do": "wait",
+   "frames": 15
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "shot",
+   "name": "walked"
+  },
+  {
+   "do": "sheet",
+   "level": "Mines",
+   "seeds": [
+    2,
+    3
+   ]
+  }
+ ]
+}

@@ -2,7 +2,7 @@
 
 function Dungeon_Draw_WallDecor(_RoomIndex){
 	
-	switch(global.Level.Index){
+	switch(LevelDef.Theme){
 		case DungeonLevel.Start:
 		case DungeonLevel.Village:
 		case DungeonLevel.Mines:
@@ -90,7 +90,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 	WallDataCount[LOWER] = array_length(WallData[LOWER]);
 	WallDataCount[UPPER] = array_length(WallData[UPPER]);
 	
-	var _CurtainType = LevelCurtainType(global.Level.Index);
+	var _CurtainType = LevelCurtainType(LevelDef.Theme);
 	
 	//check all created doors to see if they overlap the walls, and set those positions in the WallData to false;
 	var PosX, PosY, _CurtainInst, Segment;
@@ -353,7 +353,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 			
 			var _Column = (ColumnCount > 2 ? DecorType.Column : DecorType.Mural);
 			
-			switch(global.Level.Index){
+			switch(LevelDef.Theme){
 				default:
 					_DecorType = choose(DecorType.Mural, _Column, DecorType.Lighting, DecorType.Lighting, DecorType.Lighting)
 					break;
@@ -381,7 +381,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 					
 					MuralStyle = FlipCoin_Bin();	
 					
-					switch(global.Level.Index){
+					switch(LevelDef.Theme){
 							
 						case DungeonLevel.Catacombs:
 							//if(WallGID == TemplateObjGID.WallSideB || Room.TemplateClass != RoomTemplateClass.Main_Upper) MuralStyle = 0 //in catacombs, mural 1 looks weird if not on top in main_upper template class
@@ -447,7 +447,7 @@ function Dungeon_Draw_WallDecor(_RoomIndex){
 	
 	//Draw random vines
 	
-	var _LevelCurtainType = LevelCurtainType(global.Level.Index);
+	var _LevelCurtainType = LevelCurtainType(LevelDef.Theme);
 	
 	for(var WallDataIndex = 0; WallDataIndex < WallDataCount[UPPER]; WallDataIndex++){
 		

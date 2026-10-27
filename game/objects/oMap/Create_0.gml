@@ -99,7 +99,7 @@ if(_CompassOwned){
 				break;
 
 			case oRodCharger:
-				if(global.Level.Index == DungeonLevel.Village){
+				if(LevelDef.Special == LevelSpecial.Village){
 					//if village, draw rod charger where it would be in the world, not in the room which is off view
 					var _RoomIndex = global.Level.Map_RoomIndex[2][3];
 					_PosX = global.Level.Rooms[_RoomIndex].MapX + 33;

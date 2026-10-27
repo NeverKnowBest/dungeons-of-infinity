@@ -11,6 +11,9 @@ global.TestMode = false;
 global.Test = undefined;
 global.TestFrame = 0;
 global.TestKills = 0;
+global.TestDumps = 0;		// level dumps written so far (scenario "dump": true)
+global.TestDumpFile = "";
+global.TestBuildSeed = 0;
 
 // Verbs a scenario may hold or press (see __input_config_verbs)
 global.TestVerbs = ["up", "down", "left", "right", "sword", "action", "item", "map", "strafe", "inventory", "menu_access", "hud"];
@@ -51,6 +54,7 @@ function Test_Init(){
 		MaxFrames: 36000,
 		Sound: false,
 		Speed: 60,
+		Dump: false,
 		Failures: 0,
 		Finished: false
 	};
@@ -70,6 +74,7 @@ function Test_Init(){
 	global.Test.MaxFrames = _Scenario[$ "max_frames"] ?? 36000;
 	global.Test.Sound = _Scenario[$ "sound"] ?? false;
 	global.Test.Speed = _Scenario[$ "speed"] ?? 60;
+	global.Test.Dump = _Scenario[$ "dump"] ?? false;
 
 	// Windowed, and no pause or mute when the window loses focus (the input library is told the same in
 	// INPUT_ALLOW_OUT_OF_FOCUS), so a test keeps running while someone uses the PC
@@ -117,7 +122,7 @@ function Test_Begin(){
 
 /// Called from oGame's Create in place of the intro level
 function Test_StartLevel(){
-	if(!is_real(global.Test.Level) || global.Test.Level < DungeonLevel.Start || global.Test.Level > DungeonLevel.Aghanim2){
+	if(!is_real(global.Test.Level) || global.Test.Level < 0 || global.Test.Level >= array_length(global.LevelDefs)){
 		Test_Fail("bad level " + string(global.Test.Level));
 		global.Test.Level = DungeonLevel.Castle;
 	}
@@ -130,7 +135,9 @@ function Test_BuildLevel(_Level, _Seed){
 	random_set_seed(_Seed);
 	DungeonSeq_Init(global.UserIndex);
 	global.SaveLevel = false;
+	global.TestBuildSeed = _Seed;
 	Dungeon_InitLevel(_Level);
+	Test_DumpGlobals();
 }
 
 #region Log
@@ -180,7 +187,7 @@ function Test_Finish(_Result){
 
 function Test_LevelName(){
 	if(global.HubLevel) return "hub";
-	return string(global.Level.Index) + " \"" + global.DungeonNames[global.Level.Index] + "\"";
+	return string(global.Level.Index) + " \"" + LevelDef.Name + "\"";
 }
 
 function Test_RoomStr(_RoomIndex){
@@ -376,6 +383,19 @@ function Test_DoStep(_S){
 			else Test_Fail("expect" + _Bad);
 			return true;
 
+		case "probe":	// creates each enemy in front of Link, logs its variables and removes it
+			var _Enemies = _S[$ "enemies"] ?? [];
+			for(var i = 0; i < array_length(_Enemies); i++){
+				var _Probe = Test_SpawnEnemy(_Enemies[i], _S[$ "dist"] ?? 48);
+				if(_Probe == noone){
+					Test_Fail("unknown object " + string(_Enemies[i]));
+					continue;
+				}
+				Test_Log("probe " + Test_InstLine(_Probe));
+				instance_destroy(_Probe);	// with its Destroy event, which removes what it made (weapons, lights, lists)
+			}
+			return true;
+
 		case "sheet":
 			Test_SheetStart(_S[$ "level"] ?? global.Level.Index, _S[$ "seeds"] ?? [global.Test.Seed]);
 			return true;
@@ -387,6 +407,123 @@ function Test_DoStep(_S){
 		default:
 			Test_Fail("unknown step " + string(_Do));
 			return true;
+	}
+}
+
+#endregion
+
+#region Level dumps (reference scenarios, tools/test/baseline.py)
+
+/// Called from Dungeon_InitLevel once every room is built and before the rooms are put to sleep. With "dump": true
+/// in the scenario, writes everything the generator produced to dump_<n>_<level>_s<seed>.txt: the level and room
+/// structs, every instance with its variables and an MD5 of each tile layer per room. Two versions of the code that
+/// build the same level give the same file. Test_DumpGlobals adds the global variables once the build is over.
+function Test_OnLevelBuilt(){
+	if(!global.TestMode || !global.Test.Dump) exit;
+	global.TestDumps++;
+	global.TestDumpFile = "dump_" + string(global.TestDumps) + "_" + LevelDef.Name + "_s" + string(global.TestBuildSeed) + ".txt";
+	var _B = buffer_create(1 << 16, buffer_grow, 1);
+	buffer_write(_B, buffer_text, "level " + string(global.Level.Index) + " seed=" + string(global.TestBuildSeed) + "\n");
+	buffer_write(_B, buffer_text, "levelstruct " + Test_VarsLine(global.Level) + "\n");
+	for(var _RoomIndex = 0; _RoomIndex < global.Level.RoomCount; _RoomIndex++){
+		buffer_write(_B, buffer_text, "room " + Test_RoomStr(_RoomIndex) + "\n");
+		buffer_write(_B, buffer_text, "roomstruct " + string(_RoomIndex) + " " + Test_VarsLine(global.Level.Rooms[_RoomIndex]) + "\n");
+	}
+
+	// Tile layers: one MD5 per room and layer
+	var _Layers = layer_get_all();
+	var _Tiles = buffer_create(4096, buffer_grow, 4);
+	for(var i = 0; i < array_length(_Layers); i++){
+		var _Layer = _Layers[i];
+		buffer_write(_B, buffer_text, "layer " + layer_get_name(_Layer) + " depth=" + string(layer_get_depth(_Layer)) + " visible=" + string(layer_get_visible(_Layer)) + "\n");
+		var _TM = layer_tilemap_get_id(_Layer);
+		if(_TM == -1) continue;
+		var _TW = tilemap_get_tile_width(_TM);
+		var _TH = tilemap_get_tile_height(_TM);
+		buffer_write(_B, buffer_text, "tilemap " + layer_get_name(_Layer) + " tileset=" + tileset_get_name(tilemap_get_tileset(_TM)) + " x=" + string(tilemap_get_x(_TM)) + " y=" + string(tilemap_get_y(_TM)) + "\n");
+		for(var _RoomIndex = 0; _RoomIndex < global.Level.RoomCount; _RoomIndex++){
+			var _R = global.Level.Rooms[_RoomIndex];
+			buffer_seek(_Tiles, buffer_seek_start, 0);
+			var _Used = 0;
+			for(var _Y = _R.y; _Y < _R.y + _R.height; _Y += _TH){
+				for(var _X = _R.x; _X < _R.x + _R.width; _X += _TW){
+					var _T = tilemap_get_at_pixel(_TM, _X, _Y);
+					if(_T > 0) _Used++;
+					buffer_write(_Tiles, buffer_u32, _T == -1 ? 0 : _T);
+				}
+			}
+			if(_Used > 0) buffer_write(_B, buffer_text, "tiles " + layer_get_name(_Layer) + " room=" + string(_RoomIndex) + " used=" + string(_Used) + " md5=" + buffer_md5(_Tiles, 0, buffer_tell(_Tiles)) + "\n");
+		}
+	}
+	buffer_delete(_Tiles);
+
+	with(all){
+		if(object_index == oTest) continue;
+		buffer_write(_B, buffer_text, "inst " + Test_InstLine(id) + "\n");
+	}
+	buffer_save_ext(_B, TEST_OUT + global.TestDumpFile, 0, buffer_tell(_B));
+	buffer_delete(_B);
+}
+
+/// Called after Dungeon_InitLevel (Test_BuildLevel): adds the global variables to the level dump
+function Test_DumpGlobals(){
+	if(!global.TestMode || !global.Test.Dump || global.TestDumpFile == "") exit;
+	var _Names = variable_instance_get_names(global);
+	array_sort(_Names, true);
+	var _Text = "";
+	for(var i = 0; i < array_length(_Names); i++){
+		var _Name = _Names[i];
+		if(string_char_at(_Name, 1) == "_" || string_pos("Test", _Name) == 1 || string_pos("Time_", _Name) == 1) continue;	// libraries, test mode, clocks
+		var _Value = Test_ValueStr(variable_global_get(_Name));
+		if(_Value != undefined) _Text += "global " + _Name + "=" + _Value + "\n";
+	}
+	var _File = file_text_open_append(TEST_OUT + global.TestDumpFile);
+	if(_File == -1) exit;
+	file_text_write_string(_File, _Text);
+	file_text_close(_File);
+	Test_Log("dump " + global.TestDumpFile);
+	global.TestDumpFile = "";
+}
+
+/// Text of a plain value, or of an array of plain values (up to 256 items, two levels deep); undefined for anything else
+/// (structs, methods)
+function Test_ValueStr(_V, _Depth = 0){
+	if(is_real(_V) || is_bool(_V) || is_int64(_V) || is_int32(_V)) return string(_V);
+	if(is_string(_V)) return "\"" + string_replace_all(_V, "\n", "\\n") + "\"";
+	if(is_undefined(_V)) return "undefined";
+	if(typeof(_V) == "ref") return string(_V);
+	if(is_array(_V)){
+		var _N = array_length(_V);
+		if(_N > 256 || _Depth >= 2) return "[" + string(_N) + " items]";
+		var _Out = "[";
+		for(var i = 0; i < _N; i++){
+			var _Item = Test_ValueStr(_V[i], _Depth + 1);
+			_Out += (i > 0 ? "," : "") + (_Item ?? "?");
+		}
+		return _Out + "]";
+	}
+	return undefined;
+}
+
+/// name=value for every plain variable of a struct or instance, sorted by name
+function Test_VarsLine(_Owner){
+	var _Names = is_struct(_Owner) ? variable_struct_get_names(_Owner) : variable_instance_get_names(_Owner);
+	array_sort(_Names, true);
+	var _Out = "";
+	for(var i = 0; i < array_length(_Names); i++){
+		var _Value = Test_ValueStr(is_struct(_Owner) ? _Owner[$ _Names[i]] : variable_instance_get(_Owner, _Names[i]));
+		if(_Value != undefined) _Out += " " + _Names[i] + "=" + _Value;
+	}
+	return _Out;
+}
+
+/// One line about an instance: object, position, sprite, layer and its own variables
+function Test_InstLine(_Inst){
+	with(_Inst){
+		return object_get_name(object_index) + " x=" + string(x) + " y=" + string(y) + " depth=" + string(depth)
+			+ " layer=" + (layer == -1 ? "-" : layer_get_name(layer)) + " sprite=" + (sprite_index == -1 ? "-" : sprite_get_name(sprite_index))
+			+ " image=" + string(image_index) + " xs=" + string(image_xscale) + " ys=" + string(image_yscale) + " visible=" + string(visible)
+			+ " |" + Test_VarsLine(id);
 	}
 }
 

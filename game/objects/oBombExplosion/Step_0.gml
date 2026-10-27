@@ -49,7 +49,7 @@ if(image_index > 3 && !Exploded_Curtains){
 
 if(image_index > 4 && !Exploded_Doors){ //check a bit later in the animation for doors, otherwise they blow up too quick
 	
-	if(global.Level.Index == DungeonLevel.Start){
+	if(LevelDef.Special == LevelSpecial.Intro){
 		//check for castle wall hidden door
 		var CastleDoor = collision_circle(x, y, BlastRadius_Doors, oCastleWallDoor, false, true);
 		if(CastleDoor != noone){

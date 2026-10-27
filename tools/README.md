@@ -69,6 +69,8 @@ python tools/check/validate.py --strict   # warnings also fail
 | Asset style name (`sX`, `oX`, `Sound_X`, `Music_X`) used in GML that does not exist | warning (error if it only exists as an orphan) |
 | Array literal starting with `#RRGGBB` | error |
 | Lower case text drawn with `global.Font_Small` | warning |
+| `a[i] = ...i++` (GML evaluates the right side first) | warning |
+| Level rule on `global.Level.Index` (`switch`, comparison or formula) outside `__Levels` and `__Test`: read a `LevelDef` field instead | warning |
 | Every included file in `Zelda.yyp` exists on disk | error |
 | `data_d`, the room template files (`game/datafiles/data/rooms`) and the Tiled templates parse as JSON (LFS pointers are skipped) | error |
 | The room template files match what `templates/convert.py` makes from the Tiled maps right now (adds about 10 s) | error |
@@ -94,10 +96,24 @@ python tools/test/run.py --sheet Sewers --seeds 7,9  # chosen seeds
 python tools/test/run.py smoke --full                # also print the "step" lines of the log
 ```
 
-* It finds the active runtime (`C:\ProgramData\GameMakerStudio2-LTS2026untime.json`) and the IDE user folder in `%APPDATA%` by itself, builds in `%TEMP%\doi-test` and passes the scenario through the environment variable `DOI_TEST` (the game also takes `-test <file>`). The file goes to `%LOCALAPPDATA%\Zelda	est\scenario.json`.
+* It finds the active runtime (`C:\ProgramData\GameMakerStudio2-LTS2026\runtime.json`) and the IDE user folder in `%APPDATA%` by itself, builds in `%TEMP%\doi-test` and passes the scenario through the environment variable `DOI_TEST` (the game also takes `-test <file>`). The file goes to `%LOCALAPPDATA%\Zelda\test\scenario.json`.
 * Results are copied to `tools/test/out/` (ignored by git): `log.txt` and the PNGs. The script prints compile and runtime errors from the run output, the log, and `RESULT: ok` (exit code 0) when the log ends with `end ok` and has no `FAIL` line. `--timeout` (default 600 s) stops a run that hangs.
 * The game window opens and runs by itself; it keeps going without focus and ignores the real keyboard. Sound is muted unless the scenario says `"sound": true`. Nothing is saved (user file, stats, achievements, options).
 * `scenario.py` reads and checks scenarios; the validator uses it too.
+
+Reference runs (roadmap F4): `baseline.py` runs every `scenarios/ref_*.json` (one per level: three builds of the level with `"dump": true`, the level's enemies with per-level stats in a `probe` step, a short walk, a contact sheet of seeds 2 and 3) and keeps the results under a label, so two versions of the code can be compared.
+
+```
+python tools/test/baseline.py save before                # compiles once and runs the 14 ref_* scenarios (about 15 min)
+python tools/test/baseline.py save after --only Mines    # only the scenarios whose name contains "Mines"
+python tools/test/baseline.py save after --no-build      # reuse the last build
+python tools/test/baseline.py compare before after       # SAME, or every text line and image that differs
+```
+
+* Results go to `tools/test/baseline/<label>/<scenario>/` (ignored by git, about 60 MB per label). The same code gives the same files, so any difference is a change in behaviour (or in the dumped data: a renamed or removed global shows up too).
+* A baseline of the code before a change can be made after the change too: `git worktree add --detach %TEMP%\doi-base HEAD`, copy the test tools in, `save before` there and copy `tools/test/baseline/before` back (see `docs/dev/receitas.md`, "Comparar antes e depois").
+* `compare` shows pixel counts for images when Pillow is installed. It ignores the `step` lines of the log: they echo the scenario as GML writes it, and the key order changes between builds.
+* F4 result, for reference: every file the same except three lines per dump, the globals `DungeonNames` and `Music_LevelSongIndex` (gone) and `LevelDefs` (new).
 
 Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value; `level` and `item` also take a bare name (`"Sewers"`, `"Shield"`).
 
@@ -111,6 +127,7 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `max_frames` | The test fails with `timeout` after this many frames (default 36000) |
 | `speed` | Frames per second (default 60) |
 | `sound` | `true` to hear it |
+| `dump` | `true`: every level built writes `dump_<n>_<level>_s<seed>.txt` (level and room structs, instances with their variables, MD5 of each tile layer per room, globals). For comparing two versions of the code |
 | `steps` | List of steps, run in order (below) |
 
 | Step | Keys | What it does |
@@ -122,6 +139,7 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `room` | `x`, `y` | Moves Link into the room at that grid position (0..7), just inside one of its doors |
 | `level` | `level`, `seed` | Builds a level (the next level of a run normally comes through the stairs) |
 | `spawn` | `enemy`, `dist` (default 48) | Creates an enemy object (`oEnemy_Rat`) in front of Link |
+| `probe` | `enemies` (list), `dist` | Creates each enemy in front of Link, logs a `probe` line with its variables (energy, attack, `Type`...) and removes it. Only enemies that exist in that level: soldiers crash elsewhere |
 | `give` | `item`, `index`, `amount` | Gives an item |
 | `state` | | Logs level, room, Link's position and health, enemies and kills |
 | `log` | `text` | Writes a note in the log |
@@ -129,7 +147,7 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `sheet` | `level`, `seeds` | Contact sheet (what `--sheet` runs): `sheet_<level>_<seed>.png` per seed and `sheet_<level>.png` with all of them at half size |
 | `end` | | Ends the test (it also ends after the last step) |
 
-Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>`, `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `state`, `expect ok`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
+Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>`, `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `state`, `expect ok`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
 
 ### `templates/` (Python 3, standard library only)
 

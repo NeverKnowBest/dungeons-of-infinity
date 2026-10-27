@@ -4,7 +4,7 @@ Dir = RandomDir();
 
 Size = EnemySize.Medium;
 
-switch(global.Level.Index){
+switch(LevelDef.EnemyStats){
 	
 	case DungeonLevel.Castle: 
 		HeadIndex = SoldierHead.Normal;

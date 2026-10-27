@@ -1,5 +1,5 @@
 
-if(global.Level.Index == DungeonLevel.Start){
+if(LevelDef.Special == LevelSpecial.Intro){
 	MainAlpha = 1 - oIntro.DarkScreenAlpha;
 }
 
@@ -11,7 +11,7 @@ if(ShowLevelName){
 	draw_set_halign(fa_center);
 	draw_set_font(global.Font_Blue);
 	draw_set_alpha(ShowLevelName_Alpha);
-	draw_text(oCamera.X + 128, oCamera.Y + 100, global.DungeonNames[global.Level.Index]);
+	draw_text(oCamera.X + 128, oCamera.Y + 100, LevelDef.Name);
 	draw_set_alpha(1);
 }
 

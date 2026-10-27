@@ -5,7 +5,7 @@
 function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 	
 	
-	if(global.Level.Index != DungeonLevel.Start && global.Level.Index != DungeonLevel.Aghanim2){
+	if(LevelDef.Special != LevelSpecial.Intro && LevelDef.Special != LevelSpecial.FinalBoss){
 		if(!variable_struct_exists(Room.Template, "Objs")) exit;
 	}
 	
@@ -55,7 +55,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 					
 					MonumentStyle = Decor_Monuments_AllowedStyle(ObjX, ObjY, true);
 					
-					switch(global.Level.Index){
+					switch(LevelDef.Theme){
 						case DungeonLevel.Catacombs:
 							if(MonumentStyle == 2) MonumentStyle = 3; //don't use graves in special rooms
 							break;
@@ -74,7 +74,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				var TileY = LevelTilesY;
 				var _Mirrored = FlipCoin_Bool();
 				
-				switch(global.Level.Index){
+				switch(LevelDef.Theme){
 
 					case DungeonLevel.CastleJails:
 						_DrawMonumentItems = false;
@@ -699,13 +699,13 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				//determine which Room index the door will warp to
 				DoorWarpTemplateID = GetPropertyValue(PropertiesArray, "House");
 				
-				switch(global.Level.Index){
-					case DungeonLevel.Village:
+				switch(LevelDef.Special){
+					case LevelSpecial.Village:
 						_TemplateClass = RoomTemplateClass.Village;
 						_TemplateSubClass = RoomTemplateClass_Village.House;					
 						break;
 					
-					case DungeonLevel.Mines:
+					case LevelSpecial.Mines:
 						_TemplateClass = RoomTemplateClass.Mines;
 						_TemplateSubClass = RoomTemplateClass_Mines.House;							
 						break;
@@ -1576,7 +1576,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 					var _LightInst = instance_create_layer(ObjX, ObjY + 8, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : TOP, Status: global.ChallengeOptions[ChallengeOption.Darkness] != ChallengeOption_Darkness.NoLights || GetPropertyValue(PropertiesArray, "AlwaysLit") != -1});
 					if(Room.ForcedTheme != -1) _LightInst.PaletteIndex = Room.ForcedTheme + 1;
 				}else
-					DrawTileBlock(DecorTMID, ObjX, ObjY, 132, 4 + ((global.Level.Index - 1) * 6), 4, 3);
+					DrawTileBlock(DecorTMID, ObjX, ObjY, 132, LevelTilesY, 4, 3);
 				break;
 				
 			case TemplateObjGID.Decor_Mural_B:
@@ -1584,7 +1584,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 					var _LightInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : BOTTOM, Status: global.ChallengeOptions[ChallengeOption.Darkness] != ChallengeOption_Darkness.NoLights || GetPropertyValue(PropertiesArray, "AlwaysLit") != -1});
 					if(Room.ForcedTheme != -1) _LightInst.PaletteIndex = Room.ForcedTheme + 1;
 				}else
-					DrawTileBlock(DecorTMID, ObjX, ObjY, 132, 4 + ((global.Level.Index - 1) * 6) + 3, 4, 3);				
+					DrawTileBlock(DecorTMID, ObjX, ObjY, 132, LevelTilesY + 3, 4, 3);				
 				break;
 				
 			case TemplateObjGID.Decor_Mural_L:
@@ -1592,7 +1592,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 					var _LightInst = instance_create_layer(ObjX + 8, ObjY, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : LEFT, Status: global.ChallengeOptions[ChallengeOption.Darkness] != ChallengeOption_Darkness.NoLights || GetPropertyValue(PropertiesArray, "AlwaysLit") != -1});
 					if(Room.ForcedTheme != -1) _LightInst.PaletteIndex = Room.ForcedTheme + 1;
 				}else
-					DrawTileBlock(DecorTMID, ObjX, ObjY, 136, 4 + ((global.Level.Index - 1) * 6), 3, 4);					
+					DrawTileBlock(DecorTMID, ObjX, ObjY, 136, LevelTilesY, 3, 4);					
 				break;
 				
 			case TemplateObjGID.Decor_Mural_R:
@@ -1600,7 +1600,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 					var _LightInst = instance_create_layer(ObjX, ObjY, "ObjsDoors_Upper", oWallLight, {RoomIndex : _RoomIndex, Location : RIGHT, Status: global.ChallengeOptions[ChallengeOption.Darkness] != ChallengeOption_Darkness.NoLights || GetPropertyValue(PropertiesArray, "AlwaysLit") != -1});
 					if(Room.ForcedTheme != -1) _LightInst.PaletteIndex = Room.ForcedTheme + 1;
 				}else
-					DrawTileBlock(DecorTMID, ObjX, ObjY, 139, 4 + ((global.Level.Index - 1) * 6), 3, 4);				
+					DrawTileBlock(DecorTMID, ObjX, ObjY, 139, LevelTilesY, 3, 4);				
 				break;
 			
 			
@@ -1732,7 +1732,7 @@ function Dungeon_Draw_SpecialObjs_Forced(_RoomIndex){
 				break;
 			
 			case TemplateObjGID.Gem:
-				if(global.Level.Index == DungeonLevel.Mines){
+				if(LevelDef.Special == LevelSpecial.Mines){
 					_Inst = instance_create_layer(ObjX + 8, ObjY + 16, "Objs_" + FloorLevelStr, oItem_Gem, {From : ItemFrom.Treasure});
 				}else{
 					_Inst = instance_create_layer(ObjX + 8, ObjY + 16, "Objs_" + FloorLevelStr, choose(oItem_Gem, oItem_Gem, oItem_Kinstone), {From : ItemFrom.Treasure});

@@ -276,6 +276,16 @@ def check_gml(rep, registered, orphans, object_gml):
             line = sources[f].count('\n', 0, m.start()) + 1
             rep.error('%s:%d array literal starts with a #RRGGBB colour ([# is a ds_grid accessor); use make_colour_rgb'
                       % (rel(f), line))
+        for m in re.finditer(r'\b\w+\[\s*(\w+)\s*\]\s*=[^;\n]*\b\1\+\+', c):
+            line = c.count('\n', 0, m.start()) + 1
+            rep.warn('%s:%d a[i] = ...i++: GML evaluates the right side first, so the value goes to the next index'
+                     % (rel(f), line))
+        # level rules belong in the level sheet (roadmap F4)
+        if not re.search(r'[\\/]__(Levels|Test)[\\/]', f):
+            for m in re.finditer(r'switch\s*\(\s*global\.Level\.Index\s*\)|global\.Level\.Index\s*(==|!=|<|>|[-+*/](?!=))', c):
+                line = c.count('\n', 0, m.start()) + 1
+                rep.warn('%s:%d level rule on global.Level.Index; read a LevelDef field instead (scripts/__Levels)'
+                         % (rel(f), line))
         src = sources[f]
         for m in re.finditer(r'draw_set_font\(\s*global\.Font_Small\s*\)', src):
             nxt = re.search(r'draw_set_font\(', src[m.end():])

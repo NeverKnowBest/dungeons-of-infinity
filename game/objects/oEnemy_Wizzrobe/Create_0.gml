@@ -10,7 +10,7 @@ SleepDelay = 60;
 CheckForWater = true;
 InWaterSprYOffset = -2;
 
-switch(global.Level.Index){
+switch(LevelDef.EnemyStats){
 	
 	default:
 	case DungeonLevel.WaterTemple:

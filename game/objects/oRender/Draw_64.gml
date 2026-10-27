@@ -227,7 +227,7 @@ if(DEBUG){
 
 	
 		draw_text(10, _y, "Dungeon Index: " + string(global.Level.DungeonTemplate_Index)); _y+=15;
-		draw_text(10, _y, "Dungeon Depth: " + string(global.Level.Index)); _y+=15;
+		draw_text(10, _y, "Dungeon Depth: " + string(LevelDef.Depth)); _y+=15;
 		draw_text(10, _y, "DungeonGrid: " + string(oCamera.DungeonGridX) + "," +string(oCamera.DungeonGridY)); _y+=15;
 		
 		draw_text(10, _y, "Room Index: " + string(global.Level.Map_RoomIndex[oCamera.DungeonGridY][oCamera.DungeonGridX])); _y+=15;

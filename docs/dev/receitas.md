@@ -25,6 +25,15 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 2. Saem `tools/test/out/sheet_<nível>_<semente>.png` (fase inteira em 1x) e `sheet_<nível>.png` (todas lado a lado, em meio tamanho). O log lista cada sala com grid e template.
 3. Serve para conferir salas novas e a variedade da geração sem jogar. Para comparar antes e depois de uma mudança, rode as mesmas sementes nas duas versões.
 
+## Comparar antes e depois (cenários de referência)
+
+Para mudanças que não deveriam mudar o jogo (refatoração, faxina, troca de tabela por ficha):
+
+1. Antes de mexer no código: `python tools/test/baseline.py save before` (compila e roda os 14 `ref_*`, uns 15 min; rode em segundo plano). Se já mexeu, faça o baseline numa cópia do commit: `git worktree add --detach %TEMP%/doi-base HEAD`, copie para lá as ferramentas de teste que mudaram, rode `save before` nela e copie `tools/test/baseline/before` de volta. Não rode dois testes ao mesmo tempo: o `run.py` fecha qualquer `Runner.exe` aberto.
+2. Depois da mudança: `python tools/test/baseline.py save after` e `python tools/test/baseline.py compare before after`.
+3. `SAME` prova que as 14 fases são geradas igual (salas, objetos e suas variáveis, tiles, globais, folhas de contato). Se aparecer diferença, leia as linhas: global renomeado ou removido de propósito é esperado; qualquer outra coisa é mudança de comportamento.
+4. Fase nova ganha um `ref_NN_<Fase>.json` copiado de um parecido (no `probe`, só inimigos que existem na fase).
+
 ## Sala nova no hub
 
 1. Monte a imagem da sala (veja "Imagem de sala a partir do ALttP"). Use uma camada de baixo (`sHub_<Nome>`) e, se houver partes que cobrem o Link (topo de paredes, lustres), uma de cima (`sHub_<Nome>_Over`).
@@ -81,16 +90,18 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 
 Como os níveis são montados hoje:
 
-* Cada nível (`enum DungeonLevel`) escolhe uma classe de dungeon (`Dungeon_PickClass`): um conjunto de layouts em `data_d` (grade de salas, portas, escadas) e de salas em `game/datafiles/data/rooms/` (templates do Tiled, por classe e subclasse).
-* O visual vem dos tiles do DoI (`sTiles`, linhas por tema em `LevelTilesY`) desenhados a partir dos templates. Inimigos, baús e objetos vêm das propriedades dos templates e das tabelas de inimigos por nível (`__Enemies.gml`, `EnemyDataInit`).
+* Tudo o que muda de um nível para outro está na ficha de fase, `game/scripts/__Levels/__Levels.gml` (`global.LevelDefs`, um bloco por nível; cada campo tem comentário no `Level_Create`). Detalhes em `docs/dev/engine-notes.md` ("Level sheet").
+* Cada nível escolhe uma classe de dungeon (`Class`): um conjunto de layouts em `data_d` (grade de salas, portas, escadas) e de salas em `game/datafiles/data/rooms/` (templates do Tiled, por classe e subclasse).
+* O visual vem dos tiles do DoI (`sTiles`, linhas do tema `Theme` em `LevelTilesY`) desenhados a partir dos templates, mais as regras de decoração de cada tema (`switch(LevelDef.Theme)`). Os inimigos vêm da lista `Enemies` da ficha (objeto e peso).
 
 Passos:
 
-1. Novo valor em `DungeonLevel` (ou uma variante sorteada no lugar do nível 2) e o caso em `Dungeon_PickClass`, `Dungeon_StartDir`, `Dungeon_IsBossLevel` e tabelas por nível.
+1. Novo valor no fim de `DungeonLevel` e uma entrada no `Levels_Init`. Copie a entrada do nível mais parecido e mude o que for diferente: `Name`, `Depth` (a profundidade da run que ele ocupa; 2 para o nível 2), `Theme` e `EnemyStats` do nível cujo visual e inimigos ele usa (`DungeonLevel.Castle` no topo do castelo), `Class`, `Song`, `Enemies`, escuridão, água, obstáculos. Para entrar no lugar do nível 2, o `Next` do nível anterior aponta para ele (ou para um sorteio entre os dois) e o `Next` dele aponta para o nível 3.
 2. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.
 3. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `game/datafiles/data/rooms/` com `tools/templates/convert.py` (veja "Template de sala no Tiled"). Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
 4. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
-5. Inimigos: reaproveite os do castelo; só a tabela do nível muda.
+5. Inimigos: reaproveite os do castelo; é só a lista `Enemies` da entrada, com `EnemyStats` de um nível onde eles existem (os soldados só funcionam nos níveis que o `Create` deles conhece).
+6. Cenário de referência `ref_NN_<Fase>.json` para a fase nova (veja "Comparar antes e depois").
 
 ## Conteúdo de outro Zelda (ex.: Minish Cap)
 
@@ -99,4 +110,4 @@ Ter os sprites e o código original ajuda muito, mas não é uma tradução 1 pa
 * O código do original é de outra máquina (GBA, assembly ou decompilação em C) e conversa com o hardware dele (OAM, tilemaps, física em subpixels). Aqui cada inimigo é um objeto do GameMaker que precisa conversar com o DoI: estados (`EnemyState`), dano (`EnemyHitsToKill`, `Enemy_CheckHit`), drops, colisão com `oWall`, salas, pausa, iluminação e paletas.
 * O que se aproveita direto: sprites e animações, padrões de movimento e ataque, tempos e números (vida, velocidade, dano), sons e músicas.
 * Ordem sugerida: primeiro os sprites e um inimigo simples (andar e tocar no Link); depois os que atiram; por último o chefe, com sala própria.
-* Para cada inimigo novo: objeto filho do inimigo do DoI mais parecido, sprite por direção e estado, `EnemyDataInit` com energia e ataque, e a tabela do nível onde ele aparece.
+* Para cada inimigo novo: objeto filho do inimigo do DoI mais parecido, sprite por direção e estado, `EnemyDataInit` com energia e ataque, e o inimigo na lista `Enemies` da ficha do nível onde ele aparece.

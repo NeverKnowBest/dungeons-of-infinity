@@ -46,7 +46,7 @@ function Treasure_Open(Inst){
 	var _DoCurse;
 	switch(global.ChallengeOptions[ChallengeOption.Curses]){
 		default: //0 and 1
-			_DoCurse = Prob(Chance_Curse) && !FromAnyKinstone(Inst.ContentsFrom) && global.Level.Index != DungeonLevel.Castle && global.Level.Index != DungeonLevel.Village && global.Level.Index != DungeonLevel.Mines;
+			_DoCurse = Prob(Chance_Curse) && !FromAnyKinstone(Inst.ContentsFrom) && LevelDef.Curses;
 			break;
 		
 		case 2: 
@@ -88,7 +88,7 @@ function Treasure_Open(Inst){
 			
 				if(Inst.ContentsObj != ItemClass.Sword){ 
 				
-					if(global.Inventory.ItemData[ItemClass.Sword].Index == 0 && global.Level.Index > DungeonLevel.Castle && !FromAnyKinstone(Inst.From)){
+					if(global.Inventory.ItemData[ItemClass.Sword].Index == 0 && LevelDef.Depth > Level_Depth(DungeonLevel.Castle) && !FromAnyKinstone(Inst.From)){
 					
 						if(Item_Allowed(ItemClass.Sword)){
 					

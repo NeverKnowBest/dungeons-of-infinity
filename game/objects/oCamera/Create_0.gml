@@ -40,7 +40,7 @@ function SetToRoomIndex(_RoomIndex, _ActivateRoom = false, EnemyReset = true, _X
 	
 	if(EnemyReset) Enemy_Reset(_RoomIndex);
 	
-	if(global.Level.Index != DungeonLevel.Start) Dungeon_RoomDeActivate(global.CurrentRoomIndex);
+	if(LevelDef.Special != LevelSpecial.Intro) Dungeon_RoomDeActivate(global.CurrentRoomIndex);
 	
 	SetCurrentRoom(_RoomIndex);
 	

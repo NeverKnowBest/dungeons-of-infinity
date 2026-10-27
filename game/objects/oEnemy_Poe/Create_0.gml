@@ -2,7 +2,7 @@ event_inherited();
 
 Size = EnemySize.Small;
 
-switch(global.Level.Index){
+switch(LevelDef.EnemyStats){
 
 	case DungeonLevel.Catacombs:
 		image_index = 1;

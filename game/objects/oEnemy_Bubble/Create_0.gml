@@ -8,7 +8,7 @@ BubbleAngle[1] = 90;
 BubbleAngle[2] = 180;
 BubbleAngle[3] = 270;
 
-Type = (global.Level.Index >= DungeonLevel.MoldormsLair ? 1 : 0);
+Type = (LevelDef.EnemyStats >= DungeonLevel.MoldormsLair ? 1 : 0);
 
 switch(Type){
 	case 0:

@@ -2,7 +2,7 @@ event_inherited();
 
 Size = EnemySize.Small;
 
-Type = (global.Level.Index <= DungeonLevel.Ruins ? 0 : 1);
+Type = (LevelDef.EnemyStats <= DungeonLevel.Ruins ? 0 : 1);
 
 switch(Type){
 	case 0:

@@ -13,7 +13,7 @@ function Intro_ShowLink(){
 		Link_SetAutoMove(0, -1, WalkSpeed, 40);
 	}
 	oHUD.ShowLevelName = true;
-	Music_Play(global.Music_LevelSongIndex[DungeonLevel.Start], 10);
+	Music_Play(global.LevelDefs[DungeonLevel.Start].Song, 10);
 	audio_sound_gain(global.RainSound, 0.7, 200);
 	State = IntroState.Fade;
 }

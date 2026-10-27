@@ -151,7 +151,7 @@ function Aghanim_DropBomb(_x, _y){
 
 function Aghanim_TakingItems(){
 	
-	if(global.Level.Index == DungeonLevel.Aghanim2){ //once AGhanim grabs items, don't draw shield. Shield form inventory will eventually be destroyed, so this only applies during the taking phase
+	if(LevelDef.Special == LevelSpecial.FinalBoss){ //once AGhanim grabs items, don't draw shield. Shield form inventory will eventually be destroyed, so this only applies during the taking phase
 		with(oBoss_Aghanim){
 			if(Intro && TakeItems && TakeItems_ShowBag){
 				return true;

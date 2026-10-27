@@ -34,7 +34,7 @@ if(Close){
 		
 		UpdateStatus = true;
 		
-		if( !(global.Level.Index == DungeonLevel.Aghanim2 && TemplateCheck(RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "FinalBoss")) ){
+		if( !(LevelDef.Special == LevelSpecial.FinalBoss && TemplateCheck(RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Unique, "FinalBoss")) ){
 			with(oLink){
 				UpdateState(LinkState.Standing);
 			}

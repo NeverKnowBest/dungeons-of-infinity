@@ -3,7 +3,7 @@ function Dungeon_Draw_ExtraCeilings(_RoomIndex){
 	
 	if(!variable_struct_exists(Room.Template, "ExtraCeilings")) exit;
 	
-	var _TilesY = (global.Level.Index == DungeonLevel.Aghanim2 ? LevelTilesY_Aghanim2 : LevelTilesY);
+	var _TilesY = LevelTilesY_Base;
 	
 	var _TMID;
 	for(var ExtraCeilingIndex = 0; ExtraCeilingIndex < array_length(Room.Template.ExtraCeilings); ExtraCeilingIndex++){
