@@ -16,7 +16,9 @@ Checks:
   * GML: duplicate global functions, references to assets that do not exist,
     known gotchas (array literal starting with #RRGGBB, lower case text with
     global.Font_Small)
-  * data: data_r, data_d and the Tiled room templates parse as JSON
+  * data: the included files in Zelda.yyp exist; data_d, the room template
+    files (game/datafiles/data/rooms) and the Tiled maps parse as JSON, and
+    the room template files match what convert.py makes from the Tiled maps
   * docs: no arrows or em dashes in the Portuguese docs (house style)
   * region specs (docs/regioes/*.md): every section of _modelo.md is there,
     a valid Estado, and the assets and docs they cite exist; the reference
@@ -290,17 +292,46 @@ def check_gml(rep, registered, orphans, object_gml):
 # ---------------------------------------------------------------- data and docs
 
 def check_data(rep):
-    for name in ('data_r', 'data_d'):
-        p = os.path.join(GAME, 'datafiles', 'data', name)
+    for f in load_yy(YYP).get('IncludedFiles', []):
+        p = os.path.join(GAME, f['filePath'], f['name'])
         if not os.path.exists(p):
-            rep.error('missing game/datafiles/data/%s' % name)
+            rep.error('included file in Zelda.yyp is missing on disk: game/%s/%s' % (f['filePath'], f['name']))
+
+    data_files = [('data_d', os.path.join(GAME, 'datafiles', 'data', 'data_d'))]
+    sys.path.insert(0, os.path.join(REPO, 'tools', 'templates'))
+    import convert
+    rooms = [(cls, os.path.join(convert.ROOMS_DIR, cls + '.json')) for cls, _, _, _ in convert.CLASSES]
+    data_files += rooms
+    parsed = {}
+    for name, p in data_files:
+        shown = os.path.relpath(p, REPO).replace(os.sep, '/')
+        if not os.path.exists(p):
+            rep.error('missing %s' % shown)
         elif is_lfs_pointer(p):
-            rep.warn('game/datafiles/data/%s is a Git LFS pointer (run git lfs pull); not checked' % name)
+            rep.warn('%s is a Git LFS pointer (run git lfs pull); not checked' % shown)
         else:
+            if os.path.getsize(p) > 45e6:
+                rep.warn('%s is %.0f MB; GitHub warns at 50 MB and refuses 100 MB (split the class by subclass)'
+                         % (shown, os.path.getsize(p) / 1e6))
             try:
-                json.loads(open(p, 'rb').read().rstrip(b'\0'))
+                parsed[name] = json.loads(open(p, 'rb').read().rstrip(b'\0'))
             except ValueError as e:
-                rep.error('game/datafiles/data/%s is not valid JSON: %s' % (name, e))
+                rep.error('%s is not valid JSON: %s' % (shown, e))
+    # the room template files must be what convert.py makes from the Tiled maps right now
+    if all(cls in parsed for cls, _ in rooms):
+        warnings = []
+        try:
+            fresh = convert.convert(warnings)
+        except convert.ConvertError as e:
+            rep.error('tools/templates/convert.py fails on the Tiled maps: %s' % e)
+        else:
+            for w in warnings:
+                rep.warn('room templates: %s' % w)
+            stale = [cls for ci, (cls, _) in enumerate(rooms)
+                     if convert.class_text(fresh[ci]) != convert.class_text(parsed[cls])]
+            if stale:
+                rep.error('game/datafiles/data/rooms is out of date with data/room-templates (%s); '
+                          'run python tools/templates/convert.py' % ', '.join(stale))
     tdir = os.path.join(REPO, 'data', 'room-templates')
     for f in sorted(os.listdir(tdir)):
         if f.endswith('.json'):

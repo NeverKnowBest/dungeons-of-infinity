@@ -4,8 +4,8 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 
 ## Antes de qualquer coisa
 
-* Os dados do jogo (`game/datafiles/data/data_r` e `data_d`) estão no Git LFS. Garanta os arquivos reais antes de editar (no clone sem LFS eles são só ponteiros de texto).
-* O código GML não pode ser testado no ambiente do Claude (não há GameMaker). Teste no PC de casa (veja `CLAUDE.md`).
+* As salas do jogo ficam em `game/datafiles/data/rooms/` (um arquivo por classe, git normal) e são geradas pelo `tools/templates/convert.py`; não edite à mão. Os layouts (`data_d`) estão no Git LFS; os dois PCs têm o LFS, mas num clone sem LFS ele é só um ponteiro de texto.
+* Teste o GML no jogo, em qualquer um dos dois PCs: pelo IDE ou pela linha de comando (`docs/dev/engine-notes.md`, "Building and running from the command line").
 * Rode `python tools/check/validate.py` antes de entregar. Ele pega recursos faltando, eventos sem arquivo, assets inexistentes no GML e as armadilhas abaixo.
 * Só compila o que está no `Zelda.yyp`. O código morto da versão original foi apagado na F1; se o validador acusar uma pasta órfã nova (por exemplo, um recurso removido no IDE, que deixa a pasta no disco), apague a pasta.
 * GML que já deu problema: um array literal não pode começar com cor `#RRGGBB` (`[#` é acessor de ds_grid); use `make_colour_rgb`. `global.Font_Small` só tem letras maiúsculas.
@@ -22,9 +22,9 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 
 1. Abra o mapa da classe em `data/room-templates/` (`Room Templates <Classe>.json`) no Tiled 1.10 ou mais novo.
 2. Desenhe o retângulo da sala na camada `Rooms` (tamanho em múltiplos de 256; meia sala de 256x128 só nas classes Main) e preencha `type` com a subclasse quando a classe for por tipo (Special, Other, Village, Mines, Obstacles). Os objetos vão nas camadas de mesmo nome, sempre com a propriedade `Room` apontando para o retângulo.
-3. Gere o `data_r`: `python tools/templates/convert.py --summary`. Ele avisa camada desconhecida, objeto sem `Room`, tamanho de sala inválido e porta fora das posições de porta.
-4. Antes de gravar por cima do `data_r` do jogo pela primeira vez (até a comparação da F5 ser feita), gere em outro lugar com `-o` e confira com `python tools/templates/compare.py game/datafiles/data/data_r <novo>`: a diferença deve ser só a sala nova.
-5. Rode o validador e teste no jogo (no PC de casa).
+3. Gere as salas do jogo: `python tools/templates/convert.py --summary`. Ele avisa camada desconhecida, objeto sem `Room`, tamanho de sala inválido e porta fora das posições de porta, e grava `game/datafiles/data/rooms/<Classe>.json`.
+4. Confira no `git diff` que só mudou o arquivo da classe e só as linhas das salas novas ou alteradas (cada template é uma linha). Para comparar com uma versão anterior pelo conteúdo: `python tools/templates/compare.py <pasta antiga> game/datafiles/data/rooms`.
+5. Rode o validador (ele acusa se o mapa do Tiled mudou e as salas não foram geradas de novo) e teste no jogo.
 
 ## Imagem de sala a partir do ALttP
 
@@ -66,14 +66,14 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 
 Como os níveis são montados hoje:
 
-* Cada nível (`enum DungeonLevel`) escolhe uma classe de dungeon (`Dungeon_PickClass`): um conjunto de layouts em `data_d` (grade de salas, portas, escadas) e de salas em `data_r` (templates do Tiled, por classe e subclasse).
+* Cada nível (`enum DungeonLevel`) escolhe uma classe de dungeon (`Dungeon_PickClass`): um conjunto de layouts em `data_d` (grade de salas, portas, escadas) e de salas em `game/datafiles/data/rooms/` (templates do Tiled, por classe e subclasse).
 * O visual vem dos tiles do DoI (`sTiles`, linhas por tema em `LevelTilesY`) desenhados a partir dos templates. Inimigos, baús e objetos vêm das propriedades dos templates e das tabelas de inimigos por nível (`__Enemies.gml`, `EnemyDataInit`).
 
 Passos:
 
 1. Novo valor em `DungeonLevel` (ou uma variante sorteada no lugar do nível 2) e o caso em `Dungeon_PickClass`, `Dungeon_StartDir`, `Dungeon_IsBossLevel` e tabelas por nível.
 2. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.
-3. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `data_r` com `tools/templates/convert.py` (veja "Template de sala no Tiled"). Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
+3. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `game/datafiles/data/rooms/` com `tools/templates/convert.py` (veja "Template de sala no Tiled"). Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
 4. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
 5. Inimigos: reaproveite os do castelo; só a tabela do nível muda.
 

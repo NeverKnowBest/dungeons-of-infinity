@@ -13,7 +13,7 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 * **README:** GIF da tela de título com brilho na espada e no logo.
 * **Validador estático** (`tools/check/validate.py`): confere o projeto sem GameMaker (recursos do `.yyp`, eventos dos objetos, imagens e sons, funções duplicadas, assets inexistentes no GML, armadilhas conhecidas, dados e estilo das docs). Rodar antes de toda entrega. Etapa F2 do plano de ferramentas.
 * **Faxina do código morto** (etapa F1): apagadas as 424 pastas de recursos fora do `Zelda.yyp`, os `.gml` de eventos que os objetos não têm e acertados os 48 caminhos com maiúsculas e minúsculas diferentes. O validador não lista mais órfãos.
-* **Conversor de templates em Python** (etapa F5, primeira parte): `tools/templates/convert.py` gera o `data_r` a partir dos mapas do Tiled em `data/room-templates/`, para substituir o projeto GameMaker `editors/room-template-parser`. Roda em uns 7 s, sem GameMaker. `tools/templates/compare.py` compara dois `data_r` pelo conteúdo. Ainda não adotado: falta a comparação com o `data_r` real (veja F5).
+* **Conversor de templates em Python** (etapa F5): `tools/templates/convert.py` gera as salas do jogo a partir dos mapas do Tiled em `data/room-templates/`, em uns 10 s, sem GameMaker. A saída é idêntica, pelo conteúdo, ao último `data_r` do projeto GameMaker `editors/room-template-parser`, que foi apagado. O `data_r` único de 46 MB (Git LFS) virou `game/datafiles/data/rooms/<Classe>.json`, um arquivo por classe com um template por linha, em git normal: o diff mostra quais salas mudaram. O jogo lê os dez arquivos (`RoomTemplates_Load`) e registra a contagem no log; o `tools/hub/build3.py` chama o conversor; o validador acusa quando o Tiled muda e as salas não foram geradas de novo. Testado no jogo: título, hub e começo da run.
 * **Fichas de referência e especificação de região** (etapa F9): `docs/ref/alttp.md` (inimigos, chefes e itens do ALttP com vida, dano, velocidade, arquétipo e a função do zelda3), `docs/ref/doi.md` (tudo o que o jogo já tem, com energia, ataque, pesos por nível, soldados por nível, níveis, chefes e clima), `docs/regioes/_modelo.md` (modelo de região) e a primeira spec, `docs/regioes/topo-do-castelo.md` (o piloto). O validador confere as specs.
 
 ## Decisões (não desfazer sem conversar)
@@ -25,7 +25,7 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 * Visual sempre com assets do ALttP ou do DoI; recombinar peças da ROM é melhor que desenhar do zero. Nada de copiar uma sala inteira para outro uso.
 * A decoração do Flute Boy é comemorativa, não de loja e nem de Natal.
 * O tempo de jogo só conta a partir da saída do Santuário. No Santuário, a pausa não mostra o tempo nem "Give Up".
-* Jogo em janela no PC de casa (QoL), via `options.ini`.
+* Jogo em janela nos dois PCs (QoL), via `options.ini`.
 * Antes de conteúdo novo grande, investir nas ferramentas do "Plano de ferramentas" abaixo (aprovado em out/2026). Meta: uma região inteira a partir de um prompt, com os gráficos entregues pelo Guilherme numa pasta.
 * O código morto pode ser apagado sem backup extra: a faxina vai num commit só dela, que pode ser revertido no GitHub Desktop, e o código 1.2.1 original está no archive.org.
 
@@ -42,8 +42,8 @@ Objetivo: deixar o projeto pronto para que uma região inteira (fase com salas, 
 **F2. Validador estático** (pronto)
 * `tools/check/validate.py`. Crescer junto com o projeto: toda armadilha nova do GML ou dos dados vira uma checagem.
 
-**F3. Teste automatizado** (PC de casa)
-* Compilar pela linha de comando (o compilador que o IDE usa por baixo), com os erros em texto, sem abrir o IDE. Registrar o comando em `engine-notes.md`.
+**F3. Teste automatizado**
+* Compilar pela linha de comando (o compilador que o IDE usa por baixo), com os erros em texto, sem abrir o IDE. **Já descoberto na F5:** o Igor com o alvo `Run` compila e abre o jogo, e a saída do jogo vai para o terminal; comando em `docs/dev/engine-notes.md` ("Building and running from the command line"). Falta transformar isso num script (`tools/test/`) que acha o runtime e a pasta do usuário sozinho.
 * Modo de teste no jogo: `-test cenario.json` com nível, semente, itens, cheats, sala inicial e uma sequência de comandos (andar, atacar, esperar). O jogo grava um log em texto (sala carregada, inimigo morto, dano, erros) e prints em pontos marcados, e fecha sozinho. Atenção: o jogo atual não lê parâmetros (o `InitScreen` com `-t` e `-d` ficava num script morto, apagado na F1; está no código 1.2.1 do archive.org); a leitura precisa ser criada no código vivo.
 * Folha de contato: gerar N fases de um nível com sementes diferentes e montar todas as salas num PNG só.
 * Cheats de debug: ir para um nível ou sala e criar um inimigo na frente do Link.
@@ -54,11 +54,10 @@ Objetivo: deixar o projeto pronto para que uma região inteira (fase com salas, 
 * Inverter a tabela de inimigos: hoje cada `EnemyDataInit` tem um array com uma coluna por nível; passa a ser cada fase listando seus inimigos com peso.
 * Pronto quando: todas as fases atuais saem da ficha, o jogo se comporta igual (conferido pelos cenários da F3) e criar uma fase é acrescentar uma entrada.
 
-**F5. Conversor de templates em Python** (conversor pronto; falta a parte do PC de casa)
-* Reescrever o `editors/room-template-parser` (hoje um projeto GameMaker) em Python, gerando `data_r` a partir dos mapas do Tiled. O jogo continua no GameMaker; só a conversão sai dele. **Pronto:** `tools/templates/convert.py` (feito no PC do trabalho, sem o `data_r` real à mão: a saída tem 46.881.229 bytes contra 46.871.155 do atual).
-* **Falta (PC de casa):** comparar com o `data_r` real antes de trocar: `python tools/templates/convert.py -o novo_data_r` e `python tools/templates/compare.py game/datafiles/data/data_r novo_data_r`. Se houver diferença, corrigir o conversor (onde olhar primeiro: `docs/dev/engine-notes.md`, "Room templates"). Só depois disso gravar por cima do `data_r` e rodar uma run até o nível 2.
-* **Falta (PC de casa):** dividir o `data_r` (46 MB) em arquivos por classe, para caber na transferência para o PC e deixar os diffs menores (exige mudar o carregamento no jogo, `RoomTemplates_Load`, e o `convert.py`; testar no jogo e, quando existir, pelos cenários da F3).
-* Depois da troca: aposentar o `editors/room-template-parser` (apagar ou deixar só como referência) e fazer o `tools/hub/build3.py` chamar o conversor em vez de editar o `data_r` à mão.
+**F5. Conversor de templates em Python** (pronto)
+* `tools/templates/convert.py` substitui o projeto GameMaker `editors/room-template-parser` (apagado). Saída conferida contra o `data_r` real: mesmo conteúdo.
+* O `data_r` foi dividido em `game/datafiles/data/rooms/<Classe>.json` (um template por linha, fora do LFS). Jogo, `build3.py`, validador e documentação atualizados.
+* Testado no jogo pela linha de comando: as contagens de templates no log batem com o `data_r` antigo, hub e começo da run funcionam. Falta o Guilherme jogar uma run até o nível 2.
 
 **F6. Kit de importação de gráficos**
 * Convenção: o Guilherme coloca os gráficos em `incoming/<regiao>/` (sprites com nomes no padrão ou folhas com um `manifest.json`: tamanho do quadro, fps, origem; mais tileset e música).
@@ -93,4 +92,5 @@ Expectativa: região com inimigos reaproveitados ou de arquétipo sai de um prom
 * Ficha do Minish Cap (`docs/ref/minish-cap.md`) a partir da decompilação `zeldaret/tmc`, quando a região do Minish Cap for planejada.
 * Harness em `tools/alttp/` que imprima a tabela de vulnerabilidade por arma do ALttP (`enemy_damage_data`, nos assets da ROM) para completar `docs/ref/alttp.md` (PC de casa).
 * Topo do castelo: vento nas passarelas e buraco no telhado que leva ao porão (fora da primeira versão).
+* Calar os avisos de som que enchem o log em toda partida (`oCredits` Step e `Intro_ShowLink` pedem um som que não existe), para os logs da F3 ficarem limpos.
 * (anote aqui ideias que ainda não viraram etapa)

@@ -1,11 +1,11 @@
-"""Room template converter: Tiled maps (data/room-templates) to the game's data_r.
+"""Room template converter: Tiled maps (data/room-templates) to the game's room template files.
 
-Python port of editors/room-template-parser (the GameMaker project that used to do this).
-The game keeps loading data_r with json_parse exactly as before; only the conversion
-left GameMaker.
+Python port of the GameMaker project that used to do this (editors/room-template-parser, which
+wrote one 46 MB data_r). The output is one file per class, game/datafiles/data/rooms/<Class>.json,
+with one template per line so git diffs stay small. RoomTemplates_Load reads them in class order.
 
-    python tools/templates/convert.py                 # writes game/datafiles/data/data_r
-    python tools/templates/convert.py -o out/data_r   # writes somewhere else
+    python tools/templates/convert.py                 # writes game/datafiles/data/rooms/
+    python tools/templates/convert.py -o out/rooms    # writes somewhere else
     python tools/templates/convert.py --summary       # also prints the template count per class
 
 Standard library only. See tools/README.md and docs/dev/engine-notes.md ("Room templates").
@@ -23,7 +23,7 @@ sys.path.insert(0, HERE)
 import rt_tables  # noqa: E402
 
 TEMPLATE_DIR = os.path.join(REPO, 'data', 'room-templates')
-DATA_R = os.path.join(REPO, 'game', 'datafiles', 'data', 'data_r')
+ROOMS_DIR = os.path.join(REPO, 'game', 'datafiles', 'data', 'rooms')
 GML_ENUMS = os.path.join(REPO, 'game', 'scripts', '__RoomTemplates', '__RoomTemplates.gml')
 
 # ObjTransformation enum, in order
@@ -643,16 +643,41 @@ def convert(warnings=None):
     return [parse_class(ci, warnings) for ci in range(len(CLASSES))]
 
 
-def save(data, path):
-    raw = json.dumps(data, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
-    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-    with open(path, 'wb') as f:
-        f.write(raw + b'\0')  # buffer_string adds a terminating zero, like the GameMaker version
+def class_text(subclasses):
+    """One class file: an array of subclasses, one template per line."""
+    def dump(t):
+        return json.dumps(t, separators=(',', ':'), ensure_ascii=False)
+    return '[\n' + ',\n'.join('[\n' + ',\n'.join(dump(t) for t in sub) + '\n]' if sub else '[]'
+                              for sub in subclasses) + '\n]\n'
+
+
+def save(data, out_dir):
+    """Writes <out_dir>/<Class>.json for every class. Returns the total size in bytes."""
+    os.makedirs(out_dir, exist_ok=True)
+    total = 0
+    for (cls, _, _, _), subclasses in zip(CLASSES, data):
+        raw = class_text(subclasses).encode('utf-8')
+        with open(os.path.join(out_dir, cls + '.json'), 'wb') as f:
+            f.write(raw)
+        total += len(raw)
+    return total
+
+
+def load(path):
+    """Reads room templates back: a rooms directory, or an old single file data_r."""
+    def read(p):
+        raw = open(p, 'rb').read()
+        if raw.startswith(b'version https://git-lfs'):
+            sys.exit('%s is a Git LFS pointer; run "git lfs pull" first' % p)
+        return json.loads(raw.rstrip(b'\0').decode('utf-8'))
+    if os.path.isdir(path):
+        return [read(os.path.join(path, cls + '.json')) for cls, _, _, _ in CLASSES]
+    return read(path)
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    ap.add_argument('-o', '--out', default=DATA_R, help='output file (default: game/datafiles/data/data_r)')
+    ap.add_argument('-o', '--out', default=ROOMS_DIR, help='output directory (default: game/datafiles/data/rooms)')
     ap.add_argument('--summary', action='store_true', help='print the number of templates per class and subclass')
     a = ap.parse_args()
     warnings = []
@@ -663,12 +688,12 @@ def main():
         return 1
     for w in warnings:
         print('warning:', w)
-    save(data, a.out)
+    size = save(data, a.out)
     if a.summary:
         for ci, (cls, _, _, sub_types) in enumerate(CLASSES):
             names = sub_types or ['1x1', '1x2', '2x1'][:len(data[ci])]
             print('%-11s %s' % (cls, ', '.join('%s %d' % (n, len(s)) for n, s in zip(names, data[ci]))))
-    print('wrote %s (%.1f MB)' % (os.path.relpath(a.out), os.path.getsize(a.out) / 1e6))
+    print('wrote %d files to %s (%.1f MB)' % (len(CLASSES), a.out, size / 1e6))
     return 0
 
 

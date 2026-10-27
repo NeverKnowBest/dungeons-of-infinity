@@ -44,3 +44,7 @@ game/datafiles/polyglot.bin filter=lfs diff=lfs merge=lfs -text
 *.so    filter=lfs diff=lfs merge=lfs -text
 *.zip   filter=lfs diff=lfs merge=lfs -text
 *.bin   filter=lfs diff=lfs merge=lfs -text
+
+# Room templates, one file per class with one template per line (tools/templates/convert.py).
+# Plain git, not LFS, so diffs and history stay small.
+game/datafiles/data/rooms/*.json text eol=lf

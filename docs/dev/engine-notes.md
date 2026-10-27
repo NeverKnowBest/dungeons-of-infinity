@@ -5,22 +5,23 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 ## Levels and rooms
 
 * A level is a grid of rooms. Layouts live in `game/datafiles/data/data_d` (dungeon templates, by class; the Special class holds fixed layouts such as the save tent and the Sanctuary hub at index 5).
-* Each room uses a room template from `game/datafiles/data/data_r`, exported from the Tiled maps in `data/room-templates/`. Class Other = 9, subclass Unique = 2 holds hand made rooms like `Sanctuary`.
+* Each room uses a room template from `game/datafiles/data/rooms/` (one file per class), converted from the Tiled maps in `data/room-templates/`. Class Other = 9, subclass Unique = 2 holds hand made rooms like `Sanctuary`.
 * Rooms are made of 256px quadrants: a 2x2 room is 512x512. Template object coordinates are relative to the room's top left corner.
 * Collision is only `oWall` instances, created with `WallObj_Create(layer, x, y, tilesW, tilesH)` (8px tiles).
 * Instance layers by depth: `ObjsHigher_Upper` 400, `Objs_Upper` 600, `ObjsDoors_Upper` 700, `ObjsFloor_Upper` 800, tile floors 1400. Anything drawn with `PixelRender_Normal()` needs a `FloorLevel` variable.
-* `data_r` and `data_d` are stored with Git LFS.
+* `data_d` is stored with Git LFS. The room template files are plain git (see `.gitattributes`), so their diffs show which templates changed.
 
-## Room templates (`data_r`)
+## Room templates (`game/datafiles/data/rooms`)
 
-* `tools/templates/convert.py` builds `data_r` from the Tiled maps (one per class: `Room Templates <Class>.json`). It is a port of `editors/room-template-parser` (GameMaker); `game/scripts/__RoomTemplates` and `__Transformations` hold the same enums and transform tables on the game side.
-* `data_r` is `global.Templates_Room[class][subclass][template]`. Class order: Main_Upper, Main_Lower, Stairs, Jails, Village, Mines, Obstacles, Sections, Special, Other. The subclass is the room size (1x1, 1x2, 2x1) for the size based classes, or the Tiled room `type` (Obstacles: Blocks, MovingFloors, SpikeBlocks; Special: Fairy, Shop, GemPond, Treasure, TreasureLarge, Rupee, Gem, Kinstone; Other: Boss, Start, Unique, Save; Village: Main, House, Maze, Exit; Mines: Main, House).
+* `tools/templates/convert.py` builds the room template files from the Tiled maps (one per class: `Room Templates <Class>.json`). It is a port of the old GameMaker project `editors/room-template-parser` (deleted in F5, oct/2026; it is in the git history), and its output was checked equal, by content, to the last `data_r` that project wrote. `game/scripts/__RoomTemplates` and `__Transformations` hold the same enums and transform tables on the game side.
+* Until F5 everything was one 46 MB file in Git LFS, `data_r`. Now it is `game/datafiles/data/rooms/<Class>.json`, one file per class, with one template per line. Main_Upper alone is 37.6 MB; GitHub warns at 50 MB, so split it by subclass if it gets close (the validator warns at 45 MB). Each file is an included file in `Zelda.yyp` (`datafiles/data/rooms`).
+* `RoomTemplates_Load` reads the ten files in class order into `global.Templates_Room[class][subclass][template]` and prints `Room templates loaded: [[42.0,231.0],...]` (the template counts) to the run output. Class order: Main_Upper, Main_Lower, Stairs, Jails, Village, Mines, Obstacles, Sections, Special, Other. The subclass is the room size (1x1, 1x2, 2x1) for the size based classes, or the Tiled room `type` (Obstacles: Blocks, MovingFloors, SpikeBlocks; Special: Fairy, Shop, GemPond, Treasure, TreasureLarge, Rupee, Gem, Kinstone; Other: Boss, Start, Unique, Save; Village: Main, House, Maze, Exit; Mines: Main, House).
 * A Tiled map has a `Rooms` layer (one rectangle per template, with `type` and properties such as `Symetry` and `Split_MainSectionIDs`), one object layer per object type of the class, and for some classes a `Sections` group (Main_Upper has 5 sub groups: Main, 1-3-6-8, 2-4-5-7, 9-...-16, 17-20; the others only Main). Every object has a `Room` property pointing to its room rectangle. The lists of layers per class are in `convert.py` (`OBJ_TYPES`, `SECTION_OBJ_TYPES`) and in `RoomTemplates_Load`.
 * Object positions become relative to the room; a rotated Tiled object (90, -90, 180) is turned into a plain box first (`RoomTemplates_FixObjRotation`).
 * Main_Upper and Main_Lower templates are half rooms (256x128 or 256x256). The converter joins every pair whose `SplitConnections` match: the second half is flipped vertically (and also flipped both ways when both halves have `Symetry` 0) and placed under the first. Then touching side walls are joined, duplicated doors removed and carpet door lists merged. That is why 46 Main_Upper halves become 273 rooms. Template 11115 joined with itself unflipped is skipped on purpose (bad zones).
 * `DoorCode`: one number per transform (None, FlipH, FlipV, FlipHV, RotateCW, RotateCCW, FlipHRotateCW, FlipHRotateCCW); bit n-1 is set when there is a door at position n (1..24, the coordinates are in `DOOR_XY` / `Data_InitDoorCoordinates`) after that transform. `ZoneCodes[transform][section][zone]` is the same per zone. Doors get `Position` and `Location`. Village, Mines and Other get no codes and allow no transform.
-* Numbers are written as floats (`16.0`), like GameMaker writes its reals; the file ends with a zero byte (GameMaker `buffer_string`). The game does not care about either.
-* Carpet `DoorsFrom` and `DoorsTo` are strings in Tiled. The GML transform split them with `CSVToList` (strings) and still worked in game, so the converter treats them as numbers. If the comparison with the real `data_r` shows carpet door differences, this is the first place to look.
+* Numbers are written as floats (`16.0`), like GameMaker writes its reals. The old `data_r` ended with a zero byte (GameMaker `buffer_string`); the new files do not, and `buffer_read(..., buffer_string)` still reads them whole (tested in game).
+* Carpet `DoorsFrom` and `DoorsTo` are strings in Tiled. The GML transform split them with `CSVToList` (strings) and still worked in game, so the converter treats them as numbers (the comparison with the real `data_r` showed no difference).
 * The old parser ended with `RoomTemplates_GenerateImageSheet` (a debug PNG that read a `RoomMapSpr` nobody set); the converter does not port it.
 
 ## Project files
@@ -29,9 +30,24 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 * When a resource is removed from the project in the IDE, GameMaker leaves its folder on disk. Delete the folder too, or the validator flags it as an orphan.
 * An object's `.gml` files only run if the event is in the object's `eventList` in its `.yy`. The leftover event files of the original were deleted in F1; the validator warns about new ones.
 * Resource folder names must match the `.yyp` letter case exactly (`objects/oCape`, not `objects/ocape`); Windows does not care, Linux tools do. The 48 mismatches were fixed in F1 and the validator warns about new ones. On Windows a case only rename is not seen by Git with `core.ignorecase=true` (the default); use `git mv old tmp` then `git mv tmp New`.
-* `data_r`, `data_d` and the manuals and references in `docs/` (PDF, DOCX, MHTML) are Git LFS files. Claude's cloud sandbox clones the repo anonymously and cannot fetch LFS objects, so there they are only pointers (the validator skips them). Work that needs their contents is done on the home PC or with the files attached.
+* `data_d`, the audio and the manuals and references in `docs/` (PDF, DOCX, MHTML) are Git LFS files. Both PCs (home and work) have Git LFS, so the real files are there. A clone without LFS (Claude's cloud sandbox, for example) only has pointers; the validator skips them.
 * The live game reads no command line parameters. The original had `-t` and `-d` handling in `InitScreen` inside an old `Init` script that was not in the project (deleted in F1; see the 1.2.1 source on archive.org).
 * Level specific rules are spread through the code as `switch(global.Level.Index)` and `== DungeonLevel.X` checks (Mines: doors, decor, shop, waterfall colour, chance tables...). A new level means finding all of them until the level table (roadmap F4) exists.
+
+## Building and running from the command line
+
+Found while testing F5 on the work PC (oct/2026); it is the first piece of F3. Igor is the build tool the IDE runs:
+
+```
+<runtime>\bin\igor\windows\x64\Igor.exe -j=8 --project="<repo>\game\Zelda.yyp" --user="%APPDATA%\GameMakerStudio2-LTS2026\<user folder>" --runtimePath="<runtime>" --runtime=VM --prefabs="C:\ProgramData\GameMakerStudio2-LTS2026\Prefabs" --cache="<temp>\cache" --temp="<temp>\temp" -- Windows Run
+```
+
+* `<runtime>` is `C:\ProgramData\GameMakerStudio2-LTS2026\Cache\runtimes\runtime-2026.0.0.23` (the active one is named in `C:\ProgramData\GameMakerStudio2-LTS2026\runtime.json`). The user folder is the one inside `%APPDATA%\GameMakerStudio2-LTS2026` (`unknownUser_unknownUserID` when nobody is signed in to the IDE).
+* `--prefabs` is required: the project uses the `gm_filter_heathaze` and `gm_filter_pixelate` prefabs, and without it the asset compiler stops with "Prefab libraries that cannot be located".
+* `Run` compiles (about a minute) and starts the game; the command only returns when the game closes, so run it in the background. It writes the build to `output/` inside the current folder, so start it from a temporary folder, not from the repository. Everything the game prints (`show_debug_message`, runtime warnings, compile errors) goes to the command output.
+* `PackageZip` (making an executable) fails with "Permission Error: Unable to obtain permission to execute" when nobody is signed in to the IDE; `Run` works anyway.
+* Screenshots and key presses during a test: PowerShell with `user32` (`SetForegroundWindow`, `GetWindowRect`, `keybd_event`) and `System.Drawing` (`CopyFromScreen`) on the `Runner` process window, holding each key about 0.15 s. Close the game with `Stop-Process -Name Runner`.
+* Known noise in the output, not errors of ours: `oCredits_Step_0 ... Index did not map to an existing sound instance` and `Intro_ShowLink ... existing audio asset`.
 
 ## Enemies (`scripts/__Enemies`)
 
@@ -67,7 +83,7 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 * The hub layout has two rooms: the Sanctuary (2x2, grid 3,3) and the Hall of Fame (2x1, grid 5,3). `Hub_RoomTemplateName` picks the template by grid position and `Hub_CreateScenery` builds each room. The rooms are not joined by engine doors: `oHubDoor` (a trigger box in a doorway painted on the picture) creates `oHubTravel`, which moves Link to the other doorway with `Hub_MoveLinkTo` (activates the room, returns the camera target), scrolls the camera there 4px per frame like a dungeon room change, deactivates the old room and makes Link walk in.
 * Hall of Fame: four statues along the top wall (`Hub_CreateStatue`: `oHallStatue` draws the pedestal and the bottom of the figure at depth 750, under Link; `oHallStatueTop` draws the rest over him; a wall covers the pedestal and the space behind it, so Link can't walk behind). `oHallStatue` is an `oNPC` child so Link can talk to it (all oNPC events replaced); talking opens `oHallGallery` with only that statue: up/down picks an achievement to read what it asks for (rewards are never shown). Sprites: `sHall_Statue_*` (figure; frame 0 revealed, frame 1 silhouette) and `sHall_Pedestal` (frame = tier).
 * Hub pictures and statue sprites are built offline by the scripts in `tools/hub/` (see `tools/README.md`).
-* Testing: the game can be run from the GameMaker IDE on the user's home PC; `%LOCALAPPDATA%/Zelda/options.ini` with `Fullscreen="0"` and `AltTabPause="0"` keeps it in a window. Keys: arrows, Alt talks, Ctrl sword, Enter/Escape menus.
+* Testing: the game can be run from the GameMaker IDE on either PC, or from the command line (see "Building and running from the command line"); `%LOCALAPPDATA%/Zelda/options.ini` with `Fullscreen="0"` and `AltTabPause="0"` keeps it in a window. Keys: arrows, Alt talks, Ctrl sword, Enter/Escape menus.
 * GML gotcha: `[#` starts a ds_grid accessor, so an array literal can't start with a `#RRGGBB` colour; use `make_colour_rgb`.
 
 ## Achievements (`scripts/__Achievements`)

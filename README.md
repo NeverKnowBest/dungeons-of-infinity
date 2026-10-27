@@ -63,13 +63,12 @@ game/                      GameMaker project for the game (Zelda.yyp)
 editors/
   dungeon-editor/          GameMaker project: edits dungeon layouts (data_d)
   template-editor/         GameMaker project: older room template editor
-  room-template-parser/    GameMaker project: converts Tiled JSON to data_r
 data/
   room-templates/          Tiled room template maps (*.json) + "Tiled Objects" images
   sample-saves/            Example save/user data for testing
 art/                       Art sources (Aseprite files, tileset, title screen, characters, misc)
 docs/                      Game manual sources, design diagrams, screenshots, reference material
-tools/                     List of external tools (binaries not included)
+tools/                     Our scripts (validator, room template converter, hub builders) and the list of external tools
 ```
 
 ## GameMaker versions
@@ -82,8 +81,10 @@ release feed), documented as v1.2.1/stable for preservation.
 |---------|-----|---------|--------------------|
 | `game/Zelda.yyp` | 2024.13.1.193 | 2024.13.1.242 | v1.2.1.0 (Windows) |
 | `editors/dungeon-editor/Dungeon Editor.yyp` | 2024.13.1.193 | 2024.13.1.242 | Windows, VM |
-| `editors/room-template-parser/Room Templates.yyp` | 2024.13.1.193 | 2024.13.1.242 | Windows, VM |
 | `editors/template-editor/Template Editor.yyp` | 2023.11.0.121 | 2023.11.0.157 | Windows, VM |
+
+The room template parser (`editors/room-template-parser`, same versions as the dungeon editor) was replaced by
+`tools/templates/convert.py`; the GameMaker project is still in the git history and in the original archives.
 
 ## Original archives
 

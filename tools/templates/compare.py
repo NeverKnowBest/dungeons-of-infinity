@@ -1,6 +1,9 @@
-"""Compares two data_r files by content.
+"""Compares two sets of room templates by content.
 
     python tools/templates/compare.py OLD NEW [--max 40]
+
+OLD and NEW are each a rooms directory (one <Class>.json per class, like
+game/datafiles/data/rooms) or an old single file data_r.
 
 Key order inside objects and int versus float (16 and 16.0) are ignored, since the game reads
 both the same way. The order of the templates inside each subclass does count: the dungeon
@@ -9,15 +12,9 @@ Prints the template counts per class, then the first differences with their path
 Exit code 0 when the files match.
 """
 import argparse
-import json
 import sys
 
-
-def load(path):
-    raw = open(path, 'rb').read()
-    if raw.startswith(b'version https://git-lfs'):
-        sys.exit('%s is a Git LFS pointer; run "git lfs pull" first' % path)
-    return json.loads(raw.rstrip(b'\0').decode('utf-8'))
+from convert import load
 
 
 def label(t):
@@ -68,7 +65,7 @@ def diff(a, b, path, out, limit):
 
 
 def main():
-    ap = argparse.ArgumentParser(description='Compare two data_r files by content.')
+    ap = argparse.ArgumentParser(description='Compare two sets of room templates by content.')
     ap.add_argument('old')
     ap.add_argument('new')
     ap.add_argument('--max', type=int, default=40, help='how many differences to print (default 40)')
@@ -85,7 +82,7 @@ def main():
         print('  %-11s %s / %s%s' % (name, o, n, '' if o == n else '  <- differs'))
 
     out = []
-    diff(old, new, 'data_r', out, a.max)
+    diff(old, new, 'rooms', out, a.max)
     if not out:
         print('same content')
         return 0

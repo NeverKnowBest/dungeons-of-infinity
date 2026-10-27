@@ -1,7 +1,7 @@
 #macro GAMEDIR_DATA "data\\"
 #macro GAMEDIR_DATA_CONTROLLERS GAMEDIR_DATA + "controller_db\\"
 #macro GAMEFILE_DUNGEONTEMPLATES GAMEDIR_DATA + "data_d"
-#macro GAMEFILE_ROOMTEMPLATES GAMEDIR_DATA + "data_r"
+#macro GAMEDIR_ROOMTEMPLATES GAMEDIR_DATA + "rooms\\"
 
 #macro USERSFILE "Users"
 #macro XZIPFILE_USERS "UserData"

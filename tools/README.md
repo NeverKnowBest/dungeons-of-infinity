@@ -16,7 +16,7 @@ blocks the common extensions.
 
 | Tool | Version used | Used for |
 |------|--------------|----------|
-| GameMaker | IDE 2024.13.1.193 / Runtime 2024.13.1.242 (Template Editor: 2023.11.0.121 / 2023.11.0.157). See the root README | Opening `game/` and `editors/dungeon-editor`. `editors/room-template-parser` is being replaced by `templates/convert.py` (roadmap F5) |
+| GameMaker | IDE 2024.13.1.193 / Runtime 2024.13.1.242 (Template Editor: 2023.11.0.121 / 2023.11.0.157). See the root README | Opening `game/` and `editors/dungeon-editor`. Room templates are converted by `templates/convert.py` (the old GameMaker parser was retired in roadmap F5) |
 | [Tiled](https://www.mapeditor.org/) | 1.11.2 | Editing room templates in `data/room-templates/` |
 | Aseprite | n/a | Editing the `.aseprite` / `.ase` art sources in `art/` |
 | xzip (xgasoft GameMaker extension) | 1.0.2 | Zip support in the game. Already imported into `game/`, so you only need it again to update the extension |
@@ -69,7 +69,10 @@ python tools/check/validate.py --strict   # warnings also fail
 | Asset style name (`sX`, `oX`, `Sound_X`, `Music_X`) used in GML that does not exist | warning (error if it only exists as an orphan) |
 | Array literal starting with `#RRGGBB` | error |
 | Lower case text drawn with `global.Font_Small` | warning |
-| `data_r`, `data_d` and the Tiled templates parse as JSON (LFS pointers are skipped) | error |
+| Every included file in `Zelda.yyp` exists on disk | error |
+| `data_d`, the room template files (`game/datafiles/data/rooms`) and the Tiled templates parse as JSON (LFS pointers are skipped) | error |
+| The room template files match what `templates/convert.py` makes from the Tiled maps right now (adds about 10 s) | error |
+| A data file over 45 MB (GitHub warns at 50 MB) | warning |
 | Arrows or em dashes in the Portuguese docs (including `docs/ref/` and `docs/regioes/`) | warning |
 | Region spec (`docs/regioes/*.md`) has every `##` section of `_modelo.md` and a valid `**Estado:**` | error |
 | Region spec cites an asset (`oX`, `sX`, `Sound_X`, `Music_X` in backticks) that is not in `Zelda.yyp`, unless the line says "(novo)" | error |
@@ -80,22 +83,22 @@ When a new GML or data trap is found, add a check here.
 
 ### `templates/` (Python 3, standard library only)
 
-Room template conversion, ported from the GameMaker project `editors/room-template-parser`:
+Room template conversion, ported from the old GameMaker project `editors/room-template-parser` (retired in roadmap F5; it is in the git history):
 
 ```
-python tools/templates/convert.py                  # Tiled maps in data/room-templates -> game/datafiles/data/data_r
-python tools/templates/convert.py -o out/data_r    # write somewhere else
+python tools/templates/convert.py                  # Tiled maps in data/room-templates -> game/datafiles/data/rooms/<Class>.json
+python tools/templates/convert.py -o out/rooms     # write somewhere else
 python tools/templates/convert.py --summary        # also print the template count per class and subclass
-python tools/templates/compare.py OLD NEW          # compare two data_r files by content (exit code 1 if they differ)
+python tools/templates/compare.py OLD NEW          # compare two rooms folders (or old data_r files) by content (exit code 1 if they differ)
 ```
 
 | File | What it does |
 |------|--------------|
-| `convert.py` | Reads the ten `Room Templates <Class>.json` maps, makes positions relative to each room, joins the Main Upper/Lower halves, computes door and zone codes and writes `data_r` (about 7 s). How the data works: `docs/dev/engine-notes.md`, "Room templates" |
+| `convert.py` | Reads the ten `Room Templates <Class>.json` maps, makes positions relative to each room, joins the Main Upper/Lower halves, computes door and zone codes and writes one file per class, one template per line (about 10 s). How the data works: `docs/dev/engine-notes.md`, "Room templates" |
 | `rt_tables.py` | Transform tables (gid, door position, section id, rotation, pot and switch block directions), generated once from the GML `GetTransformed*` functions. Gid names resolve through the `TemplateObjGID` enum in the game's `__RoomTemplates.gml` |
-| `compare.py` | Content comparison of two `data_r` files, ignoring key order and int versus float. Template order inside a subclass counts (it changes what a seed builds) |
+| `compare.py` | Content comparison of two sets of room templates (a rooms folder or an old single file `data_r`), ignoring key order and int versus float. Template order inside a subclass counts (it changes what a seed builds) |
 
-Until the comparison with the real `data_r` is done on the home PC (roadmap F5), write to another file with `-o` instead of over the game's `data_r`.
+The output was checked equal to the last `data_r` written by the GameMaker parser (roadmap F5). The room files are plain git, not LFS, so `git diff` shows which templates changed (one line each).
 
 ### `hub/` (Python 3, Pillow, numpy)
 
@@ -106,8 +109,8 @@ Builds the Sanctuary hub: room pictures, sprites, objects and data. Paths are re
 | `gm_assets.py` | Writes GameMaker 2024 sprites (multi frame, fps, origin), sounds and objects, and registers them in `Zelda.yyp`. Re-running a sprite keeps its frame ids, so files overwrite in place |
 | `tiledjson.py` | Serializes objects the way Tiled writes `data/room-templates/*.json` |
 | `gids.py` | Tiled gid of each template object type, read from `__RoomTemplates.gml` |
-| `build2.py` | Shared helpers: load/save `data_r` and `data_d`, remove objects from the Tiled map |
-| `build3.py` | Writes the hub rooms (Sanctuary 2x2, Hall of Fame 2x1) into the Tiled map, `data_r` (Other/Unique templates) and `data_d` (Special template 5). Edit `ROOMS` to add a room or an NPC |
+| `build2.py` | Shared helpers: load/save `data_d`, remove objects from the Tiled map, rebuild the room templates (`room_templates()`, calls `templates/convert.py`) |
+| `build3.py` | Writes the hub rooms (Sanctuary 2x2, Hall of Fame 2x1) into the Tiled map (Other/Unique templates), rebuilds the room templates from it and writes `data_d` (Special template 5). Edit `ROOMS` to add a room or an NPC. Re-running gives the hub rooms new Tiled ids (harmless) |
 | `festive_draw.py` | The Flute Boy's counter decor over `sanct_base4.png` (writes `sanct_base6.png`) |
 | `build_pics.py` | Church picture with the side door (`church_base.png`) |
 | `build_hall3.py` | Hall of Fame picture (`hall3_base.png`) |
@@ -117,7 +120,7 @@ Builds the Sanctuary hub: room pictures, sprites, objects and data. Paths are re
 
 Order for the hub pictures: `festive_draw.py`, `build_pics.py`, `build_hall3.py`, `statues.py`, then copy the PNGs into the sprites with `gm_assets.sprite(...)`. Previews go to `hub/preview/` (ignored by git).
 
-`data_r`, `data_d` are Git LFS files. Make sure the real files are checked out (`git lfs pull`) before running `build3.py`.
+`data_d` is a Git LFS file. Make sure the real file is checked out (`git lfs pull`) before running `build3.py`. Install the dependencies with `python -m pip install --user pillow numpy`.
 
 ### `alttp/` (C, needs the zelda3 source and your own ROM)
 

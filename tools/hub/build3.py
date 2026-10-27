@@ -1,5 +1,6 @@
-# Sanctuary hub rooms (data only): the Sanctuary and the Hall of Fame, both 2x2 Unique templates in the Other class,
-# and the hub layout (Special dungeon template 5) with the two rooms.
+# Sanctuary hub rooms (data only): the Sanctuary (2x2) and the Hall of Fame (2x1), Unique templates in the Other class,
+# and the hub layout (Special dungeon template 5) with the two rooms. The rooms go into the Tiled map and the game's
+# room templates are then rebuilt from it with tools/templates/convert.py.
 import os as _os
 HERE = _os.path.dirname(_os.path.abspath(__file__)) + '/'
 REPO = _os.path.abspath(HERE + '../..')
@@ -7,7 +8,7 @@ import sys, json, re
 sys.path.insert(0, HERE)
 import tiledjson
 from gids import GID
-from build2 import load, save, remove_tiled_objects, FORK, TILED, DATA_R, DATA_D, BOY_TEXT
+from build2 import load, save, remove_tiled_objects, room_templates, FORK, TILED, DATA_D, BOY_TEXT
 
 W = H = 512
 ROOMS = [  # name, Tiled position, grid position, size in grid cells, objects
@@ -57,34 +58,13 @@ def tiled():
 
 
 def data(ids):
-    dr, nul = load(DATA_R)
-    uniq = dr[9][2]
-    layers = ["Pit", "Holes", "Water", "FloorObjs", "WallsLower", "WallsUpper", "WallsCommon", "Objs",
-              "Stairs", "Doors", "LowerFloor", "ExtraCeilings", "OutOfBounds"]
-    names = [r[0] for r in ROOMS]
-    uniq[:] = [t for t in uniq if t['name'] not in names]
+    room_templates()
     rooms = []
     for name, (rx, ry), (gx, gy), size, objs in ROOMS:
-        room_id = ids[name]
-        e = {k: [] for k in layers}
-        oid = room_id + 1
-        for layer, g, x, y, w, h, extra in objs:
-            e[layer].append({"height": float(h), "x": float(x), "y": float(y), "width": float(w), "gid": float(GID[g]),
-                             "id": float(oid), "visible": True, "rotation": 0.0, "type": extra.get('type', ''),
-                             "name": extra.get('name', ''),
-                             "properties": [{"type": t, "name": n, "value": v} for n, t, v in extra.get('properties', [])] +
-                                           [{"type": "object", "name": "Room", "value": float(room_id)}]})
-            oid += 1
-        e.update({"x": float(rx), "y": float(ry), "width": float(256 * size[0]), "height": float(256 * size[1]), "id": float(room_id),
-                  "visible": True, "rotation": 0.0, "type": "Unique", "name": name,
-                  "Sections": [{} for _ in range(31)], "SizeIndex": {(1, 1): 0, (1, 2): 1, (2, 1): 2, (2, 2): 3}[size],
-                  "RoomTransformationsAllowed": [True] + [False] * 7})
-        uniq.append(e)
         rooms.append({"x": gx * 256, "GridW": size[0], "GridH": size[1], "y": gy * 256, "width": 256 * size[0], "height": 256 * size[1], "Template": -1,
                       "Lighting": 0, "Section_ID": 0, "Section_WallType": 0, "Section_Color": 0, "SpecialObj": 0,
                       "SpecialObjSection": 0, "Warp_DestRoomIndex": -1, "WarpDest_WarpRoomIndex": -1,
                       "Warp_DestGridPosition": -1, "GridX": gx, "GridY": gy, "Doors": []})
-    save(DATA_R, dr, nul)
     dd, nul = load(DATA_D)
     dd[6][5] = {"Rooms": rooms}
     save(DATA_D, dd, nul)

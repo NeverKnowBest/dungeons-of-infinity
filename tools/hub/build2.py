@@ -9,7 +9,6 @@ from gids import GID
 
 FORK = REPO+''
 TILED = FORK + '/data/room-templates/Room Templates Other.json'
-DATA_R = FORK + '/game/datafiles/data/data_r'
 DATA_D = FORK + '/game/datafiles/data/data_d'
 W = H = 512
 RX, RY = 1176, 1176            # free spot in the Tiled map
@@ -77,26 +76,19 @@ def tiled():
     return room_id
 
 
+def room_templates():
+    """Rebuilds game/datafiles/data/rooms from the Tiled maps with the template converter."""
+    sys.path.insert(0, REPO + '/tools/templates')
+    import convert
+    warnings = []
+    data = convert.convert(warnings)
+    for w in warnings:
+        print('warning:', w)
+    convert.save(data, convert.ROOMS_DIR)
+
+
 def data(room_id):
-    dr, nul = load(DATA_R)
-    uniq = dr[9][2]
-    layers = ["Pit", "Holes", "Water", "FloorObjs", "WallsLower", "WallsUpper", "WallsCommon", "Objs",
-              "Stairs", "Doors", "LowerFloor", "ExtraCeilings", "OutOfBounds"]
-    e = {k: [] for k in layers}
-    oid = room_id + 1
-    for layer, g, x, y, w, h, extra in OBJS:
-        e[layer].append({"height": float(h), "x": float(x), "y": float(y), "width": float(w), "gid": float(GID[g]),
-                         "id": float(oid), "visible": True, "rotation": 0.0, "type": extra.get('type', ''),
-                         "name": extra.get('name', ''),
-                         "properties": [{"type": t, "name": n, "value": v} for n, t, v in extra.get('properties', [])] +
-                                       [{"type": "object", "name": "Room", "value": float(room_id)}]})
-        oid += 1
-    e.update({"x": float(RX), "y": float(RY), "width": float(W), "height": float(H), "id": float(room_id),
-              "visible": True, "rotation": 0.0, "type": "Unique", "name": "Sanctuary",
-              "Sections": [{} for _ in range(31)], "SizeIndex": 3,
-              "RoomTransformationsAllowed": [True] + [False] * 7})
-    uniq[:] = [t for t in uniq if t['name'] != 'Sanctuary'] + [e]
-    save(DATA_R, dr, nul)
+    room_templates()
 
     dd, nul = load(DATA_D)
     room = {"x": 768, "GridW": 2, "GridH": 2, "y": 768, "width": 512, "height": 512, "Template": -1, "Lighting": 0,

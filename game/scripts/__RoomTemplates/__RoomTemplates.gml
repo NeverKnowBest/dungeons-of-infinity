@@ -358,11 +358,20 @@ function RoomTemplates_Load(){
 	
 	global.MainSectionIndexes = [1, 2, 9, 17, 21, 25, 27];
 		
-	var ParsedTemplates_Buffer = buffer_load(GAMEFILE_ROOMTEMPLATES);
-	global.Templates_Room = json_parse(buffer_read(ParsedTemplates_Buffer, buffer_string));
-	buffer_delete(ParsedTemplates_Buffer);
-	ParsedTemplates_Buffer = -1;
-	
+	// One file per class, in RoomTemplateClass order, written by tools/templates/convert.py
+	var _ClassFiles = ["Main_Upper", "Main_Lower", "Stairs", "Jails", "Village", "Mines", "Obstacles", "Sections", "Special", "Other"];
+	global.Templates_Room = array_create(RoomTemplateClasses);
+	for(var _ClassIndex = 0; _ClassIndex < RoomTemplateClasses; _ClassIndex++){
+		var _File = GAMEDIR_ROOMTEMPLATES + _ClassFiles[_ClassIndex] + ".json";
+		var _Buffer = buffer_load(_File);
+		if(_Buffer == -1){
+			Error("Room templates file not found: " + _File, true);
+			return;
+		}
+		global.Templates_Room[_ClassIndex] = json_parse(buffer_read(_Buffer, buffer_string));
+		buffer_delete(_Buffer);
+	}
+
 	for(var _ClassIndex = 0; _ClassIndex < RoomTemplateClasses; _ClassIndex++){
 		var _SubClasses = array_length(global.Templates_Room[_ClassIndex]);
 		for(var _SubClassIndex = 0; _SubClassIndex < _SubClasses; _SubClassIndex++){
@@ -370,6 +379,7 @@ function RoomTemplates_Load(){
 			global.UnusedRoomTemplatesList[_ClassIndex][_SubClassIndex] = ds_list_create();
 		}
 	}
+	show_debug_message("Room templates loaded: " + json_stringify(global.Templates_Room_Count));
 
 	
 }

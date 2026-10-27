@@ -5,7 +5,7 @@
 // Sanctuary instead of going straight into a run. Walking out through the front door starts the run.
 //
 // The hub is built like the save tent level: a fixed dungeon layout (data_d, Special class) whose rooms use
-// Other/Unique room templates (data_r) for their NPCs and objects. global.Level.Index stays on DungeonLevel.Castle
+// Other/Unique room templates (data/rooms/Other.json) for their NPCs and objects. global.Level.Index stays on DungeonLevel.Castle
 // so the level tables stay valid, and global.HubLevel tells the rest of the code that this is not a real level.
 //
 // Unlike dungeon rooms, hub rooms are not drawn with the tileset: each one is a pre-rendered picture of the original
@@ -73,7 +73,7 @@ function Dungeon_InitHubLevel(){
 		Room.Template = RoomTemplates_Pick(_RoomIndex);
 
 		if(Room.Template == -1){
-			Error("Sanctuary room template '" + string(Room.TemplateName) + "' not found in data_r", true);
+			Error("Sanctuary room template '" + string(Room.TemplateName) + "' not found in the room templates", true);
 			exit;
 		}
 
