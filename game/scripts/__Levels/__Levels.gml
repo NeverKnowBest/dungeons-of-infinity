@@ -8,7 +8,13 @@
 //				The decoration rules are the switch(LevelDef.Theme) blocks in the scripts __Dungeon_Draw_* and __Decor.
 //   BaseTheme	whose door frames, holes, floor trims and stairs it uses (LevelTilesY_Base); Agahnim borrows the fortress ones
 //   EnemyStats	whose stats the enemies take (soldier colours and energy, Poe, Wizzrobe, Beamos, the Type of Bari, Keese...)
-// Depth is how far into the run the level is (1 = Hyrule Castle); difficulty formulas use it.
+// Depth is how far into the run the level is (1 = Hyrule Castle); difficulty formulas use it. Each depth is a chapter,
+// and the levels with the same Depth are its variants (roadmap F4b).
+//
+// Exits (roadmap F4b): pools of [value, weight] (weight = tickets in the draw, Level_PoolPick) say where each exit leads
+// (NextPool, a variant of the next chapter), how many exits there are (ExitCount) and whether the extra one is hidden in
+// a secret room (ExitHidden). Only a level whose NextPool has more than one level draws anything; the generator side is
+// Dungeon_PlanExits. ExitLook is how the exits that lead to THIS level look, a key of global.ExitLooks (__Doors).
 
 #macro LevelDef global.LevelDefs[global.Level.Index]
 #macro LevelTilesY (4 + ((LevelDef.Theme - 1) * 6))
@@ -43,6 +49,39 @@ function Level_Get(_Level){
 
 function Level_Depth(_Level){
 	return global.LevelDefs[_Level].Depth;
+}
+
+/// A value drawn from a pool of [value, weight] pairs. A pool with a single entry uses no random number, so a level
+/// without branches is built exactly as before F4b. undefined for an empty pool.
+function Level_PoolPick(_Pool){
+	var _N = array_length(_Pool);
+	if(_N == 0) return undefined;
+	if(_N == 1) return _Pool[0][0];
+	var _Total = 0;
+	for(var i = 0; i < _N; i++) _Total += _Pool[i][1];
+	var _Ticket = irandom(_Total - 1);
+	for(var i = 0; i < _N; i++){
+		_Ticket -= _Pool[i][1];
+		if(_Ticket < 0) return _Pool[i][0];
+	}
+	return _Pool[_N - 1][0];
+}
+
+/// True when the exits of a level can lead to more than one level (a branch of the run)
+function Level_Branches(_Def){
+	var _Pool = _Def.NextPool;
+	var _First = undefined;
+	for(var i = 0; i < array_length(_Pool); i++){
+		if(_Pool[i][1] <= 0) continue;
+		if(_First == undefined) _First = _Pool[i][0];
+		else if(_Pool[i][0] != _First) return true;
+	}
+	return false;
+}
+
+/// Level the run goes to next: where the exit Link took leads (global.RunPath.Next), or the sheet's Next
+function Level_NextIndex(){
+	return (global.RunPath.Next != -1) ? global.RunPath.Next : LevelDef.Next;
 }
 
 /// How likely an enemy is to be picked for a room of the current level (0 = never)
@@ -80,6 +119,13 @@ function Level_Create(_Index, _Name) constructor{
 	Curses = true;						// treasures may be cursed
 	Obstacles = [RoomObstacle.Holes];	// obstacle templates, picked at random (repeat one to make it more likely)
 	MovingFloors = [];					// added to Obstacles in rooms without special objects
+
+	// Exits (roadmap F4b). Pools are [value, weight] lists. Weights of today's levels: docs/roadmap.md (F4b).
+	NextPool = undefined;				// [[level, weight], ...]: where each exit leads (variants of the next chapter); undefined = [[Next, 1]]
+	ExitCount = [[1, 2], [2, 1]];		// how many exits, only drawn when NextPool can lead to more than one level
+	ExitHidden = [[false, 1], [true, 1]];	// whether the extra exit is in a secret room behind a bombable wall
+	ExitMinDistance = 2;				// grid columns between the two exits, which are also on opposite sides of the map's middle
+	ExitLook = "StairsDown";			// how the exits that lead to this level look: a key of global.ExitLooks (__Doors)
 
 	// Boss
 	Boss = false;
@@ -125,6 +171,7 @@ function Levels_Init(){
 	_L[DungeonLevel.Aghanim1] = new Level_Create(DungeonLevel.Aghanim1, "Agahnim's Fortress");
 	_L[DungeonLevel.Aghanim2] = new Level_Create(DungeonLevel.Aghanim2, "Agahnim");
 	global.LevelDefs = _L;
+	global.RunPath = {Next: -1};	// the level the exit Link took leads to (Level_NextIndex), kept through the rest stop
 
 	with(_L[DungeonLevel.Start]){
 		Special = LevelSpecial.Intro;
@@ -303,9 +350,10 @@ function Levels_Init(){
 		Dark = LevelDark.Never;
 	}
 
-	// Enemy weights by object index, for Level_EnemyWeight
+	// Enemy weights by object index, for Level_EnemyWeight, and the default exit pool (the sheet's Next)
 	for(var _Level = 0; _Level < array_length(_L); _Level++){
 		var _Def = _L[_Level];
+		if(_Def.NextPool == undefined) _Def.NextPool = (_Def.Next == -1) ? [] : [[_Def.Next, 1]];
 		_Def.EnemyWeights = array_create(array_length(global.EnemyData), 0);
 		for(var j = 0; j < array_length(_Def.Enemies); j++){
 			var _Obj = _Def.Enemies[j][0];

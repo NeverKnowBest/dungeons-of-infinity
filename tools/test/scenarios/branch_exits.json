@@ -1,0 +1,28 @@
+{
+ "comment": "Branched exits (roadmap F4b) with a temporary branch that only exists in this test: Hyrule Castle may lead to the Castle Basement (stairs down) or to the Catacombs, which stand in for a variant of chapter 2 and are reached by the stairs up. More two-exit levels than the real weights. Contact sheet of seeds that show each case (5: one exit; 3: two exits on opposite sides; 6: extra exit in a secret room; 8: stairs up and a secret extra exit), then Link takes the extra exit of seed 8 and, on a new build, the main exit, through the rest stop before the Catacombs. The 'exits' log lines say where each exit is and leads.",
+ "name": "branch_exits",
+ "seed": 8,
+ "level": "Castle",
+ "levels": {
+  "Castle": {"NextPool": [["CastleBasement", 1], ["Catacombs", 1]], "ExitCount": [[1, 1], [2, 2]], "ExitHidden": [[false, 1], [true, 1]]},
+  "Catacombs": {"ExitLook": "StairsUp"}
+ },
+ "cheats": ["Cheat_Inf_Health"],
+ "max_frames": 100000,
+ "steps": [
+  {"do": "sheet", "level": "Castle", "seeds": [5, 3, 6, 8]},
+  {"do": "exit", "which": "extra"},
+  {"do": "wait", "frames": 300},
+  {"do": "state"},
+  {"do": "expect", "exit_level": true},
+  {"do": "level", "level": "Castle", "seed": 8},
+  {"do": "exit", "which": "main"},
+  {"do": "wait", "frames": 300},
+  {"do": "state"},
+  {"do": "exit", "which": "main"},
+  {"do": "wait", "frames": 300},
+  {"do": "state"},
+  {"do": "expect", "exit_level": true},
+  {"do": "end"}
+ ]
+}

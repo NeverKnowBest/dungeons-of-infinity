@@ -81,7 +81,7 @@ if(_CompassOwned){
 						break;
 						
 					case DoorStatus.Exit:
-						draw_sprite(sLargeMap_Down, 0, _x, _y + 1);
+						draw_sprite(Door_ExitLook(inst).MapIcon, 0, _x, _y + 1);
 						break;
 				}
 				break;

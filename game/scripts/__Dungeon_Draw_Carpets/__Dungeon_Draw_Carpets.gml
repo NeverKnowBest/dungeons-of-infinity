@@ -126,7 +126,7 @@ function Dungeon_Draw_Carpets(_RoomIndex){
 									var InvalidDoor = false;
 									var RoomDoors = array_length(Room.Doors);
 									for(var _RoomDoorIndex = 0; _RoomDoorIndex < RoomDoors; _RoomDoorIndex++){
-										var _RoomDoorPosition = DungeonRoom.Doors[_RoomDoorIndex].Position;
+										var _RoomDoorPosition = Room.Doors[_RoomDoorIndex].Position; //Room.Doors, not the layout's: an extra exit (F4b) is only in the room
 										//if(_RoomDoorPosition > 12) continue;
 										var _RoomDoorStatus = Room.Doors[_RoomDoorIndex].Status;
 										if(_RoomDoorPosition == DoorPosition && Carpet_InvalidDoor(_RoomDoorStatus)){

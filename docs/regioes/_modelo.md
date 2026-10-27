@@ -1,11 +1,13 @@
 # Região: Nome da região
 
-Copie este arquivo para `docs/regioes/<nome>.md` (minúsculas, com hífens) e preencha. Uma região é um lugar jogável inteiro: um estágio alternativo de um nível que já existe, um nível novo ou uma região de outro Zelda. O validador (`tools/check/validate.py`) confere se todas as seções abaixo existem e se os assets citados existem no projeto. Para citar um asset que ainda vai ser criado, escreva "(novo)" na mesma linha.
+Copie este arquivo para `docs/regioes/<nome>.md` (minúsculas, com hífens) e preencha. Uma região é um lugar jogável inteiro, e toda região é variante de um capítulo da run (veja `docs/design/direcao.md`, "Capítulos e variantes"): um capítulo é uma posição da run, o `Depth` da ficha de fase. O validador (`tools/check/validate.py`) confere se todas as seções e todos os campos abaixo existem e se os assets citados existem no projeto. Para citar um asset que ainda vai ser criado, escreva "(novo)" na mesma linha.
 
 * **Estado:** ideia | especificada | em produção | pronta
 * **Origem:** jogo e lugar de onde a região vem (ex.: ALttP, Torre de Hera)
-* **Tipo:** estágio alternativo do nível N | nível novo | região de outro Zelda
-* **Posição na run:** qual nível ela substitui ou onde entra, e a chance de ser sorteada
+* **Tipo:** dungeon ou área externa (jardim, campina, floresta); diga também se é região de outro Zelda
+* **Capítulo:** de qual capítulo ela é variante (`Depth` N, ao lado de quais fases), de qual capítulo se chega a ela e para qual capítulo ela segue
+* **Pools de saída:** em quais fases do capítulo anterior ela entra na `NextPool` e com que peso (é o que decide a chance de aparecer); a `NextPool` dela (variantes do próximo capítulo e pesos); `ExitCount` e `ExitHidden` se fugirem do padrão da ficha
+* **Visual da saída:** como é a saída que leva até ela (`ExitLook`): `StairsDown` (padrão), `StairsUp` ou um visual novo (novo), que entra em `ExitLooks_Init`
 * **Gráficos:** pasta `incoming/<nome>/` com o que o Guilherme entregou, ou "só assets que já existem"
 
 ## Ideia
@@ -54,7 +56,7 @@ Regras próprias do lugar (gelo que escorrega, água funda, buracos que levam ao
 
 ## Mudanças no código
 
-Lista do que muda e onde. Enquanto a ficha de fase (F4) não existir, inclua os `switch` por nível que precisam do caso novo (`docs/dev/receitas.md`, "Estágio alternativo").
+Lista do que muda e onde: a entrada na ficha de fase (`__Levels.gml`), as `NextPool` das fases do capítulo anterior, o visual da saída se for novo e o que mais a região pedir. Passo a passo em `docs/dev/receitas.md`, "Estágio alternativo".
 
 ## Pronto quando
 

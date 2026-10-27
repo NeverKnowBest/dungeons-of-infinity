@@ -76,7 +76,8 @@ python tools/check/validate.py --strict   # warnings also fail
 | The room template files match what `templates/convert.py` makes from the Tiled maps right now (adds about 10 s) | error |
 | A data file over 45 MB (GitHub warns at 50 MB) | warning |
 | Arrows or em dashes in the Portuguese docs (including `docs/ref/` and `docs/regioes/`) | warning |
-| Region spec (`docs/regioes/*.md`) has every `##` section of `_modelo.md` and a valid `**Estado:**` | error |
+| Region spec (`docs/regioes/*.md`) has every `##` section and every header field (`* **Capítulo:**`...) of `_modelo.md` and a valid `**Estado:**` | error |
+| Every `ExitLook` the level sheet names is a look of `ExitLooks_Init` (`__Doors.gml`) | error |
 | Region spec cites an asset (`oX`, `sX`, `Sound_X`, `Music_X` in backticks) that is not in `Zelda.yyp`, unless the line says "(novo)" | error |
 | Reference sheet (`docs/ref/*.md`) cites an asset that is not in `Zelda.yyp` | warning |
 | A cited `docs/...md` file does not exist | warning |
@@ -114,6 +115,7 @@ python tools/test/baseline.py compare before after       # SAME, or every text l
 * A baseline of the code before a change can be made after the change too: `git worktree add --detach %TEMP%\doi-base HEAD`, copy the test tools in, `save before` there and copy `tools/test/baseline/before` back (see `docs/dev/receitas.md`, "Comparar antes e depois").
 * `compare` shows pixel counts for images when Pillow is installed. It ignores the `step` lines of the log: they echo the scenario as GML writes it, and the key order changes between builds.
 * F4 result, for reference: every file the same except three lines per dump, the globals `DungeonNames` and `Music_LevelSongIndex` (gone) and `LevelDefs` (new).
+* F4b result: SAME in all 14 against the F4 baseline. A busy PC can make one `oMusic` line differ (`SongPlaying_Intro`, `SongPlaying_Inst`): the music intro ends on the real clock, so a slower run reaches the loop before the third build. Run that scenario again (`save <label> --only ref_01 --no-build`) with nothing else running before calling it a change.
 
 Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value; `level` and `item` also take a bare name (`"Sewers"`, `"Shield"`).
 
@@ -128,6 +130,7 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `speed` | Frames per second (default 60) |
 | `sound` | `true` to hear it |
 | `dump` | `true`: every level built writes `dump_<n>_<level>_s<seed>.txt` (level and room structs, instances with their variables, MD5 of each tile layer per room, globals). For comparing two versions of the code |
+| `levels` | Temporary changes to the level sheet for this test only: `{"Castle": {"NextPool": [["CastleBasement", 1], ["Catacombs", 1]]}, "Catacombs": {"ExitLook": "StairsUp"}}`. Field names are checked against `Level_Create`, `NextPool` takes level names, `ExitLook` a look of `ExitLooks_Init`. For trying a branch of the run that no level has yet (`scenarios/branch_exits.json`) |
 | `steps` | List of steps, run in order (below) |
 
 | Step | Keys | What it does |
@@ -143,11 +146,12 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `give` | `item`, `index`, `amount` | Gives an item |
 | `state` | | Logs level, room, Link's position and health, enemies and kills |
 | `log` | `text` | Writes a note in the log |
-| `expect` | `alive`, `level`, `room` (`[x, y]`), `enemies`, `kills_min` | Checks; a mismatch is a `FAIL` line |
+| `expect` | `alive`, `level`, `room` (`[x, y]`), `enemies`, `kills_min`, `exit_level` | Checks; a mismatch is a `FAIL` line. `"exit_level": true`: the current level is the one the last `exit` step's door leads to (not the rest stop) |
+| `exit` | `which` (`main` or `extra`), `frames` (default 60) | Puts Link 40 px in front of the level's main or extra exit (roadmap F4b) and walks into it for `frames`. Fails if there is no such exit |
 | `sheet` | `level`, `seeds` | Contact sheet (what `--sheet` runs): `sheet_<level>_<seed>.png` per seed and `sheet_<level>.png` with all of them at half size |
 | `end` | | Ends the test (it also ends after the last step) |
 
-Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>`, `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `state`, `expect ok`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
+Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>`, `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `state`, `expect ok`, `levels <index> "<name>" <field>=<value>` (scenario changes), `exits main-><level> count=1|2 extra=room <n> grid= Top|Bottom [secret]-><level> main=room <n> grid=` (only in levels whose exits can lead to more than one level), `exit main|extra room= -> level <n>`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
 
 ### `templates/` (Python 3, standard library only)
 

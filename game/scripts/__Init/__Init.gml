@@ -18,6 +18,7 @@ function INIT(){
 	Enemies_InitData();	
 	
 	Levels_Init();	// after the enemies: the level sheet lists them
+	ExitLooks_Init();	// how exits look, named by the level sheet (ExitLook)
 
 	RupeePatterns_Init();
 	

@@ -20,7 +20,9 @@ Checks:
     files (game/datafiles/data/rooms) and the Tiled maps parse as JSON, and
     the room template files match what convert.py makes from the Tiled maps
   * docs: no arrows or em dashes in the Portuguese docs (house style)
-  * region specs (docs/regioes/*.md): every section of _modelo.md is there,
+  * level sheet: every ExitLook it names is a look in ExitLooks_Init (__Doors)
+  * region specs (docs/regioes/*.md): every section and header field (the
+    "* **Name:**" lines) of _modelo.md is there,
     a valid Estado, and the assets and docs they cite exist; the reference
     sheets (docs/ref/*.md) are checked for assets too
   * test scenarios (tools/test/scenarios/*.json): known steps, keys, cheats,
@@ -397,7 +399,9 @@ def check_regions(rep, registered):
     if not os.path.exists(model):
         rep.error('missing %s/%s (the region spec model)' % (REGION_DIR, REGION_MODEL))
         return
-    sections = [l[3:].strip() for l in open(model, encoding='utf-8') if l.startswith('## ')]
+    model_text = open(model, encoding='utf-8').read()
+    sections = [l[3:].strip() for l in model_text.splitlines() if l.startswith('## ')]
+    fields = re.findall(r'^\* \*\*(.+?):\*\*', model_text, re.M)
     for f in sorted(os.listdir(rdir)):
         if not f.endswith('.md') or f.startswith('_') or f == 'README.md':
             continue
@@ -407,6 +411,9 @@ def check_regions(rep, registered):
         for sec in sections:
             if sec not in have:
                 rep.error('%s is missing the section "## %s" (see %s)' % (path, sec, REGION_MODEL))
+        for field in fields:
+            if '**%s:**' % field not in text:
+                rep.error('%s is missing the field "**%s:**" (see %s)' % (path, field, REGION_MODEL))
         m = re.search(r'\*\*Estado:\*\*\s*(.+)', text)
         if not m:
             rep.error('%s has no "**Estado:**" line' % path)
@@ -418,6 +425,20 @@ def check_regions(rep, registered):
         for f in sorted(os.listdir(ref)):
             if f.endswith('.md'):
                 check_doc_refs(rep, '%s/%s' % (REF_DIR, f), registered, as_error=False)
+
+
+def check_exit_looks(rep):
+    """Every ExitLook the level sheet names is a look in ExitLooks_Init (roadmap F4b)."""
+    sys.path.insert(0, os.path.join(REPO, 'tools', 'test'))
+    import scenario
+    looks = scenario.exit_looks()
+    path = os.path.join(REPO, 'game', 'scripts', '__Levels', '__Levels.gml')
+    if not looks or not os.path.exists(path):
+        rep.error('no exit looks found (ExitLooks_Init in __Doors.gml) or no level sheet')
+        return
+    for name in re.findall(r'ExitLook\s*=\s*"(\w+)"', open(path, encoding='utf-8').read()):
+        if name not in looks:
+            rep.error('game/scripts/__Levels/__Levels.gml: ExitLook "%s" is not in ExitLooks_Init (%s)' % (name, ', '.join(sorted(looks))))
 
 
 def check_scenarios(rep):
@@ -448,6 +469,7 @@ def main():
     check_data(rep)
     check_docs(rep)
     check_regions(rep, registered)
+    check_exit_looks(rep)
     check_scenarios(rep)
 
     if CASE_MISMATCH:

@@ -27,6 +27,68 @@ enum OpenDoorSprite{
 }
 
 
+#region Exit looks (roadmap F4b)
+
+/// How exit doors look. The level sheet of the level an exit leads to names its look (ExitLook = "StairsDown"), so the
+/// player can read where a stairway goes. A new look is a new entry here and a level pointing at it; the generator
+/// does not change. Each look has:
+///   Draw(_Door, _Tiles)	draws the door beam and the doorway of an exit oDoor (x, y, Location "Top" or "Bottom",
+///							FloorLevel); _Tiles = {Decor, Beam, Y}: its decor and beam tilemaps and its tile row
+///							(Door_DrawTiles draws the door sides)
+///   Sound					played when Link goes through it
+///   MapIcon				its icon on the large map (with the compass)
+function ExitLooks_Init(){
+	global.ExitLooks = {
+		StairsDown: {Draw: ExitLook_DrawStairsDown, Sound: Sound_StairsFloorDown, MapIcon: sLargeMap_Down},	// the usual exit
+		StairsUp: {Draw: ExitLook_DrawStairsUp, Sound: Sound_StairsUp, MapIcon: sLargeMap_Down}			// the stairway a level's entrance shows
+	};
+}
+
+function ExitLook_DrawStairsDown(_Door, _Tiles){
+	with(_Door){
+		if(Location == "Top"){
+			DrawTileBlock(_Tiles.Beam, x, y, 58, _Tiles.Y, 4, 1);
+			DrawTileBlock(_Tiles.Decor, x + 8, y + 8, 60, _Tiles.Y + 2, 2, 2);
+		}else{
+			DrawTileBlock(_Tiles.Beam, x, y + 16, 58, _Tiles.Y, 4, 1);
+			DrawTileBlock(_Tiles.Decor, x + 8, y, 58, _Tiles.Y + 4, 2, 2);
+		}
+	}
+}
+
+/// The stairway Link comes down at the entrance of every level (oLink End Step), with an ordinary door beam
+function ExitLook_DrawStairsUp(_Door, _Tiles){
+	with(_Door){
+		var _BeamX = 50 + (FloorLevel == LOWER ? 4 : 0);
+		if(Location == "Top"){
+			DrawTileBlock(_Tiles.Beam, x, y, _BeamX, _Tiles.Y, 4, 1);
+			DrawTileBlock(_Tiles.Decor, x + 8, y + 8, 58, _Tiles.Y + 2, 2, 2);
+		}else{
+			DrawTileBlock(_Tiles.Beam, x, y + 16, _BeamX, _Tiles.Y + 1, 4, 1);
+			DrawTileBlock(_Tiles.Decor, x + 8, y, 60, _Tiles.Y + 4, 2, 2);
+		}
+	}
+}
+
+/// Level an exit door leads to
+function Door_ExitDest(_DoorInst){
+	if(global.SaveLevel) return Level_NextIndex();	//the rest stop leads where the exit taken before it led
+	var _Doors = global.Level.Rooms[_DoorInst.RoomIndex].Doors;
+	for(var i = 0; i < array_length(_Doors); i++){
+		if(_Doors[i].Position == _DoorInst.Position && _Doors[i].ExitDest != -1) return _Doors[i].ExitDest;
+	}
+	return global.Level.Exits.Dest;
+}
+
+/// Look of an exit door: the ExitLook of the level it leads to
+function Door_ExitLook(_DoorInst){
+	var _Def = Level_Get(Door_ExitDest(_DoorInst));
+	var _Look = (_Def == undefined) ? undefined : global.ExitLooks[$ _Def.ExitLook];
+	return _Look ?? global.ExitLooks.StairsDown;
+}
+
+#endregion
+
 function Dungeon_CreateDoors(_RoomIndex){
 
 	if(LevelDef.Special == LevelSpecial.Intro) exit;
@@ -82,9 +144,15 @@ function Dungeon_CreateDoors(_RoomIndex){
 				}else{
 					_DoorInst.SecretType = Prob(Chance_SecretDoorCrack) ? SecretDoor.Crack : choose(SecretDoor.Blank, SecretDoor.Illusion);
 				}
-				
+
 			}
-			
+
+			//the secret room of an extra exit always opens with a bomb, never walking through an illusion (roadmap F4b)
+			var _ExitRoom = global.Level.Exits.ExtraSecret ? global.Level.Exits.ExtraRoom : -1;
+			if(_DoorInst.SecretType == SecretDoor.Illusion && _ExitRoom != -1 && (_RoomIndex == _ExitRoom || _DoorInst.ConnectedRoomIndex == _ExitRoom)){
+				_DoorInst.SecretType = SecretDoor.Crack;
+			}
+
 		}
 		
 		if(LevelDef.Special == LevelSpecial.Mines){
@@ -282,8 +350,7 @@ function Door_DrawTiles(Inst){
 					//Door beam
 					switch(Status){
 						case DoorStatus.Exit:
-							DrawTileBlock(TMID_Beam, x, y, 58, TilesY, 4, 1);
-							break;
+							break; //drawn by the exit look, below
 						default:
 							if(RoomIndex == global.Level.RoomIndex_Boss){
 								DrawTileBlock(TMID_Decor, x, y, 50 + (FloorLevel == LOWER ? 4 : 0), TilesY, 4, 1); //because bosses jump higher and the beams are above them. Link doesn't go through these doors anyways
@@ -404,7 +471,7 @@ function Door_DrawTiles(Inst){
 						break;
 						
 					case DoorStatus.Exit:
-						DrawTileBlock(TMID_Decor, x + 8, y + 8, 60, TilesY + 2, 2, 2);
+						Door_ExitLook(Inst).Draw(Inst, {Decor: TMID_Decor, Beam: TMID_Beam, Y: TilesY});
 						break;
 
 					
@@ -438,8 +505,7 @@ function Door_DrawTiles(Inst){
 						//Door beam
 						switch(Status){
 							case DoorStatus.Exit:
-								DrawTileBlock(TMID_Beam, x, y + 16, 58, TilesY, 4, 1);
-								break;
+								break; //drawn by the exit look, below
 							default:
 								DrawTileBlock(TMID_Beam, x, y + 16, 50 + (FloorLevel == LOWER ? 4 : 0), TilesY + 1 , 4, 1);
 						}	
@@ -562,7 +628,7 @@ function Door_DrawTiles(Inst){
 						break;
 						
 						case DoorStatus.Exit:
-							DrawTileBlock(TMID_Decor, x + 8, y, 58, TilesY + 4, 2, 2);
+							Door_ExitLook(Inst).Draw(Inst, {Decor: TMID_Decor, Beam: TMID_Beam, Y: TilesY});
 							break;
 
 					

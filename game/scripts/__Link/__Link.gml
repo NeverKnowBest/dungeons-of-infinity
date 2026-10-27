@@ -703,9 +703,9 @@ function UpdateState(NewState, var1 = undefined){
 		case LinkState.Descending:
 			DescendingPhase = 1;
 			x = floor(x); y = floor(y);
-			var snd = audio_play_sound(Sound_StairsFloorDown, 1, false);
+			var snd = audio_play_sound(Door_ExitLook(LastDoorID).Sound, 1, false);
 			audio_sound_gain(snd, 0, 2000);
-			var NextLevelSongIndex = global.LevelDefs[LevelDef.Next].Song;
+			var NextLevelSongIndex = global.LevelDefs[Level_NextIndex()].Song;
 			if(oMusic.SongPlaying_Index != NextLevelSongIndex) Music_Fade(0, SongFadeLen_NextLevel, SongIndex.None);
 
 			if(audio_is_playing(global.RainSound)) audio_sound_gain(global.RainSound, 0, 1000);
@@ -1222,11 +1222,13 @@ function CheckDoors(){
 		
 		if(DoorInst.Status == DoorStatus.Exit){
 			if(DoorInst.Location == "Top" && y < DoorInst.y + 24){
+				global.RunPath.Next = Door_ExitDest(DoorInst);	//this exit's branch of the run (roadmap F4b)
 				DescendingLocation = TOP;
 				UpdateState(LinkState.Descending);
 				return 1;
 			}
 			else if(DoorInst.Location == "Bottom" && y > DoorInst.y + 4){
+				global.RunPath.Next = Door_ExitDest(DoorInst);
 				DescendingLocation = BOTTOM;
 				UpdateState(LinkState.Descending);
 				return 1;

@@ -198,6 +198,9 @@ function Dungeon_CreateStruct_Level(_LevelIndex) constructor{
 	RoomIndex_Entrance = 0;
 	RoomIndex_Boss = -1;
 	RoomIndex_BossAdjacent = -1;
+
+	// Exits (roadmap F4b, Dungeon_PlanExits): where the main exit leads, and the extra exit when the level has one
+	Exits = {Dest: global.LevelDefs[_LevelIndex].Next, ExtraRoom: -1, ExtraPosition: -1, ExtraSecret: false};
 	
 	Map_RoomIndex = Array_Create2D(DungeonGridW, DungeonGridW, -1);
 	
@@ -599,9 +602,10 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 	
 }
 
-function Dungeon_CreateStruct_Door() constructor{	
+function Dungeon_CreateStruct_Door() constructor{
 	x = 0;
 	y = 0;
+	ExitDest = -1;	//level an extra exit leads to (roadmap F4b); -1 for every other door, the main exit uses global.Level.Exits.Dest
 	Level = 0;
 	Status = DoorStatus.Open;
 	Position = 0;
@@ -622,6 +626,7 @@ function Dungeon_InitLevel(_LevelIndex){
 		exit;
 	}else{
 		global.Level = new Dungeon_CreateStruct_Level(_LevelIndex);
+		global.RunPath.Next = -1;	// the exit taken to get here is used up
 	}
 	
 	
@@ -686,6 +691,8 @@ function Dungeon_InitLevel(_LevelIndex){
 		
 	}
 
+	Dungeon_PlanExits();
+
 	//set up secret room. This has to be done in a seperate loop after all the rooms have been initialised
 	for(var _RoomIndex = 0; _RoomIndex < global.Level.RoomCount; _RoomIndex++){
 		
@@ -727,26 +734,9 @@ function Dungeon_InitLevel(_LevelIndex){
 				Room.Secret = 1;
 				
 				if(LevelDef.Special == LevelSpecial.Village && Room.GridX == 3 && Room.GridY == 0) continue; //special locked door with special Room, so don't make door secret
-				
-				Room.Doors[0].Status = DoorStatus.Secret_Closed; //special Rooms should always only have 1 door into them, so we can index at 0
-				
-				var _ConnectedRoomTemplateIndex = Room.Doors[0].ConnectedRoomIndex;
-				var _ConnectedRoomTemplate = global.Level.DungeonTemplate.Rooms[_ConnectedRoomTemplateIndex];
-				var _ConnectedRoomTemplateRSI = global.RoomSizeIndex[_ConnectedRoomTemplate.GridW][_ConnectedRoomTemplate.GridH];
-				var _ConnectedDoorPos = Door_GetConnectedPos(Room.GridX, Room.GridY, Room.SizeIndex, _ConnectedRoomTemplate.GridX, _ConnectedRoomTemplate.GridY, _ConnectedRoomTemplateRSI, Room.Doors[0].Position);
-				
-				var _ConnectedRoom = global.Level.Rooms[_ConnectedRoomTemplateIndex];
-				
-				var _ConnectedRoomTemplateDoorsArray = _ConnectedRoomTemplate.Doors;
-				var ConnectedRoomTemplateDoors = array_length(_ConnectedRoomTemplateDoorsArray);
-				for(var i = 0; i < ConnectedRoomTemplateDoors; i++){
-					var _ConnectedDoor = _ConnectedRoomTemplateDoorsArray[i];
-					if(_ConnectedDoor.Position == _ConnectedDoorPos){
-						_ConnectedRoom.Doors[i].Status = DoorStatus.Secret_Closed;
-						break;
-					}
-				}		
-				
+
+				Dungeon_HideSpecialRoom(_RoomIndex);
+
 			}
 
 		}
@@ -783,7 +773,12 @@ function Dungeon_InitLevel(_LevelIndex){
 		global.SpawnedBlocks = false;
 							
 		Room.Template = RoomTemplates_Pick(_RoomIndex);
-			
+
+		if(Room.Template == -1 && _RoomIndex == global.Level.Exits.ExtraRoom){
+			Dungeon_DropExtraExit(_RoomIndex);	//no template fits the extra exit door: the level keeps only the main exit
+			Room.Template = RoomTemplates_Pick(_RoomIndex);
+		}
+
 		if(Room.Template == -1){
 			//continue;
 			
@@ -1003,6 +998,139 @@ function Dungeon_InitLevel(_LevelIndex){
 		if(LevelDef.Special != LevelSpecial.Intro) Music_Play(LevelDef.Song);	
 	}
 	
+}
+
+/// Exits of the level (roadmap F4b), drawn from the pools of the level sheet: where the main exit leads and, sometimes,
+/// an extra exit far from it, maybe in a secret room behind a bombable wall. Runs after every room struct exists and
+/// before the secret rooms and the templates are picked. A level whose exits can only lead to one level draws nothing
+/// and gets no extra exit, so today's levels are built exactly as before. The main exit is the layout's and never hidden.
+function Dungeon_PlanExits(){
+	var _Exits = global.Level.Exits;
+	if(array_length(LevelDef.NextPool) == 0) exit;
+	_Exits.Dest = Level_PoolPick(LevelDef.NextPool);
+	if(!Level_Branches(LevelDef)) exit;
+
+	var _Log = "exits main->" + string(_Exits.Dest);
+
+	//fixed layouts keep their exit; boss levels leave through the boss room, an extra exit would skip the boss
+	if(LevelDef.Special != LevelSpecial.None || global.Level.IsBossLevel || Level_PoolPick(LevelDef.ExitCount) < 2){
+		Test_Event(_Log + " count=1");
+		exit;
+	}
+	var _Secret = Level_PoolPick(LevelDef.ExitHidden);
+
+	//the main exit: its room and where that room is across the map (columns doubled, so the middle is a whole number)
+	var _MainRoom = global.Level.RoomIndex_BossAdjacent;
+	if(_MainRoom == -1) exit;
+	var _MinX = DungeonGridW;
+	var _MaxX = 0;
+	var _RoomIndex;
+	for(_RoomIndex = 0; _RoomIndex < global.Level.RoomCount; _RoomIndex++){
+		_MinX = min(_MinX, Room.GridX);
+		_MaxX = max(_MaxX, Room.GridX + Room.GridW - 1);
+	}
+	var _Middle2 = _MinX + _MaxX + 1;
+	var _Main2 = 2 * global.Level.Rooms[_MainRoom].GridX + global.Level.Rooms[_MainRoom].GridW;
+
+	//rooms where the extra exit fits: a stairway in the middle of the top or bottom wall (upper floor), with no room
+	//behind that wall, at least ExitMinDistance columns from the main exit and across the middle of the map.
+	//Hidden: a special room with one door, which then gets a bombable secret door. Otherwise an ordinary room.
+	var _Candidates = [[], []];	//[ordinary, secret], each [room, position, location]
+	for(_RoomIndex = 0; _RoomIndex < global.Level.RoomCount; _RoomIndex++){
+		if(_RoomIndex == _MainRoom || _RoomIndex == global.Level.RoomIndex_Entrance) continue;
+		if(Room.GridW != 1 || Room.Section_ID != 0 || Room.LowerDoors) continue;
+
+		var _Kind = -1;
+		if(Room.SpecialObject == SpecialDungeonObj.None && Room.TemplateClass != RoomTemplateClass.Special) _Kind = 0;
+		if(Room.SpecialObject == SpecialDungeonObj.SpecialRoom && Room.TemplateClass == RoomTemplateClass.Special && Room.DoorCount == 1) _Kind = 1;
+		if(_Kind == -1) continue;
+
+		var _Room2 = 2 * Room.GridX + Room.GridW;
+		if(abs(_Room2 - _Main2) < 2 * LevelDef.ExitMinDistance) continue;
+		if(_Main2 != _Middle2 && sign(_Room2 - _Middle2) != -sign(_Main2 - _Middle2)) continue;
+
+		var _Walls = [["Top", 12, Room.GridY - 1], ["Bottom", 6, Room.GridY + Room.GridH]];
+		for(var w = 0; w < 2; w++){
+			var _BehindY = _Walls[w][2];
+			if(_BehindY >= 0 && _BehindY < DungeonGridW && global.Level.Map_RoomIndex[_BehindY][Room.GridX] != -1) continue;
+			var _Free = true;
+			for(var d = 0; d < Room.DoorCount; d++){
+				if(Room.Doors[d].Position == _Walls[w][1]) _Free = false;
+			}
+			if(_Free) array_push(_Candidates[_Kind], [_RoomIndex, _Walls[w][1], _Walls[w][0]]);
+		}
+	}
+
+	//no special room for a hidden exit: it stays in sight; no room at all: one exit
+	if(_Secret && array_length(_Candidates[1]) == 0) _Secret = false;
+	var _List = _Candidates[_Secret ? 1 : 0];
+	if(array_length(_List) == 0){
+		Test_Event(_Log + " count=1 (no room for the extra exit)");
+		exit;
+	}
+	var _Pick = _List[irandom(array_length(_List) - 1)];
+	_RoomIndex = _Pick[0];
+
+	var _Door = new Dungeon_CreateStruct_Door();
+	_Door.Position = _Pick[1];
+	_Door.Location = _Pick[2];
+	_Door.ConnectedRoomIndex = -1;
+	_Door.x = global.DoorCoordinates[Room.SizeIndex][_Door.Position].x;
+	_Door.y = global.DoorCoordinates[Room.SizeIndex][_Door.Position].y;
+	_Door.Level = RoomTemplates_GetDoorLevel(_Door.x, _Door.y);
+	_Door.Status = DoorStatus.Exit;
+	_Door.ExitDest = Level_PoolPick(LevelDef.NextPool);
+	array_push(Room.Doors, _Door);
+	Room.DoorCount++;
+	Room.UpperDoors = true;
+	Room.DoorCode = Room.DoorCode | power(2, _Door.Position - 1);
+
+	_Exits.ExtraRoom = _RoomIndex;
+	_Exits.ExtraPosition = _Door.Position;
+	_Exits.ExtraSecret = _Secret;
+	if(_Secret){
+		Room.Secret = 1;
+		Dungeon_HideSpecialRoom(_RoomIndex);
+	}
+
+	Test_Event(_Log + " count=2 extra=room " + string(_RoomIndex) + " grid=" + string(Room.GridX) + "," + string(Room.GridY) + " " + _Door.Location
+		+ (_Secret ? " secret" : "") + "->" + string(_Door.ExitDest) + " main=room " + string(_MainRoom) + " grid=" + string(global.Level.Rooms[_MainRoom].GridX) + "," + string(global.Level.Rooms[_MainRoom].GridY));
+}
+
+/// Takes the extra exit out of its room again, when no room template has a door where it is
+function Dungeon_DropExtraExit(_RoomIndex){
+	var _Exits = global.Level.Exits;
+	array_pop(Room.Doors);	//the extra exit is always the room's last door
+	Room.DoorCount--;
+	Room.DoorCode = Room.DoorCode & ~power(2, _Exits.ExtraPosition - 1);
+	Test_Event("exits extra dropped room=" + string(_RoomIndex) + " (no template with that door)");
+	_Exits.ExtraRoom = -1;
+	_Exits.ExtraPosition = -1;
+	_Exits.ExtraSecret = false;
+}
+
+/// Makes the only door of a special room, and the door on the other side, secret doors
+function Dungeon_HideSpecialRoom(_RoomIndex){
+
+	Room.Doors[0].Status = DoorStatus.Secret_Closed; //special Rooms should always only have 1 door into them, so we can index at 0
+
+	var _ConnectedRoomTemplateIndex = Room.Doors[0].ConnectedRoomIndex;
+	var _ConnectedRoomTemplate = global.Level.DungeonTemplate.Rooms[_ConnectedRoomTemplateIndex];
+	var _ConnectedRoomTemplateRSI = global.RoomSizeIndex[_ConnectedRoomTemplate.GridW][_ConnectedRoomTemplate.GridH];
+	var _ConnectedDoorPos = Door_GetConnectedPos(Room.GridX, Room.GridY, Room.SizeIndex, _ConnectedRoomTemplate.GridX, _ConnectedRoomTemplate.GridY, _ConnectedRoomTemplateRSI, Room.Doors[0].Position);
+
+	var _ConnectedRoom = global.Level.Rooms[_ConnectedRoomTemplateIndex];
+
+	var _ConnectedRoomTemplateDoorsArray = _ConnectedRoomTemplate.Doors;
+	var ConnectedRoomTemplateDoors = array_length(_ConnectedRoomTemplateDoorsArray);
+	for(var i = 0; i < ConnectedRoomTemplateDoors; i++){
+		var _ConnectedDoor = _ConnectedRoomTemplateDoorsArray[i];
+		if(_ConnectedDoor.Position == _ConnectedDoorPos){
+			_ConnectedRoom.Doors[i].Status = DoorStatus.Secret_Closed;
+			break;
+		}
+	}
+
 }
 
 function Dungeon_InitSaveLevel(_LevelIndex){

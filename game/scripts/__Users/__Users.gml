@@ -103,6 +103,8 @@ function User_VerifyIntegrity(){
 		if(is_struct(User.SaveData)){
 			
 			if(!variable_struct_exists(User.SaveData, "Level")) variable_struct_set(User.SaveData, "Level", 0);
+			
+			if(!variable_struct_exists(User.SaveData, "NextLevel")) variable_struct_set(User.SaveData, "NextLevel", -1);
 		
 			if(!variable_struct_exists(User.SaveData, "LinkCharacterIndex")) variable_struct_set(User.SaveData, "LinkCharacterIndex", 0);
 		
@@ -193,6 +195,8 @@ function User_SaveDataStruct() constructor{
 	
 	BonusItem = StartingGear.None;
 	
+	NextLevel = -1;	//where the exit taken before the rest stop leads (global.RunPath, roadmap F4b); -1 = the level sheet's Next
+	
 	GameVersion = "";
 	
 }
@@ -206,6 +210,7 @@ function User_SaveGame(){
 	global.Users[global.UserIndex].SaveData = new User_SaveDataStruct();
 	
 	global.Users[global.UserIndex].SaveData.Level = global.Level.Index;
+	global.Users[global.UserIndex].SaveData.NextLevel = global.RunPath.Next;
 	
 	global.Users[global.UserIndex].SaveData.LinkCharacterIndex = global.LinkCharacterIndex;
 	
@@ -248,6 +253,7 @@ function User_SaveGame(){
 function User_LoadGame(){
 	
 	global.ContinueLevel = global.Users[global.UserIndex].SaveData.Level;
+	global.RunPath.Next = global.Users[global.UserIndex].SaveData.NextLevel;
 	
 	global.LinkCharacterIndex = global.Users[global.UserIndex].SaveData.LinkCharacterIndex;
 	with(oLink) Link_LoadCharacterIndex();

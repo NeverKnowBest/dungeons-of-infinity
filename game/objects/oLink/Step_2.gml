@@ -12,7 +12,7 @@ if(InitNewDungeon){
 	
 	Time_PauseStart();
 	
-	var _NextLevel = LevelDef.Next;
+	var _NextLevel = Level_NextIndex();	//where the exit Link took leads (roadmap F4b)
 	if(Dungeon_IsSaveLevel(_NextLevel) && !global.SaveLevel){
 		global.SaveLevel = true;
 		Dungeon_InitSaveLevel(global.Level.Index);

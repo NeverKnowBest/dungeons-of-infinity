@@ -28,11 +28,12 @@ STEPS = {
     'give': {'item', 'index', 'amount'},
     'state': set(),
     'log': {'text'},
-    'expect': {'alive', 'level', 'room', 'enemies', 'kills_min'},
+    'expect': {'alive', 'level', 'room', 'enemies', 'kills_min', 'exit_level'},
     'sheet': {'level', 'seeds'},
+    'exit': {'which', 'frames'},
     'end': set(),
 }
-TOP_KEYS = {'name', 'seed', 'level', 'cheats', 'items', 'steps', 'max_frames', 'sound', 'speed', 'comment', 'dump'}
+TOP_KEYS = {'name', 'seed', 'level', 'cheats', 'items', 'steps', 'max_frames', 'sound', 'speed', 'comment', 'dump', 'levels'}
 
 _enums = None
 
@@ -103,6 +104,8 @@ def resolve(scenario):
         if key not in TOP_KEYS:
             errors.append('unknown key "%s"' % key)
     out = _resolve(scenario, errors, 'scenario')
+    if 'levels' in out:
+        out['levels'] = _levels(out['levels'], errors)
     if 'level' in out and out['level'] != 'Hub':
         out['level'] = _named(out['level'], 'DungeonLevel', errors, 'level')
     for i, item in enumerate(out.get('items', [])):
@@ -125,6 +128,8 @@ def resolve(scenario):
                 errors.append('%s: unknown key "%s" (use %s)' % (where, key, ', '.join(VERBS)))
         if 'level' in step:
             step['level'] = _named(step['level'], 'DungeonLevel', errors, where)
+        if do == 'exit' and step.get('which', 'main') not in ('main', 'extra'):
+            errors.append('%s: "which" is "main" or "extra"' % where)
         if do == 'give':
             step['item'] = _named(step.get('item'), 'ItemClass', errors, where)
         if do == 'spawn' and not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(step.get('enemy')))):
@@ -133,6 +138,45 @@ def resolve(scenario):
             if not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(enemy))):
                 errors.append('%s: no object "%s"' % (where, enemy))
     return out, errors
+
+
+def level_fields():
+    """Field names of the level sheet (Level_Create in __Levels.gml)."""
+    path = os.path.join(SCRIPTS, '__Levels', '__Levels.gml')
+    if not os.path.exists(path):
+        return set()
+    src = open(path, encoding='utf-8').read()
+    body = re.search(r'function Level_Create\(.*?\n\}', src, re.S)
+    return set(re.findall(r'^\t(\w+) = ', body.group(0), re.M)) if body else set()
+
+
+def exit_looks():
+    """Names of the exit looks (ExitLooks_Init in __Doors.gml)."""
+    path = os.path.join(SCRIPTS, '__Doors', '__Doors.gml')
+    if not os.path.exists(path):
+        return set()
+    return set(re.findall(r'^\t\t(\w+): \{Draw:', open(path, encoding='utf-8').read(), re.M))
+
+
+def _levels(changes, errors):
+    """Scenario "levels" ({LevelName: {Field: value}}) into the list the game reads ([{level, Field: value}])."""
+    if not isinstance(changes, dict):
+        errors.append('"levels" must be an object: {"Castle": {"NextPool": [["CastleBasement", 2], ["Sewers", 1]]}}')
+        return []
+    fields, looks, out = level_fields(), exit_looks(), []
+    for name, change in changes.items():
+        where = 'levels.%s' % name
+        entry = {'level': _named(name, 'DungeonLevel', errors, where)}
+        for field, value in (change.items() if isinstance(change, dict) else []):
+            if fields and field not in fields:
+                errors.append('%s: the level sheet has no field "%s"' % (where, field))
+            if field == 'NextPool':
+                value = [[_named(v[0], 'DungeonLevel', errors, where), v[1]] for v in value]
+            if field == 'ExitLook' and looks and value not in looks:
+                errors.append('%s: unknown exit look "%s" (%s)' % (where, value, ', '.join(sorted(looks))))
+            entry[field] = value
+        out.append(entry)
+    return out
 
 
 def cheat_keys():

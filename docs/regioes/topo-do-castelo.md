@@ -4,13 +4,15 @@ Piloto do plano de ferramentas: a primeira região feita pelo fluxo novo (spec, 
 
 * **Estado:** especificada
 * **Origem:** ALttP, Castelo de Hyrule na noite da chuva (abertura do jogo), parte de fora e alta do castelo
-* **Tipo:** estágio alternativo do nível 2 (`DungeonLevel.Castle`)
-* **Posição na run:** sorteado no lugar do Hyrule Castle em 1 de cada 3 runs; o resto da run não muda (o nível seguinte continua sendo o porão)
+* **Tipo:** dungeon, parte de fora e alta do castelo (ALttP)
+* **Capítulo:** variante do capítulo 2 (`Depth` 2), ao lado do Castle Basement. Vem depois do capítulo 1 (Hyrule Castle, a entrada do castelo) e segue para o capítulo 3 (Castle Prison, com o chefe)
+* **Pools de saída:** entra na `NextPool` do Hyrule Castle com peso 1, ao lado do Castle Basement com peso 2 (cada saída do castelo leva ao topo em 1 de cada 3 sorteios). A `NextPool` dele é só o Castle Prison; `ExitCount` e `ExitHidden` no padrão da ficha
+* **Visual da saída:** escadaria para cima (`StairsUp`, já existe: é a escada da entrada de toda fase)
 * **Gráficos:** `incoming/topo-do-castelo/` (novo): ameias, telhado e piso de pedra externa extraídos da ROM no PC de casa (área do castelo no mundo da luz e a entrada da Torre de Agahnim)
 
 ## Ideia
 
-Em vez de entrar pelos corredores, o Link sobe pelos telhados e passarelas do castelo, debaixo da tempestade da abertura. É o mesmo castelo e os mesmos guardas, mas ao ar livre: chuva caindo sobre a tela, relâmpagos que clareiam tudo por um instante e o trovão logo depois. No fim, uma escada desce de volta para dentro, rumo ao porão.
+Em vez de entrar pelos corredores, o Link sobe pelos telhados e passarelas do castelo, debaixo da tempestade da abertura. É o mesmo castelo e os mesmos guardas, mas ao ar livre: chuva caindo sobre a tela, relâmpagos que clareiam tudo por um instante e o trovão logo depois. Chega-se a ele por uma escadaria que sobe, e no fim uma escada desce de volta para dentro, rumo à prisão.
 
 ## Visual
 
@@ -24,7 +26,7 @@ Em vez de entrar pelos corredores, o Link sobe pelos telhados e passarelas do ca
 
 * Mesma classe de dungeon e mesmos layouts do castelo (`DungeonClass.Castle`, `data_d`); muda só o conjunto de templates de sala, que ganha uma subclasse "Rooftop" (novo) no Tiled.
 * Primeira versão: 6 a 8 templates (1x1, 2x1, 1x2 e um 2x2), cada um com função clara: passarela estreita, pátio entre torres, telhado aberto cercado de ameias, sala da escada de descida. Sem torres de parede (Beamos, canhão), como no castelo.
-* Salas especiais: entrada (Link chega subindo a escada da torre), saída (escada que desce para o porão); as demais salas especiais (tesouro e outras que o castelo sorteie) iguais às do castelo.
+* Salas especiais: entrada (Link chega subindo a escada da torre), saída (escada que desce para a prisão); as demais salas especiais (tesouro e outras que o castelo sorteie) iguais às do castelo.
 * Referência para a F8: salas da Torre de Agahnim e o exterior do castelo no ALttP (as ids saem na conversão).
 
 ## Inimigos
@@ -35,11 +37,11 @@ Em vez de entrar pelos corredores, o Link sobe pelos telhados e passarelas do ca
 | `oEnemy_Soldier_Advanced` | 2 | verde, energia 2, ataque 0.5 (igual ao castelo) | `docs/ref/doi.md` |
 | `oEnemy_Keese` | 1 | padrão (energia 0, ataque 0.25) | `docs/ref/doi.md` |
 
-Os soldados usam a mesma tabela do castelo. O morcego entra com peso baixo: são os morcegos do porão espantados pela tempestade, e ele já existe no nível seguinte. Nenhum inimigo novo.
+Os soldados usam a mesma tabela do castelo. O morcego entra com peso baixo: são os morcegos do porão espantados pela tempestade, e ele já existe no porão e na prisão. Nenhum inimigo novo.
 
 ## Chefe
 
-Nenhum. O nível 2 não tem chefe.
+Nenhum. O capítulo 2 não tem chefe (o do capítulo 3, Armos, continua na prisão).
 
 ## Itens e recompensas
 
@@ -59,23 +61,23 @@ Iguais aos do castelo (baús, potes e o que mais o castelo sortear). Nenhuma con
 
 ## Regras especiais
 
-Nenhuma na primeira versão. Ideias para depois (não fazer agora): vento que empurra o Link nas passarelas, buraco no telhado que leva direto ao porão.
+Nenhuma na primeira versão. Ideias para depois (não fazer agora): vento que empurra o Link nas passarelas, buraco no telhado que leva direto à prisão.
 
 ## Mudanças no código
 
-Se a ficha de fase (F4) já existir: uma entrada nova em `global.LevelDefs` (novo) como variante do castelo, com templates Rooftop, clima `oWeather` (novo) e a mesma tabela de inimigos mais o morcego. Se ainda não existir:
+A ficha de fase (F4) e os caminhos ramificados (F4b) já existem, então a região é uma entrada nova na ficha:
 
-* Sorteio da variante no começo do nível 2 (`Dungeon_InitLevel`) e uma variável de variante no nível atual.
-* `Dungeon_PickTemplateIndex` e o carregamento de templates: subclasse Rooftop quando a variante estiver ativa.
-* Tabela de inimigos: o morcego no castelo só na variante.
-* Clima: criar `oWeather` (novo) no começo do nível na variante.
-* `oIntro`: passar a usar o `oWeather` (novo) para a chuva e o relâmpago.
+* `DungeonLevel` ganha o membro do topo (novo) e `Levels_Init` a entrada: `Depth` 2, `Next` e `NextPool` no Castle Prison, `Theme` e `EnemyStats` do castelo, `ExitLook` "StairsUp", a música e a lista de inimigos acima.
+* `NextPool` do Hyrule Castle: `[[DungeonLevel.CastleBasement, 2], [<topo>, 1]]`. Só isso liga o sorteio de saídas no castelo (quantas, escondida, destino); nenhuma outra fase muda.
+* Salas: subclasse Rooftop (novo) no Tiled e a escolha de templates por ela (`Dungeon_PickTemplateIndex` e o carregamento de templates).
+* Clima: criar `oWeather` (novo) no começo da fase e passar o `oIntro` a usá-lo para a chuva e o relâmpago.
+* Os soldados: confirmar se usam os números do castelo (`EnemyStats` do castelo, como decidido) agora que a fase está no capítulo 2, onde o porão usa os dele.
 * `tools/check/validate.py` e `docs/dev/engine-notes.md`: registrar o que for aprendido.
 
 ## Pronto quando
 
-* Em várias runs, o nível 2 aparece às vezes como o topo do castelo, com salas Rooftop, chuva, relâmpago e trovão, e o nível seguinte é o porão normal.
-* Cenários de teste da F3: começar no nível 2 com a variante forçada e semente fixa, andar até a escada de saída e conferir no log que as salas carregaram, os soldados apareceram e nada deu erro; folha de contato com 5 sementes mostrando as salas.
+* Em várias runs, o capítulo 2 aparece às vezes como o topo do castelo (por uma escadaria para cima no Hyrule Castle), com salas Rooftop, chuva, relâmpago e trovão, e o capítulo seguinte é a prisão normal.
+* Cenários de teste da F3: começar no topo do castelo com semente fixa, andar até a escada de saída e conferir no log que as salas carregaram, os soldados apareceram e nada deu erro; folha de contato com 5 sementes mostrando as salas.
 * O validador passa e a entrada (nível `Start`) continua igual com o `oWeather` (novo).
 * O Guilherme joga uma run e aprova o visual.
 
@@ -84,3 +86,4 @@ Se a ficha de fase (F4) já existir: uma entrada nova em `global.LevelDefs` (nov
 * Mesmos inimigos do castelo, chuva e relâmpagos como no começo da run (roadmap, out/2026).
 * É o piloto do plano de ferramentas: só começa depois das etapas F1 a F10, para testar o fluxo inteiro.
 * Chance de 1 em 3 e o morcego com peso 1 foram escolhas do Claude dentro da direção de design; mudar se o Guilherme preferir.
+* É variante do capítulo 2 (`Depth` 2, no lugar do Castle Basement), entre o Hyrule Castle e o Castle Prison, e a saída que leva a ele é a escadaria para cima (Guilherme, out/2026). A versão anterior desta spec o punha no lugar do Hyrule Castle; isso foi corrigido.

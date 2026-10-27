@@ -86,22 +86,27 @@ Para mudanças que não deveriam mudar o jogo (refatoração, faxina, troca de t
 5. Mostre a spec ao Guilherme antes de construir; o que ele decidir vai na seção Decisões.
 6. Ao avançar, atualize o Estado (em produção, pronta).
 
-## Estágio alternativo (ex.: topo do castelo no nível 2)
+## Estágio alternativo (variante de capítulo, ex.: topo do castelo no capítulo 2)
 
 Como os níveis são montados hoje:
 
-* Tudo o que muda de um nível para outro está na ficha de fase, `game/scripts/__Levels/__Levels.gml` (`global.LevelDefs`, um bloco por nível; cada campo tem comentário no `Level_Create`). Detalhes em `docs/dev/engine-notes.md` ("Level sheet").
+* Tudo o que muda de um nível para outro está na ficha de fase, `game/scripts/__Levels/__Levels.gml` (`global.LevelDefs`, um bloco por nível; cada campo tem comentário no `Level_Create`). Detalhes em `docs/dev/engine-notes.md` ("Level sheet" e "Branched exits").
+* A run é uma sequência de capítulos (o `Depth` da ficha); as fases com o mesmo `Depth` são variantes do capítulo. Uma variante entra na run pelas saídas das fases do capítulo anterior: a `NextPool` de cada uma (`[[fase, peso], ...]`) sorteia para onde cada saída leva. Enquanto a `NextPool` de uma fase tiver um destino só, ela não sorteia nada e sai igual a antes da F4b.
 * Cada nível escolhe uma classe de dungeon (`Class`): um conjunto de layouts em `data_d` (grade de salas, portas, escadas) e de salas em `game/datafiles/data/rooms/` (templates do Tiled, por classe e subclasse).
 * O visual vem dos tiles do DoI (`sTiles`, linhas do tema `Theme` em `LevelTilesY`) desenhados a partir dos templates, mais as regras de decoração de cada tema (`switch(LevelDef.Theme)`). Os inimigos vêm da lista `Enemies` da ficha (objeto e peso).
+* A saída do nível não é uma sala: é uma porta com status `Exit` na parede de cima ou de baixo de uma sala (a classe de templates Stairs é outra coisa, as escadas internas entre os dois andares de uma sala). O desenho dela vem do `ExitLook` da fase de destino.
 
 Passos:
 
-1. Novo valor no fim de `DungeonLevel` e uma entrada no `Levels_Init`. Copie a entrada do nível mais parecido e mude o que for diferente: `Name`, `Depth` (a profundidade da run que ele ocupa; 2 para o nível 2), `Theme` e `EnemyStats` do nível cujo visual e inimigos ele usa (`DungeonLevel.Castle` no topo do castelo), `Class`, `Song`, `Enemies`, escuridão, água, obstáculos. Para entrar no lugar do nível 2, o `Next` do nível anterior aponta para ele (ou para um sorteio entre os dois) e o `Next` dele aponta para o nível 3.
-2. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.
-3. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `game/datafiles/data/rooms/` com `tools/templates/convert.py` (veja "Template de sala no Tiled"). Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
-4. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
-5. Inimigos: reaproveite os do castelo; é só a lista `Enemies` da entrada, com `EnemyStats` de um nível onde eles existem (os soldados só funcionam nos níveis que o `Create` deles conhece).
-6. Cenário de referência `ref_NN_<Fase>.json` para a fase nova (veja "Comparar antes e depois").
+1. Novo valor no fim de `DungeonLevel` e uma entrada no `Levels_Init`. Copie a entrada do nível mais parecido e mude o que for diferente: `Name`, `Depth` (o capítulo do qual ela é variante), `Theme` e `EnemyStats` do nível cujo visual e inimigos ele usa (`DungeonLevel.Castle` no topo do castelo), `Class`, `Song`, `Enemies`, escuridão, água, obstáculos. `Next` (e, se o próximo capítulo tiver variantes, `NextPool`) aponta para o próximo capítulo.
+2. Caminho: acrescente a fase nova na `NextPool` de cada fase do capítulo anterior, com o peso que dá a chance desejada (ex.: Hyrule Castle `[[DungeonLevel.CastleBasement, 2], [<nova>, 1]]` leva ao topo em 1 de cada 3 saídas). Isso já liga o sorteio de quantas saídas a fase tem e se a extra fica escondida (`ExitCount`, `ExitHidden`, padrão na ficha).
+3. Visual da saída: `ExitLook` na entrada da fase nova (`"StairsDown"` é o padrão, `"StairsUp"` a escadaria para cima). Para um visual que ainda não existe, acrescente uma entrada em `ExitLooks_Init` (`__Doors.gml`): uma função que desenha a viga e o vão da porta de saída em cima e embaixo, o som e o ícone do mapa. O gerador não muda.
+4. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.
+5. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `game/datafiles/data/rooms/` com `tools/templates/convert.py` (veja "Template de sala no Tiled"). Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
+6. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
+7. Inimigos: reaproveite os do castelo; é só a lista `Enemies` da entrada, com `EnemyStats` de um nível onde eles existem (os soldados só funcionam nos níveis que o `Create` deles conhece).
+8. Teste: antes de existir a fase, dá para ver o sorteio com uma ramificação temporária no cenário (chave `"levels"`, como em `tools/test/scenarios/branch_exits.json`); com ela pronta, folha de contato da fase anterior com várias sementes e o passo `exit` para atravessar cada saída.
+9. Cenário de referência `ref_NN_<Fase>.json` para a fase nova (veja "Comparar antes e depois").
 
 ## Conteúdo de outro Zelda (ex.: Minish Cap)
 

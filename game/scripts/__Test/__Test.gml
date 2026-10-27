@@ -14,6 +14,7 @@ global.TestKills = 0;
 global.TestDumps = 0;		// level dumps written so far (scenario "dump": true)
 global.TestDumpFile = "";
 global.TestBuildSeed = 0;
+global.TestExitDest = -1;	// level the exit of the last "exit" step leads to (expect "exit_level")
 
 // Verbs a scenario may hold or press (see __input_config_verbs)
 global.TestVerbs = ["up", "down", "left", "right", "sword", "action", "item", "map", "strafe", "inventory", "menu_access", "hud"];
@@ -55,6 +56,7 @@ function Test_Init(){
 		Sound: false,
 		Speed: 60,
 		Dump: false,
+		Levels: [],
 		Failures: 0,
 		Finished: false
 	};
@@ -75,6 +77,7 @@ function Test_Init(){
 	global.Test.Sound = _Scenario[$ "sound"] ?? false;
 	global.Test.Speed = _Scenario[$ "speed"] ?? 60;
 	global.Test.Dump = _Scenario[$ "dump"] ?? false;
+	global.Test.Levels = _Scenario[$ "levels"] ?? [];
 
 	// Windowed, and no pause or mute when the window loses focus (the input library is told the same in
 	// INPUT_ALLOW_OUT_OF_FOCUS), so a test keeps running while someone uses the PC
@@ -113,11 +116,38 @@ function Test_Begin(){
 	input_player_ghost_set(true);
 
 	if(is_string(global.Test.Level) && global.Test.Level == "Hub") global.HubPending = true;
+	
+	Test_ChangeLevels();
 
 	Test_Log("start scenario=" + string(global.Test.Name) + " seed=" + string(global.Test.Seed) + " level=" + string(global.Test.Level));
 	random_set_seed(global.Test.Seed);
 	DungeonSeq_Init(global.UserIndex);
 	room_goto(Room_Dungeon);
+}
+
+/// Scenario "levels": temporary changes to the level sheet for this test only, such as a branch of the run that no
+/// level has yet (roadmap F4b). Each entry is {level, <field>: value, ...}; tools/test/scenario.py checks the fields.
+function Test_ChangeLevels(){
+	for(var i = 0; i < array_length(global.Test.Levels); i++){
+		var _Change = global.Test.Levels[i];
+		var _Def = Level_Get(_Change[$ "level"] ?? -1);
+		if(_Def == undefined){
+			Test_Fail("levels: bad level " + string(_Change[$ "level"]));
+			continue;
+		}
+		var _Names = variable_struct_get_names(_Change);
+		array_sort(_Names, true);
+		for(var j = 0; j < array_length(_Names); j++){
+			var _Field = _Names[j];
+			if(_Field == "level") continue;
+			if(!variable_struct_exists(_Def, _Field)){
+				Test_Fail("levels: no field " + _Field);
+				continue;
+			}
+			_Def[$ _Field] = _Change[$ _Field];
+			Test_Log("levels " + string(_Def.Index) + " \"" + _Def.Name + "\" " + _Field + "=" + json_stringify(_Change[$ _Field]));
+		}
+	}
 }
 
 /// Called from oGame's Create in place of the intro level
@@ -214,7 +244,12 @@ function Test_GotoRoom(_GridX, _GridY){
 	var _RoomIndex = global.Level.Map_RoomIndex[_GridY][_GridX];
 	if(_RoomIndex == -1) return false;
 
-	var _Pos = Test_RoomEntryPoint(_RoomIndex);
+	Test_PlaceLink(_RoomIndex, Test_RoomEntryPoint(_RoomIndex));
+	return true;
+}
+
+/// Moves Link to _Pos [x, y] in a room of the current level and points the camera at it
+function Test_PlaceLink(_RoomIndex, _Pos){
 	with(oLink){
 		x = _Pos[0];
 		y = _Pos[1];
@@ -228,11 +263,31 @@ function Test_GotoRoom(_GridX, _GridY){
 		FallSpawnFacing = Facing;
 		UpdateState(LinkState.Standing);
 	}
-	with(oCamera) SetToRoomIndex(_RoomIndex, true);
+	//SetToRoomIndex activates the new room and then deactivates the current one: for the same room that would put
+	//Link and everything else to sleep
+	if(_RoomIndex != global.CurrentRoomIndex) with(oCamera) SetToRoomIndex(_RoomIndex, true);
 	global.Level.Rooms[_RoomIndex].Visited = true;
 	Map_UpdateExploredRooms();
 	global.InWaterSprite = Link_GetInWaterSprite();
-	return true;
+}
+
+/// Moves Link into the room of the main exit (_Extra false) or of the extra exit (roadmap F4b), 40 px in front of the
+/// exit door. Returns the verb that walks into it ("up" or "down"), or "" when the level has no such exit.
+function Test_GotoExit(_Extra){
+	var _Exits = global.Level.Exits;
+	var _RoomIndex = _Extra ? _Exits.ExtraRoom : global.Level.RoomIndex_BossAdjacent;
+	if(_RoomIndex == -1) return "";
+	var _R = global.Level.Rooms[_RoomIndex];
+	for(var i = 0; i < array_length(_R.Doors); i++){
+		var _Door = _R.Doors[i];
+		if(_Door.Status != DoorStatus.Exit || (_Door.Location != "Top" && _Door.Location != "Bottom") || (_Extra && _Door.Position != _Exits.ExtraPosition)) continue;
+		var _Top = (_Door.Location == "Top");
+		Test_PlaceLink(_RoomIndex, [_R.x + _Door.x + 16, _R.y + _Door.y + 16 + (_Top ? 40 : -40)]);
+		global.TestExitDest = _Extra ? _Door.ExitDest : (global.SaveLevel ? Level_NextIndex() : _Exits.Dest);
+		Test_Log("exit " + (_Extra ? "extra" : "main") + " room=" + string(_RoomIndex) + " " + _Door.Location + " -> level " + string(global.TestExitDest));
+		return _Top ? "up" : "down";
+	}
+	return "";
 }
 
 /// A spot just inside one of the room's doors: [x, y]
@@ -340,6 +395,18 @@ function Test_DoStep(_S){
 			if(!Test_GotoRoom(_S[$ "x"] ?? -1, _S[$ "y"] ?? -1)) Test_Fail("no room at " + string(_S[$ "x"]) + "," + string(_S[$ "y"]));
 			return true;
 
+		case "exit":	// Link in front of the main or the extra exit, then walking into it ("frames", default 60)
+			if(StepFrames == 1){
+				ExitVerb = Test_GotoExit((_S[$ "which"] ?? "main") == "extra");
+				if(ExitVerb == ""){
+					Test_Fail("no " + string(_S[$ "which"] ?? "main") + " exit");
+					return true;
+				}
+			}
+			if(ExitVerb == "" || StepFrames > (_S[$ "frames"] ?? 60)) return true;
+			Test_HoldVerbs([ExitVerb]);
+			return false;
+
 		case "level":
 			// Dungeon_Clear only removes active instances: wake every room first (oTest Step), build in the next End Step
 			if(StepFrames == 1){
@@ -379,6 +446,7 @@ function Test_DoStep(_S){
 			}
 			if(variable_struct_exists(_S, "enemies") && instance_number(oEnemy) != _S.enemies) _Bad += " enemies(" + string(instance_number(oEnemy)) + ")";
 			if(variable_struct_exists(_S, "kills_min") && global.TestKills < _S.kills_min) _Bad += " kills(" + string(global.TestKills) + ")";
+			if((_S[$ "exit_level"] ?? false) && (global.SaveLevel || global.Level.Index != global.TestExitDest)) _Bad += " exit_level(" + string(global.Level.Index) + (global.SaveLevel ? " rest stop" : "") + ")";
 			if(_Bad == "") Test_Log("expect ok");
 			else Test_Fail("expect" + _Bad);
 			return true;

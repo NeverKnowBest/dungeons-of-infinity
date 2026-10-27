@@ -49,6 +49,9 @@ Este documento é o guia para as decisões artísticas e de design. O Guilherme 
 
 ## Conteúdo novo
 
+* **Capítulos e variantes.** A run é uma sequência de capítulos, como no Binding of Isaac: cada posição da run (o `Depth` da ficha de fase) é um capítulo, e um capítulo pode ter variantes (o capítulo 2 do Isaac pode ser Caves, Catacombs ou Flooded Caves). Toda região nova diz de qual capítulo é variante. Uma variante pode ser uma área externa da franquia (jardim, campina, floresta), não só uma dungeon.
+* **Saídas.** Nada é garantido: pools com pesos sorteiam quantas saídas a fase tem (uma ou duas), se a extra fica escondida e para qual variante do próximo capítulo cada uma leva; muitas runs têm uma saída só. Duas saídas nunca ficam perto: uma de um lado do mapa, a outra do lado oposto, para quem corre muitas vezes nem achar a segunda. A extra pode ficar numa sala secreta atrás de uma parede que abre com bomba; a principal nunca fica escondida, para ninguém ficar preso sem bombas.
+* **O visual da saída mostra o destino.** Ele vem da ficha da fase de destino, nunca fixo no gerador: escadaria para baixo é o padrão, escadaria para cima leva ao topo do castelo, e um destino ao ar livre pode ter, por exemplo, uma parede explodida. O jogador aprende a ler a saída antes de entrar.
 * **Estágios alternativos** devem ser lugares que fazem sentido no mundo do ALttP ou de outro Zelda (topo do castelo, Palácio do Leste, Torre de Hera...), com inimigos e clima coerentes. Variação de um estágio existente reaproveita os inimigos dele.
 * **Outros Zeldas** (Minish Cap, Link's Awakening, Oracle) entram como "regiões" inteiras: tiles, inimigos, chefe e música da mesma origem, convertidos para as regras visuais acima. Não misture um inimigo de Minish Cap num estágio do ALttP sem motivo.
 * **Itens novos** seguem a lógica de Zelda: cada item abre uma possibilidade (um caminho, um jeito de lutar), não só aumenta números.
