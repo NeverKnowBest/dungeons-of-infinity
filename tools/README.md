@@ -174,13 +174,32 @@ python tools/templates/compare.py OLD NEW          # compare two rooms folders (
 
 The output was checked equal to the last `data_r` written by the GameMaker parser (roadmap F5). The room files are plain git, not LFS, so `git diff` shows which templates changed (one line each).
 
+### `import/` (Python 3, Pillow, numpy)
+
+Graphics and music of a region, from `incoming/<region>/` into the project (roadmap F6). The folder convention (file names, frames, sheets, GIFs, tileset band, music, `manifest.json`) is in `incoming/README.md`.
+
+```
+python tools/import/import_region.py <region>              # convert, write the sprites and sounds, register them, preview
+python tools/import/import_region.py <region> --dry-run    # only convert and build the preview; game/ is untouched
+python tools/import/import_region.py <region> --remove     # take out everything the last import of the region made
+python tools/import/import_region.py --export-band Castle tileset.png   # a theme band of sTiles (1248x48), to paint over
+python tools/import/make_example.py [folder]               # example region from existing assets (default tools/import/out/example)
+```
+
+| File | What it does |
+|------|--------------|
+| `import_region.py` | Reads `sprites/` (one file per sprite, numbered frames `_0 _1`, a sheet cut by `"frame"`, or an animated GIF), `tileset.png` and `music/*.wav`. Applies the palette rules of `docs/design/direcao.md`: 32 levels per channel (`round(round(c*31/255)*255/31)`, like the ROM extractions), hard alpha, at most 7 colors (the two closest colors merge until it fits; the outline color is kept) and an outline check (`add` or `darken` fix it). Writes the sprites with `hub/gm_assets.py` into the IDE folder `Regions/<Region>/Sprites` (sounds in `.../Music`), adds `SongIndex.<Song>` and its line in `Music_InitData` (`__Music.gml`, marked `// incoming/<region>`), and records what it made and the source hashes in `incoming/<region>/imported.json`. Re-importing gives the same files, removes what is no longer in the folder, and never overwrites an asset that is not from that region. A region given as a path (not under `incoming/`) works the same; its record goes into that folder |
+| `make_example.py` | Builds a region that uses every input of the convention from assets the project already has (rat, ropa, bari, a piece of the Sanctuary, the Castle band tinted blue, 6 s of the Sanctuary song). For testing the importer: import it, check, then `--remove` it |
+
+Output: `tools/import/out/<region>/` (ignored by git) with `frames/` (the converted PNGs), `preview.png` (each sprite before and after next to Link at the same scale, the tileset under its base band), `report.txt` and the cut `.wav` files. The validator reads `incoming/*/imported.json`: an imported asset missing from `Zelda.yyp` is an error, sources changed since the import a warning, a region never imported a note.
+
 ### `hub/` (Python 3, Pillow, numpy)
 
 Builds the Sanctuary hub: room pictures, sprites, objects and data. Paths are relative to the repo, so run them from anywhere.
 
 | Script | What it does |
 |--------|--------------|
-| `gm_assets.py` | Writes GameMaker 2024 sprites (multi frame, fps, origin), sounds and objects, and registers them in `Zelda.yyp`. Re-running a sprite keeps its frame ids, so files overwrite in place |
+| `gm_assets.py` | Writes GameMaker 2024 sprites (multi frame, fps, origin), sounds (with their sample rate) and objects, and registers them in `Zelda.yyp`. Re-running a sprite keeps its frame ids, so files overwrite in place. `folder('A/B')` adds IDE folders, `remove(kind, name)` deletes a resource and unregisters it, `remove_folder` drops IDE folders nothing uses |
 | `tiledjson.py` | Serializes objects the way Tiled writes `data/room-templates/*.json` |
 | `gids.py` | Tiled gid of each template object type, read from `__RoomTemplates.gml` |
 | `build2.py` | Shared helpers: load/save `data_d`, remove objects from the Tiled map, rebuild the room templates (`room_templates()`, calls `templates/convert.py`) |

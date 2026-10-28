@@ -27,6 +27,9 @@ Checks:
     sheets (docs/ref/*.md) are checked for assets too
   * test scenarios (tools/test/scenarios/*.json): known steps, keys, cheats,
     enemies and enum names (the same check tools/test/run.py does)
+  * incoming graphics (incoming/<region>/, roadmap F6): what the last
+    import_region.py made is still in the project, and the sources did not
+    change since then
 """
 import json
 import os
@@ -454,6 +457,37 @@ def check_scenarios(rep):
                 rep.error('tools/test/scenarios/%s: %s' % (f, e))
 
 
+def check_incoming(rep, registered):
+    """incoming/<region>/imported.json (written by tools/import/import_region.py) matches the project and the files."""
+    idir = os.path.join(REPO, 'incoming')
+    if not os.path.isdir(idir):
+        return
+    sys.path.insert(0, os.path.join(REPO, 'tools', 'import'))
+    import import_region
+    for slug in sorted(os.listdir(idir)):
+        d = os.path.join(idir, slug)
+        if not os.path.isdir(d):
+            continue
+        recp = os.path.join(d, 'imported.json')
+        if not os.path.exists(recp):
+            if import_region.source_files(d):
+                rep.note('incoming/%s is not imported yet (python tools/import/import_region.py %s)' % (slug, slug))
+            continue
+        try:
+            rec = json.load(open(recp, encoding='utf-8'))
+        except ValueError as e:
+            rep.error('incoming/%s/imported.json is not valid JSON: %s' % (slug, e))
+            continue
+        missing = [n for kind, key in (('sprites', 'sprites'), ('sounds', 'sounds'))
+                   for n in rec.get(key, []) if (kind, n) not in registered]
+        if missing:
+            rep.error('incoming/%s was imported but %s are not in Zelda.yyp; run python tools/import/import_region.py %s'
+                      % (slug, ', '.join(missing), slug))
+        if import_region.source_hashes(d) != rec.get('sources'):
+            rep.warn('incoming/%s changed since the last import; run python tools/import/import_region.py %s'
+                     % (slug, slug))
+
+
 # ---------------------------------------------------------------- main
 
 def main():
@@ -471,6 +505,7 @@ def main():
     check_regions(rep, registered)
     check_exit_looks(rep)
     check_scenarios(rep)
+    check_incoming(rep, registered)
 
     if CASE_MISMATCH:
         for p in sorted(set(CASE_MISMATCH)):

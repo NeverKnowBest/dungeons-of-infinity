@@ -86,6 +86,16 @@ Para mudanças que não deveriam mudar o jogo (refatoração, faxina, troca de t
 5. Mostre a spec ao Guilherme antes de construir; o que ele decidir vai na seção Decisões.
 6. Ao avançar, atualize o Estado (em produção, pronta).
 
+## Importar gráficos de uma região
+
+1. O Guilherme põe os arquivos em `incoming/<regiao>/` (mesmo nome da spec em `docs/regioes/`), seguindo `incoming/README.md`. Se faltar o manifesto e algo não der para deduzir pelo nome (tamanho do quadro de uma folha, ponto de loop), escreva o `manifest.json` você mesmo.
+2. `python tools/import/import_region.py <regiao> --dry-run` e leia o relatório: avisos de cores reduzidas, contorno claro ou meia transparência. Olhe a prévia (`tools/import/out/<regiao>/preview.png`) se houver aviso de contorno ou de cores, ou se for o primeiro lote da região; a escala aparece ao lado do Link.
+3. Ajuste o manifesto (`outline`, `colors`, `origin`, `fps`) e repita até não sobrar aviso que importe. Mostre a prévia ao Guilherme se a conversão mudou muito o original.
+4. `python tools/import/import_region.py <regiao>` grava os sprites e sons, registra no `.yyp` (pasta `Regions/<Regiao>` no IDE) e acrescenta as músicas em `SongIndex` e no `Music_InitData`. O `imported.json` da pasta vai no mesmo commit.
+5. `python tools/check/validate.py` e `python tools/test/run.py boot` (compila e confere que o GameMaker aceita os arquivos).
+6. Trocar um gráfico: substitua o arquivo em `incoming/` e importe de novo; o que saiu da pasta sai do projeto. Desfazer: `--remove`.
+7. Testar o importador sem gráficos novos: `python tools/import/make_example.py`, `python tools/import/import_region.py tools/import/out/example`, `python tools/test/run.py boot` e `--remove` no fim (o `git status` volta limpo).
+
 ## Estágio alternativo (variante de capítulo, ex.: topo do castelo no capítulo 2)
 
 Como os níveis são montados hoje:
@@ -115,4 +125,5 @@ Ter os sprites e o código original ajuda muito, mas não é uma tradução 1 pa
 * O código do original é de outra máquina (GBA, assembly ou decompilação em C) e conversa com o hardware dele (OAM, tilemaps, física em subpixels). Aqui cada inimigo é um objeto do GameMaker que precisa conversar com o DoI: estados (`EnemyState`), dano (`EnemyHitsToKill`, `Enemy_CheckHit`), drops, colisão com `oWall`, salas, pausa, iluminação e paletas.
 * O que se aproveita direto: sprites e animações, padrões de movimento e ataque, tempos e números (vida, velocidade, dano), sons e músicas.
 * Ordem sugerida: primeiro os sprites e um inimigo simples (andar e tocar no Link); depois os que atiram; por último o chefe, com sala própria.
+* Os sprites entram pelo kit de importação (receita "Importar gráficos de uma região"), que já ajusta as cores e o contorno.
 * Para cada inimigo novo: objeto filho do inimigo do DoI mais parecido, sprite por direção e estado, `EnemyDataInit` com energia e ataque, e o inimigo na lista `Enemies` da ficha do nível onde ele aparece.

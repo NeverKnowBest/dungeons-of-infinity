@@ -64,7 +64,7 @@ def sprite(name, png_path, folder=('Sprites', 'folders/Sprites.yy'), frames=None
     register('sprites', name)
 
 
-def sound(name, wav_path, duration, folder=('Music', 'folders/Sounds/Music.yy')):
+def sound(name, wav_path, duration, folder=('Music', 'folders/Sounds/Music.yy'), sample_rate=22050):
     d = os.path.join(GAME, 'sounds', name)
     os.makedirs(d, exist_ok=True)
     shutil.copy(wav_path, os.path.join(d, name + '.wav'))
@@ -90,10 +90,10 @@ def sound(name, wav_path, duration, folder=('Music', 'folders/Sounds/Music.yy'))
   "preload":false,
   "resourceType":"GMSound",
   "resourceVersion":"2.0",
-  "sampleRate":22050,
+  "sampleRate":%(sr)d,
   "soundFile":"%(n)s.wav",
   "volume":0.7,
-}''' % {'n': name, 'dur': duration, 'fn': folder[0], 'fp': folder[1]}
+}''' % {'n': name, 'dur': duration, 'fn': folder[0], 'fp': folder[1], 'sr': sample_rate}
     open(os.path.join(d, name + '.yy'), 'w').write(yy)
     register('sounds', name)
 
@@ -162,3 +162,67 @@ def register(kind, name):
     assert idx, kind
     s = s[:idx[-1]] + line + s[idx[-1]:]
     open(p, 'w').write(s)
+
+
+def unregister(kind, name):
+    p = GAME + '/Zelda.yyp'
+    s = open(p).read()
+    line = '    {"id":{"name":"%s","path":"%s/%s/%s.yy",},},\n' % (name, kind, name, name)
+    if line in s:
+        open(p, 'w').write(s.replace(line, ''))
+
+
+def remove(kind, name):
+    """Deletes a sprite/sound/object folder and takes it out of Zelda.yyp."""
+    unregister(kind, name)
+    d = os.path.join(GAME, kind, name)
+    if os.path.isdir(d):
+        shutil.rmtree(d)
+
+
+FOLDER = '    {"$GMFolder":"","%%Name":"%s","folderPath":"%s","name":"%s","resourceType":"GMFolder","resourceVersion":"2.0",},\n'
+
+
+def folder(path):
+    """Makes sure the IDE folder 'A/B/C' (and its parents) exists in Zelda.yyp; returns the (name, path) pair
+    that sprite() and sound() take."""
+    p = GAME + '/Zelda.yyp'
+    s = open(p).read()
+    parts = path.split('/')
+    for i in range(1, len(parts) + 1):
+        fp = 'folders/%s.yy' % '/'.join(parts[:i])
+        if '"folderPath":"%s"' % fp in s:
+            continue
+        line = FOLDER % (parts[i - 1], fp, parts[i - 1])
+        rows = list(re.finditer(r'    \{"\$GMFolder":"","%Name":"[^"]*","folderPath":"([^"]*)"[^\n]*\n', s))
+        after = [m for m in rows if m.group(1).lower() < fp.lower()]   # the list is kept sorted by path
+        at = after[-1].end() if after else rows[0].start()
+        s = s[:at] + line + s[at:]
+    open(p, 'w').write(s)
+    return parts[-1], 'folders/%s.yy' % path
+
+
+def remove_folder(path):
+    """Takes the IDE folder 'A/B/C' out of Zelda.yyp if nothing is in it any more, then its empty parents."""
+    p = GAME + '/Zelda.yyp'
+    s = open(p).read()
+    parts = path.split('/')
+    for i in range(len(parts), 0, -1):
+        sub = '/'.join(parts[:i])
+        # resources point to their folder from their own .yy, subfolders from the .yyp
+        if folder_in_use(sub) or '"folderPath":"folders/%s/' % sub in s:
+            break
+        s = s.replace(FOLDER % (parts[i - 1], 'folders/%s.yy' % sub, parts[i - 1]), '')
+    open(p, 'w').write(s)
+
+
+def folder_in_use(path):
+    """True if a sprite, sound or object .yy still has the IDE folder 'A/B/C' as its parent."""
+    fp = '"path":"folders/%s.yy"' % path
+    for kind in ('sprites', 'sounds', 'objects'):
+        base = os.path.join(GAME, kind)
+        for n in os.listdir(base):
+            y = os.path.join(base, n, n + '.yy')
+            if os.path.exists(y) and fp in open(y).read():
+                return True
+    return False

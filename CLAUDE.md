@@ -75,6 +75,7 @@ O Guilherme diz qual é a etapa (e, se importar, em qual PC está). Leia os docu
 
 * `tools/check/validate.py`: validador estático do projeto (veja `tools/README.md`). `--orphans` lista os recursos que estão no disco mas não no projeto. Também confere as especificações de região (seções do modelo, estado, assets citados).
 * `tools/test/`: `run.py` (teste automatizado e folha de contato, precisa do GameMaker instalado) e os cenários em `scenarios/`. O jogo tem um modo de teste (`scripts/__Test`) que não grava nada no usuário.
+* `tools/import/`: `import_region.py` importa os gráficos e músicas de uma região que o Guilherme pôs em `incoming/<regiao>/` (convenção em `incoming/README.md`): ajusta as cores, cria sprites e sons, registra no `.yyp` e monta uma prévia.
 * `tools/templates/`: `convert.py` gera as salas do jogo (`game/datafiles/data/rooms/<Classe>.json`, um template por linha) a partir dos mapas do Tiled; `compare.py` compara duas versões pelo conteúdo. Nunca edite os arquivos de `rooms/` à mão.
 * `tools/hub/`: scripts Python que geram as salas do hub, sprites e dados (Tiled, `data_d`, e chamam o conversor). Veja `tools/README.md`.
 * `tools/alttp/`: utilitários em C que usam o código do zelda3 (reimplementação de ALttP) para extrair salas, sprites e músicas da ROM. A ROM nunca vai para o repositório.

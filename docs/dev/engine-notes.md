@@ -135,6 +135,14 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 * Saved per user in `User.Achievements` (struct of keys), plus `User.Skin` and `User.BonusItem`.
 * Hooks: `Achievements_OnLevelStart` (Dungeon_InitLevel), `Achievements_OnBossDefeated` (crystal pickup in oLink Step), `Achievements_OnGameWon` (oBoss_Aghanim), `Achievements_CheckStats` (end of `User_UpdateStats`). Nothing unlocks while cheats are on.
 
+## Sprites, tiles and colors (roadmap F6)
+
+* IDE folders exist only as `Folders` entries in `Zelda.yyp` (kept sorted by path); there are no `folders/*.yy` files on disk. A resource names its folder in its own `.yy` (`parent`). `gm_assets.folder()` adds the entries, `remove_folder()` drops the ones nothing uses.
+* `sTiles` (1248x800, 156 x 100 tiles of 8px) is the image of the only tileset, `tilesets/Tileset`. Theme T uses tile rows `4 + (T - 1) * 6` to `+5` (`LevelTilesY`), a band of 1248x48; rows 0 to 3 and 82 to 99 hold shared pieces. The image is full, so a new theme band means a taller `sTiles` and an updated `tile_count` in the tileset (not done yet). Its tiles use semi transparent pixels on purpose (shadows, alpha 196, 204, 128...), so the importer keeps the alpha of a tileset. The sprite folder also has 36 PNGs that its `.yy` does not list (leftovers; harmless).
+* Colors: the original DoI sprites use web safe steps of 51 (`51,51,51` outline, `153,51,0`), the ROM extractions of the hub use the SNES levels written as `round(n*255/31)` (`33,49,41`). The importer writes the second form. Palette swap sprites (`*_Pal`, e.g. `sEnemy_Rat_Pal`) are matched color by color by the palette shader, so a sprite and its `_Pal` must be converted the same way.
+* Sprite origin in the `.yy`: `origin` 0 top left, 4 middle center, 7 bottom center (`yorigin` = height), 9 custom. Speed is `playbackSpeed` in frames per second (`playbackSpeedType` 0).
+* Igor builds only what changed: the `boot` scenario with six new sprites and two sounds compiled in about 20 s. To confirm the new assets are in a build, look for their names in `%TEMP%\doi-test\output\Zelda\Zelda.win`.
+
 ## Assets from A Link to the Past
 
 Room pictures, sprites and music were taken from the original game with small harnesses built on the zelda3 reimplementation (room render with animated tiles, sprite OAM dump, SPC music render). Music is split into an intro and a loop (`Music_Sanctuary_Intro`, `Music_Sanctuary_Main`).

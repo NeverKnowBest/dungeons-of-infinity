@@ -31,3 +31,6 @@ __pycache__/
 # Test results (tools/test/run.py)
 tools/test/out/
 tools/test/baseline/
+
+# import_region.py output (converted frames, preview, report)
+tools/import/out/
