@@ -73,8 +73,19 @@ def source_files(d):
     return sorted(out)
 
 
+TEXT_SOURCES = ('.json', '.txt', '.csv', '.tmx', '.tsx', '.ini')
+
+
+def source_hash(path):
+    """sha1 of a source file; text files with LF line endings, since git (core.autocrlf) checks them out with CRLF on Windows."""
+    data = open(path, 'rb').read()
+    if path.lower().endswith(TEXT_SOURCES):
+        data = data.replace(b'\r\n', b'\n')
+    return hashlib.sha1(data).hexdigest()
+
+
 def source_hashes(d):
-    return {rel: hashlib.sha1(open(os.path.join(d, rel), 'rb').read()).hexdigest() for rel in source_files(d)}
+    return {rel: source_hash(os.path.join(d, rel)) for rel in source_files(d)}
 
 
 def load_manifest(d):

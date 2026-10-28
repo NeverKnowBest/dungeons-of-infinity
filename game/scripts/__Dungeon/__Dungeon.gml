@@ -38,7 +38,7 @@ enum TileLayer{
 	Ceiling,
 }
 
-#macro DungeonLevels 14
+#macro DungeonLevels 15
 enum DungeonLevel{
 	Start,
 	Castle,
@@ -53,7 +53,8 @@ enum DungeonLevel{
 	Mines,
 	MoldormsLair,
 	Aghanim1,
-	Aghanim2
+	Aghanim2,
+	CastleTop		// chapter 2 variant (docs/regioes/topo-do-castelo.md)
 }
 
 enum RoomSize{

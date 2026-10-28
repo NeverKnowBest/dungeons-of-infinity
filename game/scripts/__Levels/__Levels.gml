@@ -181,6 +181,7 @@ function Levels_Init(){
 	_L[DungeonLevel.MoldormsLair] = new Level_Create(DungeonLevel.MoldormsLair, "Moldorm's Lair");
 	_L[DungeonLevel.Aghanim1] = new Level_Create(DungeonLevel.Aghanim1, "Agahnim's Fortress");
 	_L[DungeonLevel.Aghanim2] = new Level_Create(DungeonLevel.Aghanim2, "Agahnim");
+	_L[DungeonLevel.CastleTop] = new Level_Create(DungeonLevel.CastleTop, "Castle Rooftops");
 	global.LevelDefs = _L;
 	global.RunPath = {Next: -1};	// the level the exit Link took leads to (Level_NextIndex), kept through the rest stop
 
@@ -359,6 +360,28 @@ function Levels_Init(){
 		Ceiling = false;
 		Song = SongIndex.Boss_Final_Hallway;
 		Dark = LevelDark.Never;
+	}
+
+	// Chapter 2 variant: the castle rooftops in the rain (docs/regioes/topo-do-castelo.md), seen from above like ALttP's
+	// overworld area 0x1B. Waits for the outdoor rooms of F12b: no NextPool leads to it yet (Hyrule Castle will take it
+	// with weight 1 beside the basement's 2).
+	with(_L[DungeonLevel.CastleTop]){
+		Depth = 2;
+		Next = DungeonLevel.CastleJails;
+		Theme = DungeonLevel.Castle;
+		BaseTheme = DungeonLevel.Castle;
+		EnemyStats = DungeonLevel.Castle;
+		RegionTiles = "CastleTop";
+		Class = DungeonClass.Castle;
+		StartDir = DOWN;
+		Spikes = false;
+		Curses = false;
+		FairyRooms = false;
+		Song = SongIndex.Castle;
+		Dark = LevelDark.Low;
+		SecretDoorType = SecretDoor.Crack;
+		ExitLook = "StairsUp";
+		Enemies = [[oEnemy_Soldier_Advanced, 2], [oEnemy_Soldier_Simple, 3], [oEnemy_Keese, 1]];
 	}
 
 	// Enemy weights by object index, for Level_EnemyWeight, and the default exit pool (the sheet's Next)
