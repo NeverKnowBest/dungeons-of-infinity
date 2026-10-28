@@ -9,7 +9,7 @@ Leia antes de começar qualquer tarefa:
 3. `docs/dev/engine-notes.md`: como o motor funciona.
 4. `docs/dev/receitas.md`: passo a passo das tarefas que se repetem.
 
-Quando a tarefa envolver inimigos, chefes, itens ou uma região, leia também `docs/ref/` (fichas com os números do ALttP e do que já existe no DoI) e a especificação da região em `docs/regioes/` (modelo em `docs/regioes/_modelo.md`).
+Quando a tarefa envolver inimigos, chefes, itens ou uma região, leia também `docs/ref/` (fichas com os números do ALttP e do que já existe no DoI) e a especificação da região em `docs/regioes/` (modelo em `docs/regioes/_modelo.md`). Região nova (ou ensaio de uma): use a skill `nova-regiao` (`.claude/skills/nova-regiao/`).
 
 ## Regras de trabalho
 
@@ -74,6 +74,7 @@ O Guilherme diz qual é a etapa (e, se importar, em qual PC está). Leia os docu
 
 ## Ferramentas
 
+* `.claude/skills/nova-regiao/`: skill com o fluxo de uma região nova, da spec ao commit (ensaio ou produção); `tools/region/status.py <regiao>` mostra onde a região está e o que falta.
 * `tools/check/validate.py`: validador estático do projeto (veja `tools/README.md`). `--orphans` lista os recursos que estão no disco mas não no projeto. Também confere as especificações de região (seções do modelo, estado, assets citados).
 * `tools/test/`: `run.py` (teste automatizado e folha de contato, precisa do GameMaker instalado) e os cenários em `scenarios/`. O jogo tem um modo de teste (`scripts/__Test`) que não grava nada no usuário.
 * `tools/import/`: `import_region.py` importa os gráficos e músicas de uma região que o Guilherme pôs em `incoming/<regiao>/` (convenção em `incoming/README.md`): ajusta as cores, cria sprites e sons, registra no `.yyp` e monta uma prévia.

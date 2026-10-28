@@ -5,6 +5,7 @@ Piloto do plano de ferramentas: a primeira região feita pelo fluxo novo (spec, 
 * **Estado:** especificada
 * **Origem:** ALttP, Castelo de Hyrule na noite da chuva (abertura do jogo), parte de fora e alta do castelo
 * **Tipo:** dungeon, parte de fora e alta do castelo (ALttP)
+* **Fase:** `DungeonLevel.CastleTop` (novo), nome no jogo "Castle Rooftops"
 * **Capítulo:** variante do capítulo 2 (`Depth` 2), ao lado do Castle Basement. Vem depois do capítulo 1 (Hyrule Castle, a entrada do castelo) e segue para o capítulo 3 (Castle Prison, com o chefe)
 * **Pools de saída:** entra na `NextPool` do Hyrule Castle com peso 1, ao lado do Castle Basement com peso 2 (cada saída do castelo leva ao topo em 1 de cada 3 sorteios). A `NextPool` dele é só o Castle Prison; `ExitCount` e `ExitHidden` no padrão da ficha
 * **Visual da saída:** escadaria para cima (`StairsUp`, já existe: é a escada da entrada de toda fase)

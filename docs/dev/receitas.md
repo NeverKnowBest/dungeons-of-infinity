@@ -80,7 +80,9 @@ Para mudanças que não deveriam mudar o jogo (refatoração, faxina, troca de t
 
 ## Especificação de região
 
-1. Copie `docs/regioes/_modelo.md` para `docs/regioes/<nome>.md` e preencha todas as seções. Estado começa em "ideia" ou "especificada".
+O fluxo inteiro de uma região nova (spec, importação, ficha, salas, inimigos, testes, docs e commit) é a skill `.claude/skills/nova-regiao/`; `python tools/region/status.py <regiao>` mostra onde a região está e o que falta nas ferramentas.
+
+1. Copie `docs/regioes/_modelo.md` para `docs/regioes/<nome>.md` e preencha todas as seções, inclusive o campo **Fase** (o membro de `DungeonLevel`). Estado começa em "ideia" ou "especificada".
 2. Números de inimigos, chefes e itens: tire de `docs/ref/` (ALttP em `alttp.md`, o que já existe em `doi.md`). Se faltar um jogo ou um inimigo, pesquise uma vez e acrescente a ficha lá (veja `docs/ref/README.md`), não na spec.
 3. Cite os assets entre crases (`oEnemy_Rat`, `Sound_Rain`). Para os que ainda vão ser criados, escreva "(novo)" na linha.
 4. Rode `python tools/check/validate.py`: ele acusa seção faltando, estado inválido e asset inexistente.
@@ -110,7 +112,7 @@ Como os níveis são montados hoje:
 
 Passos:
 
-1. Novo valor no fim de `DungeonLevel` e uma entrada no `Levels_Init`. Copie a entrada do nível mais parecido e mude o que for diferente: `Name`, `Depth` (o capítulo do qual ela é variante), `Theme` e `EnemyStats` do nível cujo visual e inimigos ele usa (`DungeonLevel.Castle` no topo do castelo), `Class`, `Song`, `Enemies`, escuridão, água, obstáculos. `Next` (e, se o próximo capítulo tiver variantes, `NextPool`) aponta para o próximo capítulo.
+1. Novo valor no fim de `DungeonLevel` e uma entrada no `Levels_Init`. Copie a entrada do nível mais parecido e mude o que for diferente: `Name`, `Depth` (o capítulo do qual ela é variante), `Theme` e `EnemyStats` do nível cujo visual e inimigos ele usa (`DungeonLevel.Castle` no topo do castelo), `Class`, `Song`, `Enemies`, escuridão, água, obstáculos. `Next` (e, se o próximo capítulo tiver variantes, `NextPool`) aponta para o próximo capítulo. O `Level_Create` tira do índice do enum o `Depth`, o `Theme`, o `BaseTheme`, o `EnemyStats`, o `Next` (índice + 1) e o `StartDir` (pela paridade), e o índice de uma fase nova não bate com o capítulo: escreva todos, com o `StartDir` igual ao das outras variantes do capítulo. Conserte também a macro `DungeonLevels` (`__Dungeon.gml`, hoje sem uso).
 2. Caminho: acrescente a fase nova na `NextPool` de cada fase do capítulo anterior, com o peso que dá a chance desejada (ex.: Hyrule Castle `[[DungeonLevel.CastleBasement, 2], [<nova>, 1]]` leva ao topo em 1 de cada 3 saídas). Isso já liga o sorteio de quantas saídas a fase tem e se a extra fica escondida (`ExitCount`, `ExitHidden`, padrão na ficha).
 3. Visual da saída: `ExitLook` na entrada da fase nova (`"StairsDown"` é o padrão, `"StairsUp"` a escadaria para cima). Para um visual que ainda não existe, acrescente uma entrada em `ExitLooks_Init` (`__Doors.gml`): uma função que desenha a viga e o vão da porta de saída em cima e embaixo, o som de saída, a animação do Link (`LinkAnim`: quatro sprites `global.LinkSpr_<LinkAnim>_Top1/_Bottom1/_Top2/_Bottom2` criadas em `LinkSprites_Construct` e apagadas em `LinkSprites_Destroy`; `LinkSprite_Remix` deriva uma de outra existente, escolhendo, deslocando e espelhando quadros), o som de chegada (`ArriveSound`), o vão por onde o Link chega na fase seguinte (`Entrance`, a coluna do tile de decoração em cima e embaixo) e o ícone do mapa. O Link deve sempre acompanhar os degraus desenhados no vão, na saída e na chegada. Nem o gerador nem o Link mudam.
 4. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.

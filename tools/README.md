@@ -170,6 +170,17 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 
 Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>`, `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `trace <frame> <object> ...`, `arch <object> ...`, `state`, `expect ok`, `levels <index> "<name>" <field>=<value>` (scenario changes), `exits main-><level> count=1|2 extra=room <n> grid= Top|Bottom [secret]-><level> main=room <n> grid=` (only in levels whose exits can lead to more than one level), `exit main|extra room= -> level <n>`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
 
+### `region/` (Python 3, standard library only)
+
+Where a region stands in the "nova região" flow (roadmap F10; the flow itself is the Claude skill `.claude/skills/nova-regiao/`):
+
+```
+python tools/region/status.py topo-do-castelo                  # by name (docs/regioes/<name>.md)
+python tools/region/status.py docs/regioes/topo-do-castelo.md  # or by path
+```
+
+It reads the spec (header fields, Inimigos table, Salas, Música e som, Clima e efeitos) and the project (`DungeonLevel`, the level sheet entries with `Depth`, `Next`, `NextPool`, `ExitLook`, `Theme`, the exit looks, `Zelda.yyp`, `EnemyArch` and `EnemyDataInit`, `incoming/<name>/`, the `ref_*` scenarios) and prints one block per step of the flow: `ok` (already there), `todo` (to do), `GAP [key]` (the tools cannot do it yet; the keys are explained in `.claude/skills/nova-regiao/references/lacunas.md`), `WAIT` (Guilherme still has to deliver something) and `note`. The last lines are `STOP: ...`, `WAIT: ...` or `READY`. It only reads files. The gap checks are heuristics on the spec's words; when a gap is solved, take it out of the script and of `lacunas.md` together.
+
 ### `templates/` (Python 3, standard library only)
 
 Room template conversion, ported from the old GameMaker project `editors/room-template-parser` (retired in roadmap F5; it is in the git history):

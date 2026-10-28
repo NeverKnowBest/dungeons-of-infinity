@@ -5,6 +5,7 @@ Copie este arquivo para `docs/regioes/<nome>.md` (minúsculas, com hífens) e pr
 * **Estado:** ideia | especificada | em produção | pronta
 * **Origem:** jogo e lugar de onde a região vem (ex.: ALttP, Torre de Hera)
 * **Tipo:** dungeon ou área externa (jardim, campina, floresta); diga também se é região de outro Zelda
+* **Fase:** o membro de `DungeonLevel` da região na ficha de fase (ex.: `DungeonLevel.CastleTop`, com "(novo)" enquanto não existir); o `tools/region/status.py` usa este nome
 * **Capítulo:** de qual capítulo ela é variante (`Depth` N, ao lado de quais fases), de qual capítulo se chega a ela e para qual capítulo ela segue
 * **Pools de saída:** em quais fases do capítulo anterior ela entra na `NextPool` e com que peso (é o que decide a chance de aparecer); a `NextPool` dela (variantes do próximo capítulo e pesos); `ExitCount` e `ExitHidden` se fugirem do padrão da ficha
 * **Visual da saída:** como é a saída que leva até ela (`ExitLook`): `StairsDown` (padrão), `StairsUp` ou um visual novo (novo), que entra em `ExitLooks_Init`

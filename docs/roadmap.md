@@ -22,6 +22,7 @@ Estado do projeto, próximos passos e decisões tomadas. Atualize no fim de cada
 * **Kit de importação de gráficos** (etapa F6): o Guilherme põe sprites, tileset e música em `incoming/<regiao>/` (convenção em `incoming/README.md`) e `python tools/import/import_region.py <regiao>` ajusta as cores às regras do `direcao.md`, cria os sprites e sons na pasta `Regions/<Regiao>` do IDE, liga as músicas no `SongIndex` e monta uma prévia ao lado do Link. Reimportar refaz igual e tira o que saiu da pasta; `--remove` desfaz. O validador avisa quando `incoming/` mudou depois da importação. Testado com uma região de exemplo feita de assets do projeto (`tools/import/make_example.py`), que compilou e rodou o cenário `boot` e depois foi removida.
 * **Inimigos por arquétipo** (etapa F7, base): inimigo simples vira dados (`game/scripts/__EnemyArch`, objeto `oEnemy_Archetype`), com movimentos de andar, perseguir, andar de lado e investir; rato, cobra, caranguejo e Hover convertidos sem mudar nada no jogo (conferido quadro a quadro). Cor, energia e ataque por fase dos soldados e de qualquer inimigo ficam nas variantes, e o importador gera a paleta de cores por fase de um inimigo novo. Faltam atirar, pular, voar em onda e se esconder (F7 no plano).
 * **Fichas de referência e especificação de região** (etapa F9): `docs/ref/alttp.md` (inimigos, chefes e itens do ALttP com vida, dano, velocidade, arquétipo e a função do zelda3), `docs/ref/doi.md` (tudo o que o jogo já tem, com energia, ataque, pesos por nível, soldados por nível, níveis, chefes e clima), `docs/regioes/_modelo.md` (modelo de região) e a primeira spec, `docs/regioes/topo-do-castelo.md` (o piloto). O validador confere as specs.
+* **Skill "nova região"** (etapa F10): `.claude/skills/nova-regiao/` leva uma região da spec ao commit pelas ferramentas F3 a F7 e para quando a região pede o que elas não fazem; `tools/region/status.py <regiao>` mostra onde a região está e o que falta. Ensaio no topo do castelo: plano completo e cinco lacunas (veja "Piloto").
 
 ## Decisões (não desfazer sem conversar)
 
@@ -119,10 +120,30 @@ Objetivo: deixar o projeto pronto para que uma região inteira (fase com salas, 
   * Candidatos a converter depois disso: Keese, Buzz, Popo, Zol, Tektite, Octorok, HardhatBeetle. Os que têm estados próprios (Wake, Sleep, Shock) precisam do gancho também nesses estados.
   * Variantes dos outros inimigos que mudam por fase no `Create` (Poe, Wizzrobe, Beamos, Bari, Gibdo, Keese, Kodongo, Octorok, Ropa, SnapDragon): passar para `EnemyVariants_Init` como os soldados.
 
-**F10. Skill "nova região"**
-* Juntar o fluxo inteiro (especificação, importação, ficha de fase, templates, inimigos, validador, teste) numa skill do Claude com checklist. Prompt esperado: "nova região X, gráficos em `incoming/x`, spec em `docs/regioes/x.md`".
+**F10. Skill "nova região"** (pronto)
+* Skill do Claude em `.claude/skills/nova-regiao/` (vai no repositório, vale nos dois PCs e nas duas contas): `SKILL.md` com o fluxo na ordem (spec, importação F6, ficha e pools de saída F4 e F4b, salas F5, inimigos F7, clima e música, testes F3 e F3b, validador e docs, entrega com roteiro e commit), `references/lacunas.md` (o que as ferramentas ainda não fazem, como reconhecer, o que resolveria e a alternativa) e `references/plano.md` (formato do plano e da entrega). Dois modos: ensaio (só o plano) e produção.
+* Regra da skill: quando a região pede algo que o fluxo não cobre, ela para e diz o que falta em vez de improvisar. Três tipos de pendência: lacuna de ferramenta (para), entrega do Guilherme (espera) e código próprio previsto na spec (segue).
+* `tools/region/status.py <regiao>`: lê a spec e o projeto e imprime, passo a passo, o que existe, o que fazer, as lacunas (`GAP [chave]`) e as esperas (`WAIT`). Só lê arquivos.
+* O modelo de região ganhou o campo **Fase** (o membro de `DungeonLevel`), que o `status.py` usa.
+* Ensaio no piloto (out/2026): resultado em "Piloto" abaixo.
 
 **Piloto:** topo do Castelo de Hyrule (item 1 abaixo, spec em `docs/regioes/topo-do-castelo.md`), feito pelo fluxo novo. Reaproveita inimigos existentes, então testa as ferramentas sem o risco de mecânicas novas.
+* **Ensaio da F10 (out/2026):** `python tools/region/status.py topo-do-castelo` e a leitura da spec dão o plano abaixo. Pronto para usar: `StairsUp`, os três inimigos (soldados pela variante do castelo com `EnemyStats` Castle, Keese com `Type` 0), a música do castelo, `Sound_Rain` e todo o caminho de teste.
+  1. Spec: ok (especificada; ganhou `DungeonLevel.CastleTop`, "Castle Rooftops").
+  2. Gráficos: espera `incoming/topo-do-castelo/` (ameias, telhado, piso de pedra externa).
+  3. Ficha: `DungeonLevel.CastleTop` no fim do enum, `Depth` 2, `Next` CastleJails, `Theme`/`BaseTheme`/`EnemyStats` Castle, `StartDir` DOWN (o do Castle Basement), `Class` Castle, `Song` Castle, `ExitLook` "StairsUp", `Enemies` [[Soldier_Advanced, 2], [Soldier_Simple, 3], [Keese, 1]]. Castle: `NextPool` [[CastleBasement, 2], [CastleTop, 1]]. Sem `SaveBefore` (a armadilha da sala de descanso depois do castelo não se aplica).
+  4. Salas: subclasse Rooftop com 6 a 8 templates novos.
+  5. Inimigos: só a lista da ficha.
+  6. Clima: `oWeather` tirado do `oIntro` (código previsto na spec); `ref_00_Start` antes e depois prova que a entrada não muda.
+  7. Testes: `ref_14_CastleTop`, cenário `castle_top` (semente fixa, `exit` até a prisão), cenário no Castle com `exit` `main` e `extra` em sementes que levam ao topo, folha de contato com 5 sementes, bateria inteira e `compare --handles` (muda o `ref_01_Castle`, que passa a sortear saídas; o `ref_00_Start` só no que o `oWeather` mexer; nos outros, só a linha do global `LevelDefs`, que ganha uma entrada).
+  8. Docs: spec (Estado), `docs/ref/doi.md` (nível novo), roadmap, engine-notes (clima).
+* **O que falta antes do piloto (a skill para aqui):**
+  * `templates-por-fase`: nenhuma fase escolhe um conjunto de salas; todas sorteiam dos mesmos templates `Main_*` pelo tamanho. Falta um campo na ficha, o conversor separando por conjunto e o sorteio por conjunto.
+  * `templates-novos`: não há script que escreva templates `Main_*` (meias salas com seções e zonas) e o Claude não usa o Tiled.
+  * `tileset` (provável, quando os gráficos chegarem): ameias, telhado e piso são tiles, e o `sTiles` está cheio; a faixa importada não liga ao jogo.
+  * `sfx`: `Sound_Thunder` é efeito sonoro; o importador só lê música e o `musicdump.c` não tira efeitos.
+  * `rom-externo`: o exterior do castelo é overworld, e `tools/alttp/` não renderiza fundo do overworld (a entrada da Torre de Agahnim, que é sala de dungeon, sai pelo `roomdump.c`).
+* **Para decidir com o Guilherme:** fazer uma etapa de ferramentas antes do piloto (conjunto de salas por fase, ajudante de templates, tileset de região, `sounds/` no importador; recomendação do Claude) ou um piloto mais simples (templates e tema do castelo, só chuva, trovão e decoração em sprites), que não testa salas nem tiles novos. As extrações da ROM (peças e trovão) são no PC de casa.
 
 **F8. Conversão de salas de referência** (depois do piloto, antes da primeira região com arquitetura que o DoI não tem, como o Palácio do Leste ou o Minish Cap)
 * Sala do ALttP (dump do `roomdump.c`) para template do Tiled com colisão, portas e posições de objetos, como ponto de partida para salas recombinadas. Depois o mesmo para o Minish Cap a partir da decompilação da comunidade.
