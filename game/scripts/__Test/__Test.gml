@@ -333,6 +333,7 @@ function Test_CheckPainted(_RoomIndex){
 		+ " tiles=" + string(_Tiles) + "/" + string(_G.W * _G.H) + " solid=" + string(_SolidCells) + " walls=" + string(array_length(_Walls))
 		+ " passages=" + string(_Passages) + " mismatch=" + string(_Bad) + _First);
 	if(_Bad > 0) Test_Fail("painted room " + string(_RoomIndex) + ": " + string(_Bad) + " cells where the walls do not match the tiles");
+	if(array_length(_Walls) != array_length(_G.Walls)) Test_Fail("painted room " + string(_RoomIndex) + ": " + string(array_length(_Walls)) + " walls, " + string(array_length(_G.Walls)) + " made last (old walls left over)");
 }
 
 /// Paints a grid of blocks of the level's region tileset turned by a room transform, like RegionRoom_Paint turns a room
@@ -595,7 +596,7 @@ function Test_DoStep(_S){
 			if(_Painted != _PW * _PH) Test_Fail("paint: " + string(_PW * _PH - _Painted) + " blocks not painted");
 			return true;
 
-		case "painted":	// painted room (roadmap F12b): Link to the first one of the level (or "index"), then its walls checked tile by tile
+		case "painted":	// painted room (roadmap F12b): Link to the first one of the level (or "index"), then its walls checked tile by tile; "remake" makes its walls again first
 			if(StepFrames == 1){
 				PaintedRoom = _S[$ "index"] ?? -1;
 				for(var i = 0; PaintedRoom == -1 && i < global.Level.RoomCount; i++) if(RegionRoom_Is(i)) PaintedRoom = i;
@@ -603,6 +604,7 @@ function Test_DoStep(_S){
 					Test_Fail("no painted room in the level");
 					return true;
 				}
+				if(_S[$ "remake"] ?? false) RegionRoom_Walls(PaintedRoom);	//while the room sleeps, as a bombed secret door does to the room behind it
 				var _GotoPainted = global.Level.Rooms[PaintedRoom];
 				Test_PlaceLink(PaintedRoom, (_S[$ "at"] ?? "") == "center" ? [_GotoPainted.x + 128, _GotoPainted.y + (_GotoPainted.GridH * 128) + 8] : Test_RoomEntryPoint(PaintedRoom));
 				return false;

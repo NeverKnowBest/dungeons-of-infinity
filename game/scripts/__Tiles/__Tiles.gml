@@ -373,7 +373,7 @@ function RegionRoom_Paint(_RoomIndex){
 			if(_V != 0) _Open[_Cell[1] * _RW + _Cell[0]] = (_V & 0xFFFF) | (RegionTiles_TransformFlags(_V >> 16, _Tr) << 16);
 		}
 	}
-	_R.RegionGrid = {W : _RW, H : _RH, Tiles : _Base, Open : _Open};
+	_R.RegionGrid = {W : _RW, H : _RH, Tiles : _Base, Open : _Open, Walls : []};
 	var _TM = RegionTiles_Tilemap(UPPER);
 	for(var k = 0; k < _RW * _RH; k++){
 		tilemap_set_at_pixel(_TM, _Base[k] == 0 ? 0 : RegionTiles_TileData(_Base[k]), _R.x + (k mod _RW) * 8, _R.y + (k div _RW) * 8);
@@ -419,12 +419,22 @@ function RegionRoom_OpenPassage(_RoomIndex, _DX, _DY, _RemakeWalls = true){
 	return _Count;
 }
 
-/// The room's walls from its solid tiles, as few oWall as rows of equal runs allow (made again after a passage opens)
+/// The room's walls from its solid tiles, as few oWall as rows of equal runs allow (made again after a passage opens).
+/// The old walls go by their ids: a bombed secret door opens the passage of the room behind it too, which is asleep
+/// (Dungeon_RoomDeActivate), and `with(oWall)` would not see its walls. The new ones sleep if the old ones did.
 function RegionRoom_Walls(_RoomIndex){
 	var _R = global.Level.Rooms[_RoomIndex];
 	var _G = _R.RegionGrid;
 	var _Solid = RegionTiles_Get(LevelDef.RegionTiles).solid;
-	with(oWall) if(variable_instance_exists(id, "RegionRoom") && RegionRoom == _RoomIndex) instance_destroy();
+	var _Asleep = false;
+	for(var w = 0; w < array_length(_G.Walls); w++){
+		if(!instance_exists(_G.Walls[w])){
+			_Asleep = true;
+			instance_activate_object(_G.Walls[w]);
+		}
+		instance_destroy(_G.Walls[w]);
+	}
+	_G.Walls = [];
 	var _Open = {};		// runs still growing down: "x0,x1" -> [x0, y0, x1]
 	for(var j = 0; j <= _G.H; j++){
 		var _Runs = {};
@@ -449,6 +459,7 @@ function RegionRoom_Walls(_RoomIndex){
 			var _Run = _Open[$ _Keys[k]];
 			var _Wall = WallObj_Create("Objs_Upper", _R.x + _Run[0] * 8, _R.y + _Run[1] * 8, _Run[2] - _Run[0], j - _Run[1]);
 			_Wall.RegionRoom = _RoomIndex;
+			array_push(_G.Walls, _Wall);
 			variable_struct_remove(_Open, _Keys[k]);
 		}
 		_Keys = variable_struct_get_names(_Runs);
@@ -458,6 +469,7 @@ function RegionRoom_Walls(_RoomIndex){
 			_Open[$ _Keys[k]] = [real(_Parts[0]), j, real(_Parts[1])];
 		}
 	}
+	if(_Asleep) for(var n = 0; n < array_length(_G.Walls); n++) instance_deactivate_object(_G.Walls[n]);
 }
 
 /// Class of the region tile at a pixel ("" where none is painted): what the outdoor rooms will collide with (F12b)

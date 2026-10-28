@@ -33,7 +33,7 @@ STEPS = {
     'expect': {'alive', 'level', 'room', 'enemies', 'kills_min', 'exit_level', 'set_rooms_min', 'free'},
     'sheet': {'level', 'seeds'},
     'paint': {'x', 'y', 'w', 'h', 'blocks', 'mirror', 'flip', 'transform'},
-    'painted': {'index', 'at'},
+    'painted': {'index', 'at', 'remake'},
     'exit': {'which', 'frames'},
     'end': set(),
 }

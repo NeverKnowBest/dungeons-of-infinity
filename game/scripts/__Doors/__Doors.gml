@@ -328,8 +328,9 @@ function Door_DrawTiles(Inst){
 		var TilesY = global.Level.Rooms[RoomIndex].ForcedTheme != -1 && global.Level.Rooms[RoomIndex].ForcedTheme <= 11 ? 4 + (global.Level.Rooms[RoomIndex].ForcedTheme * 6) : LevelTilesY_Base;
 		var TMID_Beam = (FloorLevel == UPPER ? global.TMID_Tiles_Highest : global.TMID_Walls_Upper);
 		
-		//outdoor levels (roadmap F12b): an open door is the passage the painted room leaves in its walls, no frame
-		if(LevelDef.Layout == LevelLayout.Outdoor && (Status == DoorStatus.Open || Status == DoorStatus.Curtain)){
+		//outdoor levels (roadmap F12b): an open door of a painted room is the passage it leaves in its walls, no frame
+		//(a room of the shared templates keeps its door frames, since its walls are the dungeon's)
+		if(LevelDef.Layout == LevelLayout.Outdoor && RegionRoom_Is(RoomIndex) && (Status == DoorStatus.Open || Status == DoorStatus.Curtain)){
 			ClearTileBlock(TMID_Decor, x, y, 4, 4);
 			ClearTileBlock(TMID_Beam, x, y, 4, 4);
 			exit;
