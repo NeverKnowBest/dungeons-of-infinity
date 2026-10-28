@@ -5,6 +5,7 @@ Números e comportamentos de inimigos, chefes e itens, pesquisados uma vez e gua
 | Arquivo | Conteúdo | Fonte |
 |---------|----------|-------|
 | `alttp.md` | A Link to the Past: inimigos, chefes, itens | código do zelda3 (snesrev), tabelas de `src/sprite.c`, `src/player.c`, `src/ancilla.c` |
+| `alttp-overworld.md` | A Link to the Past: overworld (áreas, passagem pela borda, entradas, obstáculos, segredos, inimigos, música, motivos de composição) | ROM lida com `tools/alttp/owdump.py` e código do zelda3 (`src/overworld.c`, `src/tile_detect.c`, `src/sprite.c`) |
 | `doi.md` | O que já existe no jogo: cada inimigo e chefe com os números da tabela `EnemyDataInit`, onde aparece, velocidade e equivalente no ALttP | código do jogo (`game/scripts/__Enemies`, objetos `oEnemy_*` e `oBoss_*`) |
 
 ## Unidades

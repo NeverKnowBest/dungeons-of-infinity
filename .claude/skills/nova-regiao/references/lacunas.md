@@ -42,8 +42,8 @@ Ao reportar uma lacuna ao Guilherme: diga o que a região pede, por que o fluxo 
 ## `area-externa`: região ao ar livre
 
 * **Reconhecer:** Tipo "área externa" (jardim, campina, floresta), passagem de tela pela borda em vez de portas.
-* **Por que falta:** o gerador só monta dungeons (grade de salas com portas). A Rebel Village é o único precedente.
-* **Resolveria:** a etapa futura "Áreas externas" (roadmap, Ideias).
+* **Por que falta:** o gerador só monta dungeons (grade de salas com portas). A Rebel Village e as minas são layouts fixos de centro de NPC, não o modelo (decisão "Áreas externas" no roadmap).
+* **Resolveria:** a F12b (áreas externas, roadmap), proposta em `docs/design/areas-externas.md`, com a ficha do overworld em `docs/ref/alttp-overworld.md`.
 
 ## `f8`: sala que depende da conversão do ALttP
 
@@ -54,8 +54,8 @@ Ao reportar uma lacuna ao Guilherme: diga o que a região pede, por que o fluxo 
 ## `rom-externo`: gráficos do mundo externo do ALttP
 
 * **Reconhecer:** a spec quer peças do overworld do ALttP (exterior do castelo, telhados, campina) como tiles. O `status.py` não detecta; leia a seção Visual.
-* **Por que falta:** em `tools/alttp/`, o `roomdump.c` e o `z3room.py` renderizam salas de dungeon e o `sprdump.c` só os sprites (OBJ) de uma área externa; nada renderiza o fundo (BG, map16) do overworld.
-* **Resolveria:** um `owdump.c` (com a ROM), no molde do `roomdump.c`. Ou o Guilherme recorta as peças de outra fonte e entrega em `incoming/`.
+* **Por que falta (em parte):** desde a F12a, `tools/alttp/owdump.py` lê e desenha o overworld (`png <área>`, `world`, `vocab`) e dá os atributos de cada tile, então a prévia e a escolha das peças já saem da ROM. Falta cortar os blocos escolhidos num tileset da região com a tabela de atributos, e o jogo ainda não tem tileset por região (F6b).
+* **Resolveria:** a extração de blocos no `owdump.py` mais o tileset por região da F6b. Ou o Guilherme recorta as peças (pode partir das imagens do `owdump.py`) e entrega em `incoming/`.
 * **Alternativa:** peças de salas de dungeon (ex.: a entrada da Torre de Agahnim, que é sala de dungeon e o `roomdump.c` já tira).
 
 ## Entregas do Guilherme (`WAIT`, não é lacuna de ferramenta)

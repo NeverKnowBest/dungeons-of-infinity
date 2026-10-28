@@ -34,3 +34,6 @@ tools/test/baseline/
 
 # import_region.py output (converted frames, preview, report)
 tools/import/out/
+
+# owdump.py renders (tools/alttp/owdump.py)
+tools/alttp/out/

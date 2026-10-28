@@ -166,7 +166,7 @@ def main(argv):
     r.note('Estado: %s' % estado)
     tipo = fields.get('Tipo', '').lower()
     if re.search(r'área externa|area externa|jardim|campina|floresta', tipo) and 'dungeon' not in tipo:
-        r.gap('area-externa', 'Tipo is an outdoor area: the generator only makes dungeons (roadmap Ideias, outdoor areas)')
+        r.gap('area-externa', 'Tipo is an outdoor area: the generator only makes dungeons (roadmap F12b, docs/design/areas-externas.md)')
     if re.search(r'outro zelda|minish|link.s awakening|oracle', tipo):
         r.note('region from another Zelda: check docs/ref for its sheet and docs/dev/receitas.md "Conteúdo de outro Zelda"')
     m = re.search(r'`DungeonLevel\.(\w+)`', fields.get('Fase', ''))

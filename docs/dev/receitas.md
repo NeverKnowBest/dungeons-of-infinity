@@ -86,6 +86,14 @@ Salas próprias de uma fase (formas, portas, seções e decoração composta por
 2. Chame `Achievement_Unlock("Key")` onde ela acontece, ou estenda `Achievements_CheckStats` se depender das estatísticas.
 3. Regras: a recompensa é segredo até ser conquistada (não aparece na galeria nem nos menus). Nada é liberado com cheats ligados.
 
+## Overworld do ALttP (ler, medir, desenhar)
+
+1. A ROM e o zelda3 ficam na pasta `zelda3` ao lado do repositório (`zelda3.sfc` dentro dela). Se faltarem no PC, peça ao Guilherme; o `owdump.py` diz onde procurou.
+2. Ache a área: `python tools/alttp/owdump.py areas` (número, nome, tamanho, música, entradas, segredos, inimigos).
+3. Detalhe e colisão: `owdump.py area 0x2c` mostra o mapa de atributos em texto (borda de mão única, arbusto, água, escada, entrada). Aberturas para as vizinhas: `edges`. Composição: `stats` e `vocab`.
+4. Imagem: `owdump.py png 0x2c --scale 0.5` (ou `world --scale 0.25`). Olhe em escala reduzida e amplie só a região que importa.
+5. Números já medidos estão em `docs/ref/alttp-overworld.md`; acrescente lá o que medir de novo.
+
 ## Música da ROM
 
 1. `musicdump.c` renderiza a música (carregue o banco certo: intro ou indoor/overworld).

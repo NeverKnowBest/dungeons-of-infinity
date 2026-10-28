@@ -275,7 +275,7 @@ Order for the hub pictures: `festive_draw.py`, `build_pics.py`, `build_hall3.py`
 
 `data_d` is a Git LFS file. Make sure the real file is checked out (`git lfs pull`) before running `build3.py`. Install the dependencies with `python -m pip install --user pillow numpy`.
 
-### `alttp/` (C, needs the zelda3 source and your own ROM)
+### `alttp/` (C harnesses and `owdump.py`; need the zelda3 source and your own ROM)
 
 Small harnesses compiled against [zelda3](https://github.com/snesrev/zelda3) (the C reimplementation of ALttP). They load the game's assets (`zelda3_assets.dat`, built from your ROM by zelda3's own asset script) and dump data:
 
@@ -285,5 +285,19 @@ Small harnesses compiled against [zelda3](https://github.com/snesrev/zelda3) (th
 | `sprdump.c` | OBJ VRAM and palettes of an overworld area, plus sprite OAM flags (for extracting NPC sprites) |
 | `musicdump.c` | A song rendered to PCM through the SPC emulator (`TRACE=1` prints the song pointer) |
 | `entm.c` | The entrance to music table |
+
+`owdump.py` (roadmap F12a) is Python, not C: it reads the overworld straight from the ROM, so it needs no compiler. It imports zelda3's own `assets/util.py` (ROM loading, decompression) and `assets/tables.py` (area, sprite, music and secret names), uses the ROM addresses of zelda3's `assets/extract_resources.py` and `compile_resources.py`, and parses three small tables from `src/load_gfx.c` (`kMainTilesets`, `kAuxTilesets`, `kOwBgPalInfo`). It looks for zelda3 in `$ZELDA3_DIR` or in the `zelda3` folder next to the repository (`--zelda3` to change), and for the ROM at `<zelda3>/zelda3.sfc` (`--rom`). Rendering needs Pillow; the rest uses only the standard library.
+
+```bash
+python tools/alttp/owdump.py areas                    # one line per area: size, music per story stage, entrances, holes, secrets, enemies per stage
+python tools/alttp/owdump.py area 0x2c                # one area: header, entrances, exits, secrets, sprites, attribute map as text
+python tools/alttp/owdump.py edges                    # openings between neighbouring areas (offset+width px, walk or swim)
+python tools/alttp/owdump.py stats                    # composition per area: distinct map16/map32, % of each tile class, bush groups
+python tools/alttp/owdump.py png 0x2c 0x1b --scale 0.5
+python tools/alttp/owdump.py world --scale 0.25       # the whole light world (--world dark)
+python tools/alttp/owdump.py vocab --top 64           # the most used map32 blocks, drawn
+```
+
+Images go to `tools/alttp/out/` (ignored by git). How it reads an area, from zelda3: each 512x512 screen is 16x16 map32 indices, decompressed from two streams (high and low bytes, `0x82F94D` and `0x82FB2D`); a map32 is four map16 (`0x838000`, `0x83B400`, `0x848000`, `0x84B400`, 6 bytes per four map32); a map16 is four 8x8 tiles (`0x8F8000`, top left, top right, bottom left, bottom right); the tile attribute comes from the tile number (`0x8E9459`). Graphics: main tileset 0x20 (light world) or 0x21 (dark), with the area's aux tileset over slots 3 to 6; 3bpp packs expanded to 4bpp, the "high" slots adding 8 to every non zero pixel. Palette: `Overworld_LoadPalettes` with the area's palette index; `-1` in `kOwBgPalInfo` means "keep the previous one", rendered with the game's defaults. Not drawn: animated water, overlays (fog, clouds, rain), event changes (opened doors, the pyramid hole).
 
 Build them like zelda3's own `main.c`: compile the file together with zelda3's `src/*.c` and `snes/*.c` (minus `src/main.c`), with zelda3's include paths.
