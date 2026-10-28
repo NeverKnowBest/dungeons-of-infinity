@@ -22,10 +22,7 @@ if(InitNewDungeon){
 		Dungeon_InitLevel(_NextLevel);		
 	}
 	
-	if(global.Level.StartDir == UP)
-		sprite_index = global.LinkSpr_Descending_Bottom2;
-	else
-		sprite_index = global.LinkSpr_Descending_Top2;
+	sprite_index = ExitLook_LinkSprite(ExitLook, 2, global.Level.StartDir == UP ? BOTTOM : TOP);	//the look of the exit Link took
 				
 	with(oDoor){
 		
@@ -42,7 +39,7 @@ if(InitNewDungeon){
 				DrawTileBlock(TMID, x, y + 8, 70, LevelTilesY, 1, 2);
 				DrawTileBlock(TMID, x + 24, y + 8, 71, LevelTilesY, 1, 2);
 				
-				DrawTileBlock(TMID, x + 8, y + 8, 58, LevelTilesY + 2, 2, 2);
+				DrawTileBlock(TMID, x + 8, y + 8, other.ExitLook.Entrance[0], LevelTilesY + 2, 2, 2);	//the doorway of the look of the exit Link took
 				break;
 				
 			case "Bottom":
@@ -53,7 +50,7 @@ if(InitNewDungeon){
 				DrawTileBlock(TMID, x, y, 72, _TilesY + 2, 1, 2);
 				DrawTileBlock(TMID, x + 24, y, 73, _TilesY + 2, 1, 2);				
 				
-				DrawTileBlock(TMID, x + 8, y, 60, _TilesY + 4, 2, 2);
+				DrawTileBlock(TMID, x + 8, y, other.ExitLook.Entrance[1], _TilesY + 4, 2, 2);
 				break;
 
 		}

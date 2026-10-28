@@ -109,12 +109,14 @@ python tools/test/baseline.py save before                # compiles once and run
 python tools/test/baseline.py save after --only Mines    # only the scenarios whose name contains "Mines"
 python tools/test/baseline.py save after --no-build      # reuse the last build
 python tools/test/baseline.py compare before after       # SAME, or every text line and image that differs
+python tools/test/baseline.py compare before after --handles   # same, ignoring sprite and surface numbers in the dumps
 ```
 
 * Results go to `tools/test/baseline/<label>/<scenario>/` (ignored by git, about 60 MB per label). The same code gives the same files, so any difference is a change in behaviour (or in the dumped data: a renamed or removed global shows up too).
 * A baseline of the code before a change can be made after the change too: `git worktree add --detach %TEMP%\doi-base HEAD`, copy the test tools in, `save before` there and copy `tools/test/baseline/before` back (see `docs/dev/receitas.md`, "Comparar antes e depois").
 * `compare` shows pixel counts for images when Pillow is installed. It ignores the `step` lines of the log: they echo the scenario as GML writes it, and the key order changes between builds.
 * F4 result, for reference: every file the same except three lines per dump, the globals `DungeonNames` and `Music_LevelSongIndex` (gone) and `LevelDefs` (new).
+* `--handles`: a change that creates sprites or surfaces (even temporary ones) shifts the numbers of every sprite and surface made after them, so every dump differs in lines like `MapSurface=ref surface 127`. With `--handles` those numbers (and `OldWinFocus`, which depends on the window focus) are ignored and only real differences are left, plus the new globals themselves (`+global LinkSpr_Ascending_Top1=...`).
 * F4b result: SAME in all 14 against the F4 baseline. A busy PC can make one `oMusic` line differ (`SongPlaying_Intro`, `SongPlaying_Inst`): the music intro ends on the real clock, so a slower run reaches the loop before the third build. Run that scenario again (`save <label> --only ref_01 --no-build`) with nothing else running before calling it a change.
 
 Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value; `level` and `item` also take a bare name (`"Sewers"`, `"Shield"`).

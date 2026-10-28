@@ -703,7 +703,7 @@ function UpdateState(NewState, var1 = undefined){
 		case LinkState.Descending:
 			DescendingPhase = 1;
 			x = floor(x); y = floor(y);
-			var snd = audio_play_sound(Door_ExitLook(LastDoorID).Sound, 1, false);
+			var snd = audio_play_sound(ExitLook.Sound, 1, false);	//ExitLook: set by CheckDoors
 			audio_sound_gain(snd, 0, 2000);
 			var NextLevelSongIndex = global.LevelDefs[Level_NextIndex()].Song;
 			if(oMusic.SongPlaying_Index != NextLevelSongIndex) Music_Fade(0, SongFadeLen_NextLevel, SongIndex.None);
@@ -927,8 +927,7 @@ function UpdateSprites(){
 			break;
 		
 		case LinkState.Descending:
-			if(DescendingLocation == TOP) sprite_index = global.LinkSpr_Descending_Top1;
-			else sprite_index = global.LinkSpr_Descending_Bottom1;
+			sprite_index = ExitLook_LinkSprite(ExitLook, 1, DescendingLocation);
 			break;
 		
 		case LinkState.Shocked:
@@ -1221,6 +1220,8 @@ function CheckDoors(){
 		}
 		
 		if(DoorInst.Status == DoorStatus.Exit){
+			//its animation and sounds, leaving and arriving (roadmap F4b); before UpdateState, which sets the sprite first
+			ExitLook = Door_ExitLook(DoorInst);
 			if(DoorInst.Location == "Top" && y < DoorInst.y + 24){
 				global.RunPath.Next = Door_ExitDest(DoorInst);	//this exit's branch of the run (roadmap F4b)
 				DescendingLocation = TOP;

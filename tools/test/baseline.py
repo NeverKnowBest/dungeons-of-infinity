@@ -4,6 +4,7 @@
     python tools/test/baseline.py save after --only Mines    # only the scenarios whose name contains "Mines"
     python tools/test/baseline.py save after --no-build      # reuse the last build
     python tools/test/baseline.py compare before after       # what changed between two saved runs
+    python tools/test/baseline.py compare before after --handles   # ignore sprite and surface numbers in the dumps
 
 Each scenario's results (log.txt, the level dumps dump_<n>_<level>_s<seed>.txt and the PNGs) are copied to
 tools/test/baseline/<label>/<scenario>/ (ignored by git). The same code gives the same files, so "compare" lists every
@@ -24,6 +25,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, 'out')
 BASE = os.path.join(HERE, 'baseline')
 STEP_RE = re.compile(r'f\d+ step ')
+# --handles: runtime numbers that shift when the code creates one more sprite or surface (or with the window focus)
+HANDLE_RES = [(re.compile(r'__newsprite\d+'), '__newsprite#'), (re.compile(r'ref surface \d+'), 'ref surface #'),
+              (re.compile(r'OldWinFocus=\d+'), 'OldWinFocus=#')]
 
 
 def scenarios(only):
@@ -68,7 +72,7 @@ def pixels_differ(a, b):
     return '%d pixels' % (sum(diff.histogram()[255:]))
 
 
-def compare(a, b, lines):
+def compare(a, b, lines, handles=False):
     da, db = os.path.join(BASE, a), os.path.join(BASE, b)
     for d in (da, db):
         if not os.path.isdir(d):
@@ -97,6 +101,9 @@ def compare(a, b, lines):
             lb = open(pb, encoding='utf-8', errors='replace').read().splitlines()
             if f == 'log.txt':	# "step" lines echo the scenario as GML writes it; key order changes between builds
                 la, lb = [l for l in la if not STEP_RE.match(l)], [l for l in lb if not STEP_RE.match(l)]
+            elif handles and f.startswith('dump_'):
+                for rx, rep in HANDLE_RES:
+                    la, lb = [rx.sub(rep, l) for l in la], [rx.sub(rep, l) for l in lb]
             diff = [l for l in difflib.unified_diff(la, lb, a, b, n=0, lineterm='') if l[:1] in '+-' and l[:3] not in ('---', '+++')]
             if not diff:
                 continue
@@ -124,10 +131,12 @@ def main():
     c.add_argument('a')
     c.add_argument('b')
     c.add_argument('--lines', type=int, default=12, help='differing lines shown per file (default 12)')
+    c.add_argument('--handles', action='store_true', help='in the dumps, ignore sprite and surface numbers and OldWinFocus '
+                   '(for a change that creates sprites or surfaces: they shift the numbers of everything made after them)')
     args = ap.parse_args()
     if args.cmd == 'save':
         sys.exit(save(args.label, args.only, args.no_build))
-    sys.exit(compare(args.a, args.b, args.lines))
+    sys.exit(compare(args.a, args.b, args.lines, args.handles))
 
 
 if __name__ == '__main__':

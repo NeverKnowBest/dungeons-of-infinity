@@ -2983,73 +2983,80 @@ function LinkSprites_Construct(_CharacterIndex){
 		#region 2
 
 			SprW = 16;
-			SprH = 16;
+			SprH = 24;	//8 rows above the doorway, so the last frames (facing down) show the whole head
 			SprSurface = surface_create(SprW, SprH);
 			surface_set_target(SprSurface);
 			
 			//Frame 1-4
 			draw_clear_alpha(c_black, 0.0);
-			global.LinkSpr_Descending_Top2 = sprite_create_from_surface(SprSurface, 0, 0, SprW, SprH, false, false, 8, 15);
+			global.LinkSpr_Descending_Top2 = sprite_create_from_surface(SprSurface, 0, 0, SprW, SprH, false, false, 8, 23);
 			repeat(3) sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);	
 			
 			//frame 5
 			draw_clear_alpha(c_black, 0.0);
-			draw_sprite_part_ext(SpriteSheet, 0,   16, 336,   16, 16,   8+16, -11,  -1,1, c_white,1);    //source body
-			draw_sprite_part_ext(SpriteSheet, 0,   0, 0,      16, 16,   7+16, -18,  -1,1, c_white,1);    //source head	
+			draw_sprite_part_ext(SpriteSheet, 0,   16, 336,   16, 16,   8+16, -3,  -1,1, c_white,1);    //source body
+			draw_sprite_part_ext(SpriteSheet, 0,   0, 0,      16, 16,   7+16, -10,  -1,1, c_white,1);    //source head	
+			LinkSprite_ClearRows(0, 8);	//the wall above the doorway hides it
 			sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);
 			
 			//frame 6
 			draw_clear_alpha(c_black, 0.0);
-			draw_sprite_part_ext(SpriteSheet, 0,   32, 336,   16, 16,   7+16, -10,  -1,1, c_white,1);    //source body
-			draw_sprite_part_ext(SpriteSheet, 0,   0, 0,      16, 16,  8+16, -16,  -1,1, c_white,1);    //source head	
+			draw_sprite_part_ext(SpriteSheet, 0,   32, 336,   16, 16,   7+16, -2,  -1,1, c_white,1);    //source body
+			draw_sprite_part_ext(SpriteSheet, 0,   0, 0,      16, 16,  8+16, -8,  -1,1, c_white,1);    //source head	
+			LinkSprite_ClearRows(0, 8);	//the wall above the doorway hides it
 			sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);
 
 			//frame 7
 			draw_clear_alpha(c_black, 0.0);
-			draw_sprite_part_ext(SpriteSheet, 0,   16, 384,   16, 16,   5+16, -8,  -1,1, c_white,1);    //source body
-			draw_sprite_part_ext(SpriteSheet, 0,   212, 16,    16, 16,  5+16, -16,  -1,1, c_white,1);    //source head	
+			draw_sprite_part_ext(SpriteSheet, 0,   16, 384,   16, 16,   5+16, 0,  -1,1, c_white,1);    //source body
+			draw_sprite_part_ext(SpriteSheet, 0,   212, 16,    16, 16,  5+16, -8,  -1,1, c_white,1);    //source head	
+			LinkSprite_ClearRows(0, 8);	//the wall above the doorway hides it
 			sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);
 
 			//frame 8
 			draw_clear_alpha(c_black, 0.0);
-			draw_sprite_part_ext(SpriteSheet, 0,   0, 384,    16, 16,   4+16, -7,  -1,1, c_white,1);    //source body
-			draw_sprite_part_ext(SpriteSheet, 0,   212, 16,    16, 16,  4+16, -16,  -1,1, c_white,1);    //source head	
+			draw_sprite_part_ext(SpriteSheet, 0,   0, 384,    16, 16,   4+16, 1,  -1,1, c_white,1);    //source body
+			draw_sprite_part_ext(SpriteSheet, 0,   212, 16,    16, 16,  4+16, -8,  -1,1, c_white,1);    //source head	
+			LinkSprite_ClearRows(0, 8);	//the wall above the doorway hides it
 			sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);
 
 			//frame 9
 			draw_clear_alpha(c_black, 0.0);
-			draw_sprite_part_ext(SpriteSheet, 0,   32, 384,    16, 16,   3+16, -7,  -1,1, c_white,1);    //source body
-			draw_sprite_part_ext(SpriteSheet, 0,   112, 16,    16, 16,  3+16, -14,  -1,1, c_white,1);    //source head	
+			draw_sprite_part_ext(SpriteSheet, 0,   32, 384,    16, 16,   3+16, 1,  -1,1, c_white,1);    //source body
+			draw_sprite_part_ext(SpriteSheet, 0,   112, 16,    16, 16,  3+16, -6,  -1,1, c_white,1);    //source head	
+			LinkSprite_ClearRows(0, 8);	//the wall above the doorway hides it
 			sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);
 
 			//frame 10
 			draw_clear_alpha(c_black, 0.0);
-			draw_sprite_part_ext(SpriteSheet, 0,   16, 384,    16, 16,   2+16, -5,  -1,1, c_white,1);    //source body
-			draw_sprite_part_ext(SpriteSheet, 0,   112, 16,    16, 16,  2+16, -13,  -1,1, c_white,1);    //source head	
+			draw_sprite_part_ext(SpriteSheet, 0,   16, 384,    16, 16,   2+16, 3,  -1,1, c_white,1);    //source body
+			draw_sprite_part_ext(SpriteSheet, 0,   112, 16,    16, 16,  2+16, -5,  -1,1, c_white,1);    //source head	
+			LinkSprite_ClearRows(0, 8);	//the wall above the doorway hides it
 			sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);
 
 			//frame 11
 			draw_clear_alpha(c_black, 0.0);
-			draw_sprite_part_ext(SpriteSheet, 0,   0, 384,    16, 16,   1+16, -3,  -1,1, c_white,1);    //source body
-			draw_sprite_part_ext(SpriteSheet, 0,   112, 16,    16, 16,  1+16, -12,  -1,1, c_white,1);    //source head	
+			draw_sprite_part_ext(SpriteSheet, 0,   0, 384,    16, 16,   1+16, 5,  -1,1, c_white,1);    //source body
+			draw_sprite_part_ext(SpriteSheet, 0,   112, 16,    16, 16,  1+16, -4,  -1,1, c_white,1);    //source head	
+			LinkSprite_ClearRows(0, 8);	//the wall above the doorway hides it
 			sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);
 
-			//frame 12
+			//frame 12 (frames 12-13 step down the last 4 pixels, so the walk that follows starts at the same height)
 			draw_clear_alpha(c_black, 0.0);
-			draw_sprite_part(SpriteSheet, 0,   48, 336,    16, 16,   0, -2);    //source body
-			draw_sprite_part(SpriteSheet, 0,   16, 0,     16, 16,   0, -9);    //source head	
+			draw_sprite_part(SpriteSheet, 0,   48, 336,    16, 16,   0, 8);    //source body
+			draw_sprite_part(SpriteSheet, 0,   16, 0,     16, 16,   0, 1);    //source head	
 			sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);
 
 			//frame 13
 			draw_clear_alpha(c_black, 0.0);
-			draw_sprite_part(SpriteSheet, 0,   64, 336,    16, 16,   0, -2);    //source body
-			draw_sprite_part(SpriteSheet, 0,   16, 0,     16, 16,   0, -8);    //source head	
+			draw_sprite_part(SpriteSheet, 0,   64, 336,    16, 16,   0, 10);    //source body
+			draw_sprite_part(SpriteSheet, 0,   16, 0,     16, 16,   0, 4);    //source head	
 			sprite_add_from_surface(global.LinkSpr_Descending_Top2, SprSurface, 0, 0, SprW, SprH, false, false);
 			
 			surface_reset_target();		
 			surface_free(SprSurface);
 
-			sprite_collision_mask(global.LinkSpr_Descending_Top2, false, 0,   0, 0, 15, 13,   bboxkind_rectangular, 0);			
+			sprite_collision_mask(global.LinkSpr_Descending_Top2, false, 0,   0, 8, 15, 21,   bboxkind_rectangular, 0);			
 			sprite_set_speed(global.LinkSpr_Descending_Top2, 12, spritespeed_framespersecond);
 		
 		#endregion
@@ -3274,6 +3281,28 @@ function LinkSprites_Construct(_CharacterIndex){
 		
 	#endregion
 
+	#region Ascending (the StairsUp exit look, roadmap F4b)
+
+		//Link follows the steps drawn in the doorway. The arrival doorway is the one an exit of the other way shows (the
+		//look's Entrance): ALttP lands you on a stairway going down after going up (zelda3 SpiralStairs_FindLandingSpot).
+		//So each Ascending sprite is the mirror of a Descending one, taking the steps the other way: Top1 is the mirror of
+		//Top1 rising as much as it moves (Top2 comes down those steps); Top2 the mirror of Top2 kept level (Top1 leaves
+		//along those steps level); in the bottom wall the plain mirrors already follow the steps.
+		//Each frame is [Descending frame, dx, dy], drawn mirrored.
+		global.LinkSpr_Ascending_Top1 = LinkSprite_Remix(global.LinkSpr_Descending_Top1, true, [
+			[0, 0, 0], [1, 0, 0], [2, 0, 0], [3, 0, 0], [4, 0, 0], [5, 0, 0],
+			[6, 0, -2], [7, 0, -2], [8, 0, -3], [9, 0, -4], [10, 0, -4], [11, 0, -5], [12, 0, -7],
+			[13, 0, -7], [14, 0, -8], [15, 0, -9], [16, 0, -10], [17, 0, -10], [18, 0, -11], [19, 0, -13]]);
+		global.LinkSpr_Ascending_Top2 = LinkSprite_Remix(global.LinkSpr_Descending_Top2, true, [
+			[0, 0, 0], [1, 0, 0], [2, 0, 0], [3, 0, 0],
+			[4, 0, 9, 8], [5, 0, 8, 8], [6, 0, 6, 8], [7, 0, 5, 8], [8, 0, 5, 8], [9, 0, 3, 8], [10, 0, 1, 8], [11, 0, 0], [12, 0, 0]]);	//8: the doorway's top, as in Descending_Top2
+		var _Mirror = [];
+		for(var i = 0; i < sprite_get_number(global.LinkSpr_Descending_Bottom1); i++) _Mirror[i] = [i, 0, 0];
+		global.LinkSpr_Ascending_Bottom1 = LinkSprite_Remix(global.LinkSpr_Descending_Bottom1, true, _Mirror);
+		global.LinkSpr_Ascending_Bottom2 = LinkSprite_Remix(global.LinkSpr_Descending_Bottom2, true, _Mirror);	//frames past its end are ignored
+
+	#endregion
+
 	#region Dungeon Icon
 			
 		SprW = 16;
@@ -3415,8 +3444,46 @@ function LinkSprites_Destroy(){
 	sprite_delete(global.LinkSpr_Descending_Top2);
 	sprite_delete(global.LinkSpr_Descending_Bottom1);
 	sprite_delete(global.LinkSpr_Descending_Bottom2);
+	sprite_delete(global.LinkSpr_Ascending_Top1);
+	sprite_delete(global.LinkSpr_Ascending_Top2);
+	sprite_delete(global.LinkSpr_Ascending_Bottom1);
+	sprite_delete(global.LinkSpr_Ascending_Bottom2);
 	
 	sprite_delete(global.LinkSpr_DungeonIcon);
 	sprite_delete(global.LinkSpr_MapIcon);
 	
+}
+
+/// Makes rows _From to _To - 1 of the surface being drawn on transparent
+function LinkSprite_ClearRows(_From, _To){
+	gpu_set_blendmode_ext(bm_zero, bm_zero);
+	draw_rectangle(0, _From, surface_get_width(surface_get_target()), _To - 1, false);
+	gpu_set_blendmode(bm_normal);
+}
+
+/// A sprite (same size, origin, mask, speed and frame count as _Spr) whose frame i is frame _Frames[i][0] of _Spr,
+/// moved by _Frames[i][1], _Frames[i][2] pixels and mirrored around the origin if _Mirror; what goes past the sprite's
+/// edges is cut off (the doorway hides it), and so are the rows above _Frames[i][3] when it is given; the frames past
+/// the end of _Frames are blank
+function LinkSprite_Remix(_Spr, _Mirror, _Frames){
+	var _W = sprite_get_width(_Spr), _H = sprite_get_height(_Spr);
+	var _XO = sprite_get_xoffset(_Spr), _YO = sprite_get_yoffset(_Spr);
+	var _Surf = surface_create(_W, _H);
+	var _New = -1;
+	surface_set_target(_Surf);
+	for(var i = 0; i < sprite_get_number(_Spr); i++){
+		draw_clear_alpha(c_black, 0.0);
+		if(i < array_length(_Frames)){
+			var _F = _Frames[i];
+			draw_sprite_ext(_Spr, _F[0], _XO + _F[1], _YO + _F[2], _Mirror ? -1 : 1, 1, 0, c_white, 1);
+			if(array_length(_F) > 3) LinkSprite_ClearRows(0, _F[3]);
+		}
+		if(i == 0) _New = sprite_create_from_surface(_Surf, 0, 0, _W, _H, false, false, _XO, _YO);
+		else sprite_add_from_surface(_New, _Surf, 0, 0, _W, _H, false, false);
+	}
+	surface_reset_target();
+	surface_free(_Surf);
+	sprite_collision_mask(_New, false, 0,   sprite_get_bbox_left(_Spr), sprite_get_bbox_top(_Spr), sprite_get_bbox_right(_Spr), sprite_get_bbox_bottom(_Spr),   bboxkind_rectangular, 0);
+	sprite_set_speed(_New, sprite_get_speed(_Spr), sprite_get_speed_type(_Spr));
+	return _New;
 }

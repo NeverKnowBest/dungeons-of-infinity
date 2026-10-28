@@ -19,6 +19,7 @@ Action[ActionKey.Strafe] = false;
 
 DescendingPhase = 0;
 DescendingLocation = NONE;
+ExitLook = global.ExitLooks.StairsDown;	//look of the exit Link last took (Door_ExitLook): his animation and sounds through it
 
 
 MoveAssist = false;

@@ -36,11 +36,18 @@ enum OpenDoorSprite{
 ///							FloorLevel); _Tiles = {Decor, Beam, Y}: its decor and beam tilemaps and its tile row
 ///							(Door_DrawTiles draws the door sides)
 ///   Sound					played when Link goes through it
+///   LinkAnim				Link's animation through it: global.LinkSpr_<LinkAnim>_Top1/_Bottom1 to leave by a stairway
+///							in the top or bottom wall, _Top2/_Bottom2 to arrive at the next level (LinkSprites_Construct)
+///   ArriveSound			played when Link arrives at the next level (oLink Alarm 9)
+///   Entrance				[top, bottom] decor tile column of the doorway Link arrives through at the next level (oLink
+///							End Step): the stairway of the other way, as in ALttP
 ///   MapIcon				its icon on the large map (with the compass)
 function ExitLooks_Init(){
 	global.ExitLooks = {
-		StairsDown: {Draw: ExitLook_DrawStairsDown, Sound: Sound_StairsFloorDown, MapIcon: sLargeMap_Down},	// the usual exit
-		StairsUp: {Draw: ExitLook_DrawStairsUp, Sound: Sound_StairsUp, MapIcon: sLargeMap_Down}			// the stairway a level's entrance shows
+		// the usual exit
+		StairsDown: {Draw: ExitLook_DrawStairsDown, Sound: Sound_StairsFloorDown, LinkAnim: "Descending", ArriveSound: Sound_StairsDown, Entrance: [58, 60], MapIcon: sLargeMap_Down},
+		// the stairway a level's entrance shows; Link climbs it
+		StairsUp: {Draw: ExitLook_DrawStairsUp, Sound: Sound_StairsUp, LinkAnim: "Ascending", ArriveSound: Sound_StairsUp, Entrance: [60, 58], MapIcon: sLargeMap_Down}
 	};
 }
 
@@ -68,6 +75,12 @@ function ExitLook_DrawStairsUp(_Door, _Tiles){
 			DrawTileBlock(_Tiles.Decor, x + 8, y, 60, _Tiles.Y + 4, 2, 2);
 		}
 	}
+}
+
+/// Link's sprite going through an exit with look _Look: _Phase 1 leaving, 2 arriving; _Location TOP or BOTTOM, the wall
+/// of the stairway
+function ExitLook_LinkSprite(_Look, _Phase, _Location){
+	return variable_global_get("LinkSpr_" + _Look.LinkAnim + (_Location == TOP ? "_Top" : "_Bottom") + string(_Phase));
 }
 
 /// Level an exit door leads to
