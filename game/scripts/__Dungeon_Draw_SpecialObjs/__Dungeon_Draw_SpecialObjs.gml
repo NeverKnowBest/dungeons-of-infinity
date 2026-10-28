@@ -1800,6 +1800,9 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 			var _UsedSpaceType = UsedSpaceType.Enemy;
 			var _UsedSpaceBuffer = 0;
 			
+			var _Arch = EnemyArch_Get(EnemyIndex);	// archetype enemies that never leave the water (Hover)
+			if(_Arch != undefined && _Arch.StayOnWater && !OnWaterTile(_FloorLevel == UPPER ? global.TMID_Water_Upper : global.TMID_Water_Lower, EnemyX, EnemyY)) continue;
+			
 			switch(EnemyIndex){
 
 				case oEnemy_Beamos:
@@ -1831,7 +1834,6 @@ function SpawnEnemies(_RoomIndex, _SpecialItem = -1){
 					break;
 				
 				case oEnemy_Kyameron_Emitter:
-				case oEnemy_Hover:	
 					if(!OnWaterTile(_FloorLevel == UPPER ? global.TMID_Water_Upper : global.TMID_Water_Lower, EnemyX, EnemyY)) continue;
 					break;
 				

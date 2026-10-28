@@ -94,7 +94,8 @@ Para mudanças que não deveriam mudar o jogo (refatoração, faxina, troca de t
 4. `python tools/import/import_region.py <regiao>` grava os sprites e sons, registra no `.yyp` (pasta `Regions/<Regiao>` no IDE) e acrescenta as músicas em `SongIndex` e no `Music_InitData`. O `imported.json` da pasta vai no mesmo commit.
 5. `python tools/check/validate.py` e `python tools/test/run.py boot` (compila e confere que o GameMaker aceita os arquivos).
 6. Trocar um gráfico: substitua o arquivo em `incoming/` e importe de novo; o que saiu da pasta sai do projeto. Desfazer: `--remove`.
-7. Testar o importador sem gráficos novos: `python tools/import/make_example.py`, `python tools/import/import_region.py tools/import/out/example`, `python tools/test/run.py boot` e `--remove` no fim (o `git status` volta limpo).
+7. Paleta de um inimigo (cores por fase): recolorações em `palettes/<Nome>/1.png, 2.png...`, cada uma o mesmo quadro de um sprite da família pintado com outras cores. O relatório diz quantas cores e variantes saíram; erro se uma cor virar duas. A variante da fase escolhe a coluna com `ColorIndex` (receita "Variante de inimigo por fase").
+8. Testar o importador sem gráficos novos: `python tools/import/make_example.py`, `python tools/import/import_region.py tools/import/out/example`, `python tools/test/run.py boot` e `--remove` no fim (o `git status` volta limpo).
 
 ## Estágio alternativo (variante de capítulo, ex.: topo do castelo no capítulo 2)
 
@@ -114,9 +115,25 @@ Passos:
 4. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.
 5. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `game/datafiles/data/rooms/` com `tools/templates/convert.py` (veja "Template de sala no Tiled"). Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
 6. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
-7. Inimigos: reaproveite os do castelo; é só a lista `Enemies` da entrada, com `EnemyStats` de um nível onde eles existem (os soldados só funcionam nos níveis que o `Create` deles conhece).
+7. Inimigos: reaproveite os do castelo; é só a lista `Enemies` da entrada, com `EnemyStats` de um nível onde eles existem. Os soldados funcionam em qualquer fase (pegam a variante padrão); para outra cor, energia ou ataque, ponha a variante na própria ficha: `EnemyVariants = {oEnemy_Soldier_Simple: {HeadIndex: SoldierHead.Normal, ColorIndex: SoldierColor.Red, Energy: 1, Attack: 0.5}}` (receita "Variante de inimigo por fase").
 8. Teste: antes de existir a fase, dá para ver o sorteio com uma ramificação temporária no cenário (chave `"levels"`, como em `tools/test/scenarios/branch_exits.json`); com ela pronta, folha de contato da fase anterior com várias sementes e o passo `exit` para atravessar cada saída.
 9. Cenário de referência `ref_NN_<Fase>.json` para a fase nova (veja "Comparar antes e depois").
+
+## Inimigo novo por arquétipo
+
+Para inimigo simples (anda, persegue, corre, investe), sem código próprio (roadmap F7). Campos e movimentos no topo de `game/scripts/__EnemyArch/__EnemyArch.gml`; exemplos prontos lá mesmo (rato, cobra, caranguejo, Hover).
+
+1. Sprites pelo kit de importação, com o nome `Enemy_<Nome>_<Ação>_<Direção>` (`_Left`, `_Right`, `_Up`, `_Down`); sem direção, um sprite só por ação. Cores por fase: recolorações em `palettes/Enemy_<Nome>/1.png, 2.png...` (veja `incoming/README.md`), que viram o `sEnemy_<Nome>_Pal`.
+2. Objeto sem eventos, filho do `oEnemy_Archetype`, com o primeiro sprite como sprite do objeto: `gm_assets.obj('oEnemy_<Nome>', {}, sprite_name='sEnemy_<Nome>_Walk_Down', parent='oEnemy_Archetype', folder=('Enemies', 'folders/Objects/Characters/Enemies.yy'))` (em `tools/hub/gm_assets.py`).
+3. `EnemyDataInit` em `Enemies_InitData` (energia, ataque, itens, pontos, efeitos das armas; copie a linha do inimigo mais parecido).
+4. `EnemyArch(oEnemy_<Nome>, {...})` em `EnemyArch_Init`: `Vars` (tamanho, velocidades, água), `States` com `Move`, `Time` e `Next`, `Sprites`, `Palette`, `Recover`. Partir do rato (anda e para), da cobra (anda e corre) ou do Hover (investida) e mudar os números de `docs/ref/`.
+5. Variante por fase, se houver: `EnemyVariant(oEnemy_<Nome>, {}, [[DungeonLevel.X, {ColorIndex: 1, Energy: 2}]])` em `EnemyVariants_Init`, ou `EnemyVariants` na ficha da fase.
+6. O inimigo na lista `Enemies` da ficha da fase.
+7. Teste: `python tools/check/validate.py`, e um cenário com `spawn` e `trace` (como `tools/test/scenarios/arch_patterns.json`) para ler no log se ele anda, para e vira como deveria. Movimento que o arquétipo ainda não tem (atirar, pular, voar em onda, se esconder): veja a F7 no `docs/roadmap.md`; até lá, inimigo assim continua com código próprio.
+
+## Variante de inimigo por fase
+
+O que um inimigo muda de uma fase para outra (cor, energia, ataque, cabeça e arma dos soldados, sprites) fica em `EnemyVariants_Init` (`__EnemyArch.gml`): `EnemyVariant(objeto, padrão, [[DungeonLevel.X, {...}], ...])`. Campos são variáveis do inimigo (`ColorIndex` escolhe a coluna da paleta), mais `Energy` (índice de energia) e, nos arquétipos, `Sprites`. Lista vira sorteio (`HeadIndex: [SoldierHead.Pig, SoldierHead.Demon]`). Uma fase pode ter a sua sem mexer na tabela: `EnemyVariants = {oEnemy_X: {...}}` na ficha. Ordem: a da ficha, a da fase de `EnemyStats`, a padrão. Inimigo que não é arquétipo precisa chamar `Enemy_ApplyVariant()` no `Create` (os soldados chamam).
 
 ## Conteúdo de outro Zelda (ex.: Minish Cap)
 
@@ -126,4 +143,4 @@ Ter os sprites e o código original ajuda muito, mas não é uma tradução 1 pa
 * O que se aproveita direto: sprites e animações, padrões de movimento e ataque, tempos e números (vida, velocidade, dano), sons e músicas.
 * Ordem sugerida: primeiro os sprites e um inimigo simples (andar e tocar no Link); depois os que atiram; por último o chefe, com sala própria.
 * Os sprites entram pelo kit de importação (receita "Importar gráficos de uma região"), que já ajusta as cores e o contorno.
-* Para cada inimigo novo: objeto filho do inimigo do DoI mais parecido, sprite por direção e estado, `EnemyDataInit` com energia e ataque, e o inimigo na lista `Enemies` da ficha do nível onde ele aparece.
+* Para cada inimigo novo: se ele cabe num arquétipo, vira dados (receita "Inimigo novo por arquétipo"); senão, objeto filho do inimigo do DoI mais parecido, sprite por direção e estado, `EnemyDataInit` com energia e ataque, e o inimigo na lista `Enemies` da ficha do nível onde ele aparece.

@@ -16,6 +16,7 @@ function INIT(){
 	Inventory_InitData();
 		
 	Enemies_InitData();	
+	EnemyArch_Init();	// archetype enemies and per-level variants (after the enemy table: same objects)
 	
 	Levels_Init();	// after the enemies: the level sheet lists them
 	ExitLooks_Init();	// how exits look, named by the level sheet (ExitLook)

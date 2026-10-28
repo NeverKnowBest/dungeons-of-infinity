@@ -7,6 +7,7 @@ Cada região tem uma pasta aqui, com o mesmo nome da especificação em `docs/re
 ```
 incoming/<regiao>/
   sprites/          imagens .png ou .gif (pode ter subpastas para organizar)
+  palettes/         opcional: recolorações de um inimigo para as cores por fase (veja abaixo)
   tileset.png       opcional: faixa de tiles da região (veja abaixo)
   music/            opcional: músicas .wav
   manifest.json     opcional: o que não dá para dizer pelo nome do arquivo
@@ -21,6 +22,19 @@ incoming/<regiao>/
   * um GIF animado (a velocidade do GIF vira a do sprite, se o manifesto não disser outra).
 * Fundo transparente. Pode vir de qualquer jogo: as cores são ajustadas sozinhas (veja "O que a importação ajusta").
 * Tamanho: o mesmo do original (Link tem 16x24). Deixe 1 pixel livre em volta se o sprite não tiver contorno e for preciso acrescentar um.
+
+## Paletas (cores por fase)
+
+Um inimigo pode ter outra cor em cada fase (como o soldado verde, azul e cinza) sem sprites repetidos: o jogo troca as cores na hora de desenhar. Para isso, pinte de novo **um quadro** de um sprite dele com as cores da variante e ponha em `palettes/<Nome>/`, numerado a partir de 1:
+
+```
+palettes/Enemy_Ropa/1.png    o quadro com as cores da variante 1
+palettes/Enemy_Ropa/2.png    variante 2
+```
+
+* `<Nome>` é o começo do nome dos sprites do inimigo (`Enemy_Ropa` vale para `Enemy_Ropa_Walk_Down`, `Enemy_Ropa_Walk_Up`...). O quadro pintado é o primeiro quadro do primeiro desses sprites em ordem alfabética, ou o que o manifesto disser: `"palettes": {"Enemy_Ropa": {"base": "Enemy_Ropa_Walk_Down", "frame": 0}}`.
+* Mesmo tamanho do quadro, mesmos pixels: só as cores mudam. Cada cor do original vira uma cor só na variante (uma cor que vira duas é erro). Cor que não aparece no quadro pintado fica igual em todas as variantes (o relatório avisa).
+* A importação cria o sprite `sEnemy_Ropa_Pal`; a variante 0 é o original. Qual variante cada fase usa é dito no jogo (`ColorIndex` da variante do inimigo).
 
 ## Tileset
 
@@ -49,6 +63,7 @@ Tudo é opcional; sem manifesto valem os padrões. Exemplo:
   "Enemy_Keese": {"outline": "add"},
   "Deco_Banner": {"origin": "top-left", "colors": 5}
  },
+ "palettes": {"Enemy_Ropa": {"base": "Enemy_Ropa_Walk_Down"}},
  "tileset": {"base": "Castle"},
  "music": {"CastleRoof": {"loop": 3.52}}
 }

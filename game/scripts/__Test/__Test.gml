@@ -234,6 +234,16 @@ function Test_LogState(){
 		+ " enemies=" + string(instance_number(oEnemy)) + " kills=" + string(global.TestKills) + " linkstate=" + string(oLink.State));
 }
 
+/// One "trace" line per enemy that exists: position, state, direction, sprite, speed and energy (step "trace")
+function Test_LogEnemies(_Frame){
+	var _Link = "link=" + string(oLink.x) + "," + string(oLink.y);
+	with(oEnemy){
+		Test_Log("trace " + string(_Frame) + " " + object_get_name(object_index) + " x=" + string(x) + " y=" + string(y) + " z=" + string(z)
+			+ " state=" + string(State) + " dir=" + string(Dir) + " sprite=" + (sprite_index == -1 ? "-" : sprite_get_name(sprite_index)) + " image=" + string(image_index)
+			+ " vx=" + string(vx) + " vy=" + string(vy) + " energy=" + string(Energy) + " alarm0=" + string(alarm[0]) + " " + _Link);
+	}
+}
+
 #endregion
 
 #region Debug cheats (also usable outside tests)
@@ -449,6 +459,22 @@ function Test_DoStep(_S){
 			if((_S[$ "exit_level"] ?? false) && (global.SaveLevel || global.Level.Index != global.TestExitDest)) _Bad += " exit_level(" + string(global.Level.Index) + (global.SaveLevel ? " rest stop" : "") + ")";
 			if(_Bad == "") Test_Log("expect ok");
 			else Test_Fail("expect" + _Bad);
+			return true;
+
+		case "trace":	// every enemy's position, state and sprite every "every" frames (default 10) for "frames" (default 120)
+			if((StepFrames - 1) mod (_S[$ "every"] ?? 10) == 0) Test_LogEnemies(StepFrames - 1);
+			return StepFrames >= (_S[$ "frames"] ?? 120);
+
+		case "arch":	// changes a state of an archetype enemy for this test (scripts/__EnemyArch): "move", "time" [min, max]
+			var _Arch = EnemyArch_Get(asset_get_index(_S[$ "enemy"] ?? ""));
+			var _ArchState = _Arch == undefined ? undefined : EnemyArch_State(_Arch, _S[$ "state"] ?? 0);
+			if(_ArchState == undefined){
+				Test_Fail("no archetype state " + string(_S[$ "enemy"]) + " " + string(_S[$ "state"]));
+				return true;
+			}
+			if(variable_struct_exists(_S, "move")) _ArchState.Move = _S.move;
+			if(variable_struct_exists(_S, "time")) _ArchState.Time = _S.time;
+			Test_Log("arch " + _Arch.Name + " state=" + string(_S.state) + " move=" + _ArchState.Move + " time=" + string(_ArchState.Time));
 			return true;
 
 		case "probe":	// creates each enemy in front of Link, logs its variables and removes it

@@ -138,6 +138,7 @@ function WallCollision(CollidedWallList, VX, VY, WallObj){
 		}else{
 			
 			var _ParentObj = object_get_parent(object_index);
+			if(_ParentObj == oEnemy_Archetype) _ParentObj = oEnemy;	// archetype enemies are enemies (scripts/__EnemyArch)
 			var Condition = (_ParentObj == oEnemy && WallInst.BlockEnemies) || 
 							( 
 								(_ParentObj == oProjectile && WallInst.BlockProjectiles) ||

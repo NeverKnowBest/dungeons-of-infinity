@@ -1,12 +1,7 @@
 {
   "$GMObject":"",
   "%Name":"oEnemy_Hover",
-  "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+  "eventList":[],
   "managed":true,
   "name":"oEnemy_Hover",
   "overriddenProperties":[],
@@ -15,8 +10,8 @@
     "path":"folders/Objects/Characters/Enemies/Hover.yy",
   },
   "parentObjectId":{
-    "name":"oEnemy",
-    "path":"objects/oEnemy/oEnemy.yy",
+    "name":"oEnemy_Archetype",
+    "path":"objects/oEnemy_Archetype/oEnemy_Archetype.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,

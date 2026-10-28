@@ -78,6 +78,10 @@ python tools/check/validate.py --strict   # warnings also fail
 | Arrows or em dashes in the Portuguese docs (including `docs/ref/` and `docs/regioes/`) | warning |
 | Region spec (`docs/regioes/*.md`) has every `##` section and every header field (`* **Capítulo:**`...) of `_modelo.md` and a valid `**Estado:**` | error |
 | Every `ExitLook` the level sheet names is a look of `ExitLooks_Init` (`__Doors.gml`) | error |
+| Archetype enemies (`scripts/__EnemyArch`): every child of `oEnemy_Archetype` has an `EnemyArch` entry and every entry names such a child; the sprites the entries name exist (with or without `_Left/_Right/_Up/_Down`) | error |
+| Archetype enemy with events of its own | warning |
+| `object_get_parent(...) == oEnemy` in GML (misses the archetype enemies; use `object_is_ancestor`) | warning |
+| `Zelda.resource_order` lists a file that does not exist | warning |
 | Region spec cites an asset (`oX`, `sX`, `Sound_X`, `Music_X` in backticks) that is not in `Zelda.yyp`, unless the line says "(novo)" | error |
 | Reference sheet (`docs/ref/*.md`) cites an asset that is not in `Zelda.yyp` | warning |
 | A cited `docs/...md` file does not exist | warning |
@@ -117,6 +121,7 @@ python tools/test/baseline.py compare before after --handles   # same, ignoring 
 * `compare` shows pixel counts for images when Pillow is installed. It ignores the `step` lines of the log: they echo the scenario as GML writes it, and the key order changes between builds.
 * F4 result, for reference: every file the same except three lines per dump, the globals `DungeonNames` and `Music_LevelSongIndex` (gone) and `LevelDefs` (new).
 * `--handles`: a change that creates sprites or surfaces (even temporary ones) shifts the numbers of every sprite and surface made after them, so every dump differs in lines like `MapSurface=ref surface 127`. With `--handles` those numbers (and `OldWinFocus`, which depends on the window focus) are ignored and only real differences are left, plus the new globals themselves (`+global LinkSpr_Ascending_Top1=...`).
+* `scenarios/arch_trace.json` is the behaviour check of the archetype enemies (roadmap F7): it spawns them and the soldiers in four levels, hits them with the sword and traces every enemy. Run it on both versions (in the worktree copy as well) and compare the two `log.txt` with `python tools/test/logdiff.py before.txt after.txt`, which ignores the frame numbers, the `step` lines and the `ref ds_list/instance` numbers (`--frames` compares the frames too). F7 result: SAME (1321 lines, frames included).
 * F4b result: SAME in all 14 against the F4 baseline. A busy PC can make one `oMusic` line differ (`SongPlaying_Intro`, `SongPlaying_Inst`): the music intro ends on the real clock, so a slower run reaches the loop before the third build. Run that scenario again (`save <label> --only ref_01 --no-build`) with nothing else running before calling it a change.
 
 Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value; `level` and `item` also take a bare name (`"Sewers"`, `"Shield"`).
@@ -144,7 +149,9 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `room` | `x`, `y` | Moves Link into the room at that grid position (0..7), just inside one of its doors |
 | `level` | `level`, `seed` | Builds a level (the next level of a run normally comes through the stairs) |
 | `spawn` | `enemy`, `dist` (default 48) | Creates an enemy object (`oEnemy_Rat`) in front of Link |
-| `probe` | `enemies` (list), `dist` | Creates each enemy in front of Link, logs a `probe` line with its variables (energy, attack, `Type`...) and removes it. Only enemies that exist in that level: soldiers crash elsewhere |
+| `probe` | `enemies` (list), `dist` | Creates each enemy in front of Link, logs a `probe` line with its variables (energy, attack, `Type`...) and removes it. An enemy outside the levels its code knows may crash (the soldiers no longer do: they take their default variant) |
+| `trace` | `frames` (default 120), `every` (default 10) | Every `every` frames, one `trace` line per enemy: position, `z`, state, `Dir`, sprite, image, speed, energy, `alarm[0]` and Link's position. Two versions of the code that log the same lines move the same way (`scenarios/arch_trace.json`, roadmap F7) |
+| `arch` | `enemy`, `state` (`EnemyState` name), `move`, `time` (`[min, max]`) | Changes a state of an archetype enemy (`scripts/__EnemyArch`) for this test only, e.g. a rat that chases Link (`scenarios/arch_patterns.json`) |
 | `give` | `item`, `index`, `amount` | Gives an item |
 | `state` | | Logs level, room, Link's position and health, enemies and kills |
 | `log` | `text` | Writes a note in the log |
@@ -153,7 +160,7 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `sheet` | `level`, `seeds` | Contact sheet (what `--sheet` runs): `sheet_<level>_<seed>.png` per seed and `sheet_<level>.png` with all of them at half size |
 | `end` | | Ends the test (it also ends after the last step) |
 
-Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>`, `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `state`, `expect ok`, `levels <index> "<name>" <field>=<value>` (scenario changes), `exits main-><level> count=1|2 extra=room <n> grid= Top|Bottom [secret]-><level> main=room <n> grid=` (only in levels whose exits can lead to more than one level), `exit main|extra room= -> level <n>`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
+Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>`, `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `trace <frame> <object> ...`, `arch <object> ...`, `state`, `expect ok`, `levels <index> "<name>" <field>=<value>` (scenario changes), `exits main-><level> count=1|2 extra=room <n> grid= Top|Bottom [secret]-><level> main=room <n> grid=` (only in levels whose exits can lead to more than one level), `exit main|extra room= -> level <n>`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
 
 ### `templates/` (Python 3, standard library only)
 
@@ -188,8 +195,8 @@ python tools/import/make_example.py [folder]               # example region from
 
 | File | What it does |
 |------|--------------|
-| `import_region.py` | Reads `sprites/` (one file per sprite, numbered frames `_0 _1`, a sheet cut by `"frame"`, or an animated GIF), `tileset.png` and `music/*.wav`. Applies the palette rules of `docs/design/direcao.md`: 32 levels per channel (`round(round(c*31/255)*255/31)`, like the ROM extractions), hard alpha, at most 7 colors (the two closest colors merge until it fits; the outline color is kept) and an outline check (`add` or `darken` fix it). Writes the sprites with `hub/gm_assets.py` into the IDE folder `Regions/<Region>/Sprites` (sounds in `.../Music`), adds `SongIndex.<Song>` and its line in `Music_InitData` (`__Music.gml`, marked `// incoming/<region>`), and records what it made and the source hashes in `incoming/<region>/imported.json`. Re-importing gives the same files, removes what is no longer in the folder, and never overwrites an asset that is not from that region. A region given as a path (not under `incoming/`) works the same; its record goes into that folder |
-| `make_example.py` | Builds a region that uses every input of the convention from assets the project already has (rat, ropa, bari, a piece of the Sanctuary, the Castle band tinted blue, 6 s of the Sanctuary song). For testing the importer: import it, check, then `--remove` it |
+| `import_region.py` | Reads `sprites/` (one file per sprite, numbered frames `_0 _1`, a sheet cut by `"frame"`, or an animated GIF), `palettes/<Name>/<n>.png`, `tileset.png` and `music/*.wav`. Applies the palette rules of `docs/design/direcao.md`: 32 levels per channel (`round(round(c*31/255)*255/31)`, like the ROM extractions), hard alpha, at most 7 colors (the two closest colors merge until it fits; the outline color is kept) and an outline check (`add` or `darken` fix it). Writes the sprites with `hub/gm_assets.py` into the IDE folder `Regions/<Region>/Sprites` (sounds in `.../Music`), adds `SongIndex.<Song>` and its line in `Music_InitData` (`__Music.gml`, marked `// incoming/<region>`), and records what it made and the source hashes in `incoming/<region>/imported.json`. Re-importing gives the same files, removes what is no longer in the folder, and never overwrites an asset that is not from that region. Palettes (roadmap F7): recolor `n` of a sprite of the family `s<Name>_*` becomes column `n` of `s<Name>_Pal`, the palette sprite of the palette shader (column 0 holds every color of the family, matched pixel by pixel against the converted base frame; a color that would become two colors is an error). A region given as a path (not under `incoming/`) works the same; its record goes into that folder |
+| `make_example.py` | Builds a region that uses every input of the convention from assets the project already has (rat with two recolors for a palette, ropa, bari, a piece of the Sanctuary, the Castle band tinted blue, 6 s of the Sanctuary song). For testing the importer: import it, check, then `--remove` it |
 
 Output: `tools/import/out/<region>/` (ignored by git) with `frames/` (the converted PNGs), `preview.png` (each sprite before and after next to Link at the same scale, the tileset under its base band), `report.txt` and the cut `.wav` files. The validator reads `incoming/*/imported.json`: an imported asset missing from `Zelda.yyp` is an error, sources changed since the import a warning, a region never imported a note.
 
@@ -199,7 +206,7 @@ Builds the Sanctuary hub: room pictures, sprites, objects and data. Paths are re
 
 | Script | What it does |
 |--------|--------------|
-| `gm_assets.py` | Writes GameMaker 2024 sprites (multi frame, fps, origin), sounds (with their sample rate) and objects, and registers them in `Zelda.yyp`. Re-running a sprite keeps its frame ids, so files overwrite in place. `folder('A/B')` adds IDE folders, `remove(kind, name)` deletes a resource and unregisters it, `remove_folder` drops IDE folders nothing uses |
+| `gm_assets.py` | Writes GameMaker 2024 sprites (multi frame, fps, origin), sounds (with their sample rate) and objects, and registers them in `Zelda.yyp`. Re-running a sprite keeps its frame ids, so files overwrite in place. `folder('A/B')` adds IDE folders, `remove(kind, name)` deletes a resource and unregisters it (from `Zelda.yyp` and `Zelda.resource_order`), `remove_folder` drops IDE folders nothing uses |
 | `tiledjson.py` | Serializes objects the way Tiled writes `data/room-templates/*.json` |
 | `gids.py` | Tiled gid of each template object type, read from `__RoomTemplates.gml` |
 | `build2.py` | Shared helpers: load/save `data_d`, remove objects from the Tiled map, rebuild the room templates (`room_templates()`, calls `templates/convert.py`) |

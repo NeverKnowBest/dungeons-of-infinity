@@ -170,10 +170,20 @@ def unregister(kind, name):
     line = '    {"id":{"name":"%s","path":"%s/%s/%s.yy",},},\n' % (name, kind, name, name)
     if line in s:
         open(p, 'w').write(s.replace(line, ''))
+    # once the project was opened in the IDE, the resource is also listed in Zelda.resource_order
+    p = GAME + '/Zelda.resource_order'
+    if os.path.exists(p):
+        raw = open(p, 'rb').read()
+        key = ('"path":"%s/%s/%s.yy"' % (kind, name, name)).encode()
+        nl = b'\r\n' if b'\r\n' in raw else b'\n'
+        rows = raw.split(nl)
+        kept = [r for r in rows if key not in r]
+        if len(kept) != len(rows):
+            open(p, 'wb').write(nl.join(kept))
 
 
 def remove(kind, name):
-    """Deletes a sprite/sound/object folder and takes it out of Zelda.yyp."""
+    """Deletes a sprite/sound/object folder and takes it out of Zelda.yyp (and Zelda.resource_order)."""
     unregister(kind, name)
     d = os.path.join(GAME, kind, name)
     if os.path.isdir(d):

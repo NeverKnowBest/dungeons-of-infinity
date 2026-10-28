@@ -7,7 +7,8 @@
 //				those tiles (floors and floor decor, monuments, cracks, curtains, carpets, wall decor, pots, palettes).
 //				The decoration rules are the switch(LevelDef.Theme) blocks in the scripts __Dungeon_Draw_* and __Decor.
 //   BaseTheme	whose door frames, holes, floor trims and stairs it uses (LevelTilesY_Base); Agahnim borrows the fortress ones
-//   EnemyStats	whose stats the enemies take (soldier colours and energy, Poe, Wizzrobe, Beamos, the Type of Bari, Keese...)
+//   EnemyStats	whose stats the enemies take (the variants of __EnemyArch: soldier colours and energy, rope sprites; and the
+//				per-level code of Poe, Wizzrobe, Beamos, the Type of Bari, Keese...). EnemyVariants overrides a variant here
 // Depth is how far into the run the level is (1 = Hyrule Castle); difficulty formulas use it. Each depth is a chapter,
 // and the levels with the same Depth are its variants (roadmap F4b).
 //
@@ -152,6 +153,8 @@ function Level_Create(_Index, _Name) constructor{
 	Enemies = [];
 	PackPoints = {};
 	EnemyWeights = [];
+	EnemyVariants = {};					// {oEnemy_X: {...}}: this level's own variant of an enemy (colour, energy, attack...), see scripts/__EnemyArch
+
 }
 
 function Levels_Init(){

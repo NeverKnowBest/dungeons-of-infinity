@@ -25,6 +25,8 @@ STEPS = {
     'level': {'level', 'seed'},
     'spawn': {'enemy', 'dist'},
     'probe': {'enemies', 'dist'},
+    'trace': {'frames', 'every'},
+    'arch': {'enemy', 'state', 'move', 'time'},
     'give': {'item', 'index', 'amount'},
     'state': set(),
     'log': {'text'},
@@ -132,7 +134,11 @@ def resolve(scenario):
             errors.append('%s: "which" is "main" or "extra"' % where)
         if do == 'give':
             step['item'] = _named(step.get('item'), 'ItemClass', errors, where)
-        if do == 'spawn' and not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(step.get('enemy')))):
+        if do == 'arch':
+            step['state'] = _named(step.get('state'), 'EnemyState', errors, where)
+            if step.get('move', 'Dir') not in ('', 'Dir', 'Toward', 'Scuttle', 'Dash'):
+                errors.append('%s: unknown move "%s" (scripts/__EnemyArch)' % (where, step.get('move')))
+        if do in ('spawn', 'arch') and not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(step.get('enemy')))):
             errors.append('%s: no object "%s"' % (where, step.get('enemy')))
         for enemy in (step.get('enemies', []) if do == 'probe' else []):
             if not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(enemy))):

@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"Crab",
+  "%Name":"__EnemyArch",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"Crab",
+  "name":"__EnemyArch",
   "parent":{
-    "name":"Crab",
-    "path":"folders/Objects/Characters/Enemies/Crab.yy",
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

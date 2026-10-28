@@ -4,27 +4,7 @@ Dir = RandomDir();
 
 Size = EnemySize.Medium;
 
-switch(LevelDef.EnemyStats){
-	
-	case DungeonLevel.Castle: 
-		HeadIndex = SoldierHead.Normal;
-		ColorIndex = SoldierColor.Green;
-		Enemy_SetEnergy(1);
-		Attack = 0.5;
-		break;
-	case DungeonLevel.CastleBasement: 
-		HeadIndex = SoldierHead.Normal;
-		ColorIndex = SoldierColor.Blue; 
-		Enemy_SetEnergy(1);
-		Attack = 0.5;
-		break;
-	case DungeonLevel.CastleJails: 
-		HeadIndex = SoldierHead.Normal;
-		ColorIndex = SoldierColor.Grey; 
-		Enemy_SetEnergy(2);
-		Attack = 0.5;
-		break;
-}
+Enemy_ApplyVariant();	// colour, head, energy and attack of the level (EnemyVariants_Init in scripts/__EnemyArch)
 
 
 HeadDir = Dir;

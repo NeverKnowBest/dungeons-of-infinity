@@ -4,7 +4,8 @@
 #   python tools/import/make_example.py [folder]      default tools/import/out/example (ignored by git)
 #
 # It covers every input the convention accepts: numbered frames, a sheet cut by the manifest, an animated GIF,
-# a sprite without outline ("outline": "add"), one with too many colors, a tileset band and a song with a loop.
+# a sprite without outline ("outline": "add"), one with too many colors, a palette with two recolors, a tileset band
+# and a song with a loop.
 import os, sys, re, json, wave
 from PIL import Image
 import numpy as np
@@ -33,6 +34,14 @@ def main():
     # numbered frames: Enemy_ExRat_Walk_Down_0.png, _1.png
     for i, f in enumerate(frames('sEnemy_Rat_Walk_Down')):
         f.save(os.path.join(sd, 'Enemy_ExRat_Walk_Down_%d.png' % i))
+    # palette (roadmap F7): two recolors of the rat's first frame, palette indexes 1 and 2 of sEnemy_ExRat_Pal
+    pd = os.path.join(d, 'palettes', 'Enemy_ExRat')
+    os.makedirs(pd, exist_ok=True)
+    for f in os.listdir(pd):
+        os.remove(os.path.join(pd, f))
+    r = np.array(frames('sEnemy_Rat_Walk_Down')[0])
+    Image.fromarray(r[..., [2, 0, 1, 3]]).save(os.path.join(pd, '1.png'))     # channels rotated: the dark outline stays dark
+    Image.fromarray(r[..., [1, 2, 0, 3]]).save(os.path.join(pd, '2.png'))
     # a sheet, cut by "frame" in the manifest
     ropa = frames('sEnemy_Ropa')
     sheet = Image.new('RGBA', (16 * len(ropa), 22))

@@ -1,21 +1,6 @@
 event_inherited();
 
-switch(LevelDef.EnemyStats){
-	
-	case DungeonLevel.CastleJails: 
-		ColorIndex = SoldierColor.Grey; 
-		HeadIndex = SoldierHead.Knight;
-		Enemy_SetEnergy(4);
-		Attack = 1;
-		break;
-	case DungeonLevel.Aghanim1: 
-		ColorIndex = SoldierColor.Gold; 
-		HeadIndex = SoldierHead.Warrior;
-		Enemy_SetEnergy(9);
-		Attack = 3.25;
-		break;
-
-}
+Enemy_ApplyVariant();	// colour, head, energy and attack of the level (EnemyVariants_Init in scripts/__EnemyArch)
 
 Size = EnemySize.Large;
 

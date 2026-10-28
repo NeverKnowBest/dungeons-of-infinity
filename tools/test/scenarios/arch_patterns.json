@@ -1,0 +1,18 @@
+{
+ "comment": "Archetype moves that no converted enemy uses yet (roadmap F7): the rat with the Toward move (it chases Link) instead of Dir. The trace lines show its direction facing Link and the distance shrinking.",
+ "name": "arch_patterns",
+ "seed": 1,
+ "level": "Sewers",
+ "cheats": [
+  "Cheat_Inf_Health"
+ ],
+ "max_frames": 4000,
+ "steps": [
+  {"do": "wait", "frames": 60},
+  {"do": "arch", "enemy": "oEnemy_Rat", "state": "Walking", "move": "Toward", "time": [20, 40]},
+  {"do": "arch", "enemy": "oEnemy_Rat", "state": "Standing", "time": [10, 20]},
+  {"do": "spawn", "enemy": "oEnemy_Rat", "dist": 90},
+  {"do": "trace", "frames": 300, "every": 10},
+  {"do": "state"}
+ ]
+}

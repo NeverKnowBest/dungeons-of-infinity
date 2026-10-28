@@ -1,55 +1,6 @@
 event_inherited();
 
-switch(LevelDef.EnemyStats){
-	
-	case DungeonLevel.Castle: 
-		Size = EnemySize.Medium;
-		ColorIndex = SoldierColor.Green;
-		HeadIndex = SoldierHead.Normal;
-		Weapon = SoldierWeapon.Sword;
-		Enemy_SetEnergy(2);
-		Attack = 0.5;
-		break;
-	case DungeonLevel.CastleBasement: 
-		Size = EnemySize.Medium;
-		ColorIndex = SoldierColor.Blue; 
-		HeadIndex = SoldierHead.Normal;
-		Weapon = SoldierWeapon.Sword;
-		Enemy_SetEnergy(2);
-		Attack = 0.5;
-		break;
-	case DungeonLevel.CastleJails: 
-		Size = EnemySize.Large;
-		ColorIndex = SoldierColor.Grey; 
-		HeadIndex = SoldierHead.Knight;
-		Weapon = SoldierWeapon.Spear;
-		Enemy_SetEnergy(3);
-		Attack = 0.75;
-		break;
-	case DungeonLevel.Catacombs: 
-		Size = EnemySize.Large;
-		ColorIndex = SoldierColor.Grey; 
-		HeadIndex = SoldierHead.Skull;
-		Weapon = SoldierWeapon.Stick;
-		Enemy_SetEnergy(3);
-		Attack = 0.75;
-		break;
-	case DungeonLevel.WaterTemple: 
-		Size = EnemySize.Large;
-		ColorIndex = SoldierColor.Blue; 
-		HeadIndex = SoldierHead.Dragon;
-		Weapon = SoldierWeapon.Fork;
-		Enemy_SetEnergy(6);
-		Attack = 1.75;
-		break;
-	case DungeonLevel.Aghanim1: 
-		Size = EnemySize.Large;
-		ColorIndex = SoldierColor.Red; 
-		Weapon = SoldierWeapon.Sword;
-		HeadIndex = choose(SoldierHead.Pig, SoldierHead.Pig2, SoldierHead.Demon);
-		break;
-
-}
+Enemy_ApplyVariant();	// colour, head, weapon, energy and attack of the level (EnemyVariants_Init in scripts/__EnemyArch)
 
 
 Dir = RandomDir();

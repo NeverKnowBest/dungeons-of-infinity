@@ -127,7 +127,7 @@ Estes objetos ignoram a energia e o ataque de `EnemyDataInit` (ou só o ataque) 
 
 ### Soldados por nível
 
-Os soldados escolhem cor, energia e ataque pelo nível, no `Create` do objeto (os da Fortaleza, pela cabeça sorteada, no `Step_1`). Outros inimigos que mudam por nível estão na tabela acima.
+Os soldados escolhem cor, cabeça, arma, energia e ataque pelo nível, na variante (`EnemyVariants_Init` em `__EnemyArch.gml`, roadmap F7); fora dos níveis da tabela, pegam a do primeiro nível. Os da Fortaleza tiram energia e ataque da cabeça sorteada, no `Step_1`. Outros inimigos que mudam por nível estão na tabela acima.
 
 | Objeto | Nível | Cor | Energia (golpes) | Ataque |
 |--------|-------|-----|------------------|--------|

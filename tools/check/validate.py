@@ -285,6 +285,11 @@ def check_gml(rep, registered, orphans, object_gml):
             line = c.count('\n', 0, m.start()) + 1
             rep.warn('%s:%d a[i] = ...i++: GML evaluates the right side first, so the value goes to the next index'
                      % (rel(f), line))
+        # archetype enemies have oEnemy_Archetype as parent (roadmap F7)
+        for m in re.finditer(r'object_get_parent\([^)]*\)\s*==\s*oEnemy\b(?!_)', c):
+            line = c.count('\n', 0, m.start()) + 1
+            rep.warn('%s:%d object_get_parent(...) == oEnemy misses the archetype enemies (parent oEnemy_Archetype); use object_is_ancestor'
+                     % (rel(f), line))
         # level rules belong in the level sheet (roadmap F4)
         if not re.search(r'[\\/]__(Levels|Test)[\\/]', f):
             for m in re.finditer(r'switch\s*\(\s*global\.Level\.Index\s*\)|global\.Level\.Index\s*(==|!=|<|>|[-+*/](?!=))', c):
@@ -439,7 +444,7 @@ def check_exit_looks(rep):
     if not looks or not os.path.exists(path):
         rep.error('no exit looks found (ExitLooks_Init in __Doors.gml) or no level sheet')
         return
-    for name in re.findall(r'ExitLook\s*=\s*"(\w+)"', open(path, encoding='utf-8').read()):
+    for name in re.findall(r'ExitLook\s*=\s*"(\w+)"', open(path, encoding='utf-8').read()):
         if name not in looks:
             rep.error('game/scripts/__Levels/__Levels.gml: ExitLook "%s" is not in ExitLooks_Init (%s)' % (name, ', '.join(sorted(looks))))
 
@@ -490,6 +495,47 @@ def check_incoming(rep, registered):
 
 # ---------------------------------------------------------------- main
 
+def check_resource_order(rep):
+    """Zelda.resource_order (the IDE's order of resources) only lists files that exist."""
+    p = os.path.join(GAME, 'Zelda.resource_order')
+    if not os.path.exists(p):
+        return
+    for path in re.findall(r'"path":"((?:scripts|objects|sprites|sounds|rooms|shaders|fonts|paths|tilesets)/[^"]+)"', open(p, encoding='utf-8').read()):
+        if not resolve(os.path.join(GAME, path)):
+            rep.warn('Zelda.resource_order lists %s, which does not exist (remove its line)' % path)
+
+
+def check_archetypes(rep, registered):
+    """Archetype enemies (roadmap F7): a child of oEnemy_Archetype has an EnemyArch entry and no events of its own,
+    an entry names an object of the project whose parent is oEnemy_Archetype, and its Sprites exist."""
+    path = os.path.join(GAME, 'scripts', '__EnemyArch', '__EnemyArch.gml')
+    if not os.path.exists(path):
+        return
+    src = strip_code(open(path, encoding='utf-8').read())
+    entries = set(re.findall(r'\bEnemyArch\(\s*(\w+)\s*,\s*\{', src))
+    children = set()
+    for (d, name), p in registered.items():
+        if d != 'objects':
+            continue
+        yp = resolve(os.path.join(GAME, p))
+        if not yp:
+            continue
+        yy = load_yy(yp)
+        if (yy.get('parentObjectId') or {}).get('name') == 'oEnemy_Archetype':
+            children.add(name)
+            if yy.get('eventList'):
+                rep.warn('%s: an archetype enemy should have no events of its own (its entry in __EnemyArch does it all)' % name)
+    for n in sorted(children - entries):
+        rep.error('%s has oEnemy_Archetype as parent but no EnemyArch(%s, {...}) in EnemyArch_Init' % (n, n))
+    for n in sorted(entries - children):
+        rep.error('__EnemyArch: EnemyArch(%s, ...) but %s is not an object of the project with oEnemy_Archetype as parent' % (n, n))
+    sprites = {name for (d, name) in registered if d == 'sprites'}
+    for base in set(re.findall(r'\[\s*EnemyState\.\w+\s*,\s*"(\w+)"\s*\]', open(path, encoding='utf-8').read())):
+        dirs = all(base + s_ in sprites for s_ in ('_Left', '_Right', '_Up', '_Down'))
+        if not dirs and base not in sprites:
+            rep.error('__EnemyArch: no sprite %s (nor %s_Left/_Right/_Up/_Down)' % (base, base))
+
+
 def main():
     args = sys.argv[1:]
     rep = Report()
@@ -504,6 +550,8 @@ def main():
     check_docs(rep)
     check_regions(rep, registered)
     check_exit_looks(rep)
+    check_archetypes(rep, registered)
+    check_resource_order(rep)
     check_scenarios(rep)
     check_incoming(rep, registered)
 

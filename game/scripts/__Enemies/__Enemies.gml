@@ -825,6 +825,11 @@ function Enemy_UpdateState(NewState, Variable = 0){
 	
 	State = NewState;
 	
+	if(EnemyArch_UpdateState()){	// a state an archetype enemy lists (scripts/__EnemyArch)
+		Enemy_UpdateSprite(State);
+		exit;
+	}
+	
 	var A, _Hearts, _Rupees, _PoofInst;
 	switch(State){
 		
@@ -968,10 +973,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					ObjSetImageSpeed(0);
 					alarm[1] = 40;
 					break;
-					
-				case oEnemy_Hover:
-					alarm[0] = choose(45, 60, 75, 90);
-					break;
+
 				
 				case oEnemy_Keese:
 					CanFly = false;
@@ -1042,11 +1044,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 				case oEnemy_Popo:
 					alarm[1] = irandom_range(60, 180);
 					break;
-				
-				
-				case oEnemy_Rat:
-					alarm[0] = irandom_range(30, 160);
-					break;
+
 				
 				case oEnemy_Ropa:
 					alarm[0] = JumpDelay;
@@ -1149,10 +1147,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					vz = JumpSpeed;
 					Chicken_PickNewDir();	
 					break;
-					
-				case oEnemy_Crab:
-					Crab_UpdateDir();
-					break;
+
 					
 				case oEnemy_Eyegore:
 					image_index = 0;
@@ -1199,15 +1194,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 				case oEnemy_Hoarder:
 					Hoarder_UpdateDir();
 					break;
-					
-				case oEnemy_Hover:
-					Dir = (oLink.Cape ? irandom(359) : point_direction(x, y, oLink.x, oLink.y));
-					Speed = Speed_Initial;
-					vx = lengthdir_x(Speed, Dir);
-					vy = lengthdir_y(Speed, Dir);
-					FacingDir = vx < 0 ? -1 : 1;
-					SlowdownSpeed = choose(0.05, 0.1, 0.2);
-					break;
+
 				
 				case oEnemy_Keese:
 					Dir = point_direction(x, y, oLink.x, oLink.y) + irandom_range(-30, 30);
@@ -1255,14 +1242,6 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					alarm[2] = MoveDelay;
 					break;
 
-				case oEnemy_Rat:
-					Rat_UpdateDir(RandomDir());
-					break;
-
-				case oEnemy_Rope:
-					Rope_UpdateDir(RandomDir());
-					ObjSetImageSpeed(0.5)
-					break;
 
 				case oEnemy_Skeleton:
 					Skeleton_UpdateDir(NextDir);
@@ -1359,11 +1338,7 @@ function Enemy_UpdateState(NewState, Variable = 0){
 					alarm[1] = -1;
 					alarm[2] = -1;
 					break;
-					
-				case oEnemy_Rope:
-					Rope_UpdateDir(RandomDir());
-					ObjSetImageSpeed(1)
-					break;
+
 					
 				case oEnemy_Soldier_Simple:
 					ObjSetImageSpeed(1);
@@ -1830,6 +1805,8 @@ function Enemy_UpdateState(NewState, Variable = 0){
 
 function Enemy_UpdateSprite(_State){
 	
+	if(EnemyArch_UpdateSprite(_State)) exit;	// archetype enemies (scripts/__EnemyArch)
+	
 	switch(_State){
 		
 		case EnemyState.Idle:
@@ -1927,10 +1904,7 @@ function Enemy_UpdateSprite(_State){
 						case DOWN:	sprite_index = sEnemy_Hinox_Walk_Down; break;
 					}
 					break;
-					
-				case oEnemy_Hover:
-					sprite_index = sEnemy_Hover_Standing; 
-					break;
+
 					
 				case oEnemy_Keese:
 					sprite_index = asset_get_index("sEnemy_" + Keese_GetSpriteStr() + "_Standing"); 
@@ -1957,15 +1931,7 @@ function Enemy_UpdateSprite(_State){
 				case oEnemy_Pikit:
 					sprite_index = sEnemy_Pikit;
 					break;
-					
-				case oEnemy_Rat:
-					switch(Dir){
-						case LEFT:	sprite_index = sEnemy_Rat_Stand_Left; break;
-						case RIGHT:	sprite_index = sEnemy_Rat_Stand_Right; break;
-						case UP: sprite_index = sEnemy_Rat_Stand_Up;	break;
-						case DOWN: sprite_index = sEnemy_Rat_Stand_Down;	break;
-					}	
-					break;
+
 
 				case oEnemy_Skeleton:
 					sprite_index = sEnemy_SkeletonBody_Standing;
@@ -2080,10 +2046,7 @@ function Enemy_UpdateSprite(_State){
 						case DOWN:	sprite_index = sEnemy_Hinox_Walk_Down; break;
 					}
 					break;
-					
-				case oEnemy_Hover:
-					sprite_index = sEnemy_Hover_Walking; 
-					break;
+
 
 				case oEnemy_Keese:
 					sprite_index = asset_get_index("sEnemy_" + Keese_GetSpriteStr() + "_Flying"); 
@@ -2114,24 +2077,7 @@ function Enemy_UpdateSprite(_State){
 						case DOWN:	sprite_index = Sprite_Down; break;
 					}
 					break;
-					
-				case oEnemy_Rat:
-					switch(Dir){
-						case LEFT:	sprite_index = sEnemy_Rat_Walk_Left; break;
-						case RIGHT:	sprite_index = sEnemy_Rat_Walk_Right; break;
-						case UP: sprite_index = sEnemy_Rat_Walk_Up;	break;
-						case DOWN: sprite_index = sEnemy_Rat_Walk_Down;	break;
-					}	
-					break;
 
-				case oEnemy_Rope:
-					switch(Dir){
-						case LEFT:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Left : sEnemy_Rope_Left; break;
-						case RIGHT:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Right : sEnemy_Rope_Right; break;
-						case UP:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Up : sEnemy_Rope_Up; break;
-						case DOWN:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Down : sEnemy_Rope_Down; break;
-					}
-					break;
 
 				case oEnemy_Skeleton:
 					switch(Dir){
@@ -2217,15 +2163,7 @@ function Enemy_UpdateSprite(_State){
 						case DOWN:	sprite_index = sEnemy_Hinox_Walk_Down; break;
 					}
 					break;
-					
-				case oEnemy_Rope:
-					switch(Dir){
-						case LEFT:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Left : sEnemy_Rope_Left; break;
-						case RIGHT:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Right : sEnemy_Rope_Right; break;
-						case UP:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Up : sEnemy_Rope_Up; break;
-						case DOWN:	sprite_index = LevelDef.EnemyStats == DungeonLevel.Catacombs ? sEnemy_Rope2_Down : sEnemy_Rope_Down; break;
-					}
-					break;				
+
 
 				case oEnemy_Soldier_Simple:
 					switch(Dir){
@@ -2665,13 +2603,13 @@ function Enemy_GoodForTrap(_EnemyIndex){
 		
 		//don't use small weak enemies
 		case oEnemy_BuzzBlob:
-		case oEnemy_Hover:
-		case oEnemy_Rat:
-		case oEnemy_Rope:
 
 			return false
 			
 	}
+	
+	var _Arch = EnemyArch_Get(_EnemyIndex);
+	if(_Arch != undefined && !_Arch.Trap) return false;
 	
 	return Enemy_GoodForSpecialAttack(_EnemyIndex) && !Enemy_CanFly(_EnemyIndex)
 	
@@ -2717,6 +2655,9 @@ function Enemy_CanBeHidden(_EnemyIndex){
 			
 	}
 	
+	var _Arch = EnemyArch_Get(_EnemyIndex);
+	if(_Arch != undefined) return _Arch.Hides;
+	
 	return false;	
 }
 
@@ -2760,6 +2701,9 @@ function Enemy_CanJump(_EnemyIndex){
 			
 	}
 	
+	var _Arch = EnemyArch_Get(_EnemyIndex);
+	if(_Arch != undefined) return _Arch.Jumps;
+	
 	return false;	
 	
 }
@@ -2775,6 +2719,9 @@ function Enemy_CanFly(_EnemyIndex){
 			return true
 			
 	}
+	
+	var _Arch = EnemyArch_Get(_EnemyIndex);
+	if(_Arch != undefined) return _Arch.Flies;
 	
 	return false;	
 }

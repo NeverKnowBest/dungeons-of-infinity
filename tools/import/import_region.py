@@ -16,7 +16,8 @@ REPO = os.path.abspath(os.path.join(HERE, '..', '..'))
 GAME = os.path.join(REPO, 'game')
 INCOMING = os.path.join(REPO, 'incoming')
 MUSIC_GML = os.path.join(GAME, 'scripts', '__Music', '__Music.gml')
-MANIFEST_KEYS = {'name', 'defaults', 'sprites', 'tileset', 'music'}
+MANIFEST_KEYS = {'name', 'defaults', 'sprites', 'tileset', 'music', 'palettes'}
+PALETTE_KEYS = {'base', 'frame'}
 SPRITE_KEYS = {'frame', 'count', 'fps', 'origin', 'colors', 'outline', 'outline_color', 'alpha'}
 DEFAULTS = {'fps': 8, 'origin': 'center', 'colors': 7, 'outline': 'check', 'outline_color': None, 'alpha': 'hard'}
 BAND_W, BAND_H = 1248, 48          # a theme band of sTiles: 156 x 6 tiles of 8px
@@ -157,6 +158,98 @@ def read_sprites(d, manifest):
     if unused:
         raise ImportError_('manifest.json: sprites %s have no file in sprites/' % sorted(unused))
     return out
+
+
+def read_palettes(d, manifest, sprite_names):
+    """[(palette sprite, base sprite, base frame, family, [recolors])] from palettes/<Name>/1.png, 2.png...: recolors
+    of one frame of a sprite of the family s<Name>_* (roadmap F7). Recolor n becomes palette index n (ColorIndex)."""
+    from PIL import Image
+    pd = os.path.join(d, 'palettes')
+    opts = manifest.get('palettes', {})
+    if not os.path.isdir(pd):
+        if opts:
+            raise ImportError_('manifest.json has "palettes" but there is no palettes/ folder')
+        return []
+    out = []
+    for fam in sorted(os.listdir(pd)):
+        fd = os.path.join(pd, fam)
+        if not os.path.isdir(fd):
+            if fam.lower().endswith('.md'):
+                continue
+            raise ImportError_('palettes/%s: one folder per palette (palettes/<Name>/1.png, 2.png...)' % fam)
+        name = sprite_name(fam)
+        o = opts.get(fam, opts.get(name, {}))
+        bad = set(o) - PALETTE_KEYS
+        if bad:
+            raise ImportError_('manifest.json: unknown palette option %s (allowed: %s)' % (sorted(bad), sorted(PALETTE_KEYS)))
+        files = {}
+        for f in os.listdir(fd):
+            stem, ext = os.path.splitext(f)
+            if f.lower().endswith('.md'):
+                continue
+            if ext.lower() != '.png' or not stem.isdigit():
+                raise ImportError_('palettes/%s/%s: the recolors are named 1.png, 2.png...' % (fam, f))
+            files[int(stem)] = os.path.join(fd, f)
+        if sorted(files) != list(range(1, len(files) + 1)):
+            raise ImportError_('palettes/%s: the recolors must be numbered from 1 with no gaps (%s)' % (fam, sorted(files)))
+        family = [n for n in sprite_names if n == name or n.startswith(name + '_')]
+        base = sprite_name(o['base']) if 'base' in o else (family[0] if family else None)
+        if base not in sprite_names:
+            raise ImportError_('palettes/%s: no sprite %s in sprites/ to recolor (set "base" in the manifest)'
+                               % (fam, base or name + '_*'))
+        if base not in family:
+            family.append(base)
+        out.append((name + '_Pal', base, int(o.get('frame', 0)), family, [Image.open(files[i]).convert('RGBA') for i in sorted(files)]))
+    unused = set(sprite_name(k) for k in opts) - {p[0][:-4] for p in out}
+    if unused:
+        raise ImportError_('manifest.json: palettes %s have no folder in palettes/' % sorted(unused))
+    return out
+
+
+def build_palette(pal, arrs, warn):
+    """The palette sprite for the palette shader: column 0 holds every color of the family, column n the color it
+    takes with palette index n (from recolor n, compared pixel by pixel with the converted base frame)."""
+    import numpy as np
+    global SNAP
+    if SNAP is None:
+        SNAP = np.array([snap(v) for v in range(256)], np.uint8)
+    name, base, frame, family, recolors = pal
+    if frame >= len(arrs[base]):
+        raise ImportError_('%s: %s has no frame %d' % (name, base, frame))
+    b = arrs[base][frame]
+    colors = sorted({tuple(int(x) for x in c) for n in family for a in arrs[n] for c in a[a[..., 3] > 0][:, :3]},
+                    key=lambda c: (luma(c), c))
+    in_base = {tuple(int(x) for x in c) for c in b[b[..., 3] > 0][:, :3]}
+    missing = [c for c in colors if c not in in_base]
+    if missing:
+        warn('%d colors of the %s sprites are not in %s frame %d and keep their color in every variant'
+             % (len(missing), name[:-4], base, frame))
+    table = np.zeros((len(colors), 1 + len(recolors), 4), np.uint8)
+    table[..., 3] = 255
+    for y, c in enumerate(colors):
+        table[y, :, :3] = c
+    for k, im in enumerate(recolors, 1):
+        v = np.array(im, np.uint8)
+        if v.shape[:2] != b.shape[:2]:
+            raise ImportError_('%s: recolor %d is %dx%d, %s is %dx%d' % (name, k, v.shape[1], v.shape[0], base, b.shape[1], b.shape[0]))
+        solid = v[..., 3] >= 128
+        both = (b[..., 3] > 0) & solid
+        if ((b[..., 3] > 0) & ~solid).any():
+            warn('recolor %d: %d pixels of the sprite are clear in it (their color is kept)' % (k, int(((b[..., 3] > 0) & ~solid).sum())))
+        if (solid & (b[..., 3] == 0)).any():
+            warn('recolor %d: %d pixels outside the sprite are ignored' % (k, int((solid & (b[..., 3] == 0)).sum())))
+        m = {}
+        for cb, cn in zip(b[both][:, :3], SNAP[v[both][:, :3]]):
+            m.setdefault(tuple(int(x) for x in cb), set()).add(tuple(int(x) for x in cn))
+        split = {c: t for c, t in m.items() if len(t) > 1}
+        if split:
+            c, t = sorted(split.items())[0]
+            raise ImportError_('%s: in recolor %d the color %s of %s becomes %d colors %s; one color can only become one'
+                               % (name, k, c, base, len(t), sorted(t)))
+        for y, c in enumerate(colors):
+            if c in m:
+                table[y, k, :3] = next(iter(m[c]))
+    return table, len(colors)
 
 
 # ---------------------------------------------------------------- palette rules
@@ -544,10 +637,10 @@ def run(arg, dry=False, remove=False):
     music = read_music(d, manifest)
     if not (sprites or tileset or music):
         raise ImportError_('incoming/%s has nothing to import (sprites/, tileset.png, music/)' % slug)
+    palettes = read_palettes(d, manifest, [n for n, _, _ in sprites])
+    sprites_names = [n for n, _, _ in sprites] + [p[0] for p in palettes]
     if tileset:
-        sprites_names = [n for n, _, _ in sprites] + ['sTiles_' + region]
-    else:
-        sprites_names = [n for n, _, _ in sprites]
+        sprites_names.append('sTiles_' + region)
     sound_names = [n for _, snd in music for n, _ in snd]
     # never overwrite something that is not from this region
     mine_s, mine_a = set(old.get('sprites', [])), set(old.get('sounds', []))
@@ -560,6 +653,7 @@ def run(arg, dry=False, remove=False):
     os.makedirs(os.path.join(out, 'frames'), exist_ok=True)
     report, rows, warnings = [], [], 0
     converted = []
+    arrs = {}
     for name, frames, o in sprites:
         msgs = []
         arr, info = convert(frames, o, msgs.append)
@@ -580,6 +674,18 @@ def run(arg, dry=False, remove=False):
         warnings += len(msgs)
         rows.append((name, frames, arr, text))
         converted.append((name, paths, fps, org))
+        arrs[name] = arr
+    for pal in palettes:
+        msgs = []
+        table, n = build_palette(pal, arrs, msgs.append)
+        p = os.path.join(out, 'frames', '%s_0.png' % pal[0])
+        Image.fromarray(table).save(p)
+        converted.append((pal[0], [p], None, (0, 0, 0)))
+        text = '%d colors x %d variants, from %s frame %d' % (n, len(pal[4]), pal[1], pal[2])
+        rows.append((pal[0], [Image.fromarray(table)], [table], text))
+        report.append('%s: palette, %s' % (pal[0], text))
+        report += ['  ! ' + m for m in msgs]
+        warnings += len(msgs)
     tile = None
     if tileset:
         im, base = tileset
