@@ -91,25 +91,33 @@ When a new GML or data trap is found, add a check here.
 
 ### `test/` (Python 3, standard library only; needs GameMaker installed)
 
-Automated test (roadmap F3): compiles the game with Igor, runs a scenario with nobody at the keyboard and prints the result as text. The game side is `game/scripts/__Test` (test mode) and the object `oTest`.
+Automated test (roadmap F3, F3b): compiles the game with Igor, runs scenarios with nobody at the keyboard and out of sight, and prints the result as text. The game side is `game/scripts/__Test` (test mode) and the object `oTest`.
 
 ```
 python tools/test/run.py smoke                       # a scenario in test/scenarios (or a path to a .json)
+python tools/test/run.py boot smoke arch_trace       # several: one build, then each scenario in a new game
+python tools/test/run.py --all                       # every scenario (the battery before a delivery, about 15 min)
+python tools/test/run.py --all --only ref_           # only the ones whose name contains "ref_"
+python tools/test/run.py --all --save after          # also keep the results as the baseline "after" (baseline.py compare)
 python tools/test/run.py smoke --no-build            # run the last build again (8 s instead of about 80 s); only when no GML changed
 python tools/test/run.py --sheet Castle --seeds 4    # contact sheet: levels of seeds 1..4, every room in one PNG
 python tools/test/run.py --sheet Sewers --seeds 7,9  # chosen seeds
 python tools/test/run.py smoke --full                # also print the "step" lines of the log
+python tools/test/run.py smoke --show                # the game on the screen, as the IDE runs it (it takes the focus)
 ```
 
-* It finds the active runtime (`C:\ProgramData\GameMakerStudio2-LTS2026\runtime.json`) and the IDE user folder in `%APPDATA%` by itself, builds in `%TEMP%\doi-test` and passes the scenario through the environment variable `DOI_TEST` (the game also takes `-test <file>`). The file goes to `%LOCALAPPDATA%\Zelda\test\scenario.json`.
-* Results are copied to `tools/test/out/` (ignored by git): `log.txt` and the PNGs. The script prints compile and runtime errors from the run output, the log, and `RESULT: ok` (exit code 0) when the log ends with `end ok` and has no `FAIL` line. `--timeout` (default 600 s) stops a run that hangs.
-* The game window opens and runs by itself; it keeps going without focus and ignores the real keyboard. Sound is muted unless the scenario says `"sound": true`. Nothing is saved (user file, stats, achievements, options).
+* It finds the active runtime (`C:\ProgramData\GameMakerStudio2-LTS2026\runtime.json`) and the IDE user folder in `%APPDATA%` by itself, builds in `%TEMP%\doi-test` with Igor `Compile` (builds without starting the game; compile output in `%TEMP%\doi-test\build_output.txt`) and starts `Runner.exe` itself. The scenario goes through the environment variable `DOI_TEST` (the game also takes `-test <file>`) to `%LOCALAPPDATA%\Zelda\test\scenario.json`.
+* Out of sight (F3b): the game runs on a hidden Windows desktop of its own (`CreateDesktop`, one per call, gone when the call ends). Nothing shows on the screen and the game never takes the focus or the keyboard, so tests can run while someone uses the PC. It runs `Zelda_test.win`, a copy of the build with the "start fullscreen" option off (bit 0 of the GEN8 info flags; see `docs/dev/engine-notes.md`); `Zelda.win` itself is not touched. `--show` runs `Zelda.win` on the screen instead.
+* One game per scenario, one after the other, never one game for several: the generator, the instance and ds numbers and the globals would carry over and a scenario's result would depend on the ones before it. Two calls at the same time clash (same scenario file and output folder in `%LOCALAPPDATA%\Zelda\test`); run one at a time.
+* Results go to `tools/test/out/` (ignored by git): with one scenario `log.txt` and the PNGs right there, with several one folder per scenario (`out/<scenario>/`). One scenario prints compile and runtime errors, the log and `RESULT: ok`; several print one line per scenario (with the `FAIL`/`crash` lines of the ones that failed) and `RESULT: ok (N scenarios)` or `RESULT: FAILED k of N: <names>`. Exit code 0 when every log ends with `end ok` and has no `FAIL` line. `--timeout` (default 600 s per scenario) stops a run that hangs.
+* The game keeps going without focus and ignores the real keyboard. Sound is muted unless the scenario says `"sound": true`. Nothing is saved (user file, stats, achievements, options).
+* On the hidden desktop the runtime makes one more surface at start than on the screen, so in the dumps every `ref surface N` is one higher than in a baseline made with `--show` or before F3b. `baseline.py compare --handles` ignores it; baselines made out of sight compare SAME among themselves without it.
 * `scenario.py` reads and checks scenarios; the validator uses it too.
 
 Reference runs (roadmap F4): `baseline.py` runs every `scenarios/ref_*.json` (one per level: three builds of the level with `"dump": true`, the level's enemies with per-level stats in a `probe` step, a short walk, a contact sheet of seeds 2 and 3) and keeps the results under a label, so two versions of the code can be compared.
 
 ```
-python tools/test/baseline.py save before                # compiles once and runs the 14 ref_* scenarios (about 15 min)
+python tools/test/baseline.py save before                # compiles once and runs the 14 ref_* scenarios (about 15 min, out of sight)
 python tools/test/baseline.py save after --only Mines    # only the scenarios whose name contains "Mines"
 python tools/test/baseline.py save after --no-build      # reuse the last build
 python tools/test/baseline.py compare before after       # SAME, or every text line and image that differs

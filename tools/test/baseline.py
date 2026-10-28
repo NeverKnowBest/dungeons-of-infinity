@@ -1,6 +1,6 @@
 """Reference runs of every level (roadmap F4): run all the ref_* scenarios, keep the results, compare two versions.
 
-    python tools/test/baseline.py save before                # compiles once, runs every ref_* scenario
+    python tools/test/baseline.py save before                # compiles once, runs every ref_* scenario (out of sight)
     python tools/test/baseline.py save after --only Mines    # only the scenarios whose name contains "Mines"
     python tools/test/baseline.py save after --no-build      # reuse the last build
     python tools/test/baseline.py compare before after       # what changed between two saved runs
@@ -18,10 +18,13 @@ import glob
 import os
 import re
 import shutil
-import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import run
+import scenario as scn
+
 OUT = os.path.join(HERE, 'out')
 BASE = os.path.join(HERE, 'baseline')
 STEP_RE = re.compile(r'f\d+ step ')
@@ -35,27 +38,25 @@ def scenarios(only):
     return [n for n in names if not only or only.lower() in n.lower()]
 
 
-def save(label, only, no_build):
+def save(label, only, no_build, show=False):
     dest = os.path.join(BASE, label)
     names = scenarios(only)
     if not names:
         sys.exit('no ref_* scenario matches')
-    failed = []
-    for i, name in enumerate(names):
-        cmd = [sys.executable, os.path.join(HERE, 'run.py'), name]
-        if no_build or i > 0:
-            cmd.append('--no-build')
-        proc = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
-        result = [l for l in proc.stdout.splitlines() if l.startswith('RESULT')]
-        print('%-28s %s' % (name, result[-1] if result else 'no result'))
-        if proc.returncode != 0:
-            failed.append(name)
-            tail = [l for l in proc.stdout.splitlines() if ' crash ' in l or ' FAIL ' in l or '  at ' in l or 'rror' in l]
-            for l in tail[:8]:
-                print('    ' + l[:200])
+    jobs = []
+    for name in names:
+        data, errors = scn.load(os.path.join(HERE, 'scenarios', name + '.json'))
+        if errors:
+            sys.exit('scenario %s: %s' % (name, '; '.join(errors)))
+        jobs.append((name, data))
+    # one build and one call: every scenario in its own game on the hidden desktop (run.py)
+    results = run.run_batch(jobs, no_build, out=OUT, show=show)
+    failed = [n for n, (ok, _) in results.items() if not ok]
+    for name in names:
         shutil.rmtree(os.path.join(dest, name), ignore_errors=True)
-        if os.path.isdir(OUT):
-            shutil.copytree(OUT, os.path.join(dest, name))
+        src = OUT if len(names) == 1 else os.path.join(OUT, name)
+        if os.path.isdir(src):
+            shutil.copytree(src, os.path.join(dest, name))
     print('\nSaved to %s (%d scenarios, %d failed%s)' % (dest, len(names), len(failed), ': ' + ', '.join(failed) if failed else ''))
     return 1 if failed else 0
 
@@ -126,7 +127,8 @@ def main():
     s = sub.add_parser('save', help='run the ref_* scenarios and keep the results under a label')
     s.add_argument('label')
     s.add_argument('--only', help='only scenarios whose name contains this text')
-    s.add_argument('--no-build', action='store_true', help='reuse the last build for the first scenario too')
+    s.add_argument('--no-build', action='store_true', help='reuse the last build instead of compiling')
+    s.add_argument('--show', action='store_true', help='run the games on the screen (run.py --show)')
     c = sub.add_parser('compare', help='compare two saved labels')
     c.add_argument('a')
     c.add_argument('b')
@@ -135,7 +137,7 @@ def main():
                    '(for a change that creates sprites or surfaces: they shift the numbers of everything made after them)')
     args = ap.parse_args()
     if args.cmd == 'save':
-        sys.exit(save(args.label, args.only, args.no_build))
+        sys.exit(save(args.label, args.only, args.no_build, args.show))
     sys.exit(compare(args.a, args.b, args.lines, args.handles))
 
 

@@ -17,6 +17,7 @@ Quando a tarefa envolver inimigos, chefes, itens ou uma região, leia também `d
 * Os dois PCs (casa e trabalho) são iguais: o Claude Code abre direto na pasta do repositório, os dois têm GameMaker e Git LFS. Grave os arquivos lá. Não existe mais entrega por zip.
 * **Quem joga o jogo é o Guilherme**, porque jogar pelo Claude (prints e teclas) consome muito. O Claude não abre o jogo pelo IDE nem tira prints de tela por conta própria; só faz isso se o Guilherme pedir. Em vez disso, entrega um roteiro de teste curto (veja "Como testar").
 * **Exceção aprovada (out/2026):** o Claude pode rodar `python tools/test/run.py` por conta própria (compilar, rodar cenários, folha de contato) e conferir o resultado pelo texto (log e `RESULT`). Sem prints de tela; olhar um PNG do `tools/test/out/` só quando ajudar a decidir algo. Mesmo assim, entrega o roteiro de teste para o Guilherme jogar.
+* **Quais cenários rodar (F3b):** durante o trabalho, rode só os cenários que a mudança afeta (ex.: `run.py smoke arch_trace`, ou `baseline.py save after --only Mines`). Antes da entrega, rode a bateria inteira uma vez: `python tools/test/run.py --all --save after` (todos os cenários, os 14 de referência inclusive, uma compilação, uns 15 min em segundo plano) e compare com o baseline de antes (`baseline.py compare before after`). O jogo de teste roda numa área de trabalho escondida, sem piscar nem roubar o foco, então pode rodar com o Guilherme usando o PC. Só use `--show` (jogo na tela) se ele pedir.
 
   | PC | Repositório | GameMaker |
   |----|-------------|-----------|
@@ -65,7 +66,7 @@ O Guilherme diz qual é a etapa (e, se importar, em qual PC está). Leia os docu
 * GameMaker LTS 2026 (caminho de cada PC na tabela acima). O projeto é `game/Zelda.yyp`.
 * Ao gravar arquivos com o projeto aberto, o GameMaker mostra "Diretório do projeto modificado": clique em Recarregar. Ele volta à tela inicial; abra o projeto "Zelda" de novo em Projetos recentes.
 * Rodar: botão Executar (triângulo) na barra de ferramentas. A janela do jogo é o processo `Runner.exe` (precisa de permissão própria no controle do computador).
-* Rodar sem o IDE: `python tools/test/run.py <cenário>` compila com o Igor, roda um cenário de teste sozinho (sem teclado) e mostra os erros e o log em texto; `--sheet <fase>` monta a folha de contato. Formato em `tools/README.md` ("test/"), receita em `docs/dev/receitas.md`.
+* Rodar sem o IDE: `python tools/test/run.py <cenário> [<cenário> ...]` (ou `--all`) compila com o Igor, roda os cenários de teste sozinho (sem teclado, fora da tela) e mostra os erros e o log em texto; `--sheet <fase>` monta a folha de contato. Formato em `tools/README.md` ("test/"), receita em `docs/dev/receitas.md`.
 * O jogo roda em janela por causa de `%LOCALAPPDATA%\Zelda\options.ini` (`Fullscreen="0"` em `[Screen]`, `AltTabPause="0"`). O Guilherme quer manter assim nos dois PCs. Se o arquivo não existir, o jogo abre em tela cheia: crie a partir de `game/datafiles/options.ini` com esses dois valores.
 * Scripts Python: o validador e o conversor só usam a biblioteca padrão; os de `tools/hub/` precisam de `python -m pip install --user pillow numpy`.
 * Teclas: setas movem, Alt fala/age, Ctrl espada, Enter abre menus e confirma, Esc pausa e volta. Para o jogo registrar a tecla, segure por cerca de 0.15 s em vez de um toque instantâneo.

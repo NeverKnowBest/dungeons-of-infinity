@@ -18,6 +18,7 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 4. Rode e leia o `RESULT` e o log. Para repetir sem mudar o GML (só o cenário), use `--no-build`.
 5. Se um passo falhar, olhe a linha `FAIL` ou `crash` e o print do momento antes de mexer no código. A mesma semente sempre joga igual, então o erro se repete.
 6. Cenário que prova algo que pode quebrar de novo fica em `tools/test/scenarios/` (o validador confere todos).
+7. Durante o trabalho, rode só os cenários que a mudança afeta (`run.py smoke arch_trace`: vários numa chamada compilam uma vez). Antes da entrega, a bateria inteira uma vez: `python tools/test/run.py --all` (com `--save after` se houver baseline de antes para comparar). O jogo roda numa área de trabalho escondida, sem aparecer na tela nem pegar o foco; `--show` mostra o jogo.
 
 ## Folha de contato de uma fase
 
@@ -29,8 +30,8 @@ Passo a passo das tarefas que se repetem. Detalhes do motor em `engine-notes.md`
 
 Para mudanças que não deveriam mudar o jogo (refatoração, faxina, troca de tabela por ficha):
 
-1. Antes de mexer no código: `python tools/test/baseline.py save before` (compila e roda os 14 `ref_*`, uns 15 min; rode em segundo plano). Se já mexeu, faça o baseline numa cópia do commit: `git worktree add --detach %TEMP%/doi-base HEAD`, copie para lá as ferramentas de teste que mudaram, rode `save before` nela e copie `tools/test/baseline/before` de volta. Não rode dois testes ao mesmo tempo: o `run.py` fecha qualquer `Runner.exe` aberto.
-2. Depois da mudança: `python tools/test/baseline.py save after` e `python tools/test/baseline.py compare before after`.
+1. Antes de mexer no código: `python tools/test/baseline.py save before` (compila e roda os 14 `ref_*`, uns 15 min; rode em segundo plano). Se já mexeu, faça o baseline numa cópia do commit: `git worktree add --detach %TEMP%/doi-base HEAD`, copie para lá as ferramentas de teste que mudaram, rode `save before` nela e copie `tools/test/baseline/before` de volta. Não rode dois testes ao mesmo tempo: os dois usam o mesmo arquivo de cenário e a mesma pasta de saída.
+2. Depois da mudança: `python tools/test/baseline.py save after` (ou, já na bateria final, `python tools/test/run.py --all --save after`, que roda também os outros cenários) e `python tools/test/baseline.py compare before after`. Baseline feito antes da F3b (jogo na tela) difere em `ref surface N` (um a mais fora da tela): compare com `--handles`.
 3. `SAME` prova que as 14 fases são geradas igual (salas, objetos e suas variáveis, tiles, globais, folhas de contato). Se aparecer diferença, leia as linhas: global renomeado ou removido de propósito é esperado; qualquer outra coisa é mudança de comportamento. Se a mudança cria sprites ou surfaces, todo dump muda nos números delas: compare com `--handles`, que ignora esses números.
 4. Fase nova ganha um `ref_NN_<Fase>.json` copiado de um parecido (no `probe`, só inimigos que existem na fase).
 
