@@ -65,6 +65,17 @@ Salas próprias de uma fase (formas, portas, seções e decoração composta por
 6. Na ficha da fase: `RoomSet = "<Conjunto>";`. Antes de a fase existir, dá para testar numa fase qualquer pelo cenário (`"levels": {"Castle": {"RoomSet": "<Conjunto>"}}`, como em `tools/test/scenarios/room_sets.json`).
 7. Prova: o log tem `roomset <Conjunto> rooms=N/M` e as linhas `room ... set=<Conjunto>`; `expect` com `set_rooms_min`; a folha de contato mostra as salas; o validador passa (ele acusa mapa fora da descrição, catálogo de motivos velho, arquivo do jogo velho e arquivo fora do `.yyp`).
 
+## Sala pintada com o tileset da região
+
+Sala inteira pintada tile a tile com peças de uma área do ALttP, com colisão pelos tiles (F12b-1). Detalhes em `docs/dev/engine-notes.md` ("Painted rooms"); formato em `tools/README.md` ("templates/", "Painted rooms").
+
+1. A região já tem o tileset importado (receita "Tiles e sons da ROM para uma região"): `incoming/<regiao>/tiles/` com `tiles.png`, `tiles.json` e `areas.json` (a área em números de bloco), `data/tiles/<Regiao>.json` com `solid` e o tileset do Tiled em `data/room-templates/tilesets/<Regiao>.json`.
+2. Prévia antes (é visual): `python tools/alttp/owdump.py png <área>` e uma imagem da sala montada com os blocos, ao lado da colisão. Escolha as peças na área renderizada (coluna e linha de blocos de 16x16; os números de `areas.json`): piso, os três pedaços de cima, do meio e de baixo da moldura, a abertura de cada lado de porta e a decoração.
+3. No `rooms.json` do conjunto: `kit` (tileset, área, peças, moldura, aberturas) e `painted` (nome, tamanho, portas, decoração com `pair` para a cópia espelhada). Exemplo: `data/room-templates/sets/CastleTop/rooms.json`.
+4. `python tools/templates/make_rooms.py <Conjunto> --map`: a sala em texto (`#` parede, `.` piso, `o` passagem, `D` célula de porta). O script recusa decoração em cima de uma passagem, passagens que se encostam e porta cuja passagem não chega do meio da sala até a borda.
+5. `make_rooms.py <Conjunto>` e `convert.py --summary`; na ficha, `RoomSet`, `RegionTiles` igual ao tileset da pintura (o validador confere) e, ao ar livre, `Layout = LevelLayout.Outdoor`.
+6. Prova: passo `painted` de um cenário (vai à primeira sala pintada e confere tile a tile: linha `painted ... mismatch=0`), `expect` com `free` depois de andar contra as paredes, e uma foto. Para achar uma semente em que a sala aparece, monte a fase em várias sementes (`level` com `seed`) e leia as linhas `roomset <Conjunto> rooms=N/M`. Exemplo: `tools/test/scenarios/castle_top_room.json`.
+
 ## Imagem de sala a partir do ALttP
 
 1. Descubra o número da sala no ALttP (wikis e o próprio zelda3 ajudam).
@@ -131,7 +142,7 @@ Para a região usar peças do ALttP sem esperar os gráficos do Guilherme (F6b).
 3. Efeito sonoro: ache no zelda3 onde o jogo toca o efeito (`sound_effect_1 = 54` em `OverworldOverlay_HandleRain` é o trovão; `sound_effect_ambient` vai na porta 1, `sound_effect_1` na 2, `sound_effect_2` na 3) e rode `python tools/alttp/sfx.py <porta> <número> incoming/<regiao>/sounds/<Nome>.wav`. A primeira vez compila o `musicdump.c` (`tools/alttp/build.py`; sem compilador, `python -m pip install --user ziglang`) e pede o `zelda3_assets.dat` (`python assets/restool.py --extract-from-rom` na pasta do zelda3, com PyYAML).
 4. `manifest.json` com `"name"` igual ao nome da fase (`CastleTop`), para os assets saírem `ts_CastleTop`, `Sound_Thunder`.
 5. `python tools/import/import_region.py <regiao>`: tileset `ts_<Regiao>` com a textura, `datafiles/data/tiles/<Regiao>.json`, `Sound_<Nome>`.
-6. Na ficha: `RegionTiles = "<Regiao>"`. Quem pinta são as salas externas (F12b) ou o código da região, com `RegionTiles_PaintBlock`; o passo `paint` dos cenários pinta blocos numa sala para ver (cenário `region_tiles`).
+6. Na ficha: `RegionTiles = "<Regiao>"`. Quem pinta são as salas pintadas (receita "Sala pintada com o tileset da região", F12b-1) ou o código da região, com `RegionTiles_PaintBlock`; o passo `paint` dos cenários pinta blocos numa sala para ver (cenário `region_tiles`).
 7. Paredes e piso de dungeon com peças da ROM: exporte a faixa do tema mais próximo (`import_region.py --export-band Castle`), recombine por cima as peças de `tiles.png` sem mudar a arrumação, ponha como `incoming/<regiao>/tileset.png` com `"tileset": {"base": "Castle"}` e importe; na ficha, `TilesBand = "<Regiao>"` com `Theme` do tema base. É visual: prévia ao Guilherme antes.
 
 ## Estágio alternativo (variante de capítulo, ex.: topo do castelo no capítulo 2)

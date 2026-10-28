@@ -292,6 +292,67 @@ function Test_PlaceLink(_RoomIndex, _Pos){
 	global.InWaterSprite = Link_GetInWaterSprite();
 }
 
+/// True when Link stands in a wall (an oWall that blocks him)
+function Test_LinkInWall(){
+	var _In = false;
+	with(oLink){
+		var _W = instance_place(x, y, oWall);
+		_In = (_W != noone && _W.BlockLink);
+	}
+	return _In;
+}
+
+/// Checks a painted room (roadmap F12b): every 8x8 cell of a solid tile is in one of the room's walls and no other is
+function Test_CheckPainted(_RoomIndex){
+	var _R = global.Level.Rooms[_RoomIndex];
+	var _G = _R.RegionGrid;
+	var _Solid = RegionTiles_Get(LevelDef.RegionTiles).solid;
+	var _Walls = [];
+	with(oWall) if(variable_instance_exists(id, "RegionRoom") && RegionRoom == _RoomIndex) array_push(_Walls, id);
+	var _Tiles = 0, _SolidCells = 0, _Bad = 0, _First = "";
+	for(var k = 0; k < _G.W * _G.H; k++){
+		var _T = _G.Tiles[k];
+		if(_T != 0) _Tiles++;
+		var _IsSolid = (_T != 0 && _Solid[_T & 0xFFFF] == 1);
+		if(_IsSolid) _SolidCells++;
+		var _PX = _R.x + (k mod _G.W) * 8 + 4;
+		var _PY = _R.y + (k div _G.W) * 8 + 4;
+		var _InWall = false;
+		for(var w = 0; w < array_length(_Walls) && !_InWall; w++){
+			var _I = _Walls[w];
+			_InWall = (_PX >= _I.x && _PX < _I.x + _I.sprite_width && _PY >= _I.y && _PY < _I.y + _I.sprite_height);
+		}
+		if(_InWall != _IsSolid){
+			_Bad++;
+			if(_First == "") _First = " first=" + string(k mod _G.W) + "," + string(k div _G.W);
+		}
+	}
+	var _Passages = 0;
+	for(var d = 0; d < array_length(_R.Doors); d++) if(_R.Doors[d].Status != DoorStatus.Unused && _R.Doors[d].Status != DoorStatus.Secret_Closed) _Passages++;
+	Test_Log("painted room=" + string(_RoomIndex) + " template=" + string(_R.TemplateName) + " transform=" + TransformationStr(_R.Template[$ "Transform"] ?? 0)
+		+ " tiles=" + string(_Tiles) + "/" + string(_G.W * _G.H) + " solid=" + string(_SolidCells) + " walls=" + string(array_length(_Walls))
+		+ " passages=" + string(_Passages) + " mismatch=" + string(_Bad) + _First);
+	if(_Bad > 0) Test_Fail("painted room " + string(_RoomIndex) + ": " + string(_Bad) + " cells where the walls do not match the tiles");
+}
+
+/// Paints a grid of blocks of the level's region tileset turned by a room transform, like RegionRoom_Paint turns a room
+function Test_PaintTransformed(_Blocks, _X, _Y, _BW, _BH, _Transform){
+	var _Tiles = RegionTiles_Get(LevelDef.RegionTiles);
+	var _PR = global.Level.Rooms[global.CurrentRoomIndex];
+	var _TM = RegionTiles_Tilemap(UPPER);
+	var _W = _BW * 2, _H = _BH * 2;
+	for(var j = 0; j < _H; j++){
+		for(var i = 0; i < _W; i++){
+			var _Data = _Tiles.blocks[_Blocks[((j div 2) * _BW + (i div 2)) mod array_length(_Blocks)]][(j mod 2) * 2 + (i mod 2)];
+			var _Value = tile_get_index(_Data) | (((tile_get_mirror(_Data) ? 1 : 0) | (tile_get_flip(_Data) ? 2 : 0)) << 16);
+			var _Cell = RegionTiles_TransformCell(i, j, _W, _H, _Transform);
+			var _New = (_Value & 0xFFFF) | (RegionTiles_TransformFlags(_Value >> 16, _Transform) << 16);
+			tilemap_set_at_pixel(_TM, RegionTiles_TileData(_New), _PR.x + _X + _Cell[0] * 8, _PR.y + _Y + _Cell[1] * 8);
+		}
+	}
+	Test_Log("paint transform=" + TransformationStr(_Transform) + " blocks=" + string(_BW * _BH));
+}
+
 /// Moves Link into the room of the main exit (_Extra false) or of the extra exit (roadmap F4b), 40 px in front of the
 /// exit door. Returns the verb that walks into it ("up" or "down"), or "" when the level has no such exit.
 function Test_GotoExit(_Extra){
@@ -469,6 +530,7 @@ function Test_DoStep(_S){
 			if(variable_struct_exists(_S, "enemies") && instance_number(oEnemy) != _S.enemies) _Bad += " enemies(" + string(instance_number(oEnemy)) + ")";
 			if(variable_struct_exists(_S, "kills_min") && global.TestKills < _S.kills_min) _Bad += " kills(" + string(global.TestKills) + ")";
 			if(variable_struct_exists(_S, "set_rooms_min") && Test_SetRooms() < _S.set_rooms_min) _Bad += " set_rooms(" + string(Test_SetRooms()) + ")";
+			if((_S[$ "free"] ?? false) && Test_LinkInWall()) _Bad += " free(" + string(round(oLink.x)) + "," + string(round(oLink.y)) + ")";
 			if((_S[$ "exit_level"] ?? false) && (global.SaveLevel || global.Level.Index != global.TestExitDest)) _Bad += " exit_level(" + string(global.Level.Index) + (global.SaveLevel ? " rest stop" : "") + ")";
 			if(_Bad == "") Test_Log("expect ok");
 			else Test_Fail("expect" + _Bad);
@@ -505,6 +567,10 @@ function Test_DoStep(_S){
 
 		case "paint":	// region tileset (roadmap F6b): "blocks" painted in turn over a "w" x "h" grid of 16x16 at "x", "y" of Link's room
 			var _Blocks = _S[$ "blocks"] ?? [0];
+			if(variable_struct_exists(_S, "transform")){	// the grid turned like a painted room (roadmap F12b)
+				Test_PaintTransformed(_Blocks, _S[$ "x"] ?? 0, _S[$ "y"] ?? 0, _S[$ "w"] ?? 1, _S[$ "h"] ?? 1, _S.transform);
+				return true;
+			}
 			var _PR = global.Level.Rooms[global.CurrentRoomIndex];
 			var _PX = _PR.x + (_S[$ "x"] ?? 0);
 			var _PY = _PR.y + (_S[$ "y"] ?? 0);
@@ -527,6 +593,22 @@ function Test_DoStep(_S){
 			var _PTiles = RegionTiles_Get(LevelDef.RegionTiles);
 			Test_Log("paint tileset=" + (_PTiles == undefined ? "none" : _PTiles.tileset) + " blocks=" + string(_Painted) + " of " + string(_PW * _PH) + " classes=" + _Classes);
 			if(_Painted != _PW * _PH) Test_Fail("paint: " + string(_PW * _PH - _Painted) + " blocks not painted");
+			return true;
+
+		case "painted":	// painted room (roadmap F12b): Link to the first one of the level (or "index"), then its walls checked tile by tile
+			if(StepFrames == 1){
+				PaintedRoom = _S[$ "index"] ?? -1;
+				for(var i = 0; PaintedRoom == -1 && i < global.Level.RoomCount; i++) if(RegionRoom_Is(i)) PaintedRoom = i;
+				if(PaintedRoom == -1 || !RegionRoom_Is(PaintedRoom)){
+					Test_Fail("no painted room in the level");
+					return true;
+				}
+				var _GotoPainted = global.Level.Rooms[PaintedRoom];
+				Test_PlaceLink(PaintedRoom, (_S[$ "at"] ?? "") == "center" ? [_GotoPainted.x + 128, _GotoPainted.y + (_GotoPainted.GridH * 128) + 8] : Test_RoomEntryPoint(PaintedRoom));
+				return false;
+			}
+			if(StepFrames < 10) return false;	// the room wakes up
+			Test_CheckPainted(PaintedRoom);
 			return true;
 
 		case "sheet":

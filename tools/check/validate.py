@@ -434,6 +434,16 @@ def check_room_sets(rep, convert):
     for m in re.finditer(r'\bRoomSet\s*=\s*"([^"]*)"', COMMENT_RE.sub("", src)):
         if m.group(1) and m.group(1) not in sets:
             rep.error('__Levels.gml: RoomSet "%s" is not a room set (data/room-templates/sets)' % m.group(1))
+    # painted rooms (roadmap F12b) paint with the level's RegionTiles: a level whose set paints must name that tileset
+    for m in re.finditer(r'with\(_L\[DungeonLevel\.(\w+)\]\)\{(.*?)\n\t\}', COMMENT_RE.sub("", src), re.S):
+        rs = re.search(r'\bRoomSet\s*=\s*"([^"]*)"', m.group(2))
+        if not rs or rs.group(1) not in sets:
+            continue
+        painted = {t['Region']['tileset'] for subs in sets[rs.group(1)].values() for sub in subs for t in sub if 'Region' in t}
+        rt = re.search(r'\bRegionTiles\s*=\s*"([^"]*)"', m.group(2))
+        for name in sorted(painted - {rt.group(1) if rt else ''}):
+            rep.error('__Levels.gml: %s takes room set %s, painted with %s, but its RegionTiles is "%s"'
+                      % (m.group(1), rs.group(1), name, rt.group(1) if rt else ''))
     diffs = make_rooms.selftest()
     for d in diffs:
         rep.error('tools/templates/make_rooms.py --selftest: %s' % d)

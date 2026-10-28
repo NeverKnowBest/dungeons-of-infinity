@@ -7,6 +7,7 @@ Sheet = undefined;	// contact sheet in progress (Test_SheetStart)
 ActivateAll = false;	// set by steps that build a level: oTest's Step activates every instance, like oLink before the stairs
 
 ExitVerb = "";		// verb the "exit" step holds to walk into the exit
+PaintedRoom = -1;	// room the "painted" step checks
 
 LastLevel = undefined;
 LastRoom = -1;

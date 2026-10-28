@@ -33,6 +33,11 @@ enum LevelSpecial{
 	FinalBoss	// Agahnim: the hall and the final fight
 }
 
+enum LevelLayout{
+	Dungeon,	// rooms joined by doors with frames in the walls
+	Outdoor		// rooms joined by open passages at the door positions, no frames (roadmap F12b)
+}
+
 enum LevelDark{
 	Never,		// rooms are never dark
 	Low,		// dark only with the Darkness challenge
@@ -109,6 +114,7 @@ function Level_Create(_Index, _Name) constructor{
 	Special = LevelSpecial.None;
 
 	// Layout
+	Layout = LevelLayout.Dungeon;		// Outdoor: an open door is a passage in the painted walls, drawn with no frame (roadmap F12b)
 	Class = DungeonClass.Castle;		// dungeon template class (global.Templates_Dungeon)
 	Template = -1;						// for DungeonClass.Special: index of the fixed layout
 	Transform = true;					// dungeon template may be flipped and rotated
@@ -363,8 +369,8 @@ function Levels_Init(){
 	}
 
 	// Chapter 2 variant: the castle rooftops in the rain (docs/regioes/topo-do-castelo.md), seen from above like ALttP's
-	// overworld area 0x1B. Waits for the outdoor rooms of F12b: no NextPool leads to it yet (Hyrule Castle will take it
-	// with weight 1 beside the basement's 2).
+	// overworld area 0x1B, its rooms painted with ts_CastleTop (room set CastleTop, roadmap F12b-1). Waits for the rest
+	// of the pilot: no NextPool leads to it yet (Hyrule Castle will take it with weight 1 beside the basement's 2).
 	with(_L[DungeonLevel.CastleTop]){
 		Depth = 2;
 		Next = DungeonLevel.CastleJails;
@@ -372,13 +378,16 @@ function Levels_Init(){
 		BaseTheme = DungeonLevel.Castle;
 		EnemyStats = DungeonLevel.Castle;
 		RegionTiles = "CastleTop";
+		Layout = LevelLayout.Outdoor;
+		RoomSet = "CastleTop";
+		Ceiling = false;
 		Class = DungeonClass.Castle;
 		StartDir = DOWN;
 		Spikes = false;
 		Curses = false;
 		FairyRooms = false;
 		Song = SongIndex.Castle;
-		Dark = LevelDark.Low;
+		Dark = LevelDark.Never;
 		SecretDoorType = SecretDoor.Crack;
 		ExitLook = "StairsUp";
 		Enemies = [[oEnemy_Soldier_Advanced, 2], [oEnemy_Soldier_Simple, 3], [oEnemy_Keese, 1]];

@@ -834,7 +834,9 @@ function Dungeon_InitLevel(_LevelIndex){
 		
 		Dungeon_Draw_Walls(_RoomIndex);
 		
-		if(LevelDef.Ceiling && !TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.Main)){
+		var _Painted = RegionRoom_Paint(_RoomIndex);	//a room painted with the region tileset, walls from its tiles (roadmap F12b)
+		
+		if(LevelDef.Ceiling && !_Painted && !TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.Main)){
 			Dungeon_Draw_Ceiling(GetTileID(8, LevelTilesY + 2), Room.TileX, Room.TileY, Room.TileX, Room.TileY, Room.TileX + Room.TileW, Room.TileY + Room.TileH);
 		}
 		
@@ -895,6 +897,10 @@ function Dungeon_InitLevel(_LevelIndex){
 
 			for(var i = 0; i < array_length(global.TMID); i++){
 				ClearTileBlock(global.TMID[i], Room.x, Room.y, Room.TileW, Room.TileH);
+			}
+			if(RegionRoom_Is(_RoomIndex)){
+				ClearTileBlock(RegionTiles_Tilemap(UPPER), Room.x, Room.y, Room.TileW, Room.TileH);
+				variable_struct_remove(Room, "RegionGrid");
 			}
 									
 			_RoomListIndex--;

@@ -1,0 +1,15 @@
+{
+ "columns": 32,
+ "image": "../../../incoming/topo-do-castelo/tiles/tiles.png",
+ "imageheight": 72,
+ "imagewidth": 256,
+ "margin": 0,
+ "name": "CastleTop",
+ "spacing": 0,
+ "tilecount": 288,
+ "tiledversion": "1.10.1",
+ "tileheight": 8,
+ "tilewidth": 8,
+ "type": "tileset",
+ "version": "1.10"
+}

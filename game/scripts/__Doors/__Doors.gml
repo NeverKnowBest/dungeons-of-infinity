@@ -194,7 +194,8 @@ function Dungeon_CreateDoors(_RoomIndex){
 			var TMID_Decor = global.TMID_Decor_Lower;
 		}
 
-		switch(_DoorInst.Location){
+		//a painted room's walls already leave the passage open (RegionRoom_Paint)
+		if(!RegionRoom_Is(_RoomIndex)) switch(_DoorInst.Location){
 			case "Top":
 				if(LevelDef.Special == LevelSpecial.FinalBoss){
 					//clear larger area for the large door frames
@@ -326,6 +327,13 @@ function Door_DrawTiles(Inst){
 		var WallLevel = (FloorLevel == UPPER ? 0 : 1);
 		var TilesY = global.Level.Rooms[RoomIndex].ForcedTheme != -1 && global.Level.Rooms[RoomIndex].ForcedTheme <= 11 ? 4 + (global.Level.Rooms[RoomIndex].ForcedTheme * 6) : LevelTilesY_Base;
 		var TMID_Beam = (FloorLevel == UPPER ? global.TMID_Tiles_Highest : global.TMID_Walls_Upper);
+		
+		//outdoor levels (roadmap F12b): an open door is the passage the painted room leaves in its walls, no frame
+		if(LevelDef.Layout == LevelLayout.Outdoor && (Status == DoorStatus.Open || Status == DoorStatus.Curtain)){
+			ClearTileBlock(TMID_Decor, x, y, 4, 4);
+			ClearTileBlock(TMID_Beam, x, y, 4, 4);
+			exit;
+		}
 		
 		switch(Location){
 		
@@ -1027,6 +1035,8 @@ function Door_OpenSecretDoor(_Inst){
 	with(_Inst){
 		Status = DoorStatus.Secret_Open;
 		UpdateStatus = true;
+		RegionRoom_OpenPassage(RoomIndex, x - global.Level.Rooms[RoomIndex].x, y - global.Level.Rooms[RoomIndex].y);
+		RegionRoom_OpenPassage(LinkedDoor.RoomIndex, LinkedDoor.x - global.Level.Rooms[LinkedDoor.RoomIndex].x, LinkedDoor.y - global.Level.Rooms[LinkedDoor.RoomIndex].y);
 		LinkedDoor.Status = DoorStatus.Secret_Open;
 		LinkedDoor.SecretType = SecretType;
 		LinkedDoor.UpdateStatus = true;	

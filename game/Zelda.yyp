@@ -949,6 +949,7 @@
     {"$GMIncludedFile":"","%Name":"sets.json","CopyToMask":-1,"filePath":"datafiles/data/rooms","name":"sets.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"Main_Upper.json","CopyToMask":-1,"filePath":"datafiles/data/rooms/sets/Example","name":"Main_Upper.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"Main_Lower.json","CopyToMask":-1,"filePath":"datafiles/data/rooms/sets/Example","name":"Main_Lower.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"Main_Upper.json","CopyToMask":-1,"filePath":"datafiles/data/rooms/sets/CastleTop","name":"Main_Upper.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"Discord.txt","CopyToMask":-1,"filePath":"datafiles","name":"Discord.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"Game Manual.pdf","CopyToMask":-1,"filePath":"datafiles","name":"Game Manual.pdf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"Gem Combo Poster (Spoiler).pdf","CopyToMask":-1,"filePath":"datafiles","name":"Gem Combo Poster (Spoiler).pdf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},

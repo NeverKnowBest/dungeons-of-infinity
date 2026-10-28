@@ -767,6 +767,7 @@ function RoomTemplates_PickFrom(_RoomIndex, _Templates, _Counts, _Unused){
 			
 
 			NewRoomTemplate = StructCopy(RoomTemplate);
+			if(RoomTemplate[$ "Region"] != undefined) NewRoomTemplate.Transform = _TransformType;	//a painted room turns its tiles the same way (RegionRoom_Paint, roadmap F12b)
 			
 			var _TransformTemplate = (_TransformType != ObjTransformation.None || _RoomTemplateClass == RoomTemplateClass.Sections);
 			

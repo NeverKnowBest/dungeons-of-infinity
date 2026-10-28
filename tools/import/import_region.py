@@ -21,6 +21,7 @@ INCOMING = os.path.join(REPO, 'incoming')
 MUSIC_GML = os.path.join(GAME, 'scripts', '__Music', '__Music.gml')
 TILES_GML = os.path.join(GAME, 'scripts', '__Tiles', '__Tiles.gml')
 TILES_DATA = os.path.join(GAME, 'datafiles', 'data', 'tiles')
+TILED_TILESETS = os.path.join(REPO, 'data', 'room-templates', 'tilesets')   # region tilesets for Tiled (roadmap F12b)
 MANIFEST_KEYS = {'name', 'defaults', 'sprites', 'tileset', 'tiles', 'music', 'sounds', 'palettes'}
 SOUND_KEYS = {'volume'}
 PALETTE_KEYS = {'base', 'frame'}
@@ -37,6 +38,10 @@ SOUND_RE = re.compile(r'^[A-Z][A-Za-z0-9_]*$')
 TILE_CLASSES = {'floor', 'solid', 'slope', 'deep_water', 'shallow_water', 'tall_grass', 'ledge_n', 'ledge_s', 'ledge_w',
                 'ledge_e', 'ledge_diag', 'bush', 'rock', 'sign', 'big_rock', 'bonk', 'pit', 'stairs', 'entrance', 'dig',
                 'warp', 'spike', 'grave', 'plaque', 'chest', 'other'}
+# classes Link and the enemies walk over; every other class is a wall (oWall) in a painted room (roadmap F12b).
+# Ledges, bushes, rocks, pits and water stay walls until their own objects exist. data/tiles/<Region>.json gets
+# "solid" (1 or 0 per tile) from this, and tools/templates/paint_rooms.py reads it back.
+TILE_WALKABLE = {'floor', 'shallow_water', 'tall_grass', 'stairs', 'entrance', 'dig', 'warp'}
 TILES_KEYS = {'source', 'areas', 'tile', 'columns', 'transparent', 'attributes', 'classes', 'class', 'blocks',
               'animated', 'animation_speed'}
 
@@ -696,9 +701,30 @@ def tileset_write(name, sprite, data, folder, image):
 def tiles_data_text(region, data):
     """data/tiles/<Region>.json, what the game reads (RegionTiles_Get): the class of every tile, one block per line."""
     head = {'name': region, 'tileset': 'ts_' + region, 'columns': data['columns'], 'source': data['source'],
-            'class': data['class'], 'animated': data['animated']}
+            'class': data['class'], 'solid': [0] + [0 if c in TILE_WALKABLE else 1 for c in data['class'][1:]],
+            'animated': data['animated']}
     s = json.dumps(head, separators=(',', ':'))[:-1]
     return s + ',\n"blocks":[\n' + ',\n'.join(json.dumps(b, separators=(',', ':')) for b in data['blocks']) + '\n]}\n'
+
+
+def tiled_tileset_text(region, image_rel, w, h):
+    """The region tileset as a Tiled tileset (8x8 tiles of tiles/tiles.png, tile i is tile i of ts_<Region>): the
+    painted room templates (Region and RegionOpen tile layers, roadmap F12b) use it."""
+    cols = w // 8
+    return json.dumps({'columns': cols, 'image': image_rel, 'imageheight': h, 'imagewidth': w, 'margin': 0,
+                       'name': region, 'spacing': 0, 'tilecount': cols * (h // 8), 'tiledversion': '1.10.1',
+                       'tileheight': 8, 'tilewidth': 8, 'type': 'tileset', 'version': '1.10'}, indent=1) + '\n'
+
+
+def tiled_tileset_write(region, d):
+    """data/room-templates/tilesets/<Region>.json over incoming/<region>/tiles/tiles.png."""
+    from PIL import Image
+    png = os.path.join(d, 'tiles', 'tiles.png')
+    w, h = Image.open(png).size
+    os.makedirs(TILED_TILESETS, exist_ok=True)
+    rel = os.path.relpath(png, TILED_TILESETS).replace(os.sep, '/')
+    with open(os.path.join(TILED_TILESETS, region + '.json'), 'w', newline='\n') as f:
+        f.write(tiled_tileset_text(region, rel, w, h))
 
 
 INCLUDED = ('    {"$GMIncludedFile":"","%%Name":"%s","CopyToMask":-1,"filePath":"%s","name":"%s",'
@@ -962,9 +988,9 @@ def remove_record(rec, slug):
         g.remove('tilesets', n)
         region = n[len('ts_'):]
         included_remove('datafiles/data/tiles', region + '.json')
-        p = os.path.join(TILES_DATA, region + '.json')
-        if os.path.exists(p):
-            os.remove(p)
+        for p in (os.path.join(TILES_DATA, region + '.json'), os.path.join(TILED_TILESETS, region + '.json')):
+            if os.path.exists(p):
+                os.remove(p)
     if rec.get('folder'):
         for sub in ('Music', 'Sounds', 'Sprites', 'Tiles', ''):
             g.remove_folder(rec['folder'] + ('/' + sub if sub else ''))
@@ -1135,6 +1161,7 @@ def run(arg, dry=False, remove=False):
         with open(os.path.join(TILES_DATA, region + '.json'), 'w', newline='\n') as f:
             f.write(tiles_data_text(region, tiles[1]))
         included_add('datafiles/data/tiles', region + '.json')
+        tiled_tileset_write(region, d)
         extra['tilesets'] = tileset_names
         print('ts_%s: region tileset and datafiles/data/tiles/%s.json (the level sheet takes it with RegionTiles: "%s")'
               % (region, region, region))

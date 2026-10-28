@@ -204,7 +204,7 @@ def main(argv):
             r.do('tileset.png is a band of sTiles (F6b): TilesBand = "%s" in the level sheet, Theme the band it is laid out like' % band)
         if os.path.isdir(os.path.join(inc, 'tiles')):
             ts = (rec.get('tilesets') or ['ts_<Region>'])[0]
-            r.ok('tiles/ is the region tileset %s (F6b): RegionTiles = "%s" in the level sheet paints with it (RegionTiles_PaintBlock); rooms painted tile by tile come with F12b' % (ts, ts[3:]))
+            r.ok('tiles/ is the region tileset %s (F6b): RegionTiles = "%s" in the level sheet paints with it (RegionTiles_PaintBlock); rooms painted tile by tile: kit and painted in the rooms.json of the set (F12b-1)' % (ts, ts[3:]))
         if any(f.lower().startswith('sounds') for f in files):
             r.ok('sounds/ become Sound_<Name> (F6b)')
 

@@ -14,6 +14,7 @@
  "sources": {
   "manifest.json": "88211cd97fdeae9044027c97e5db3edc8d6b7951",
   "sounds/Thunder.wav": "308c1ae16c967fb1363964b8a0a9503182ed1aaa",
+  "tiles/areas.json": "2938cbe6889d7d4648cec12d480b1f954663da73",
   "tiles/tiles.json": "6f1fb7a6f5b4e4ee936fb3640d672860764c6e1c",
   "tiles/tiles.png": "64352e6d9e70a3672e1b68a229c5fa14ab598cfc"
  }

@@ -704,6 +704,12 @@ def cmd_tiles(args):
            'blocks': blocks, 'animated': old.get('animated', []) if old else []}
     with open(jp, 'w', newline='\n') as f:
         f.write(dump_tiles_json(out))
+    # each area as block indices, the source the room composer cuts its pieces from (make_rooms.py "painted")
+    bindex = {(b_['area'], b_['map16']): i for i, b_ in enumerate(blocks)}
+    maps = {hx(a): [[bindex[(hx(a), v)] for v in row] for row in area_map16(a)] for a in areas}
+    with open(os.path.join(d, 'areas.json'), 'w', newline='\n') as f:
+        f.write('{\n' + ',\n'.join(' "%s": [\n%s\n ]' % (k, ',\n'.join('  ' + json.dumps(r, separators=(',', ':'))
+                                                                   for r in v)) for k, v in maps.items()) + '\n}\n')
     sheet = Image.new('RGBA', (16 * 20, ((len(blocks) + 15) // 16) * 20), (40, 40, 40, 255))
     for i, b_ in enumerate(blocks):
         for k, (ti, fl) in enumerate(b_['tiles']):

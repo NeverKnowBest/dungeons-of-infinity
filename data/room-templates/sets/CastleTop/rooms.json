@@ -1,0 +1,41 @@
+{
+ "comment": "Castle rooftops (docs/regioes/topo-do-castelo.md), roadmap F12b-1: rooms painted tile by tile with ts_CastleTop, written by tools/templates/make_rooms.py. The kit's pieces are cells of ALttP area 0x1B (the top of Hyrule Castle; col, row of 16x16 blocks, incoming/topo-do-castelo/tiles/areas.json): the teal roof terrace is the floor, the cream wall tops and the riveted beige faces are walls, as on the original. Only the terrace of the approved preview for now; the other rooms of the level come with the rest of the pilot.",
+ "halves": [],
+ "kit": {
+  "tiles": "CastleTop",
+  "area": "1B",
+  "pieces": {
+   "floor": [15, 7, 1, 1],
+   "top_left": [11, 0, 3, 4],
+   "top_mid": [14, 0, 2, 4],
+   "top_right": [50, 0, 3, 4],
+   "side_left": [11, 6, 3, 1],
+   "side_right": [50, 6, 3, 1],
+   "bottom_left": [[[11, 6], [12, 6], [17, 8]], [[11, 6], [12, 6], [17, 9]], [[11, 6], [12, 6], [13, 2]]],
+   "bottom_mid": [17, 8, 1, 3],
+   "bottom_right": [[[17, 8], [51, 6], [52, 6]], [[17, 9], [51, 6], [52, 6]], [[50, 2], [51, 6], [52, 6]]],
+   "open_top": [[[50, 0], [15, 7], [15, 7], [13, 0]], [[50, 1], [15, 7], [15, 7], [13, 1]], [[50, 2], [15, 7], [15, 7], [13, 2]], [[50, 3], [15, 7], [15, 7], [13, 3]]],
+   "open_bottom": [[[17, 8], [15, 7], [15, 7], [17, 8]], [[17, 9], [15, 7], [15, 7], [17, 9]], [[50, 2], [15, 7], [15, 7], [13, 2]]],
+   "tower": [22, 14, 3, 3],
+   "crest": [31, 8, 2, 3]
+  },
+  "frame": {
+   "top": ["top_left", "top_mid", "top_right"],
+   "middle": ["side_left", "floor", "side_right"],
+   "bottom": ["bottom_left", "bottom_mid", "bottom_right"]
+  },
+  "openings": {"Top": "open_top", "Bottom": "open_bottom"}
+ },
+ "painted": [
+  {
+   "name": "Terrace",
+   "comment": "Roof terrace between the castle walls, as in the preview approved by Guilherme (oct/2026): towers with green lamps either side of the top passage, the Hylian crest in the middle.",
+   "size": "1x1",
+   "doors": [12, 6],
+   "decor": [
+    {"piece": "tower", "at": [48, 16], "pair": true},
+    {"piece": "crest", "at": [112, 112]}
+   ]
+  }
+ ]
+}

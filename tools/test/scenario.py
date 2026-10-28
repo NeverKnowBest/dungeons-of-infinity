@@ -30,9 +30,10 @@ STEPS = {
     'give': {'item', 'index', 'amount'},
     'state': set(),
     'log': {'text'},
-    'expect': {'alive', 'level', 'room', 'enemies', 'kills_min', 'exit_level', 'set_rooms_min'},
+    'expect': {'alive', 'level', 'room', 'enemies', 'kills_min', 'exit_level', 'set_rooms_min', 'free'},
     'sheet': {'level', 'seeds'},
-    'paint': {'x', 'y', 'w', 'h', 'blocks', 'mirror', 'flip'},
+    'paint': {'x', 'y', 'w', 'h', 'blocks', 'mirror', 'flip', 'transform'},
+    'painted': {'index', 'at'},
     'exit': {'which', 'frames'},
     'end': set(),
 }

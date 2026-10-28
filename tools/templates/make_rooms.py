@@ -42,6 +42,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import convert  # noqa: E402
 import motifs as mt  # noqa: E402
+import paint_rooms  # noqa: E402
 
 G = convert.GIDS
 GRID = 8
@@ -861,7 +862,8 @@ def build_map(cls, halves):
         rid = next_id('obj')
         props = [{'name': 'Split_MainSectionIDs', 'type': 'string', 'value': ','.join(str(s) for s in half.split_ids)},
                  {'name': 'Symetry', 'type': 'int', 'value': 1 if half.symmetric else 0}]
-        for k, v in sorted((half.d.get('props') or {}).items()):
+        extra = half.room_props() if getattr(half, 'painted', False) else (half.d.get('props') or {})
+        for k, v in sorted(extra.items()):
             props.append({'name': k, 'type': 'string' if isinstance(v, str) else 'int', 'value': v})
         props.sort(key=lambda p: p['name'])
         rooms.append({'height': half.h, 'id': rid, 'name': half.name, 'properties': props, 'rotation': 0, 'type': '',
@@ -888,11 +890,30 @@ def build_map(cls, halves):
     out.append({'id': next_id('layer'), 'layers': groups, 'name': 'Sections', 'opacity': 1, 'type': 'group',
                 'visible': True, 'x': 0, 'y': 0})
     height = max(h.h for h in halves)
+    tilesets = [{'firstgid': 1, 'source': '../../RoomTemplateTileset.json'}]
+    painted = [(i, h) for i, h in enumerate(halves) if getattr(h, 'painted', False)]
+    if painted:
+        # the painted rooms' tiles (roadmap F12b): tile layers over the region tileset, after the object layers
+        # (the converter reads the first layer as Rooms)
+        kit = painted[0][1].kit
+        firstgid = 1 + json.load(open(os.path.join(convert.TEMPLATE_DIR, 'RoomTemplateTileset.json'),
+                                      encoding='utf-8'))['tilecount']
+        firstgid = (firstgid + 999) // 1000 * 1000 + 1
+        tilesets.append({'firstgid': firstgid, 'source': '../../tilesets/%s.json' % kit.name})
+        mw, mh = width // GRID, height // GRID
+        for name, attr in (('Region', 'base'), ('RegionOpen', 'open')):
+            data = [0] * (mw * mh)
+            for i, h in painted:
+                for gy, row in enumerate(h.gids(getattr(h, attr), firstgid)):
+                    for gx, v in enumerate(row):
+                        data[gy * mw + i * 288 // GRID + gx] = v
+            out.append({'data': data, 'height': mh, 'id': next_id('layer'), 'name': name, 'opacity': 1,
+                        'type': 'tilelayer', 'visible': True, 'width': mw, 'x': 0, 'y': 0})
     return {'compressionlevel': -1, 'editorsettings': {'export': {'format': 'json'}}, 'height': height // GRID,
             'infinite': False, 'layers': out, 'nextlayerid': ids['layer'], 'nextobjectid': ids['obj'],
             'orientation': 'orthogonal', 'properties': [{'name': 'Generator', 'type': 'string', 'value': GENERATOR}],
             'renderorder': 'right-down', 'tiledversion': '1.10.1', 'tileheight': GRID,
-            'tilesets': [{'firstgid': 1, 'source': '../../RoomTemplateTileset.json'}], 'tilewidth': GRID,
+            'tilesets': tilesets, 'tilewidth': GRID,
             'type': 'map', 'version': '1.10', 'width': width // GRID}
 
 
@@ -922,9 +943,17 @@ def load_set(name):
             raise RoomError('%s: the name is used twice' % where)
         names.add(h.get('name'))
         halves.append(Half(h, where))
-    if not halves:
-        raise RoomError('%s: rooms.json has no "halves"' % name)
-    return halves
+    try:
+        _, painted = paint_rooms.load(d, name)
+    except paint_rooms.PaintError as e:
+        raise RoomError(str(e))
+    for p in painted:
+        if p.name in names:
+            raise RoomError('%s: the name %s is used twice' % (name, p.name))
+        names.add(p.name)
+    if not halves and not painted:
+        raise RoomError('%s: rooms.json has no "halves" nor "painted" rooms' % name)
+    return halves + painted
 
 
 def check_converted(name, by_class, warnings):
@@ -941,7 +970,7 @@ def check_converted(name, by_class, warnings):
                 union |= int(t['DoorCode'][0])
             doors = [p + 1 for p in range(24) if union & (1 << p)]
             sections = sorted({int(s) for t in sub for s in t['Split_MainSectionIDs'] if s})
-            lines.append('  %s %s: %d rooms from %d halves; doors %s; sections %s'
+            lines.append('  %s %s: %d rooms from %d halves and painted rooms; doors %s; sections %s'
                          % (cls, ['1x1', '1x2'][si], len(sub), len([h for h in by_class[cls] if h.size_index == si]),
                             ','.join(map(str, doors)), ','.join(map(str, sections)) or 'none'))
     return lines
@@ -1130,7 +1159,11 @@ def main():
             print('error:', e)
             return 1
         for h in halves:
-            print('%s (%s %s)' % (h.name, h.cls, ['1x1', '1x2'][h.size_index]))
+            print('%s (%s %s%s)' % (h.name, h.cls, ['1x1', '1x2'][h.size_index], ', painted' if getattr(h, 'painted', False) else ''))
+            if getattr(h, 'painted', False):
+                for row in paint_rooms.text_map(h).splitlines():
+                    print('  ' + row)
+                continue
             for row in text_map(h):
                 print('  ' + row)
         print('# wall or outside, . floor, o door lane, ' + ', '.join('%s %s' % (c, n) for n, c in MAP_CHARS))

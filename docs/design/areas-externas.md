@@ -60,6 +60,15 @@ O que a F6b entregou (out/2026; detalhes em `docs/dev/engine-notes.md`, "Tile ba
 * Faixa de tema por região no `sTiles` (`TilesBand`), para regiões em forma de dungeon como o topo do castelo, e efeitos sonoros (`sounds/`, `tools/alttp/sfx.py`) para os sons ambientes em loop e o trovão.
 * Fica para a F12b: as salas pintadas tile a tile pelos templates (com as transformações e as meias salas), a colisão criada a partir das classes e a água animada do ALttP.
 
+## O que a F12b-1 entregou (out/2026)
+
+Só o que o telhado do castelo pedia (detalhes em `docs/dev/engine-notes.md`, "Painted rooms"):
+
+* Sala pintada tile a tile: template inteiro (`Whole`) com as camadas de tiles `Region` e `RegionOpen`, montado pelo `make_rooms.py` a partir de um kit de peças recortadas de uma área do ALttP (`tools/templates/paint_rooms.py`, o mapa da área em `tiles/areas.json`).
+* As transformações do gerador valem para a pintura (as 8 conferidas numa foto); cada sala diz quais aceita, por padrão original e espelho.
+* Colisão: `oWall` a partir dos tiles sólidos (`solid` por tile, das classes). Bordas de mão única, arbustos, pedras, buracos e água funda ainda são paredes.
+* Campo `Layout` na ficha (`Dungeon` ou `Outdoor`) e passagem pela borda nas posições de porta: a porta aberta de uma fase `Outdoor` não tem moldura, só a passagem pintada. A classe de layouts continua a do castelo (`data_d`); uma classe de layout aberta própria, a chegada e a saída fora da parede e as portas trancadas, escondidas e de saída ao ar livre ficam para as partes seguintes.
+
 ## Grafo de ramificações: o que já existe e o que falta
 
 O grafo pedido: o castelo (capítulo 1) leva ao porão, ao topo ou a uma área externa (capítulo 2); a prisão (capítulo 3, com chefe) vem do porão ou do topo; a Deku Tree (capítulo 3) vem da área externa.

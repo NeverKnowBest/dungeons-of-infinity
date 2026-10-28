@@ -490,6 +490,79 @@ def generate_door_codes(tpl, cls, name):
     tpl['ZoneCodes'] = zone
 
 
+# ---------------------------------------------------------------- painted rooms (roadmap F12b)
+
+REGION_LAYERS = ('Region', 'RegionOpen')    # tile layers of a region tileset: the room, and its open door passages
+TILED_FLIP_H, TILED_FLIP_V, TILED_FLIP_D = 0x80000000, 0x40000000, 0x20000000
+DEFAULT_PAINTED_TRANSFORMS = ['None', 'FlipH']   # turning ALttP art upside down or sideways puts the wall faces wrong
+
+
+def region_tilesets(js, where):
+    """[(firstgid, name)] of the map's region tilesets (data/room-templates/tilesets/<Name>.json), highest first."""
+    out = []
+    for ts in js.get('tilesets', []):
+        src = ts.get('source', '').replace('\\', '/')
+        if '/tilesets/' in '/' + src:
+            out.append((int(ts['firstgid']), os.path.splitext(os.path.basename(src))[0]))
+    return sorted(out, reverse=True)
+
+
+def region_cells(layer, room, tilesets, where):
+    """The 8x8 cells of a tile layer under a room: (tileset name or None, [value per cell, row by row]). A value is
+    the tile of the region tileset with its flips: index | flags << 16, flags 1 mirrored, 2 flipped, 4 diagonal (the
+    order Tiled applies them: diagonal, then mirror, then flip); 0 is no tile."""
+    lw = int(layer['width'])
+    data = layer['data']
+    x0, y0 = int(room['x']) // 8, int(room['y']) // 8
+    w, h = int(room['width']) // 8, int(room['height']) // 8
+    name, cells = None, []
+    for j in range(h):
+        for i in range(w):
+            gid = int(data[(y0 + j) * lw + x0 + i])
+            raw = gid & 0x1FFFFFFF
+            if raw == 0:
+                cells.append(0)
+                continue
+            first = next(((f, n) for f, n in tilesets if raw >= f), None)
+            if first is None:
+                raise ConvertError('%s: room %s: layer %s has a tile of no region tileset'
+                                   % (where, gm_str(room['id']), layer['name']))
+            if name not in (None, first[1]):
+                raise ConvertError('%s: room %s paints with two tilesets (%s, %s)' % (where, gm_str(room['id']), name, first[1]))
+            name = first[1]
+            index = raw - first[0]
+            flags = (1 if gid & TILED_FLIP_H else 0) | (2 if gid & TILED_FLIP_V else 0) | (4 if gid & TILED_FLIP_D else 0)
+            cells.append(float(index | (flags << 16)) if index else 0)
+    return name, cells
+
+
+def add_region(t, room, layers, tilesets, where):
+    """Region: {tileset, w, h, base, open} (tiles of 8x8, row by row) of a painted room, from its tile layers."""
+    found = {l['name']: l for l in layers if l.get('name') in REGION_LAYERS and l.get('type') == 'tilelayer'}
+    if 'Region' not in found:
+        return
+    name, base = region_cells(found['Region'], room, tilesets, where)
+    if name is None:
+        return
+    opened = [0] * len(base)
+    if 'RegionOpen' in found:
+        n2, opened = region_cells(found['RegionOpen'], room, tilesets, where)
+        if n2 not in (None, name):
+            raise ConvertError('%s: room %s: Region and RegionOpen use two tilesets' % (where, gm_str(room['id'])))
+    t['Region'] = {'tileset': name, 'w': float(int(room['width']) // 8), 'h': float(int(room['height']) // 8),
+                   'base': base, 'open': opened}
+
+
+def painted_transforms(t, where):
+    """RoomTransformationsAllowed of a painted room: its Transforms property ("None,FlipH"), else None and FlipH."""
+    v = get_prop(t.get('properties'), 'Transforms')
+    names = DEFAULT_PAINTED_TRANSFORMS if v == -1 else [s.strip() for s in str(v).split(',') if s.strip()]
+    bad = [n for n in names if n not in T]
+    if bad or not names:
+        raise ConvertError('%s: room %s: Transforms "%s" (names: %s)' % (where, gm_str(t['id']), v, ', '.join(TRANSFORMS)))
+    return [n in names for n in TRANSFORMS]
+
+
 # ---------------------------------------------------------------- one Tiled map
 
 def find_layer(layers, name, where):
@@ -516,7 +589,8 @@ def parse_class(ci, warnings, set_name=None):
 
     rooms_layer = layers[0]
     rooms = rooms_layer['objects']
-    known = {'Rooms', 'Sections'} | set(obj_types)
+    known = {'Rooms', 'Sections'} | set(obj_types) | set(REGION_LAYERS)
+    tilesets = region_tilesets(js, where)
     for l in layers:
         if l.get('name') not in known:
             warnings.append('%s: layer "%s" is ignored by the converter' % (where, l.get('name')))
@@ -531,7 +605,8 @@ def parse_class(ci, warnings, set_name=None):
         ids = get_prop(t.get('properties'), 'Split_MainSectionIDs')
         if ids != -1:
             t['Split_MainSectionIDs'] = [0.0] + split_reals(ids)
-        if cls in ('Main_Upper', 'Main_Lower'):
+        whole = get_prop(t.get('properties'), 'Whole') == 1
+        if cls in ('Main_Upper', 'Main_Lower') and not whole:
             t['SizeIndex'] = 0 if t['height'] == 128 else 1
         else:
             key = (int(t['width'] // 256), int(t['height'] // 256))
@@ -539,6 +614,19 @@ def parse_class(ci, warnings, set_name=None):
                 raise ConvertError('%s: room %s has size %sx%s' % (where, gm_str(t['id']), gm_str(t['width']), gm_str(t['height'])))
             t['SizeIndex'] = ROOM_SIZE[key]
         t['RoomTransformationsAllowed'] = [True] * 8
+        add_region(t, r, layers, tilesets, where)
+        if whole:
+            if cls != 'Main_Upper':
+                raise ConvertError('%s: room %s: Whole rooms are only Main_Upper for now' % (where, gm_str(t['id'])))
+            if t['SizeIndex'] >= n_sub:
+                raise ConvertError('%s: room %s: a Whole Main_Upper room is 1x1 or 1x2 (a 2x1 room turns a 1x2 one)'
+                                   % (where, gm_str(t['id'])))
+            t['Whole'] = True
+            t.setdefault('Split_MainSectionIDs', [0.0])
+        elif 'Region' in t and cls in ('Main_Upper', 'Main_Lower'):
+            raise ConvertError('%s: room %s is a half room with a Region layer (painted rooms are Whole)' % (where, gm_str(t['id'])))
+        if 'Region' in t:
+            t['RoomTransformationsAllowed'] = painted_transforms(t, where)
         if set_name is not None:
             t['RoomSet'] = set_name
         temps.append(t)
@@ -600,6 +688,10 @@ def parse_class(ci, warnings, set_name=None):
         if cls in ('Village', 'Mines', 'Other'):
             main['RoomTransformationsAllowed'] = [True] + [False] * 7
             target.append(copy.deepcopy(main))
+        elif main.get('Whole'):   # a whole painted room (roadmap F12b): no halves to join
+            generate_door_codes(main, cls, where)
+            target = final[main['SizeIndex']]
+            target.append(copy.deepcopy(main))
         elif cls in ('Obstacles', 'Sections', 'Special'):
             generate_door_codes(main, cls, where)
             target.append(copy.deepcopy(main))
@@ -621,7 +713,7 @@ def parse_class(ci, warnings, set_name=None):
         else:  # Main_Upper, Main_Lower: every pair of halves whose split connections fit
             for si in range(mi, len(temps)):
                 second = temps[si]
-                if main['height'] != second['height']:
+                if main['height'] != second['height'] or second.get('Whole'):
                     continue
                 fit = False
                 for mc in main['SplitConnections'][:2]:

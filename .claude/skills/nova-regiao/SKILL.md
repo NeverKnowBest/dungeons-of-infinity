@@ -54,7 +54,7 @@ Peças da ROM sem esperar o Guilherme (F6b, receita "Tiles e sons da ROM para um
 * Paredes e piso de tema próprio: `tileset.png` (faixa de 1248x48 na arrumação de um tema, a partir de `--export-band <Tema>`, com peças da ROM recombinadas; prévia ao Guilherme antes). O importador grava a faixa no `sTiles`; na ficha, `TilesBand = "<Regiao>"` e o `Theme` de quem a faixa segue a arrumação.
 * Efeito sonoro: `python tools/alttp/sfx.py <porta> <número> incoming/<regiao>/sounds/<Nome>.wav` vira `Sound_<Nome>`.
 
-Para: sala pintada tile a tile com o tileset da região (lacuna `area-externa`, F12b).
+Sala pintada tile a tile com o tileset da região (F12b-1): `kit` e `painted` no `rooms.json` do conjunto, receita "Sala pintada com o tileset da região" (prévia ao Guilherme antes). Para: área externa inteira, com chegada e saída fora da parede (lacuna `area-externa`, partes seguintes da F12b).
 
 ## Passo 3. Ficha de fase e pools de saída (F4, F4b)
 
