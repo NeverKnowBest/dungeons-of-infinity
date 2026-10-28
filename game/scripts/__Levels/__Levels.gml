@@ -9,6 +9,10 @@
 //   BaseTheme	whose door frames, holes, floor trims and stairs it uses (LevelTilesY_Base); Agahnim borrows the fortress ones
 //   EnemyStats	whose stats the enemies take (the variants of __EnemyArch: soldier colours and energy, rope sprites; and the
 //				per-level code of Poe, Wizzrobe, Beamos, the Type of Bari, Keese...). EnemyVariants overrides a variant here
+// A region's own art (roadmap F6b) does not need a level to borrow from: TilesBand names an imported band of sTiles
+// (global.TileBands, scripts/__Tiles) that takes the place of the Theme's rows in LevelTilesY, laid out like the Theme's
+// band so the Theme's decoration rules still fit; RegionTiles names a region tileset (ts_<Name>, RegionTiles_*), the
+// tiles painted one by one in 16x16 blocks, with a class per tile for collision.
 // Depth is how far into the run the level is (1 = Hyrule Castle); difficulty formulas use it. Each depth is a chapter,
 // and the levels with the same Depth are its variants (roadmap F4b).
 //
@@ -18,7 +22,7 @@
 // Dungeon_PlanExits. ExitLook is how the exits that lead to THIS level look, a key of global.ExitLooks (__Doors).
 
 #macro LevelDef global.LevelDefs[global.Level.Index]
-#macro LevelTilesY (4 + ((LevelDef.Theme - 1) * 6))
+#macro LevelTilesY (LevelDef.TilesBand == "" ? (4 + ((LevelDef.Theme - 1) * 6)) : global.TileBands[$ LevelDef.TilesBand])
 #macro LevelTilesY_Base (4 + ((LevelDef.BaseTheme - 1) * 6))	// door frames, holes, floor trims and stairs
 
 enum LevelSpecial{
@@ -100,6 +104,8 @@ function Level_Create(_Index, _Name) constructor{
 	Theme = _Index;
 	BaseTheme = _Index;
 	EnemyStats = _Index;
+	TilesBand = "";						// imported band of sTiles used instead of the Theme's rows (a key of global.TileBands)
+	RegionTiles = "";					// region tileset painted in blocks (data/tiles/<Name>.json, tileset ts_<Name>)
 	Special = LevelSpecial.None;
 
 	// Layout

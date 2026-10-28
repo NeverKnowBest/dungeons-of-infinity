@@ -439,6 +439,68 @@ def check_room_sets(rep, convert):
         rep.error('tools/templates/make_rooms.py --selftest: %s' % d)
 
 
+def check_tiles(rep, registered):
+    """Tilesets and the imported tile art (roadmap F6b): each tileset's texture (output_tileset.png, which the IDE
+    writes and a build only copies) and tile_count fit its sprite; every TilesBand and RegionTiles of the level sheet
+    exists; every region tileset has its data file, included in Zelda.yyp, with a class for each of its tiles."""
+    try:
+        from PIL import Image
+    except ImportError:
+        Image = None
+    for (d, name), p in sorted(registered.items()):
+        if d != 'tilesets':
+            continue
+        yy = load_yy(os.path.join(GAME, p))
+        spr = registered.get(('sprites', (yy.get('spriteId') or {}).get('name')))
+        if not spr:
+            rep.error('%s: its sprite is not in the project' % name)
+            continue
+        sy = load_yy(os.path.join(GAME, spr))
+        count = (sy['width'] // yy['tileWidth']) * (sy['height'] // yy['tileHeight'])
+        if yy.get('tile_count') != count:
+            rep.error('%s: tile_count %s but its sprite has %d tiles of %dx%d' % (
+                name, yy.get('tile_count'), count, yy['tileWidth'], yy['tileHeight']))
+        tex = os.path.join(GAME, 'tilesets', name, 'output_tileset.png')
+        if not os.path.exists(tex):
+            rep.error('%s: no output_tileset.png (the game draws nothing from it); import_region.py writes it' % name)
+        elif Image is not None:
+            cols = yy.get('out_columns', 1)
+            cell = yy['tileWidth'] + 2 * yy.get('out_tilehborder', 2)
+            w, h = Image.open(tex).size
+            if w != cols * cell or h < -(-count // cols) * cell:
+                rep.error('%s: output_tileset.png is %dx%d, %d tiles in %d columns need %dx%d; the texture is out of date '
+                          '(import_region.py writes it)' % (name, w, h, count, cols, cols * cell, -(-count // cols) * cell))
+    tiles_gml = open(os.path.join(GAME, 'scripts', '__Tiles', '__Tiles.gml'), encoding='utf-8').read()
+    bands = set(re.findall(r'global\.TileBands\[\$ "(\w+)"\]', tiles_gml))
+    src = COMMENT_RE.sub('', open(os.path.join(GAME, 'scripts', '__Levels', '__Levels.gml'), encoding='utf-8').read())
+    for m in re.finditer(r'\bTilesBand\s*=\s*"([^"]*)"', src):
+        if m.group(1) and m.group(1) not in bands:
+            rep.error('__Levels.gml: TilesBand "%s" is not an imported band (global.TileBands in __Tiles.gml)' % m.group(1))
+    tdir = os.path.join(GAME, 'datafiles', 'data', 'tiles')
+    data = sorted(f[:-5] for f in os.listdir(tdir) if f.endswith('.json')) if os.path.isdir(tdir) else []
+    for m in re.finditer(r'\bRegionTiles\s*=\s*"([^"]*)"', src):
+        if m.group(1) and m.group(1) not in data:
+            rep.error('__Levels.gml: RegionTiles "%s" has no game/datafiles/data/tiles/%s.json' % (m.group(1), m.group(1)))
+    included = {(f['filePath'], f['name']) for f in load_yy(YYP).get('IncludedFiles', [])}
+    for n in data:
+        if ('datafiles/data/tiles', n + '.json') not in included:
+            rep.error('game/datafiles/data/tiles/%s.json is not an included file in Zelda.yyp' % n)
+        if ('tilesets', 'ts_' + n) not in registered:
+            rep.error('game/datafiles/data/tiles/%s.json has no tileset ts_%s' % (n, n))
+            continue
+        try:
+            js = json.load(open(os.path.join(tdir, n + '.json'), encoding='utf-8'))
+        except ValueError as e:
+            rep.error('game/datafiles/data/tiles/%s.json is not valid JSON: %s' % (n, e))
+            continue
+        count = load_yy(os.path.join(GAME, registered[('tilesets', 'ts_' + n)])).get('tile_count', 0)
+        if len(js.get('class', [])) > count:
+            rep.error('data/tiles/%s.json has %d tile classes, ts_%s only %d tiles' % (n, len(js['class']), n, count))
+        bad = [i for i, b in enumerate(js.get('blocks', [])) if any(t[0] >= len(js.get('class', [])) for t in b)]
+        if bad:
+            rep.error('data/tiles/%s.json: blocks %s use tiles with no class' % (n, bad[:5]))
+
+
 def pt_docs():
     docs = list(PT_DOCS)
     for d in PT_DOC_DIRS:
@@ -555,8 +617,10 @@ def check_incoming(rep, registered):
         except ValueError as e:
             rep.error('incoming/%s/imported.json is not valid JSON: %s' % (slug, e))
             continue
-        missing = [n for kind, key in (('sprites', 'sprites'), ('sounds', 'sounds'))
+        missing = [n for kind, key in (('sprites', 'sprites'), ('sounds', 'sounds'), ('tilesets', 'tilesets'))
                    for n in rec.get(key, []) if (kind, n) not in registered]
+        if rec.get('band') and rec['band'] not in import_region.bands():
+            missing.append('the tile band ' + rec['band'])
         if missing:
             rep.error('incoming/%s was imported but %s are not in Zelda.yyp; run python tools/import/import_region.py %s'
                       % (slug, ', '.join(missing), slug))
@@ -623,6 +687,7 @@ def main():
     check_docs(rep)
     check_regions(rep, registered)
     check_exit_looks(rep)
+    check_tiles(rep, registered)
     check_archetypes(rep, registered)
     check_resource_order(rep)
     check_scenarios(rep)

@@ -32,6 +32,7 @@ STEPS = {
     'log': {'text'},
     'expect': {'alive', 'level', 'room', 'enemies', 'kills_min', 'exit_level', 'set_rooms_min'},
     'sheet': {'level', 'seeds'},
+    'paint': {'x', 'y', 'w', 'h', 'blocks', 'mirror', 'flip'},
     'exit': {'which', 'frames'},
     'end': set(),
 }
@@ -140,6 +141,9 @@ def resolve(scenario):
                 errors.append('%s: unknown move "%s" (scripts/__EnemyArch)' % (where, step.get('move')))
         if do in ('spawn', 'arch') and not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(step.get('enemy')))):
             errors.append('%s: no object "%s"' % (where, step.get('enemy')))
+        if do == 'paint' and not (isinstance(step.get('blocks', [0]), list) and step.get('blocks', [0]) and
+                                  all(isinstance(b, int) and b >= 0 for b in step.get('blocks', [0]))):
+            errors.append('%s: "blocks" is a list of block numbers of the region tileset' % where)
         for enemy in (step.get('enemies', []) if do == 'probe' else []):
             if not os.path.isdir(os.path.join(REPO, 'game', 'objects', str(enemy))):
                 errors.append('%s: no object "%s"' % (where, enemy))
@@ -154,6 +158,14 @@ def level_fields():
     src = open(path, encoding='utf-8').read()
     body = re.search(r'function Level_Create\(.*?\n\}', src, re.S)
     return set(re.findall(r'^\t(\w+) = ', body.group(0), re.M)) if body else set()
+
+
+def tile_bands():
+    """Names of the imported tile bands (TileBands_Init in __Tiles.gml, written by import_region.py)."""
+    path = os.path.join(SCRIPTS, '__Tiles', '__Tiles.gml')
+    if not os.path.exists(path):
+        return set()
+    return set(re.findall(r'global\.TileBands\[\$ "(\w+)"\]', open(path, encoding='utf-8').read()))
 
 
 def exit_looks():
@@ -188,6 +200,11 @@ def _levels(changes, errors):
                 errors.append('%s: unknown exit look "%s" (%s)' % (where, value, ', '.join(sorted(looks))))
             if field == 'RoomSet' and value and value not in room_sets():
                 errors.append('%s: unknown room set "%s" (game/datafiles/data/rooms/sets.json)' % (where, value))
+            if field == 'TilesBand' and value and value not in tile_bands():
+                errors.append('%s: unknown tile band "%s" (TileBands_Init in __Tiles.gml)' % (where, value))
+            if field == 'RegionTiles' and value and not os.path.exists(
+                    os.path.join(REPO, 'game', 'datafiles', 'data', 'tiles', str(value) + '.json')):
+                errors.append('%s: unknown region tileset "%s" (game/datafiles/data/tiles)' % (where, value))
             entry[field] = value
         out.append(entry)
     return out

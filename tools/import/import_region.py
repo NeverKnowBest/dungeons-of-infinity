@@ -7,6 +7,9 @@
 #
 # <region> is a folder name under incoming/ or a path. The convention is in incoming/README.md. The colors follow
 # docs/design/direcao.md: 32 levels per channel (SNES), hard alpha, a dark outline and few colors per sprite.
+# A tileset band (tileset.png) is written into sTiles below the original rows and named in __Tiles.gml (the level
+# sheet's TilesBand); a region tileset (tiles/) becomes a tileset of its own with its tile classes (the level sheet's
+# RegionTiles); sounds/ become Sound_<Name> (roadmap F6b).
 # Converted frames, the preview (preview.png) and the report go to tools/import/out/<region>/ (ignored by git).
 # What an import made is recorded in incoming/<region>/imported.json; the validator uses it.
 import os, sys, re, json, wave, hashlib
@@ -16,15 +19,26 @@ REPO = os.path.abspath(os.path.join(HERE, '..', '..'))
 GAME = os.path.join(REPO, 'game')
 INCOMING = os.path.join(REPO, 'incoming')
 MUSIC_GML = os.path.join(GAME, 'scripts', '__Music', '__Music.gml')
-MANIFEST_KEYS = {'name', 'defaults', 'sprites', 'tileset', 'music', 'palettes'}
+TILES_GML = os.path.join(GAME, 'scripts', '__Tiles', '__Tiles.gml')
+TILES_DATA = os.path.join(GAME, 'datafiles', 'data', 'tiles')
+MANIFEST_KEYS = {'name', 'defaults', 'sprites', 'tileset', 'tiles', 'music', 'sounds', 'palettes'}
+SOUND_KEYS = {'volume'}
 PALETTE_KEYS = {'base', 'frame'}
 SPRITE_KEYS = {'frame', 'count', 'fps', 'origin', 'colors', 'outline', 'outline_color', 'alpha'}
 DEFAULTS = {'fps': 8, 'origin': 'center', 'colors': 7, 'outline': 'check', 'outline_color': None, 'alpha': 'hard'}
 BAND_W, BAND_H = 1248, 48          # a theme band of sTiles: 156 x 6 tiles of 8px
+BAND_FIRST, BAND_ROWS = 100, 6     # the original sTiles has tile rows 0 to 99; imported bands go below, 6 rows each
 DARK = 64                          # luma below this counts as outline dark
 OUTLINE_MAX = 56                   # the sprite's darkest color is its outline color if its luma is below this
 NAME_RE = re.compile(r'^s[A-Z][A-Za-z0-9_]*$')
 SONG_RE = re.compile(r'^[A-Z][A-Za-z0-9]*$')
+SOUND_RE = re.compile(r'^[A-Z][A-Za-z0-9_]*$')
+# tile classes of a region tileset (roadmap F6b): the collision source; the ALttP ones come from tools/alttp/owdump.py
+TILE_CLASSES = {'floor', 'solid', 'slope', 'deep_water', 'shallow_water', 'tall_grass', 'ledge_n', 'ledge_s', 'ledge_w',
+                'ledge_e', 'ledge_diag', 'bush', 'rock', 'sign', 'big_rock', 'bonk', 'pit', 'stairs', 'entrance', 'dig',
+                'warp', 'spike', 'grave', 'plaque', 'chest', 'other'}
+TILES_KEYS = {'source', 'areas', 'tile', 'columns', 'transparent', 'attributes', 'classes', 'class', 'blocks',
+              'animated', 'animation_speed'}
 
 
 class ImportError_(Exception):
@@ -402,8 +416,134 @@ def theme_band(theme):
     names = themes()
     if theme not in names or names.index(theme) == 0:
         raise ImportError_('theme must be one of %s' % ', '.join(names[1:]))
-    y = (4 + (names.index(theme) - 1) * 6) * 8      # LevelTilesY in scripts/__Levels
+    y = (4 + (names.index(theme) - 1) * 6) * 8      # LevelTilesY in scripts/__Levels, for a level without TilesBand
     return tiles_image().crop((0, y, BAND_W, y + BAND_H))
+
+
+def stiles_files():
+    """(yy path, frame png, layer png) of sTiles."""
+    d = os.path.join(GAME, 'sprites', 'sTiles')
+    t = open(os.path.join(d, 'sTiles.yy')).read()
+    fid = re.search(r'"\$GMSpriteFrame":"v1","%Name":"([0-9a-f-]+)"', t).group(1)
+    lid = re.search(r'"\$GMImageLayer":"","%Name":"([0-9a-f-]+)"', t).group(1)
+    return os.path.join(d, 'sTiles.yy'), os.path.join(d, fid + '.png'), os.path.join(d, 'layers', fid, lid + '.png')
+
+
+BAND_LINE = '\tglobal.TileBands[$ "%s"] = %d;\t// incoming/%s\n'
+BAND_ROW = re.compile(r'\tglobal\.TileBands\[\$ "(\w+)"\] = (\d+);\t// incoming/(\S+)\n')
+
+
+def bands():
+    """{band name: (first tile row, region folder)} as written in __Tiles.gml."""
+    return {m.group(1): (int(m.group(2)), m.group(3)) for m in BAND_ROW.finditer(open(TILES_GML).read())}
+
+
+TEX_BORDER = 2                     # output_tileset.png: every tile with 2 px of its own edge around it
+
+
+def tileset_texture(tileset_dir, tileset_yy, src, count):
+    """Writes the tileset's output_tileset.png, the texture the game draws a tileset from (the IDE writes it when a
+    tileset changes; a build does not make it). Each 8x8 tile of src, in order, gets a 12x12 cell with its edge pixels
+    repeated around it, out_columns cells per row (the IDE's choice, the rounded up square root of the tile count;
+    125 for the 15600 tiles of sTiles). Cell 0 is the IDE's empty tile mark, kept from the previous texture."""
+    from PIL import Image
+    import math
+    import numpy as np
+    cols_in = src.width // 8
+    out_cols = int(math.ceil(math.sqrt(count)))
+    cell = 8 + 2 * TEX_BORDER
+    a = np.array(src.convert('RGBA'))
+    out = np.zeros((int(math.ceil(count / float(out_cols))) * cell, out_cols * cell, 4), dtype=np.uint8)
+    for i in range(1, count):
+        x, y = (i % cols_in) * 8, (i // cols_in) * 8
+        t = a[y:y + 8, x:x + 8]
+        if t.shape[:2] != (8, 8):
+            continue
+        cx, cy = (i % out_cols) * cell, (i // out_cols) * cell
+        out[cy:cy + cell, cx:cx + cell] = np.pad(t, ((TEX_BORDER, TEX_BORDER), (TEX_BORDER, TEX_BORDER), (0, 0)), mode='edge')
+    p = os.path.join(tileset_dir, 'output_tileset.png')
+    if os.path.exists(p):
+        old = np.array(Image.open(p).convert('RGBA'))
+        if old.shape[0] >= cell and old.shape[1] >= cell:
+            out[:cell, :cell] = old[:cell, :cell]
+    Image.fromarray(out).save(p)
+    t = open(tileset_yy).read()
+    t = re.sub(r'"out_columns":\d+,', '"out_columns":%d,' % out_cols, t)
+    t = re.sub(r'"tile_count":\d+,', '"tile_count":%d,' % count, t)
+    open(tileset_yy, 'w').write(t)
+
+
+def stiles_resize(rows):
+    """Makes sTiles (image, sprite and tileset) exactly `rows` tile rows tall; new rows are empty."""
+    from PIL import Image
+    yy, frame, layer = stiles_files()
+    im = Image.open(frame).convert('RGBA')
+    h = rows * 8
+    if im.height != h:
+        new = Image.new('RGBA', (im.width, h), (0, 0, 0, 0))
+        new.paste(im.crop((0, 0, im.width, min(h, im.height))), (0, 0))
+        new.save(frame)
+        new.save(layer)
+    t = open(yy).read()
+    t = re.sub(r'"height":\d+,', '"height":%d,' % h, t, count=1)
+    t = re.sub(r'"bbox_bottom":\d+,', '"bbox_bottom":%d,' % (h - 1), t, count=1)
+    open(yy, 'w').write(t)
+    ts = os.path.join(GAME, 'tilesets', 'Tileset', 'Tileset.yy')
+    t = open(ts).read()
+    t = re.sub(r'"tile_count":\d+,', '"tile_count":%d,' % (rows * (BAND_W // 8)), t)
+    open(ts, 'w').write(t)
+
+
+def band_add(region, slug, arr):
+    """Writes the converted band into sTiles (the region's rows, or the first free ones) and names it in __Tiles.gml.
+    Returns the band's first tile row."""
+    from PIL import Image
+    have = bands()
+    if region in have and have[region][1] != slug:
+        raise ImportError_('a tile band "%s" already comes from incoming/%s' % (region, have[region][1]))
+    used = {r for n, (r, _) in have.items() if n != region}
+    row = have[region][0] if region in have else next(r for r in range(BAND_FIRST, 10000, BAND_ROWS) if r not in used)
+    _, frame, layer = stiles_files()
+    if Image.open(frame).height < (max(used | {row}) + BAND_ROWS) * 8:
+        stiles_resize(max(used | {row}) + BAND_ROWS)
+    im = Image.open(frame).convert('RGBA')
+    im.paste(Image.fromarray(arr), (0, row * 8))
+    im.save(frame)
+    im.save(layer)
+    stiles_texture()
+    if region not in have:
+        s = open(TILES_GML).read()
+        at = s.index('\t// end of the imported bands')
+        open(TILES_GML, 'w').write(s[:at] + BAND_LINE % (region, row, slug) + s[at:])
+    return row
+
+
+def band_remove(region, slug):
+    """Takes a band out of sTiles and __Tiles.gml; sTiles shrinks back when the last bands go."""
+    from PIL import Image
+    have = bands()
+    if region not in have:
+        return
+    row = have[region][0]
+    s = open(TILES_GML).read().replace(BAND_LINE % (region, row, slug), '')   # read before open(..., 'w') empties it
+    open(TILES_GML, 'w').write(s)
+    _, frame, layer = stiles_files()
+    im = Image.open(frame).convert('RGBA')
+    im.paste(Image.new('RGBA', (BAND_W, BAND_H), (0, 0, 0, 0)), (0, row * 8))
+    im.save(frame)
+    im.save(layer)
+    rest = [r for n, (r, _) in have.items() if n != region]
+    stiles_resize(max(rest) + BAND_ROWS if rest else BAND_FIRST)
+    stiles_texture()
+
+
+def stiles_texture():
+    """output_tileset.png of tilesets/Tileset from the current sTiles."""
+    from PIL import Image
+    _, frame, _ = stiles_files()
+    im = Image.open(frame)
+    d = os.path.join(GAME, 'tilesets', 'Tileset')
+    tileset_texture(d, os.path.join(d, 'Tileset.yy'), im, (im.width // 8) * (im.height // 8))
 
 
 def read_tileset(d, manifest):
@@ -419,6 +559,202 @@ def read_tileset(d, manifest):
                            'Start from --export-band <Theme>' % (BAND_W, BAND_H, im.width, im.height))
     base = (manifest.get('tileset') or {}).get('base', 'Castle')
     return im, base
+
+
+# ---------------------------------------------------------------- region tileset (roadmap F6b)
+
+
+def read_tiles(d, manifest):
+    """tiles/tiles.png and tiles/tiles.json: a tileset of the region's own, painted tile by tile (outdoor rooms).
+
+    Returns (image, data for the game) or None. tiles.json gives a class to every tile of tiles.png (left to right,
+    top to bottom; tile 0 stays empty): "class": [...] written by hand, or "attributes" plus "classes" (attribute to
+    class) as tools/alttp/owdump.py tiles writes them. "blocks" are the 16x16 painting units ({"tiles": [[tile,
+    flags] x 4]}, flags 1 mirrored and 2 flipped, top left, top right, bottom left, bottom right) and "animated" the
+    animated tiles ({"name", "frames": [tile, ...]})."""
+    from PIL import Image
+    td = os.path.join(d, 'tiles')
+    pp, jp = os.path.join(td, 'tiles.png'), os.path.join(td, 'tiles.json')
+    if not os.path.isdir(td):
+        if manifest.get('tiles'):
+            raise ImportError_('manifest.json has "tiles" but there is no tiles/ folder')
+        return None
+    if not (os.path.exists(pp) and os.path.exists(jp)):
+        raise ImportError_('tiles/ needs tiles.png and tiles.json (python tools/alttp/owdump.py tiles makes both)')
+    try:
+        js = json.load(open(jp, encoding='utf-8'))
+    except ValueError as e:
+        raise ImportError_('tiles/tiles.json is not valid JSON: %s' % e)
+    bad = set(js) - TILES_KEYS
+    if bad:
+        raise ImportError_('tiles/tiles.json: unknown keys %s' % sorted(bad))
+    im = Image.open(pp).convert('RGBA')
+    cols = int(js.get('columns', im.width // 8))
+    if int(js.get('tile', 8)) != 8 or im.width != cols * 8 or im.height % 8:
+        raise ImportError_('tiles/tiles.png must be "columns" tiles of 8x8 wide (%d px) and a whole number of rows'
+                           % (cols * 8))
+    count = cols * (im.height // 8)
+    if 'class' in js:
+        classes = [''] + list(js['class'][1:])
+    else:
+        at, cl = js.get('attributes'), js.get('classes', {})
+        if at is None:
+            raise ImportError_('tiles/tiles.json needs "class" (one per tile) or "attributes" and "classes"')
+        miss = sorted({a for a in at[1:] if a not in cl})
+        if miss:
+            raise ImportError_('tiles/tiles.json: attributes %s have no class' % miss)
+        classes = [''] + [cl[a] for a in at[1:]]
+    if len(classes) > count:
+        raise ImportError_('tiles/tiles.json has %d tiles, tiles.png only %d' % (len(classes), count))
+    wrong = sorted({c for c in classes[1:] if c not in TILE_CLASSES})
+    if wrong:
+        raise ImportError_('tiles/tiles.json: unknown classes %s (allowed: %s)' % (wrong, sorted(TILE_CLASSES)))
+    blocks = []
+    for i, b in enumerate(js.get('blocks', [])):
+        q = b.get('tiles') if isinstance(b, dict) else b
+        if not (isinstance(q, list) and len(q) == 4 and all(
+                isinstance(t, list) and len(t) == 2 and 0 <= t[0] < len(classes) and t[1] in (0, 1, 2, 3) for t in q)):
+            raise ImportError_('tiles/tiles.json: block %d must be four [tile, flags] of tiles.json' % i)
+        blocks.append(q)
+    anims = []
+    for a in js.get('animated', []):
+        if not (re.match(r'^[A-Za-z][A-Za-z0-9_]*$', str(a.get('name', ''))) and a.get('frames') and
+                all(0 < f < count for f in a['frames'])):
+            raise ImportError_('tiles/tiles.json: an animation needs a "name" and "frames" (tiles of tiles.png)')
+        anims.append({'name': a['name'], 'frames': [int(f) for f in a['frames']]})
+    data = {'columns': cols, 'count': count, 'class': classes, 'blocks': blocks, 'animated': anims,
+            'animation_speed': float(js.get('animation_speed', 8)), 'source': js.get('source', '')}
+    return im, data
+
+
+TILESET_YY = '''{
+  "$GMTileSet":"v1",
+  "%%Name":"%(n)s",
+  "autoTileSets":[],
+  "macroPageTiles":{
+    "SerialiseHeight":0,
+    "SerialiseWidth":0,
+    "TileSerialiseData":[],
+  },
+  "name":"%(n)s",
+  "out_columns":%(cols)d,
+  "out_tilehborder":2,
+  "out_tilevborder":2,
+  "parent":{
+    "name":"%(fn)s",
+    "path":"%(fp)s",
+  },
+  "resourceType":"GMTileSet",
+  "resourceVersion":"2.0",
+  "spriteId":{
+    "name":"%(spr)s",
+    "path":"sprites/%(spr)s/%(spr)s.yy",
+  },
+  "spriteNoExport":true,
+  "textureGroupId":{
+    "name":"Default",
+    "path":"texturegroups/Default",
+  },
+  "tileAnimationFrames":[
+%(anims)s  ],
+  "tileAnimationSpeed":%(speed).1f,
+  "tileHeight":8,
+  "tilehsep":0,
+  "tilevsep":0,
+  "tileWidth":8,
+  "tilexoff":0,
+  "tileyoff":0,
+  "tile_count":%(count)d,
+}'''
+ANIM_YY = ('    {"$GMTileAnimation":"","%%Name":"%(a)s","frames":[%(f)s],"name":"%(a)s",'
+           '"resourceType":"GMTileAnimation","resourceVersion":"2.0",},\n')
+
+
+def tileset_write(name, sprite, data, folder, image):
+    """tilesets/<name>/<name>.yy over the sprite, with the animations, and its texture; registered in Zelda.yyp."""
+    d = os.path.join(GAME, 'tilesets', name)
+    os.makedirs(d, exist_ok=True)
+    anims = ''.join(ANIM_YY % {'a': a['name'], 'f': ''.join('%d,' % f for f in a['frames'])} for a in data['animated'])
+    open(os.path.join(d, name + '.yy'), 'w').write(TILESET_YY % {
+        'n': name, 'cols': data['columns'], 'fn': folder[0], 'fp': folder[1], 'spr': sprite, 'anims': anims,
+        'speed': data['animation_speed'], 'count': data['count']})
+    tileset_texture(d, os.path.join(d, name + '.yy'), image, data['count'])
+    gm().register('tilesets', name)
+
+
+def tiles_data_text(region, data):
+    """data/tiles/<Region>.json, what the game reads (RegionTiles_Get): the class of every tile, one block per line."""
+    head = {'name': region, 'tileset': 'ts_' + region, 'columns': data['columns'], 'source': data['source'],
+            'class': data['class'], 'animated': data['animated']}
+    s = json.dumps(head, separators=(',', ':'))[:-1]
+    return s + ',\n"blocks":[\n' + ',\n'.join(json.dumps(b, separators=(',', ':')) for b in data['blocks']) + '\n]}\n'
+
+
+INCLUDED = ('    {"$GMIncludedFile":"","%%Name":"%s","CopyToMask":-1,"filePath":"%s","name":"%s",'
+            '"resourceType":"GMIncludedFile","resourceVersion":"2.0",},\n')
+INCLUDED_ROW = re.compile(r'    \{"\$GMIncludedFile":"","%Name":"[^"]*","CopyToMask":-1,"filePath":"([^"]*)"[^\n]*\n')
+
+
+def included_add(fp, n):
+    """Lists datafiles/<fp>/<n> as an included file in Zelda.yyp (the game only gets the listed ones)."""
+    p = os.path.join(GAME, 'Zelda.yyp')
+    s = open(p, encoding='utf-8').read()
+    line = INCLUDED % (n, fp, n)
+    if line in s:
+        return
+    rows = list(INCLUDED_ROW.finditer(s))
+    after = [m for m in rows if m.group(1) <= fp] or rows
+    at = after[-1].end()
+    with open(p, 'w', encoding='utf-8', newline='') as f:
+        f.write(s[:at] + line + s[at:])
+
+
+def included_remove(fp, n):
+    p = os.path.join(GAME, 'Zelda.yyp')
+    s = open(p, encoding='utf-8').read()
+    line = INCLUDED % (n, fp, n)
+    if line in s:
+        with open(p, 'w', encoding='utf-8', newline='') as f:
+            f.write(s.replace(line, ''))
+
+
+# ---------------------------------------------------------------- sounds (roadmap F6b)
+
+
+def read_sounds(d, manifest):
+    """[(sound name, wav path, seconds, rate, channels, options)] from sounds/: sounds/<Name>.wav is Sound_<Name>."""
+    sd = os.path.join(d, 'sounds')
+    opts = manifest.get('sounds', {})
+    if not os.path.isdir(sd):
+        if opts:
+            raise ImportError_('manifest.json has "sounds" but there is no sounds/ folder')
+        return []
+    out = []
+    for f in sorted(os.listdir(sd)):
+        stem, ext = os.path.splitext(f)
+        if ext.lower() != '.wav':
+            raise ImportError_('sounds/%s: only .wav is read' % f)
+        if not SOUND_RE.match(stem):
+            raise ImportError_('sounds/%s: the name must be letters, digits and _, starting with a capital' % f)
+        o = opts.get(stem, {})
+        bad = set(o) - SOUND_KEYS
+        if bad:
+            raise ImportError_('manifest.json: sound "%s" has unknown options %s (allowed: %s)'
+                               % (stem, sorted(bad), sorted(SOUND_KEYS)))
+        p = os.path.join(sd, f)
+        try:
+            w = wave.open(p)
+        except (wave.Error, EOFError) as e:
+            raise ImportError_('sounds/%s is not a PCM .wav: %s' % (f, e))
+        width, ch, n, rate = w.getsampwidth(), w.getnchannels(), w.getnframes(), w.getframerate()
+        w.close()
+        if width not in (1, 2) or ch not in (1, 2):
+            raise ImportError_('sounds/%s: only 8 or 16 bit, mono or stereo' % f)
+        out.append(('Sound_' + stem, p, n / float(rate), rate, ch, o))
+    unused = set(opts) - {os.path.splitext(f)[0] for f in os.listdir(sd)}
+    if unused:
+        raise ImportError_('manifest.json: sounds %s have no file in sounds/' % sorted(unused))
+    return out
 
 
 # ---------------------------------------------------------------- music
@@ -558,7 +894,7 @@ def preview(path, rows, tileset, link):
         d = ImageDraw.Draw(im)
         y = 2
         for label, band in (('tileset: base theme (layout to follow)', base), ('tileset.png', before),
-                            ('tileset converted (sTiles_<Region>)', Image.fromarray(after))):
+                            ('tileset converted (written into sTiles)', Image.fromarray(after))):
             d.text((8, y), label, fill=ink)
             im.alpha_composite(band, (8, y + 12))
             y += 14 + BAND_H + 4
@@ -609,8 +945,17 @@ def remove_record(rec, slug):
         music_remove(song, [(n, None) for n in sounds], slug)
     for n in rec.get('sounds', []):
         g.remove('sounds', n)
+    if rec.get('band'):
+        band_remove(rec['band'], slug)
+    for n in rec.get('tilesets', []):
+        g.remove('tilesets', n)
+        region = n[len('ts_'):]
+        included_remove('datafiles/data/tiles', region + '.json')
+        p = os.path.join(TILES_DATA, region + '.json')
+        if os.path.exists(p):
+            os.remove(p)
     if rec.get('folder'):
-        for sub in ('Music', 'Sprites', ''):
+        for sub in ('Music', 'Sounds', 'Sprites', 'Tiles', ''):
             g.remove_folder(rec['folder'] + ('/' + sub if sub else ''))
 
 
@@ -625,8 +970,9 @@ def run(arg, dry=False, remove=False):
             raise ImportError_('incoming/%s was never imported (no imported.json)' % slug)
         remove_record(old, slug)
         os.remove(recp)
-        print('Removed %d sprites, %d sounds and %d songs of %s.' % (
-            len(old.get('sprites', [])), len(old.get('sounds', [])), len(old.get('songs', {})), slug))
+        print('Removed %d sprites, %d sounds, %d songs and %d tilesets%s of %s.' % (
+            len(old.get('sprites', [])), len(old.get('sounds', [])), len(old.get('songs', {})),
+            len(old.get('tilesets', [])), ' and the tile band' if old.get('band') else '', slug))
         return 0
 
     from PIL import Image
@@ -634,18 +980,24 @@ def run(arg, dry=False, remove=False):
     region = gm_name(slug, manifest)
     sprites = read_sprites(d, manifest)
     tileset = read_tileset(d, manifest)
+    tiles = read_tiles(d, manifest)
     music = read_music(d, manifest)
-    if not (sprites or tileset or music):
-        raise ImportError_('incoming/%s has nothing to import (sprites/, tileset.png, music/)' % slug)
+    sounds = read_sounds(d, manifest)
+    if not (sprites or tileset or tiles or music or sounds):
+        raise ImportError_('incoming/%s has nothing to import (sprites/, tileset.png, tiles/, music/, sounds/)' % slug)
     palettes = read_palettes(d, manifest, [n for n, _, _ in sprites])
     sprites_names = [n for n, _, _ in sprites] + [p[0] for p in palettes]
-    if tileset:
-        sprites_names.append('sTiles_' + region)
-    sound_names = [n for _, snd in music for n, _ in snd]
+    if tiles:
+        sprites_names.append('sTileset_' + region)
+    tileset_names = ['ts_' + region] if tiles else []
+    sound_names = [n for _, snd in music for n, _ in snd] + [s[0] for s in sounds]
     # never overwrite something that is not from this region
     mine_s, mine_a = set(old.get('sprites', [])), set(old.get('sounds', []))
     taken = [n for n in sprites_names if n in registered('sprites') and n not in mine_s]
     taken += [n for n in sound_names if n in registered('sounds') and n not in mine_a]
+    taken += [n for n in tileset_names if n in registered('tilesets') and n not in old.get('tilesets', [])]
+    if tileset and region in bands() and bands()[region][1] != slug:
+        taken.append('tile band ' + region)
     taken += ['SongIndex.' + s for s, _ in music if song_exists(s) and s not in old.get('songs', {})]
     if taken:
         raise ImportError_('already in the project and not from incoming/%s: %s' % (slug, ', '.join(taken)))
@@ -691,15 +1043,33 @@ def run(arg, dry=False, remove=False):
         im, base = tileset
         msgs = []
         arr, info = convert([im], dict(DEFAULTS, colors=0, outline='off', alpha='keep'), msgs.append)
-        p = os.path.join(out, 'frames', 'sTiles_%s_0.png' % region)
-        Image.fromarray(arr[0]).save(p)
-        converted.append(('sTiles_' + region, [p], None, (0, 0, 0)))
+        Image.fromarray(arr[0]).save(os.path.join(out, 'band_%s.png' % region))
         tile = (theme_band(base), im, arr[0])
-        report.append('sTiles_%s: tileset band %dx%d over the layout of %s, colors %d>%d'
-                      % (region, BAND_W, BAND_H, base, info['colors_in'], info['colors_out']))
+        have = bands()
+        where = 'rows %d-%d' % (have[region][0], have[region][0] + BAND_ROWS - 1) if region in have else 'new rows'
+        report.append('TileBands.%s: tileset band %dx%d over the layout of %s, sTiles %s, colors %d>%d'
+                      % (region, BAND_W, BAND_H, base, where, info['colors_in'], info['colors_out']))
+        report += ['  ! ' + m for m in msgs]
+        warnings += len(msgs)
+    if tiles:
+        im, tdata = tiles
+        msgs = []
+        arr, info = convert([im], dict(DEFAULTS, colors=0, outline='off', alpha='keep'), msgs.append)
+        p = os.path.join(out, 'frames', 'sTileset_%s_0.png' % region)
+        Image.fromarray(arr[0]).save(p)
+        converted.append(('sTileset_' + region, [p], None, (0, 0, 0)))
+        used = sorted(set(c for c in tdata['class'][1:]))
+        text = '%d tiles (%d columns), %d blocks, %d animations, classes %s' % (
+            len(tdata['class']) - 1, tdata['columns'], len(tdata['blocks']), len(tdata['animated']), ', '.join(used))
+        rows.append(('ts_' + region, [im], arr, text))
+        report.append('ts_%s: region tileset, %s' % (region, text))
         report += ['  ! ' + m for m in msgs]
         warnings += len(msgs)
     wavs = []
+    sfx = []
+    for n, src, dur, rate, ch, o in sounds:
+        sfx.append((n, src, dur, rate, ch, float(o.get('volume', 0.7))))
+        report.append('%s: %.2f s, %d Hz, %s' % (n, dur, rate, 'stereo' if ch == 2 else 'mono'))
     for song, snd in music:
         parts = []
         for n, (src, a, b) in snd:
@@ -721,7 +1091,9 @@ def run(arg, dry=False, remove=False):
     # what the previous import made and this one no longer makes goes away
     gone = {'sprites': [n for n in old.get('sprites', []) if n not in sprites_names],
             'sounds': [n for n in old.get('sounds', []) if n not in sound_names],
-            'songs': {s: v for s, v in old.get('songs', {}).items() if s not in dict(music)}}
+            'songs': {s: v for s, v in old.get('songs', {}).items() if s not in dict(music)},
+            'tilesets': [n for n in old.get('tilesets', []) if n not in tileset_names],
+            'band': old.get('band') if old.get('band') and old['band'] != (region if tileset else None) else None}
     remove_record(gone, slug)
     for song, v in old.get('songs', {}).items():       # the table line changes with the sounds
         music_remove(song, [(n, None) for n in v], slug)
@@ -733,16 +1105,39 @@ def run(arg, dry=False, remove=False):
         fm = g.folder(folder + '/Music')
         for n, p, dur, rate in wavs:
             g.sound(n, p, dur, folder=fm, sample_rate=rate)
+    if sfx:
+        fx = g.folder(folder + '/Sounds')
+        for n, p, dur, rate, ch, vol in sfx:
+            g.sound(n, p, dur, folder=fx, sample_rate=rate, group='audiogroup_SFX', channels=ch, volume=vol)
     for song, snd in music:
         music_add(song, snd, slug)
+    extra = {}
+    if tileset:
+        row = band_add(region, slug, tile[2])
+        extra['band'] = region
+        print('TileBands.%s: sTiles rows %d-%d (the level sheet takes it with TilesBand: "%s")'
+              % (region, row, row + BAND_ROWS - 1, region))
+    if tiles:
+        tileset_write('ts_' + region, 'sTileset_' + region, tiles[1], g.folder(folder + '/Tiles'),
+                      Image.open(converted[[c[0] for c in converted].index('sTileset_' + region)][1][0]))
+        os.makedirs(TILES_DATA, exist_ok=True)
+        with open(os.path.join(TILES_DATA, region + '.json'), 'w', newline='\n') as f:
+            f.write(tiles_data_text(region, tiles[1]))
+        included_add('datafiles/data/tiles', region + '.json')
+        extra['tilesets'] = tileset_names
+        print('ts_%s: region tileset and datafiles/data/tiles/%s.json (the level sheet takes it with RegionTiles: "%s")'
+              % (region, region, region))
     rec = {'region': region, 'folder': folder, 'sprites': sprites_names, 'sounds': sound_names,
-           'songs': {s: [n for n, _ in snd] for s, snd in music}, 'sources': source_hashes(d)}
+           'songs': {s: [n for n, _ in snd] for s, snd in music}}
+    rec.update(extra)
+    rec['sources'] = source_hashes(d)
     json.dump(rec, open(recp, 'w'), indent=1)
-    if gone['sprites'] or gone['sounds']:
-        print('Removed (no longer in incoming/%s): %s' % (slug, ', '.join(gone['sprites'] + gone['sounds'])))
-    print('Imported %d sprites, %d sounds and %d songs into game/ (IDE folder %s)%s.' % (
-        len(sprites_names), len(sound_names), len(music), folder,
-        ', %d warnings' % warnings if warnings else ''))
+    if gone['sprites'] or gone['sounds'] or gone['tilesets']:
+        print('Removed (no longer in incoming/%s): %s' % (
+            slug, ', '.join(gone['sprites'] + gone['sounds'] + gone['tilesets'])))
+    print('Imported %d sprites, %d sounds, %d songs, %d tilesets%s into game/ (IDE folder %s)%s.' % (
+        len(sprites_names), len(sound_names), len(music), len(tileset_names), ' and a tile band' if tileset else '',
+        folder, ', %d warnings' % warnings if warnings else ''))
     return 0
 
 

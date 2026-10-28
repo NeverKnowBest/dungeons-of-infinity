@@ -48,7 +48,13 @@ Receita "Importar gráficos de uma região"; convenção em `incoming/README.md`
 3. `python tools/import/import_region.py <regiao>`, depois `python tools/check/validate.py` e `python tools/test/run.py boot`.
 4. Prova: `boot` com `RESULT: ok` e o `imported.json` no commit.
 
-Para: `tileset.png` (a faixa não liga ao jogo ainda) e `sounds/` (o importador só lê música). Ver lacunas.
+Peças da ROM sem esperar o Guilherme (F6b, receita "Tiles e sons da ROM para uma região"):
+
+* Tiles do overworld do ALttP: `python tools/alttp/owdump.py tiles <área> [<área> ...] --region <regiao>` grava `incoming/<regiao>/tiles/` (tileset da região com a classe de cada tile). Na ficha, `RegionTiles = "<Regiao>"`.
+* Paredes e piso de tema próprio: `tileset.png` (faixa de 1248x48 na arrumação de um tema, a partir de `--export-band <Tema>`, com peças da ROM recombinadas; prévia ao Guilherme antes). O importador grava a faixa no `sTiles`; na ficha, `TilesBand = "<Regiao>"` e o `Theme` de quem a faixa segue a arrumação.
+* Efeito sonoro: `python tools/alttp/sfx.py <porta> <número> incoming/<regiao>/sounds/<Nome>.wav` vira `Sound_<Nome>`.
+
+Para: sala pintada tile a tile com o tileset da região (lacuna `area-externa`, F12b).
 
 ## Passo 3. Ficha de fase e pools de saída (F4, F4b)
 

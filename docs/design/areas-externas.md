@@ -1,6 +1,6 @@
 # Áreas externas: proposta (F12a)
 
-Proposta da etapa F12a para virar a F12b ("Áreas externas", no `docs/roadmap.md`). Base: a ficha `docs/ref/alttp-overworld.md` e a leitura do gerador do DoI. Nada aqui está implementado. As escolhas marcadas **(decidir)** dependem do Guilherme e estão juntas no fim.
+Proposta da etapa F12a para virar a F12b ("Áreas externas", no `docs/roadmap.md`). Base: a ficha `docs/ref/alttp-overworld.md` e a leitura do gerador do DoI. Do jogo, só o tileset por região existe (F6b); o resto não está implementado. As escolhas que dependiam do Guilherme foram decididas em out/2026 e estão no fim ("Decisões do Guilherme").
 
 ## A ideia, conferida
 
@@ -17,11 +17,11 @@ O estudo confirma que cabe:
 
 * **Campo novo na ficha:** `Layout` com `Dungeon` (padrão, tudo como hoje) ou `Outdoor`. Uma fase `Outdoor` muda os padrões que não fazem sentido ao ar livre: sem teto (`Ceiling`), nunca escura (`Dark` Never), sem celas, sem chaves e portas trancadas, sem espinhos de chão, sem cortinas. Cada regra da dungeon que for desligada vira um campo da ficha, não um `if` espalhado (a mesma regra da F4).
 * **Classe de layout nova** (`DungeonClass.Outdoor`): os layouts de grade de salas (as posições e as ligações) continuam sendo templates, como os das dungeons, com uma sala de chegada e uma sala de saída. A diferença é que as ligações são **passagens pela borda**, não portas.
-* **Tamanhos de sala:** 1x1, 2x1, 1x2 e 2x2 quadrantes. 2x2 é a área pequena do ALttP; 1x1 e 2x1 são as telas de passagem, como as do Minish Cap e do Link's Awakening. Sem 4x4 (a área grande do ALttP): numa run curta, uma sala gigante é só caminhada. Uma fase externa teria o mesmo número de salas que uma dungeon (10 a 13), com mais 2x2.
+* **Tamanhos de sala:** 1x1, 2x1, 1x2 e 2x2 quadrantes são o comum. 2x2 é a área pequena do ALttP; 1x1 e 2x1 são as telas de passagem, como as do Minish Cap e do Link's Awakening. Uma sala 4x4 (a área grande do ALttP) pode aparecer de vez em quando, também nas dungeons internas (decisão 1), então o gerador da F12b prevê salas maiores que 2x2. Uma fase externa teria o mesmo número de salas que uma dungeon (10 a 13), com mais 2x2.
 * **Conteúdo da sala:** desenhado por tiles (blocos de 16x16 de um tileset da região), não pelas paredes geradas das dungeons. A colisão sai do atributo de cada tile (sólido, água, borda de mão única, escada, mato), como no ALttP; o jogo cria os `oWall` a partir dele ao montar a sala. Por cima, objetos que o DoI já tem: arbusto (`oBush`), pedra (`oRock`), placa (`oSign`), baús, área de inimigos.
 * **Composição:** o ajudante de salas (como o `make_rooms.py` da F11) ganha um modo externo, com os motivos medidos no ALttP pelo `owdump.py` (a regra da F11b: disposição só a partir de salas reais). Motivos de partida, da ficha: massa de floresta em grade de 32 px, platô com penhasco, escada e borda de mão única, grupos de arbustos espelhados ao lado de portas e caminhos, cerca em linha, caminho de 32 a 64 px ligando as passagens, rio com ponte.
 * **Salas especiais** (loja, fada, tesouro, sala secreta): ao ar livre viram interiores. A sala especial é uma caverna ou casa com entrada na sala externa; entrando, a sala interna é uma sala de dungeon comum (os templates especiais de hoje servem). A sala secreta com bomba vira a caverna atrás de uma parede rachada no penhasco, e a escada sob pedra também pode esconder uma.
-* **Inimigos:** densidade de referência do ALttP, cerca de 0,75 inimigo por quadrante de 256 px (menos que uma sala de dungeon); os pesos continuam nas `Enemies` da ficha. Se eles voltam ao reentrar na sala é uma escolha **(decidir)**.
+* **Inimigos:** densidade de referência do ALttP, cerca de 0,75 inimigo por quadrante de 256 px (menos que uma sala de dungeon); os pesos continuam nas `Enemies` da ficha. Mortos continuam mortos ao voltar à sala, como nas dungeons (decisão 2).
 * **Clima:** o `oWeather` previsto no piloto (chuva e relâmpagos) e uma neblina como a da Lost Woods, por fase.
 
 ## Passagem pela borda
@@ -30,7 +30,7 @@ O estudo confirma que cabe:
 * **Troca de sala:** a mesma rolagem de câmera das dungeons, disparada quando o Link sai pela passagem; não há moldura de porta.
 * **Borda de mão única:** objeto novo de pulo (o Link pula a borda e cai no chão livre depois dela). Dá atalhos de volta e laços de um sentido só. Regra para o gerador: o caminho da chegada até a saída principal nunca depende de subir uma borda de mão única, e nenhuma sala pode virar beco sem volta.
 * **Penhascos e escadas:** uma camada só (como no ALttP): penhasco é sólido, escada é chão, a altura é só desenho. O andar de baixo das dungeons (`Main_Lower`) não é usado ao ar livre.
-* **Obstáculos que pedem item** (pedra para a luva, parede de bomba, alvo do gancho, água funda) só fecham o que é opcional: tesouro, atalho, a saída extra. A regra das saídas do DoI ("a principal nunca fica escondida") vale para qualquer obstáculo. O DoI tem luva, gancho e bombas; botas, nadadeiras, martelo e pá não existem no jogo e ficam de fora até virarem itens.
+* **Obstáculos que pedem item** (pedra para a luva, parede de bomba, alvo do gancho, água funda) só fecham o que é opcional: tesouro, atalho, a saída extra. A regra das saídas do DoI ("a principal nunca fica escondida") vale para qualquer obstáculo. O DoI tem luva, gancho e bombas; botas, nadadeiras, martelo e pá não existem no jogo e ficam de fora da primeira versão (decisão 5), mas itens novos vêm logo, por dados (etapa de ferramenta nas Ideias do roadmap).
 
 ## Visuais de transição
 
@@ -39,10 +39,10 @@ O ALttP usa um círculo que fecha sobre o Link (a íris) ao entrar num lugar fec
 * **Da dungeon para fora:** a saída que leva a uma fase externa é uma porta para o lado de fora (a porta grande do castelo, com luz entrando) ou uma parede explodida (o exemplo da decisão da F4b). Na fase externa, o Link chega saindo de uma boca de caverna ou de uma porta na face do penhasco da sala de chegada.
 * **De fora para a dungeon:** a saída é um marco na sala de saída: boca de caverna, portão de dungeon, a boca da Deku Tree. O Link anda até ela e entra.
 * **De fora para fora** (floresta para campina): a saída é uma passagem na borda do mapa que leva para fora da grade, uma "estrada", e a chegada é o Link entrando pela borda da sala de chegada.
-* **O efeito de tela** entre fases é escolha **(decidir)**: o escurecer de hoje do DoI em todas, ou a íris do ALttP nas que entram ou saem de um lugar fechado. A Lost Woods tem ainda o mosaico, que pode ser o efeito de chegada de uma floresta.
+* **O efeito de tela** entre fases é o escurecer de hoje do DoI em todas, por enquanto (decisão 3); a íris do ALttP nas que entram ou saem de um lugar fechado fica como melhoria futura. A Lost Woods tem ainda o mosaico, que pode ser o efeito de chegada de uma floresta.
 * **O que falta no visual de saída de hoje:** ele sempre desenha um vão numa parede de cima ou de baixo e o Link anda pelos degraus. Para os visuais acima, o visual ganha o lugar onde fica (na parede, num marco dentro da sala, na borda) e as animações de entrar e de sair andando, sem degraus.
 
-## O que a F6b precisa prever no tileset por região
+## O que a F6b precisa prever no tileset por região (feito na F6b)
 
 Números da ficha: uma região externa do ALttP (várias áreas) usa de 150 a 490 blocos de 16x16 e de 190 a 430 tiles de 8x8 já coloridos; uma área sozinha, de 84 a 386 blocos.
 
@@ -52,6 +52,13 @@ Números da ficha: uma região externa do ALttP (várias áreas) usa de 150 a 49
 * **Tiles animados** (água, flores) listados à parte, com os quadros.
 * **Sons ambientes em loop** (chuva, vento), além do trovão que a F6b já prevê.
 * **Ferramenta de extração:** cortar os blocos de áreas escolhidas do ALttP num tileset mais a tabela de atributos (`owdump.py` já tem a leitura e a renderização). É ela que permite recombinar peças da ROM em vez de desenhar.
+
+O que a F6b entregou (out/2026; detalhes em `docs/dev/engine-notes.md`, "Tile bands and region tilesets"):
+
+* `owdump.py tiles <áreas> --region <regiao>` corta os blocos em `incoming/<regiao>/tiles/` (tiles de 8x8 já coloridos, uma vez só cada com os giros reaproveitados, blocos de 16x16, classe de cada tile tirada do atributo da ROM, índices estáveis quando se acrescentam áreas). O exterior do castelo (área 0x1B) já está cortado: `ts_CastleTop`, 271 tiles e 386 blocos.
+* O importador faz disso o tileset `ts_<Regiao>` e `data/tiles/<Regiao>.json`; a ficha nomeia com `RegionTiles`; o jogo pinta por bloco (`RegionTiles_PaintBlock`, camadas próprias acima do piso) e lê a classe de volta (`RegionTiles_ClassAt`), a base da colisão. Formato aberto para gráficos de outros jogos (classes escritas à mão) e para tiles animados (`animated`, vazio no ALttP por enquanto).
+* Faixa de tema por região no `sTiles` (`TilesBand`), para regiões em forma de dungeon como o topo do castelo, e efeitos sonoros (`sounds/`, `tools/alttp/sfx.py`) para os sons ambientes em loop e o trovão.
+* Fica para a F12b: as salas pintadas tile a tile pelos templates (com as transformações e as meias salas), a colisão criada a partir das classes e a água animada do ALttP.
 
 ## Grafo de ramificações: o que já existe e o que falta
 
@@ -74,13 +81,16 @@ O grafo pedido: o castelo (capítulo 1) leva ao porão, ao topo ou a uma área e
 5. **Sala de descanso:** ela é montada com a ficha da fase anterior (`Dungeon_InitSaveLevel(global.Level.Index)`), então depois de uma fase externa sairia com o tema dela numa sala de dungeon. Falta uma sala de descanso externa (uma clareira ou uma casa) ou uma regra que diga de onde vem o visual dela. O defeito já anotado da sala de descanso logo depois do castelo (o `RunStart`) também precisa sair antes de o castelo ramificar para uma fase com `SaveBefore`.
 6. **Regra de capítulo como checagem:** nada garante hoje que as variantes de um capítulo concordem. Faltam no validador: todo destino da `NextPool` tem `Depth` igual ao da fase mais 1; as variantes do mesmo `Depth` concordam em `Boss` (capítulo de chefe tem chefe em todas as variantes) e em `SaveBefore`.
 7. **Mapa e bússola:** o mapa desenha portas entre salas; passagens pela borda e marcos de saída precisam de ícones próprios (junta com a ideia do `MapIcon` por visual de saída).
-8. **Regras de dungeon espalhadas** que precisam respeitar o `Layout`: chaves e portas trancadas, sala do chefe com porta grande, kinstones, desafio do Wallmaster, cortinas, tochas, teto. Levantar a lista exata no começo da F12b (busca por `LevelDef.` e `Room.` nos scripts de desenho).
+8. **Ramo com fim próprio** (decisão 4): uma fase cujo chefe encerra a run, com a tela de vitória, as conquistas e o registro no Hall of Fame desse final. Hoje só a fase `FinalBoss` (Agahnim) termina a run, e a regra 6 (todo destino da `NextPool` no `Depth` seguinte) não pode exigir que todo ramo chegue ao último capítulo.
+9. **Regras de dungeon espalhadas** que precisam respeitar o `Layout`: chaves e portas trancadas, sala do chefe com porta grande, kinstones, desafio do Wallmaster, cortinas, tochas, teto. Levantar a lista exata no começo da F12b (busca por `LevelDef.` e `Room.` nos scripts de desenho).
 
-## Decisões que dependem do Guilherme
+## Decisões do Guilherme (out/2026)
 
-1. **Tamanho das salas externas:** 1x1 a 2x2 quadrantes, sem a área grande de 4x4 do ALttP (proposta), ou também 4x4?
-2. **Inimigos ao reentrar numa sala externa:** continuam mortos, como nas salas do DoI (proposta: evita farmar e voltar atrás numa run), ou voltam, como no ALttP?
-3. **Efeito de tela entre fases:** escurecer do DoI em todas (proposta para começar, sem efeito novo) ou a íris do ALttP ao entrar e sair de lugar fechado?
-4. **Capítulo 4 depois da Deku Tree:** a Deku Tree leva às Catacumbas, como a prisão, ou o ramo externo continua separado por mais capítulos?
-5. **Itens que o DoI não tem** (botas, nadadeiras, martelo, pá): ficam de fora das áreas externas (proposta) ou entram como itens novos junto com elas?
-6. **Primeira área externa:** qual é (a floresta que leva à Deku Tree, ou uma campina em volta do castelo, que reaproveita os gráficos do ALttP sem depender de outro jogo)? Isso decide se o tileset da primeira região sai da ROM do ALttP ou de outro Zelda. Nota: a Deku Tree é do Ocarina of Time (3D); nos Zeldas 2D os parentes são a Maku Tree (Oracles) e o Deepwood Shrine (Minish Cap), o que pesa na escolha da origem dos gráficos.
+Não há mais decisões abertas nesta proposta. Também estão em `docs/roadmap.md` (Decisões, "Áreas externas: decisões").
+
+1. **Tamanho das salas:** 1x1 a 2x2 quadrantes são o comum; salas 4x4 podem aparecer de vez em quando, inclusive nas dungeons internas. O gerador da F12b deve prever isso (salas maiores que 2x2 na grade, nos templates e nas portas).
+2. **Inimigos ao voltar a uma sala externa:** continuam mortos, como nas salas do DoI.
+3. **Efeito de tela entre fases:** o escurecer de sempre, por enquanto. A íris do ALttP fica como melhoria futura nas transições entre fora e dentro.
+4. **Ramos:** podem se reencontrar (ex.: o ramo externo volta às Catacumbas), mas também pode haver ramos que terminam a run em si mesmos, com final e chefe próprios, como os caminhos alternativos do Binding of Isaac. A estrutura de ramificações deve prever um ramo com fim próprio (anotado na F12b e nas Ideias do roadmap): hoje a vitória é a fase `FinalBoss` (Agahnim), então um ramo com fim próprio pede que a fase diga se o chefe dela encerra a run, com a tela de vitória, as conquistas e o Hall of Fame desse final.
+5. **Itens que o DoI não tem** (botas, nadadeiras, martelo, pá): ficam fora da primeira versão das áreas externas, mas itens novos vão entrar logo. Antes, uma etapa de ferramenta para itens por dados, como a F7 fez com os inimigos (Ideias do roadmap).
+6. **Primeira área externa:** a campina em volta do castelo, com gráficos do ALttP (a ROM, pelo `owdump.py tiles`). A Deku Tree e os outros jogos ficam para depois de o ALttP se esgotar (prioridade de conteúdo, `docs/design/direcao.md`).

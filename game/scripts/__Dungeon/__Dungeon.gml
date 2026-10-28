@@ -71,7 +71,8 @@ function Dungeon_Clear(){
 	for(var i = 0; i < array_length(global.TMID); i++){
 		tilemap_clear(global.TMID[i], 0);
 	}
-	
+	RegionTiles_Clear();
+
 	//destroy items from previous dungeon.
 	with(oEnemy) instance_destroy(id);
 	with(oItem) instance_destroy(id);

@@ -503,6 +503,32 @@ function Test_DoStep(_S){
 			}
 			return true;
 
+		case "paint":	// region tileset (roadmap F6b): "blocks" painted in turn over a "w" x "h" grid of 16x16 at "x", "y" of Link's room
+			var _Blocks = _S[$ "blocks"] ?? [0];
+			var _PR = global.Level.Rooms[global.CurrentRoomIndex];
+			var _PX = _PR.x + (_S[$ "x"] ?? 0);
+			var _PY = _PR.y + (_S[$ "y"] ?? 0);
+			var _PW = _S[$ "w"] ?? 1;
+			var _PH = _S[$ "h"] ?? 1;
+			var _Painted = 0;
+			for(var _j = 0; _j < _PH; _j++){
+				for(var _i = 0; _i < _PW; _i++){
+					var _Block = _Blocks[(_j * _PW + _i) mod array_length(_Blocks)];
+					if(RegionTiles_PaintBlock(_Block, _PX + (_i * 16), _PY + (_j * 16), UPPER, _S[$ "mirror"] ?? false, _S[$ "flip"] ?? false)) _Painted++;
+				}
+			}
+			var _Classes = "";
+			for(var _j = 0; _j < _PH * 2; _j++){
+				for(var _i = 0; _i < _PW * 2; _i++){
+					var _C = RegionTiles_ClassAt(_PX + (_i * 8) + 4, _PY + (_j * 8) + 4);
+					if(string_pos("," + _C + ",", "," + _Classes + ",") == 0) _Classes += (_Classes == "" ? "" : ",") + _C;
+				}
+			}
+			var _PTiles = RegionTiles_Get(LevelDef.RegionTiles);
+			Test_Log("paint tileset=" + (_PTiles == undefined ? "none" : _PTiles.tileset) + " blocks=" + string(_Painted) + " of " + string(_PW * _PH) + " classes=" + _Classes);
+			if(_Painted != _PW * _PH) Test_Fail("paint: " + string(_PW * _PH - _Painted) + " blocks not painted");
+			return true;
+
 		case "sheet":
 			Test_SheetStart(_S[$ "level"] ?? global.Level.Index, _S[$ "seeds"] ?? [global.Test.Seed]);
 			return true;

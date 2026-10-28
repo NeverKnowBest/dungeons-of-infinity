@@ -1,4 +1,5 @@
-# Helpers that write GameMaker 2024 asset files (sprites, sounds, objects) and register them in Zelda.yyp.
+# Helpers that write GameMaker 2024 asset files (sprites, sounds, objects) and register them in Zelda.yyp
+# (tilesets are written by tools/import/import_region.py and registered here too).
 import os as _os
 HERE = _os.path.dirname(_os.path.abspath(__file__)) + '/'
 REPO = _os.path.abspath(HERE + '../..')
@@ -22,13 +23,17 @@ def sprite(name, png_path, folder=('Sprites', 'folders/Sprites.yy'), frames=None
     d = os.path.join(GAME, 'sprites', name)
     layer = u()
     fids = [u() for _ in ims]
+    kids = [u() for _ in ims]
     old = os.path.join(d, name + '.yy')
     if os.path.exists(old):   # keep the frame/layer ids so the files overwrite the previous ones
         t = open(old).read()
         of = re.findall(r'"\$GMSpriteFrame":"v1","%Name":"([0-9a-f-]+)"', t)
         ol = re.findall(r'"\$GMImageLayer":"","%Name":"([0-9a-f-]+)"', t)
+        ok = re.findall(r'"Disabled":false,"id":"([0-9a-f-]+)","IsCreationKey"', t)
         if len(of) == len(fids) and ol:
             fids = of; layer = ol[0]
+            if len(ok) == len(kids):
+                kids = ok
     if os.path.isdir(d):
         shutil.rmtree(d)
     for fid, fim in zip(fids, ims):
@@ -41,7 +46,7 @@ def sprite(name, png_path, folder=('Sprites', 'folders/Sprites.yy'), frames=None
     kf = re.search(r'            \{"\$Keyframe<SpriteFrameKeyframe>".*\n', s).group(0)
     kfs = ''
     for i, f in enumerate(fids):
-        kfs += kf.replace('a476df4c-aa92-41d9-85ab-6c3ef8b85dc0', f).replace('13fd97b7-8b86-43a1-aa00-69501580382f', u()).replace('"Key":0.0,', '"Key":%d.0,' % i)
+        kfs += kf.replace('a476df4c-aa92-41d9-85ab-6c3ef8b85dc0', f).replace('13fd97b7-8b86-43a1-aa00-69501580382f', kids[i]).replace('"Key":0.0,', '"Key":%d.0,' % i)
     s = s.replace(kf, kfs)
     s = s.replace('"length":1.0,', '"length":%d.0,' % len(fids))
     if fps:
@@ -64,7 +69,8 @@ def sprite(name, png_path, folder=('Sprites', 'folders/Sprites.yy'), frames=None
     register('sprites', name)
 
 
-def sound(name, wav_path, duration, folder=('Music', 'folders/Sounds/Music.yy'), sample_rate=22050):
+def sound(name, wav_path, duration, folder=('Music', 'folders/Sounds/Music.yy'), sample_rate=22050,
+          group='audiogroup_Music', channels=1, volume=0.7):
     d = os.path.join(GAME, 'sounds', name)
     os.makedirs(d, exist_ok=True)
     shutil.copy(wav_path, os.path.join(d, name + '.wav'))
@@ -72,11 +78,11 @@ def sound(name, wav_path, duration, folder=('Music', 'folders/Sounds/Music.yy'),
   "$GMSound":"v2",
   "%%Name":"%(n)s",
   "audioGroupId":{
-    "name":"audiogroup_Music",
-    "path":"audiogroups/audiogroup_Music",
+    "name":"%(g)s",
+    "path":"audiogroups/%(g)s",
   },
   "bitDepth":1,
-  "channelFormat":0,
+  "channelFormat":%(ch)d,
   "compression":0,
   "compressionQuality":4,
   "conversionMode":0,
@@ -92,8 +98,9 @@ def sound(name, wav_path, duration, folder=('Music', 'folders/Sounds/Music.yy'),
   "resourceVersion":"2.0",
   "sampleRate":%(sr)d,
   "soundFile":"%(n)s.wav",
-  "volume":0.7,
-}''' % {'n': name, 'dur': duration, 'fn': folder[0], 'fp': folder[1], 'sr': sample_rate}
+  "volume":%(vol)s,
+}''' % {'n': name, 'dur': duration, 'fn': folder[0], 'fp': folder[1], 'sr': sample_rate, 'g': group,
+       'ch': channels - 1, 'vol': repr(float(volume))}
     open(os.path.join(d, name + '.yy'), 'w').write(yy)
     register('sounds', name)
 
@@ -229,7 +236,7 @@ def remove_folder(path):
 def folder_in_use(path):
     """True if a sprite, sound or object .yy still has the IDE folder 'A/B/C' as its parent."""
     fp = '"path":"folders/%s.yy"' % path
-    for kind in ('sprites', 'sounds', 'objects'):
+    for kind in ('sprites', 'sounds', 'objects', 'tilesets'):
         base = os.path.join(GAME, kind)
         for n in os.listdir(base):
             y = os.path.join(base, n, n + '.yy')

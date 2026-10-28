@@ -12,6 +12,7 @@ and the logic mirrors zelda3's `src/overworld.c`, `src/load_gfx.c` and
   python tools/alttp/owdump.py png 0x1b [0x2c ...]    # render areas (needs Pillow)
   python tools/alttp/owdump.py world [--world dark] [--scale 0.25]
   python tools/alttp/owdump.py vocab [--world light] [--top 64]   # most used map32 blocks, rendered
+  python tools/alttp/owdump.py tiles 0x1b --region topo-do-castelo  # cut the blocks into a region tileset (F6b)
 
 Options: --zelda3 <dir> (default: $ZELDA3_DIR, else the zelda3 folder next to the
 repository), --rom <file> (default: <zelda3>/zelda3.sfc), --out <dir> (default
@@ -276,6 +277,11 @@ for ch, _, s in CLASSES:
     for v in s: CHAR.setdefault(v, ch)
 def cls(a): return CHAR.get(a, '+')
 NAME = {ch: n for ch, n, _ in CLASSES}
+# short names of the classes, the ones a region tileset carries (tiles.json "classes", the game's collision source)
+KEY = {'.': 'floor', '#': 'solid', 'z': 'slope', '~': 'deep_water', ',': 'shallow_water', '"': 'tall_grass',
+       '^': 'ledge_n', 'v': 'ledge_s', '<': 'ledge_w', '>': 'ledge_e', '/': 'ledge_diag', 'b': 'bush', 'r': 'rock',
+       's': 'sign', 'R': 'big_rock', 'B': 'bonk', 'O': 'pit', 'H': 'stairs', 'E': 'entrance', 'd': 'dig', 'W': 'warp',
+       'x': 'spike', 'T': 'grave', 'P': 'plaque', 'c': 'chest', '+': 'other'}
 PASSABLE = set('."",bEHdW^v<>/')  # walkable or crossed by a jump
 
 # --- commands ---------------------------------------------------------------
@@ -581,9 +587,156 @@ def cmd_vocab(args):
     print('order (left to right, top to bottom): ' + ', '.join('%d x%d' % kv for kv in top))
 
 
+# --- region tileset (roadmap F6b) -------------------------------------------
+
+TILES_COLUMNS = 32      # tiles per row of tiles.png (256 px)
+FLIP_H, FLIP_V = 1, 2   # flags of a block's tile: drawn mirrored, flipped
+
+
+def tile_pixels(tile, p, hf, vf, pal, back, transparent):
+    """The 64 RGBA pixels of one map8 tile as drawn (flips applied)."""
+    out = []
+    for r in range(8):
+        for c in range(8):
+            ci = tile[7 - r if vf else r][7 - c if hf else c] if tile else 0
+            if ci:
+                out.append(pal[p * 16 + ci] + (255,))
+            else:
+                out.append((0, 0, 0, 0) if transparent else back + (255,))
+    return tuple(out)
+
+
+def flipped(px, hf, vf):
+    return tuple(px[(7 - r if vf else r) * 8 + (7 - c if hf else c)] for r in range(8) for c in range(8))
+
+
+def cut_tiles(areas, old, transparent):
+    """Cuts the map16 blocks of the areas into colored 8x8 tiles (kept once, flips reused) and blocks of four.
+
+    old: a previous tiles.json, whose tiles and blocks keep their indices (the new ones are added after them), so
+    the templates that paint with the tileset stay valid when areas are added. Returns (tiles, blocks), tiles as
+    [(pixels, attribute)], blocks as dicts."""
+    t8, at = map16_to_map8(), map8_attr()
+    tiles = [(tuple([(0, 0, 0, 0)] * 64), None)]         # tile 0 is empty: GameMaker draws nothing for it
+    index = {}
+    blocks, bindex = [], {}
+    if old:
+        tiles = [(tuple(tuple(p) for p in px), a) for px, a in old['_pixels']]
+        for i, (px, a) in enumerate(tiles):
+            index.setdefault((px, a), (i, 0))
+        for b_ in old['blocks']:
+            blocks.append(b_)
+            bindex[(b_['area'], b_['map16'])] = len(blocks) - 1
+
+    def tile_id(px, a):
+        for f in (0, FLIP_H, FLIP_V, FLIP_H | FLIP_V):
+            k = (flipped(px, f & FLIP_H, f & FLIP_V), a)
+            if k in index:
+                i, f0 = index[k]
+                return i, f ^ f0
+        tiles.append((px, a))
+        index[(px, a)] = (len(tiles) - 1, 0)
+        return len(tiles) - 1, 0
+
+    for a in areas:
+        vram = area_tiles(a)
+        pal, back = area_palette(a)
+        seen = []
+        for row in area_map16(a):
+            for v in row:
+                if v not in seen:
+                    seen.append(v)
+        for v in seen:
+            if (hx(a), v) in bindex:
+                continue
+            quad = []
+            for k in range(4):
+                m8 = t8[v * 4 + k]
+                tile = vram[m8 & 0x1ff] if (m8 & 0x3ff) < 512 else None
+                attr = at[m8 & 0x1ff]
+                if 0x10 <= attr < 0x1c: attr |= (m8 >> 14) & 1
+                px = tile_pixels(tile, (m8 >> 10) & 7, m8 >> 14 & 1, m8 >> 15 & 1, pal, back, transparent)
+                quad.append(list(tile_id(px, attr)))
+            blocks.append({'area': hx(a), 'map16': v, 'tiles': quad})
+            bindex[(hx(a), v)] = len(blocks) - 1
+    return tiles, blocks
+
+
+def cmd_tiles(args):
+    """incoming/<region>/tiles/tiles.png and tiles.json: the region tileset that import_region.py brings in."""
+    import json
+    Image = need_pil()
+    if not args.region:
+        sys.exit('tiles needs --region <folder under incoming/>')
+    d = os.path.join(REPO, 'incoming', args.region, 'tiles')
+    jp = os.path.join(d, 'tiles.json')
+    old = None
+    if os.path.exists(jp) and not args.fresh:
+        old = json.load(open(jp))
+        if old.get('source') != 'ALttP overworld':
+            sys.exit('%s was not made by owdump.py; --fresh to replace it' % jp)
+        im = Image.open(os.path.join(d, 'tiles.png')).convert('RGBA')
+        old['_pixels'] = []
+        for i, a in enumerate(old['attributes']):
+            x, y = (i % TILES_COLUMNS) * 8, (i // TILES_COLUMNS) * 8
+            raw = im.crop((x, y, x + 8, y + 8)).tobytes()
+            px = [tuple(raw[k:k + 4]) for k in range(0, 256, 4)]
+            old['_pixels'].append((px, None if i == 0 else int(a, 16)))
+    kept = [int(x, 0) for x in old['areas']] if old else []
+    areas = kept + [a for a in (int(x, 0) for x in args.areas) if a not in kept]
+    if not areas:
+        sys.exit('tiles needs the areas to cut (e.g. 0x1b 0x2c)')
+    transparent = args.transparent if old is None else old.get('transparent', False)
+    tiles, blocks = cut_tiles(areas, old, transparent)
+    rows = (len(tiles) + TILES_COLUMNS - 1) // TILES_COLUMNS
+    img = Image.new('RGBA', (TILES_COLUMNS * 8, rows * 8), (0, 0, 0, 0))
+    for i, (px, _) in enumerate(tiles):
+        t = Image.new('RGBA', (8, 8))
+        t.putdata(list(px))
+        img.paste(t, ((i % TILES_COLUMNS) * 8, (i // TILES_COLUMNS) * 8))
+    os.makedirs(d, exist_ok=True)
+    img.save(os.path.join(d, 'tiles.png'))
+    classes = {hx(a): KEY[cls(a)] for _, a in tiles[1:] if a is not None}
+    out = {'source': 'ALttP overworld', 'areas': ['0x%02X' % a for a in areas], 'tile': 8, 'columns': TILES_COLUMNS,
+           'transparent': transparent,
+           'attributes': ['--'] + [hx(a) for _, a in tiles[1:]],
+           'classes': {k: classes[k] for k in sorted(classes)},
+           'blocks': blocks, 'animated': old.get('animated', []) if old else []}
+    with open(jp, 'w', newline='\n') as f:
+        f.write(dump_tiles_json(out))
+    sheet = Image.new('RGBA', (16 * 20, ((len(blocks) + 15) // 16) * 20), (40, 40, 40, 255))
+    for i, b_ in enumerate(blocks):
+        for k, (ti, fl) in enumerate(b_['tiles']):
+            t = Image.new('RGBA', (8, 8))
+            t.putdata(list(flipped(tiles[ti][0], fl & FLIP_H, fl & FLIP_V)))
+            sheet.paste(t, ((i % 16) * 20 + 2 + (k % 2) * 8, (i // 16) * 20 + 2 + (k // 2) * 8))
+    os.makedirs(args.out, exist_ok=True)
+    sp = os.path.join(args.out, 'tiles_%s_blocks.png' % args.region)
+    sheet.save(sp)
+    print('%s: %d tiles of 8x8 (%d rows of %d), %d blocks of 16x16 from areas %s' % (
+        os.path.relpath(d, REPO).replace(os.sep, '/'), len(tiles) - 1, rows, TILES_COLUMNS, len(blocks),
+        ', '.join(out['areas'])))
+    print('blocks drawn in order: %s' % os.path.relpath(sp, REPO).replace(os.sep, '/'))
+
+
+def dump_tiles_json(out):
+    """One row of tiles.png and one block per line, so a diff shows what changed."""
+    import json
+    head = {k: v for k, v in out.items() if k not in ('attributes', 'blocks')}
+    s = json.dumps(head, indent=1)[:-2]
+    at = out['attributes']
+    s += ',\n "attributes": [\n' + ',\n'.join('  ' + json.dumps(at[i:i + TILES_COLUMNS])[1:-1]
+                                              for i in range(0, len(at), TILES_COLUMNS)) + '\n ]'
+    s += ',\n "blocks": [\n' + ',\n'.join('  ' + json.dumps(b_, separators=(',', ':')) for b_ in out['blocks'])
+    return s + '\n ]\n}\n'
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('cmd', choices=['areas', 'area', 'edges', 'stats', 'png', 'world', 'vocab'])
+    ap.add_argument('cmd', choices=['areas', 'area', 'edges', 'stats', 'png', 'world', 'vocab', 'tiles'])
+    ap.add_argument('--region', help='tiles: folder under incoming/ that gets tiles/tiles.png and tiles.json')
+    ap.add_argument('--fresh', action='store_true', help='tiles: start over instead of keeping the old indices')
+    ap.add_argument('--transparent', action='store_true', help='tiles: color 0 transparent instead of the backdrop')
     ap.add_argument('areas', nargs='*')
     ap.add_argument('--zelda3')
     ap.add_argument('--rom')

@@ -2,6 +2,7 @@
 #macro GAMEDIR_DATA_CONTROLLERS GAMEDIR_DATA + "controller_db\\"
 #macro GAMEFILE_DUNGEONTEMPLATES GAMEDIR_DATA + "data_d"
 #macro GAMEDIR_ROOMTEMPLATES GAMEDIR_DATA + "rooms\\"
+#macro GAMEDIR_TILES GAMEDIR_DATA + "tiles\\"
 
 #macro USERSFILE "Users"
 #macro XZIPFILE_USERS "UserData"

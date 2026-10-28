@@ -6,7 +6,8 @@ function INIT(){
 	randomize();
 	
 	Data_InitGlobals();
-	
+	TileBands_Init();	// imported tile bands and the region tileset cache (scripts/__Tiles)
+
 	Dungeon_LoadTemplates();
 	
 	RoomTemplates_Load();

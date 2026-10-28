@@ -120,7 +120,19 @@ O fluxo inteiro de uma região nova (spec, importação, ficha, salas, inimigos,
 5. `python tools/check/validate.py` e `python tools/test/run.py boot` (compila e confere que o GameMaker aceita os arquivos).
 6. Trocar um gráfico: substitua o arquivo em `incoming/` e importe de novo; o que saiu da pasta sai do projeto. Desfazer: `--remove`.
 7. Paleta de um inimigo (cores por fase): recolorações em `palettes/<Nome>/1.png, 2.png...`, cada uma o mesmo quadro de um sprite da família pintado com outras cores. O relatório diz quantas cores e variantes saíram; erro se uma cor virar duas. A variante da fase escolhe a coluna com `ColorIndex` (receita "Variante de inimigo por fase").
-8. Testar o importador sem gráficos novos: `python tools/import/make_example.py`, `python tools/import/import_region.py tools/import/out/example`, `python tools/test/run.py boot` e `--remove` no fim (o `git status` volta limpo).
+8. Testar o importador sem gráficos novos: `python tools/import/make_example.py`, `python tools/import/import_region.py tools/import/out/example`, `python tools/test/run.py boot` e `--remove` no fim. A faixa de exemplo passa pelo `sTiles`: depois do `--remove` os pixels voltam iguais, mas os PNGs são regravados; restaure com `git checkout -- game/sprites/sTiles game/tilesets/Tileset/output_tileset.png` para o `git status` voltar limpo.
+
+## Tiles e sons da ROM para uma região
+
+Para a região usar peças do ALttP sem esperar os gráficos do Guilherme (F6b). Precisa da ROM e do zelda3 ao lado do repositório; se faltarem no PC, peça ao Guilherme.
+
+1. Escolha as áreas do overworld: `python tools/alttp/owdump.py areas` e `png <área> --scale 0.5` (ficha `docs/ref/alttp-overworld.md`). O exterior do Castelo de Hyrule é a área 0x1B.
+2. `python tools/alttp/owdump.py tiles 0x1b [outras] --region <regiao>` grava `incoming/<regiao>/tiles/tiles.png` e `tiles.json` (tiles de 8x8 já coloridos, uma vez só cada, com a classe tirada do atributo da ROM, e os blocos de 16x16 de cada área) e desenha os blocos em ordem em `tools/alttp/out/tiles_<regiao>_blocks.png`. Rodar de novo com mais áreas só acrescenta; `--fresh` recomeça (muda os números). `--transparent` deixa a cor 0 transparente em vez da cor de fundo da área.
+3. Efeito sonoro: ache no zelda3 onde o jogo toca o efeito (`sound_effect_1 = 54` em `OverworldOverlay_HandleRain` é o trovão; `sound_effect_ambient` vai na porta 1, `sound_effect_1` na 2, `sound_effect_2` na 3) e rode `python tools/alttp/sfx.py <porta> <número> incoming/<regiao>/sounds/<Nome>.wav`. A primeira vez compila o `musicdump.c` (`tools/alttp/build.py`; sem compilador, `python -m pip install --user ziglang`) e pede o `zelda3_assets.dat` (`python assets/restool.py --extract-from-rom` na pasta do zelda3, com PyYAML).
+4. `manifest.json` com `"name"` igual ao nome da fase (`CastleTop`), para os assets saírem `ts_CastleTop`, `Sound_Thunder`.
+5. `python tools/import/import_region.py <regiao>`: tileset `ts_<Regiao>` com a textura, `datafiles/data/tiles/<Regiao>.json`, `Sound_<Nome>`.
+6. Na ficha: `RegionTiles = "<Regiao>"`. Quem pinta são as salas externas (F12b) ou o código da região, com `RegionTiles_PaintBlock`; o passo `paint` dos cenários pinta blocos numa sala para ver (cenário `region_tiles`).
+7. Paredes e piso de dungeon com peças da ROM: exporte a faixa do tema mais próximo (`import_region.py --export-band Castle`), recombine por cima as peças de `tiles.png` sem mudar a arrumação, ponha como `incoming/<regiao>/tileset.png` com `"tileset": {"base": "Castle"}` e importe; na ficha, `TilesBand = "<Regiao>"` com `Theme` do tema base. É visual: prévia ao Guilherme antes.
 
 ## Estágio alternativo (variante de capítulo, ex.: topo do castelo no capítulo 2)
 

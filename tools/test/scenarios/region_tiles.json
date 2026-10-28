@@ -1,0 +1,22 @@
+{
+ "comment": "Region tileset (roadmap F6b): only in this test, Hyrule Castle takes the CastleTop region tileset (RegionTiles: ts_CastleTop, cut from the ALttP overworld by tools/alttp/owdump.py tiles and imported from incoming/topo-do-castelo/tiles). The paint step lays 12x10 blocks in the start room, the front of the castle as in area 0x1B (map16 x 26-37, y 8-17), and reads the classes back: the log line must say blocks=120 of 120 classes=floor,solid,grave,dig. The second paint is its top left block mirrored. The castle itself is built as always.",
+ "name": "region_tiles",
+ "seed": 1,
+ "level": "Castle",
+ "levels": {
+  "Castle": {"RegionTiles": "CastleTop"}
+ },
+ "cheats": ["Cheat_Inf_Health"],
+ "max_frames": 20000,
+ "steps": [
+  {"do": "wait", "frames": 60},
+  {"do": "state"},
+  {"do": "paint", "x": 32, "y": 40, "w": 12, "h": 10, "blocks": [85, 85, 85, 85, 85, 144, 145, 85, 85, 85, 85, 85, 85, 85, 85, 85, 156, 157, 158, 159, 85, 85, 85, 85, 85, 85, 85, 85, 85, 168, 169, 85, 85, 85, 85, 85, 85, 85, 138, 139, 139, 139, 142, 142, 142, 143, 85, 85, 85, 85, 96, 6, 6, 7, 7, 6, 6, 83, 85, 85, 142, 142, 147, 6, 7, 7, 7, 7, 6, 135, 142, 142, 90, 91, 92, 22, 189, 23, 23, 190, 191, 90, 91, 92, 109, 110, 111, 38, 39, 40, 41, 42, 38, 109, 110, 111, 121, 122, 123, 62, 63, 64, 65, 66, 67, 121, 122, 123, 210, 130, 212, 213, 214, 85, 85, 215, 216, 217, 130, 211]},
+  {"do": "wait", "frames": 2},
+  {"do": "shot", "name": "painted"},
+  {"do": "paint", "x": 32, "y": 40, "w": 1, "h": 1, "blocks": [144], "mirror": true},
+  {"do": "wait", "frames": 2},
+  {"do": "shot", "name": "mirrored"},
+  {"do": "end"}
+ ]
+}

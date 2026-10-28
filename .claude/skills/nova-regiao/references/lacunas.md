@@ -18,20 +18,6 @@ Ao reportar uma lacuna ao Guilherme: diga o que a região pede, por que o fluxo 
 * **Resolveria:** uma fonte nova de motivos para o `motifs.py`: as salas do ALttP pelo `tools/alttp/roomdump.c` (precisa da ROM e do zelda3, nos dois PCs fora do repositório; se faltarem, peça ao Guilherme) ou de outro Zelda top down, medidas com as mesmas âncoras. Ou uma âncora nova (ex.: `door`, ao lado de uma porta) medida nas salas que já existem. Prova como na F11b: o catálogo cobre as salas de origem e a checagem recusa o que continua solto.
 * **Alternativa:** um motivo parecido do catálogo (outra âncora ou recuo), ou a sala sem essa peça. O Guilherme decide.
 
-## `tileset`: tiles próprios da região
-
-* **Reconhecer:** `incoming/<regiao>/tileset.png`, ou a spec pede paredes, piso ou decoração de tile que nenhum tema tem (o `Theme` de outra fase não serve).
-* **Por que falta:** o `sTiles` está cheio (100 linhas) e o `LevelTilesY` deriva do índice do tema; o importador grava a faixa como `sTiles_<Regiao>`, mas nada liga essa faixa ao tileset do jogo (roadmap, Ideias, "Tileset de região").
-* **Resolveria:** a etapa F6b: aumentar a imagem do `sTiles`, acertar o `tile_count` do `tilesets/Tileset`, mapear o tema novo para a faixa nova e fazer o importador escrever nela. Os 14 de referência devem sair iguais.
-* **Alternativa:** usar o tema de uma fase existente (como o Castelo) e pôr o que for único em sprites de decoração (objetos), que o importador já faz.
-
-## `sfx`: efeito sonoro novo
-
-* **Reconhecer:** a spec cita `Sound_X` (novo).
-* **Por que falta:** o importador só lê `music/*.wav` (vira `Music_X` e entra no `SongIndex`); não há `sounds/`. Em `tools/alttp/` o `musicdump.c` renderiza músicas, não os efeitos dos bancos de som.
-* **Resolveria:** a etapa F6b: `sounds/*.wav` no importador (vira `Sound_X`, sem `SongIndex`) e, para tirar da ROM, um modo de efeito no `musicdump.c` (precisa da ROM).
-* **Alternativa:** o Guilherme entrega o `.wav` gravado de outra forma, e o som entra com `gm_assets.sound(...)` à mão; ou a região fica sem o som na primeira versão.
-
 ## `arquetipo`: movimento de inimigo que a F7 não tem
 
 * **Reconhecer:** inimigo novo (novo) que atira, pula, voa em onda ou se esconde no chão.
@@ -43,20 +29,13 @@ Ao reportar uma lacuna ao Guilherme: diga o que a região pede, por que o fluxo 
 
 * **Reconhecer:** Tipo "área externa" (jardim, campina, floresta), passagem de tela pela borda em vez de portas.
 * **Por que falta:** o gerador só monta dungeons (grade de salas com portas). A Rebel Village e as minas são layouts fixos de centro de NPC, não o modelo (decisão "Áreas externas" no roadmap).
-* **Resolveria:** a F12b (áreas externas, roadmap), proposta em `docs/design/areas-externas.md`, com a ficha do overworld em `docs/ref/alttp-overworld.md`.
+* **Resolveria:** a F12b (áreas externas, roadmap), proposta em `docs/design/areas-externas.md`, com a ficha do overworld em `docs/ref/alttp-overworld.md`. Desde a F6b já existem o tileset da região com a classe de cada tile (`owdump.py tiles`, `RegionTiles` na ficha, `RegionTiles_PaintBlock` e `RegionTiles_ClassAt` em `__Tiles`); faltam as salas pintadas tile a tile pelos templates (com as transformações) e a colisão criada a partir das classes.
 
 ## `f8`: sala que depende da conversão do ALttP
 
 * **Reconhecer:** a spec diz que as salas saem de salas do ALttP convertidas (não só "referência para a F8").
 * **Por que falta:** a F8 (dump do `roomdump.c` para template do Tiled) vem depois do piloto.
 * **Resolveria:** a F8.
-
-## `rom-externo`: gráficos do mundo externo do ALttP
-
-* **Reconhecer:** a spec quer peças do overworld do ALttP (exterior do castelo, telhados, campina) como tiles. O `status.py` não detecta; leia a seção Visual.
-* **Por que falta (em parte):** desde a F12a, `tools/alttp/owdump.py` lê e desenha o overworld (`png <área>`, `world`, `vocab`) e dá os atributos de cada tile, então a prévia e a escolha das peças já saem da ROM. Falta cortar os blocos escolhidos num tileset da região com a tabela de atributos, e o jogo ainda não tem tileset por região (F6b).
-* **Resolveria:** a extração de blocos no `owdump.py` mais o tileset por região da F6b. Ou o Guilherme recorta as peças (pode partir das imagens do `owdump.py`) e entrega em `incoming/`.
-* **Alternativa:** peças de salas de dungeon (ex.: a entrada da Torre de Agahnim, que é sala de dungeon e o `roomdump.c` já tira).
 
 ## Entregas do Guilherme (`WAIT`, não é lacuna de ferramenta)
 
@@ -68,7 +47,8 @@ Ao reportar uma lacuna ao Guilherme: diga o que a região pede, por que o fluxo 
 * Salas próprias `Main_Upper` e `Main_Lower` (formas, portas, seções, água, espinhos): conjunto de salas da região pelo `make_rooms.py` e `RoomSet` na ficha (F11, skill passo 4).
 * Inimigos que já existem, com os números do nível do `EnemyStats` ou, nos soldados e nos arquétipos, com variante na ficha (`EnemyVariants`).
 * `ExitLook` novo: entra em `ExitLooks_Init` sem mexer no gerador (receita "Estágio alternativo", passo 3). Pede prévia, por ser visual.
-* Música nova em `incoming/<regiao>/music/`.
+* Música nova em `incoming/<regiao>/music/`; efeito sonoro novo em `incoming/<regiao>/sounds/` (da ROM pelo `tools/alttp/sfx.py`).
+* Tiles próprios: faixa de tema (`tileset.png`, `TilesBand` na ficha) ou tileset da região (`tiles/`, `owdump.py tiles` para peças do overworld do ALttP, `RegionTiles` na ficha). Peças de salas de dungeon do ALttP saem pelo `roomdump.c`.
 * Código próprio que a spec prevê em "Mudanças no código" (ex.: `oWeather` no topo do castelo). O clima não é campo da ficha; a região cria o controlador e a ficha pode ganhar um campo para ele.
 
 ## Armadilhas conhecidas do fluxo

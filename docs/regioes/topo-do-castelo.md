@@ -18,7 +18,7 @@ Em vez de entrar pelos corredores, o Link sobe pelos telhados e passarelas do ca
 ## Visual
 
 * Paredes viram ameias (muretas com vãos) e o piso vira pedra externa molhada; nas bordas, o telhado inclinado faz o papel das paredes laterais. Escadas de torre ligam as alturas.
-* Base: tiles do tema do castelo do DoI (linha de `LevelTilesY` do castelo) para portas e escadas, mais as peças da ROM em `incoming/topo-do-castelo/` para ameias, telhado e piso. Recombinar peças da ROM, nada desenhado do zero sem necessidade.
+* Base: tiles do tema do castelo do DoI (linha de `LevelTilesY` do castelo) para portas e escadas, mais as peças da ROM para ameias, telhado e piso. Desde a F6b as peças do exterior do castelo (área 0x1B do overworld) já estão cortadas em `incoming/topo-do-castelo/tiles/` (tileset `ts_CastleTop`, 271 tiles e 386 blocos, com a classe de cada tile); a faixa do tema (`tileset.png`, `TilesBand` na ficha) sai delas recombinadas sobre a do castelo, sem esperar gráficos do Guilherme. Recombinar peças da ROM, nada desenhado do zero sem necessidade.
 * A noite é a mesma da entrada (nível `Start`): tela azulada e escura, clareada pelos relâmpagos.
 * Decoração: estandartes molhados, tochas apagadas pela chuva, poças. Nada animado além da chuva, dos respingos e do relâmpago.
 * Prévia obrigatória antes de implementar: uma sala 1x1 e uma 2x1 montadas, com o Link na escala.
@@ -52,7 +52,7 @@ Iguais aos do castelo (baús, potes e o que mais o castelo sortear). Nenhuma con
 
 * Música do castelo (`SongIndex.Castle`, `Music_Castle_Intro` e `Music_Castle_Main`).
 * Chuva (`Sound_Rain`) tocando o nível inteiro, no mesmo volume da entrada (o `oIntro` e o castelo usam 0.3).
-* Trovão: som novo `Sound_Thunder` (novo), extraído da ROM. No ALttP é o efeito 0x36 do banco 1, tocado pelo `OverworldOverlay_HandleRain` (zelda3, `src/overworld.c`).
+* Trovão: `Sound_Thunder`, extraído da ROM na F6b (`incoming/topo-do-castelo/sounds/Thunder.wav`, 1.69 s, pelo `tools/alttp/sfx.py 2 0x36`). No ALttP é o efeito 0x36 (54) de `sound_effect_1`, a porta 2 do APU, tocado pelo `OverworldOverlay_HandleRain` (zelda3, `src/overworld.c`).
 
 ## Clima e efeitos
 

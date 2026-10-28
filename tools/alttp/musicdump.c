@@ -1,4 +1,6 @@
-// Renders an ALttP song to raw 16-bit stereo PCM (44100 Hz) using zelda3's SPC emulation.
+// Renders an ALttP song, or a sound effect, to raw 16-bit stereo PCM (44100 Hz) using zelda3's SPC emulation.
+// Song:   musicdump <bank> <song> <seconds> <out.pcm>
+// Effect: musicdump sfx <port> <id> <seconds> <out.pcm>   (port 1 = ambient APUI01, 2 = sound_effect_1 APUI02, 3 = sound_effect_2 APUI03)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,7 +36,11 @@ static void LoadAssets() {
 }
 void zelda_apu_write(uint32_t adr, uint8_t val);
 int main(int argc, char **argv) {
+  int sfx = argc > 5 && strcmp(argv[1], "sfx") == 0;
+  if (sfx) argv++;
   int bank = atoi(argv[1]), song = atoi(argv[2]), seconds = atoi(argv[3]);
+  int port = sfx ? bank : 0;  // effects live in the driver, so any song bank works
+  if (sfx) bank = 0;
   LoadAssets();
   ZeldaInitialize();
   LoadSongBank(kSoundBank_intro);
@@ -46,7 +52,12 @@ int main(int argc, char **argv) {
   int16 *buf = malloc(per * 4);
   int frames = seconds * 60;
   for (int i = 0; i < frames; i++) {
-    zelda_apu_write(APUI00, i < 4 ? song : 0);
+    if (sfx) {
+      // Written to its port for one frame, as the NMI does (src/nmi.c); an ambient loop (rain is 1) then plays until the end
+      zelda_apu_write(APUI00 + port, i == 4 ? song : 0);
+    } else {
+      zelda_apu_write(APUI00, i < 4 ? song : 0);
+    }
     ZeldaPushApuState();
     ZeldaRenderAudio(buf, per, 2);
     fwrite(buf, 4, per, f);

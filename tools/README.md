@@ -80,6 +80,7 @@ python tools/check/validate.py --strict   # warnings also fail
 | Arrows or em dashes in the Portuguese docs (including `docs/ref/` and `docs/regioes/`) | warning |
 | Region spec (`docs/regioes/*.md`) has every `##` section and every header field (`* **Capítulo:**`...) of `_modelo.md` and a valid `**Estado:**` | error |
 | Every `ExitLook` the level sheet names is a look of `ExitLooks_Init` (`__Doors.gml`) | error |
+| Tilesets (roadmap F6b): `tile_count` fits the sprite and `output_tileset.png` (the texture the game draws from) exists with the size that count needs; every `TilesBand` of the level sheet is in `TileBands_Init` and every `RegionTiles` has its `data/tiles/<Name>.json`, included in `Zelda.yyp`, with a tileset `ts_<Name>` and a class for each tile its blocks use | error |
 | Archetype enemies (`scripts/__EnemyArch`): every child of `oEnemy_Archetype` has an `EnemyArch` entry and every entry names such a child; the sprites the entries name exist (with or without `_Left/_Right/_Up/_Down`) | error |
 | Archetype enemy with events of its own | warning |
 | `object_get_parent(...) == oEnemy` in GML (misses the archetype enemies; use `object_is_ancestor`) | warning |
@@ -167,6 +168,7 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `log` | `text` | Writes a note in the log |
 | `expect` | `alive`, `level`, `room` (`[x, y]`), `enemies`, `kills_min`, `exit_level`, `set_rooms_min` | Checks; a mismatch is a `FAIL` line. `"exit_level": true`: the current level is the one the last `exit` step's door leads to (not the rest stop). `set_rooms_min`: at least that many rooms of the level come from its room set (roadmap F11) |
 | `exit` | `which` (`main` or `extra`), `frames` (default 60) | Puts Link 40 px in front of the level's main or extra exit (roadmap F4b) and walks into it for `frames`. Fails if there is no such exit |
+| `paint` | `x`, `y` (px in Link's room), `w`, `h` (in 16x16 blocks), `blocks` (list, used in turn), `mirror`, `flip` | Paints blocks of the level's region tileset (`RegionTiles` in the sheet, roadmap F6b) and logs `paint tileset=ts_X blocks=<painted> of <asked> classes=<classes read back>`; a block not painted is a failure |
 | `sheet` | `level`, `seeds` | Contact sheet (what `--sheet` runs): `sheet_<level>_<seed>.png` per seed and `sheet_<level>.png` with all of them at half size |
 | `end` | | Ends the test (it also ends after the last step) |
 
@@ -239,7 +241,7 @@ Walls (24 px thick, corner and inner corner pieces), OutOfBounds, the Main_Lower
 Graphics and music of a region, from `incoming/<region>/` into the project (roadmap F6). The folder convention (file names, frames, sheets, GIFs, tileset band, music, `manifest.json`) is in `incoming/README.md`.
 
 ```
-python tools/import/import_region.py <region>              # convert, write the sprites and sounds, register them, preview
+python tools/import/import_region.py <region>              # convert, write the sprites, sounds and tiles, register them, preview
 python tools/import/import_region.py <region> --dry-run    # only convert and build the preview; game/ is untouched
 python tools/import/import_region.py <region> --remove     # take out everything the last import of the region made
 python tools/import/import_region.py --export-band Castle tileset.png   # a theme band of sTiles (1248x48), to paint over
@@ -248,7 +250,7 @@ python tools/import/make_example.py [folder]               # example region from
 
 | File | What it does |
 |------|--------------|
-| `import_region.py` | Reads `sprites/` (one file per sprite, numbered frames `_0 _1`, a sheet cut by `"frame"`, or an animated GIF), `palettes/<Name>/<n>.png`, `tileset.png` and `music/*.wav`. Applies the palette rules of `docs/design/direcao.md`: 32 levels per channel (`round(round(c*31/255)*255/31)`, like the ROM extractions), hard alpha, at most 7 colors (the two closest colors merge until it fits; the outline color is kept) and an outline check (`add` or `darken` fix it). Writes the sprites with `hub/gm_assets.py` into the IDE folder `Regions/<Region>/Sprites` (sounds in `.../Music`), adds `SongIndex.<Song>` and its line in `Music_InitData` (`__Music.gml`, marked `// incoming/<region>`), and records what it made and the source hashes in `incoming/<region>/imported.json`. Re-importing gives the same files, removes what is no longer in the folder, and never overwrites an asset that is not from that region. Palettes (roadmap F7): recolor `n` of a sprite of the family `s<Name>_*` becomes column `n` of `s<Name>_Pal`, the palette sprite of the palette shader (column 0 holds every color of the family, matched pixel by pixel against the converted base frame; a color that would become two colors is an error). A region given as a path (not under `incoming/`) works the same; its record goes into that folder |
+| `import_region.py` | Reads `sprites/` (one file per sprite, numbered frames `_0 _1`, a sheet cut by `"frame"`, or an animated GIF), `palettes/<Name>/<n>.png`, `tileset.png`, `tiles/`, `music/*.wav` and `sounds/*.wav`. Roadmap F6b: `tileset.png` (a theme band) is pasted into `sTiles` below row 99 (rows 100, 106...; `sTiles` grows, `tile_count` follows) and named by a line in `TileBands_Init` (`__Tiles.gml`, marked `// incoming/<region>`), for `TilesBand` in the level sheet; `tiles/` becomes the tileset `ts_<Region>` over `sTileset_<Region>` (folder `Regions/<Region>/Tiles`) and `datafiles/data/tiles/<Region>.json` (included file: the class of each tile, the blocks, the animations), for `RegionTiles`; `sounds/<Name>.wav` becomes `Sound_<Name>` in `audiogroup_SFX` (folder `.../Sounds`, `volume` in the manifest). Every tileset it changes gets its texture `output_tileset.png` rewritten (the game draws from it; see `docs/dev/engine-notes.md`, "Tile bands and region tilesets"). Applies the palette rules of `docs/design/direcao.md`: 32 levels per channel (`round(round(c*31/255)*255/31)`, like the ROM extractions), hard alpha, at most 7 colors (the two closest colors merge until it fits; the outline color is kept) and an outline check (`add` or `darken` fix it). Writes the sprites with `hub/gm_assets.py` into the IDE folder `Regions/<Region>/Sprites` (sounds in `.../Music`), adds `SongIndex.<Song>` and its line in `Music_InitData` (`__Music.gml`, marked `// incoming/<region>`), and records what it made and the source hashes in `incoming/<region>/imported.json`. Re-importing gives the same files, removes what is no longer in the folder, and never overwrites an asset that is not from that region. Palettes (roadmap F7): recolor `n` of a sprite of the family `s<Name>_*` becomes column `n` of `s<Name>_Pal`, the palette sprite of the palette shader (column 0 holds every color of the family, matched pixel by pixel against the converted base frame; a color that would become two colors is an error). A region given as a path (not under `incoming/`) works the same; its record goes into that folder |
 | `make_example.py` | Builds a region that uses every input of the convention from assets the project already has (rat with two recolors for a palette, ropa, bari, a piece of the Sanctuary, the Castle band tinted blue, 6 s of the Sanctuary song). For testing the importer: import it, check, then `--remove` it |
 
 Output: `tools/import/out/<region>/` (ignored by git) with `frames/` (the converted PNGs), `preview.png` (each sprite before and after next to Link at the same scale, the tileset under its base band), `report.txt` and the cut `.wav` files. The validator reads `incoming/*/imported.json`: an imported asset missing from `Zelda.yyp` is an error, sources changed since the import a warning, a region never imported a note.
@@ -283,7 +285,7 @@ Small harnesses compiled against [zelda3](https://github.com/snesrev/zelda3) (th
 |------|-------|
 | `roomdump.c` | A dungeon room: VRAM, palettes, BG1/BG2 tilemaps and tile attributes (render it with `hub/z3room.py`). `ANIMFRAME=n` copies animated tile frame n first |
 | `sprdump.c` | OBJ VRAM and palettes of an overworld area, plus sprite OAM flags (for extracting NPC sprites) |
-| `musicdump.c` | A song rendered to PCM through the SPC emulator (`TRACE=1` prints the song pointer) |
+| `musicdump.c` | A song rendered to PCM through the SPC emulator (`TRACE=1` prints the song pointer); `musicdump sfx <port> <number> <seconds> <out.pcm>` renders a sound effect instead (roadmap F6b) |
 | `entm.c` | The entrance to music table |
 
 `owdump.py` (roadmap F12a) is Python, not C: it reads the overworld straight from the ROM, so it needs no compiler. It imports zelda3's own `assets/util.py` (ROM loading, decompression) and `assets/tables.py` (area, sprite, music and secret names), uses the ROM addresses of zelda3's `assets/extract_resources.py` and `compile_resources.py`, and parses three small tables from `src/load_gfx.c` (`kMainTilesets`, `kAuxTilesets`, `kOwBgPalInfo`). It looks for zelda3 in `$ZELDA3_DIR` or in the `zelda3` folder next to the repository (`--zelda3` to change), and for the ROM at `<zelda3>/zelda3.sfc` (`--rom`). Rendering needs Pillow; the rest uses only the standard library.
@@ -296,8 +298,23 @@ python tools/alttp/owdump.py stats                    # composition per area: di
 python tools/alttp/owdump.py png 0x2c 0x1b --scale 0.5
 python tools/alttp/owdump.py world --scale 0.25       # the whole light world (--world dark)
 python tools/alttp/owdump.py vocab --top 64           # the most used map32 blocks, drawn
+python tools/alttp/owdump.py tiles 0x1b --region topo-do-castelo   # the area's blocks as a region tileset (F6b)
 ```
+
+`tiles` (roadmap F6b) cuts the map16 blocks of the areas into `incoming/<region>/tiles/tiles.png` (8x8 tiles already colored, 32 per row, tile 0 empty; a tile is kept once, its mirrored and flipped copies point to it) and `tiles.json` (`attributes`: the ROM attribute of each tile, `classes`: attribute to class, the short names `floor`, `solid`, `slope`, `deep_water`, `ledge_s`... of the attribute table above; `blocks`: one per distinct map16 of each area, `{"area", "map16", "tiles": [[tile, flags] x 4]}`, flags 1 mirrored, 2 flipped; `animated`: empty for now). Run again with more areas and the old tiles and blocks keep their numbers (the new ones come after), so whatever paints with them stays right; `--fresh` starts over, `--transparent` makes color 0 transparent instead of the area's backdrop. The blocks are drawn in order in `out/tiles_<region>_blocks.png`. `import_region.py` makes the folder a tileset.
+
+`build.py` compiles a harness with whatever C compiler there is (gcc, clang, or the clang inside the `ziglang` Python package: `python -m pip install --user ziglang`, no installer), into `tools/alttp/out/<name>.exe`; it rebuilds only when a source is newer. It leaves out zelda3's `src/main.c`, `config.c`, `opengl.c` and `glsl_shader.c` (SDL, OpenGL, config reader) and `stub/` stands in for what they and opus give. The harnesses read `zelda3_assets.dat` in the zelda3 folder: make it once with zelda3's `python assets/restool.py --extract-from-rom` (needs PyYAML).
+
+`sfx.py` (roadmap F6b) takes a sound effect out of the ROM as a `.wav`: it builds `musicdump`, renders the effect, cuts the silence and writes 16-bit mono 22050 Hz (like the game's effects; `--rate`, `--stereo`). An ambient loop (port 1) is cut at `--seconds`.
+
+```bash
+python tools/alttp/build.py musicdump                                          # tools/alttp/out/musicdump.exe
+python tools/alttp/sfx.py 2 0x36 incoming/topo-do-castelo/sounds/Thunder.wav   # the thunder of the rain (1.69 s)
+python tools/alttp/sfx.py 1 0x01 out.wav --seconds 4                           # the rain, an ambient loop
+```
+
+Ports: 1 the ambient sounds (`sound_effect_ambient` in zelda3's source), 2 `sound_effect_1`, 3 `sound_effect_2`; the number is the one the source writes (`OverworldOverlay_HandleRain`: `sound_effect_1 = 54`).
 
 Images go to `tools/alttp/out/` (ignored by git). How it reads an area, from zelda3: each 512x512 screen is 16x16 map32 indices, decompressed from two streams (high and low bytes, `0x82F94D` and `0x82FB2D`); a map32 is four map16 (`0x838000`, `0x83B400`, `0x848000`, `0x84B400`, 6 bytes per four map32); a map16 is four 8x8 tiles (`0x8F8000`, top left, top right, bottom left, bottom right); the tile attribute comes from the tile number (`0x8E9459`). Graphics: main tileset 0x20 (light world) or 0x21 (dark), with the area's aux tileset over slots 3 to 6; 3bpp packs expanded to 4bpp, the "high" slots adding 8 to every non zero pixel. Palette: `Overworld_LoadPalettes` with the area's palette index; `-1` in `kOwBgPalInfo` means "keep the previous one", rendered with the game's defaults. Not drawn: animated water, overlays (fog, clouds, rain), event changes (opened doors, the pyramid hole).
 
-Build them like zelda3's own `main.c`: compile the file together with zelda3's `src/*.c` and `snes/*.c` (minus `src/main.c`), with zelda3's include paths.
+Build them with `build.py` (above), which compiles the file together with zelda3's `src/*.c` and `snes/*.c` like zelda3's own `main.c`.

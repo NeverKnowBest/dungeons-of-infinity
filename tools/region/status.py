@@ -12,7 +12,7 @@ still has to deliver (a "WAIT" line, e.g. the graphics in incoming/).
 It only reads files (standard library, no GameMaker). Exit code 0 with a report (the report is the result),
 1 when the spec does not exist, 2 on bad arguments.
 """
-import os, re, sys, glob
+import os, re, sys, glob, json
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..', '..'))
@@ -196,10 +196,17 @@ def main(argv):
             r.ok('imported (imported.json); the validator says if the sources changed since')
         else:
             r.do('import: python tools/import/import_region.py %s --dry-run, then without --dry-run' % slug)
+        rec = {}
+        if os.path.exists(os.path.join(inc, 'imported.json')):
+            rec = json.load(open(os.path.join(inc, 'imported.json'), encoding='utf-8'))
         if os.path.exists(os.path.join(inc, 'tileset.png')):
-            r.gap('tileset', 'tileset.png: the importer makes sTiles_<Region>, but sTiles is full and no level can use another band yet (roadmap Ideias, "Tileset de região")')
+            band = rec.get('band') or '<Region>'
+            r.do('tileset.png is a band of sTiles (F6b): TilesBand = "%s" in the level sheet, Theme the band it is laid out like' % band)
+        if os.path.isdir(os.path.join(inc, 'tiles')):
+            ts = (rec.get('tilesets') or ['ts_<Region>'])[0]
+            r.ok('tiles/ is the region tileset %s (F6b): RegionTiles = "%s" in the level sheet paints with it (RegionTiles_PaintBlock); rooms painted tile by tile come with F12b' % (ts, ts[3:]))
         if any(f.lower().startswith('sounds') for f in files):
-            r.gap('sfx', 'sounds/: the importer only reads music/*.wav; sound effects are not imported (F6)')
+            r.ok('sounds/ become Sound_<Name> (F6b)')
 
     # 3. Level sheet and exits
     r.head('3. Level sheet and exits (__Levels.gml, F4 and F4b)')
@@ -298,7 +305,7 @@ def main(argv):
                 elif NEW in line and a.startswith('Music_'):
                     r.do('%s (novo): music/*.wav in incoming/%s, the importer adds it to SongIndex' % (a, slug))
                 elif NEW in line:
-                    r.gap('sfx', '%s (novo) is a sound effect: no tool extracts SFX from the ROM (tools/alttp has music only) and the importer only reads music/' % a)
+                    r.do('%s (novo): sounds/%s.wav in incoming/%s (from the ROM: python tools/alttp/sfx.py <port> <number> <wav>), then the importer' % (a, a[len('Sound_'):], slug))
             for o in re.findall(r'`(o[A-Z]\w*)`', line):
                 if o not in assets and NEW in line:
                     r.do('%s (novo): code of the region (planned in the spec, code changes)' % o)

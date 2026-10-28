@@ -8,8 +8,10 @@ Cada região tem uma pasta aqui, com o mesmo nome da especificação em `docs/re
 incoming/<regiao>/
   sprites/          imagens .png ou .gif (pode ter subpastas para organizar)
   palettes/         opcional: recolorações de um inimigo para as cores por fase (veja abaixo)
-  tileset.png       opcional: faixa de tiles da região (veja abaixo)
+  tileset.png       opcional: faixa de tiles da região, na arrumação de um tema (veja abaixo)
+  tiles/            opcional: tileset próprio da região, pintado tile a tile (veja abaixo)
   music/            opcional: músicas .wav
+  sounds/           opcional: efeitos sonoros .wav
   manifest.json     opcional: o que não dá para dizer pelo nome do arquivo
 ```
 
@@ -38,7 +40,32 @@ palettes/Enemy_Ropa/2.png    variante 2
 
 ## Tileset
 
-`tileset.png` tem exatamente 1248x48 pixels: uma faixa de tema do `sTiles` (156 x 6 tiles de 8x8), na mesma arrumação de um tema que já existe. Para começar, peça ao Claude a faixa de um tema como base (`--export-band Castle`) e pinte por cima, sem mudar nada de lugar. Diga no manifesto qual tema serviu de base (`"tileset": {"base": "Castle"}`). Por enquanto a faixa vira o sprite `sTiles_<Regiao>`; ligá-la ao tileset do jogo fica para a primeira região que tiver tiles próprios.
+`tileset.png` tem exatamente 1248x48 pixels: uma faixa de tema do `sTiles` (156 x 6 tiles de 8x8), na mesma arrumação de um tema que já existe. É o que as dungeons usam para paredes, piso, portas e decoração de tile. Para começar, peça ao Claude a faixa de um tema como base (`--export-band Castle`) e pinte por cima, sem mudar nada de lugar. Diga no manifesto qual tema serviu de base (`"tileset": {"base": "Castle"}`). A importação grava a faixa no próprio `sTiles`, abaixo das linhas originais (100 em diante, 6 linhas por região), e dá a ela o nome da região; a fase usa com `TilesBand` na ficha (e o `Theme` do tema base, cujas regras de decoração seguem valendo).
+
+## Tileset da região (`tiles/`)
+
+Para o que é pintado tile a tile (as áreas externas), não por colunas fixas: `tiles/tiles.png` (tiles de 8x8 lado a lado, o primeiro vazio) e `tiles/tiles.json`, que dá a **classe** de cada tile, a fonte da colisão: `floor`, `solid`, `slope`, `deep_water`, `shallow_water`, `tall_grass`, `ledge_n`, `ledge_s`, `ledge_w`, `ledge_e`, `ledge_diag`, `bush`, `rock`, `sign`, `big_rock`, `bonk`, `pit`, `stairs`, `entrance`, `dig`, `warp`, `spike`, `grave`, `plaque`, `chest` ou `other`.
+
+```json
+{
+ "columns": 16,
+ "class": ["", "floor", "floor", "solid", "deep_water"],
+ "blocks": [[[1, 0], [2, 0], [1, 1], [2, 1]]],
+ "animated": [{"name": "Water", "frames": [4, 5, 6, 5]}],
+ "animation_speed": 8
+}
+```
+
+* `class`: uma por tile de `tiles.png`, da esquerda para a direita e de cima para baixo (o tile 0 fica vazio).
+* `blocks`: os blocos de 16x16, a unidade de pintura (como o map16 do ALttP): quatro `[tile, giro]`, na ordem cima à esquerda, cima à direita, baixo à esquerda, baixo à direita; giro 0 normal, 1 espelhado, 2 de cabeça para baixo, 3 os dois.
+* `animated`: tiles animados, com os quadros (números de tile).
+* Peças do overworld do ALttP não precisam ser recortadas à mão: `python tools/alttp/owdump.py tiles <área> --region <regiao>` grava os dois arquivos com as classes tiradas da ROM, e rodar de novo com mais áreas só acrescenta (os números já usados não mudam).
+
+A importação cria o tileset `ts_<Regiao>` (e o sprite `sTileset_<Regiao>`) e o arquivo `datafiles/data/tiles/<Regiao>.json` que o jogo lê; a fase usa com `RegionTiles` na ficha.
+
+## Efeitos sonoros (`sounds/`)
+
+`sounds/<Nome>.wav` (8 ou 16 bits, mono ou estéreo) vira o som `Sound_<Nome>`, no grupo de efeitos (sem `SongIndex`). `<Nome>` começa com maiúscula; letras, números e `_`. Volume opcional no manifesto (`"sounds": {"Thunder": {"volume": 0.7}}`, padrão 0.7). Som ambiente em loop (chuva, vento) é um `.wav` como os outros; quem repete é o código (`audio_play_sound(..., true)`). Efeitos do ALttP saem da ROM: `python tools/alttp/sfx.py <porta> <número> incoming/<regiao>/sounds/<Nome>.wav` (o trovão é `2 0x36`).
 
 ## Música
 
@@ -65,7 +92,8 @@ Tudo é opcional; sem manifesto valem os padrões. Exemplo:
  },
  "palettes": {"Enemy_Ropa": {"base": "Enemy_Ropa_Walk_Down"}},
  "tileset": {"base": "Castle"},
- "music": {"CastleRoof": {"loop": 3.52}}
+ "music": {"CastleRoof": {"loop": 3.52}},
+ "sounds": {"Thunder": {"volume": 0.7}}
 }
 ```
 
