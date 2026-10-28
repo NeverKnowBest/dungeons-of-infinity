@@ -754,6 +754,7 @@ function Dungeon_InitLevel(_LevelIndex){
 	//This prevents things like shops to be bunched up in Rooms by the entrance, it spreads them out
 	
 	var ShuffledRoomIndexesList = ds_list_create_sequence_shuffled(0, global.Level.RoomCount - 1);
+	var _SetMisses = array_create(global.Level.RoomCount, 0);	//templates of the level's room set that fit a room but could not hold its special objects
 
 
 	for(var _RoomListIndex = 0; _RoomListIndex < global.Level.RoomCount; _RoomListIndex++){
@@ -772,11 +773,12 @@ function Dungeon_InitLevel(_LevelIndex){
 
 		global.SpawnedBlocks = false;
 							
-		Room.Template = RoomTemplates_Pick(_RoomIndex);
+		var _UseSet = (_SetMisses[_RoomIndex] < ROOMSET_MAXMISSES);	//a set template is picked again after a miss; after a few, the shared ones
+		Room.Template = RoomTemplates_Pick(_RoomIndex, _UseSet);
 
 		if(Room.Template == -1 && _RoomIndex == global.Level.Exits.ExtraRoom){
 			Dungeon_DropExtraExit(_RoomIndex);	//no template fits the extra exit door: the level keeps only the main exit
-			Room.Template = RoomTemplates_Pick(_RoomIndex);
+			Room.Template = RoomTemplates_Pick(_RoomIndex, _UseSet);
 		}
 
 		if(Room.Template == -1){
@@ -869,7 +871,8 @@ function Dungeon_InitLevel(_LevelIndex){
 		if(!DEBUG && !SpawnedSpecialObs){
 						
 			//important special objects couldn't spawn, so clear room and try another template
-						
+			if(Room.Template[$ "RoomSet"] != undefined) _SetMisses[_RoomIndex]++;
+
 			//items that may have spawned in Dungeon_Draw_SpecialObjs before exiting
 			var ObjsToDestroyList = ds_list_create();						
 			ds_list_add(ObjsToDestroyList, oWall, oDoor, oSwitch, oSwitchBlock, oMovingFloor, oWarp, oShop, oPrisoner, oItem, oPickupObj, oEnemy, oDeadHungryGuy, oHeartGuy, oTombSkeleton);

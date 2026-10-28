@@ -225,7 +225,18 @@ function Test_RoomStr(_RoomIndex){
 	var _Template = _R[$ "Template"];
 	var _Id = is_struct(_Template) ? _Template[$ "id"] : undefined;
 	return string(_RoomIndex) + " grid=" + string(_R.GridX) + "," + string(_R.GridY) + " size=" + string(_R.GridW) + "x" + string(_R.GridH)
-		+ " template=" + string(_R.TemplateClass) + "/" + string(_R.TemplateSubClass) + "/" + string(_R.TemplateName) + "#" + string(_Id);
+		+ " template=" + string(_R.TemplateClass) + "/" + string(_R.TemplateSubClass) + "/" + string(_R.TemplateName) + "#" + string(_Id)
+		+ (is_struct(_Template) && _Template[$ "RoomSet"] != undefined ? " set=" + _Template.RoomSet : "");
+}
+
+/// Rooms of the level built from templates of its room set (roadmap F11)
+function Test_SetRooms(){
+	var _N = 0;
+	for(var i = 0; i < global.Level.RoomCount; i++){
+		var _Template = global.Level.Rooms[i][$ "Template"];
+		if(is_struct(_Template) && _Template[$ "RoomSet"] != undefined) _N++;
+	}
+	return _N;
 }
 
 function Test_LogState(){
@@ -356,6 +367,7 @@ function Test_Watch(){
 		LastLevel = global.Level;
 		LastRoom = -1;
 		Test_Log("level " + Test_LevelName() + " rooms=" + string(global.Level.RoomCount) + " dungeon=" + string(global.Level.DungeonTemplate_Index));
+		if(!global.HubLevel && !global.SaveLevel && LevelDef.RoomSet != "") Test_Log("roomset " + LevelDef.RoomSet + " rooms=" + string(Test_SetRooms()) + "/" + string(global.Level.RoomCount));
 	}
 	if(global.CurrentRoomIndex >= 0 && global.CurrentRoomIndex != LastRoom){
 		LastRoom = global.CurrentRoomIndex;
@@ -456,6 +468,7 @@ function Test_DoStep(_S){
 			}
 			if(variable_struct_exists(_S, "enemies") && instance_number(oEnemy) != _S.enemies) _Bad += " enemies(" + string(instance_number(oEnemy)) + ")";
 			if(variable_struct_exists(_S, "kills_min") && global.TestKills < _S.kills_min) _Bad += " kills(" + string(global.TestKills) + ")";
+			if(variable_struct_exists(_S, "set_rooms_min") && Test_SetRooms() < _S.set_rooms_min) _Bad += " set_rooms(" + string(Test_SetRooms()) + ")";
 			if((_S[$ "exit_level"] ?? false) && (global.SaveLevel || global.Level.Index != global.TestExitDest)) _Bad += " exit_level(" + string(global.Level.Index) + (global.SaveLevel ? " rest stop" : "") + ")";
 			if(_Bad == "") Test_Log("expect ok");
 			else Test_Fail("expect" + _Bad);

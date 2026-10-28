@@ -23,7 +23,7 @@ Duas a quatro frases: o que o jogador vê e sente, e por que esse lugar faz sent
 
 ## Salas
 
-* Classe de dungeon e templates (do Tiled) usados ou novos; quantas salas por nível.
+* Classe de dungeon e templates usados: os compartilhados (com o tema da fase) ou um conjunto de salas próprio (novo, F11: meias salas descritas para o `make_rooms.py`); quantas salas por nível.
 * Salas especiais: entrada, saída, tesouro, loja, chefe.
 * Salas de referência (ALttP ou outro jogo) para a conversão da F8.
 

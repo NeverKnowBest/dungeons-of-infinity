@@ -8,6 +8,13 @@ with one template per line so git diffs stay small. RoomTemplates_Load reads the
     python tools/templates/convert.py -o out/rooms    # writes somewhere else
     python tools/templates/convert.py --summary       # also prints the template count per class
 
+Room sets (roadmap F11): data/room-templates/sets/<Set>/ holds a set's own Tiled maps, with the same names
+and layers as the shared ones and only the classes the set has. They become
+game/datafiles/data/rooms/sets/<Set>/<Class>.json, every template with "RoomSet": "<Set>", plus the index
+rooms/sets.json ({"<Set>": ["<Class>", ...]}) that RoomTemplates_Load reads. A level picks a set with RoomSet
+in its level sheet. The set files are registered in Zelda.yyp as included files here (and dropped when the
+set goes away). tools/templates/make_rooms.py writes the maps of a set from a short description.
+
 Standard library only. See tools/README.md and docs/dev/engine-notes.md ("Room templates").
 """
 import argparse
@@ -23,7 +30,10 @@ sys.path.insert(0, HERE)
 import rt_tables  # noqa: E402
 
 TEMPLATE_DIR = os.path.join(REPO, 'data', 'room-templates')
+SETS_DIR = os.path.join(TEMPLATE_DIR, 'sets')
 ROOMS_DIR = os.path.join(REPO, 'game', 'datafiles', 'data', 'rooms')
+YYP = os.path.join(REPO, 'game', 'Zelda.yyp')
+SET_NAME = re.compile(r'^[A-Za-z][A-Za-z0-9_]*$')
 GML_ENUMS = os.path.join(REPO, 'game', 'scripts', '__RoomTemplates', '__RoomTemplates.gml')
 
 # ObjTransformation enum, in order
@@ -489,11 +499,17 @@ def find_layer(layers, name, where):
     raise ConvertError('%s: layer "%s" not found' % (where, name))
 
 
-def parse_class(ci, warnings):
+def map_path(ci, set_name=None):
+    """The Tiled map of a class, shared or of a room set."""
+    folder = TEMPLATE_DIR if set_name is None else os.path.join(SETS_DIR, set_name)
+    return os.path.join(folder, 'Room Templates %s.json' % CLASSES[ci][1])
+
+
+def parse_class(ci, warnings, set_name=None):
     cls, fname, n_sub, sub_types = CLASSES[ci]
-    path = os.path.join(TEMPLATE_DIR, 'Room Templates %s.json' % fname)
+    path = map_path(ci, set_name)
     js = to_real(json.load(open(path, encoding='utf-8')))
-    where = os.path.basename(path)
+    where = os.path.basename(path) if set_name is None else 'sets/%s/%s' % (set_name, os.path.basename(path))
     layers = js['layers']
     obj_types = OBJ_TYPES[cls]
     sec_types = SECTION_OBJ_TYPES[cls]
@@ -523,6 +539,8 @@ def parse_class(ci, warnings):
                 raise ConvertError('%s: room %s has size %sx%s' % (where, gm_str(t['id']), gm_str(t['width']), gm_str(t['height'])))
             t['SizeIndex'] = ROOM_SIZE[key]
         t['RoomTransformationsAllowed'] = [True] * 8
+        if set_name is not None:
+            t['RoomSet'] = set_name
         temps.append(t)
         index_of[r['id']] = i
 
@@ -625,6 +643,8 @@ def parse_class(ci, warnings):
                         add_flip_h = False
                     else:
                         flip = T['FlipV']
+                    if set_name is not None:    # set rooms are named after both halves, for the test logs
+                        new['name'] = '%s+%s%s' % (main['name'], second['name'], '' if flip == T['FlipV'] else '~')
                     split_add_objs(new, second_copy, obj_types, flip, sec_types)
                     split_combine_walls(new, 'WallsUpper')
                     if cls == 'Main_Lower':
@@ -643,6 +663,40 @@ def convert(warnings=None):
     return [parse_class(ci, warnings) for ci in range(len(CLASSES))]
 
 
+def set_names():
+    """Room sets with a Tiled map in data/room-templates/sets, sorted."""
+    if not os.path.isdir(SETS_DIR):
+        return []
+    out = []
+    for n in sorted(os.listdir(SETS_DIR)):
+        if not os.path.isdir(os.path.join(SETS_DIR, n)):
+            continue
+        if not any(os.path.exists(map_path(ci, n)) for ci in range(len(CLASSES))):
+            continue
+        if not SET_NAME.match(n):
+            raise ConvertError('sets/%s: a set name has only letters, digits and _ (it is a level sheet value)' % n)
+        out.append(n)
+    return out
+
+
+def convert_sets(warnings=None):
+    """{set: {class: [subclass][template]}} for every room set, only the classes it has a map of."""
+    if warnings is None:
+        warnings = []
+    out = {}
+    for n in set_names():
+        out[n] = {}
+        for ci, (cls, _, _, _) in enumerate(CLASSES):
+            if os.path.exists(map_path(ci, n)):
+                out[n][cls] = parse_class(ci, warnings, n)
+    return out
+
+
+def sets_index(sets):
+    """rooms/sets.json: the classes of every set."""
+    return json.dumps({n: list(c) for n, c in sets.items()}, indent=1, sort_keys=True) + '\n'
+
+
 def class_text(subclasses):
     """One class file: an array of subclasses, one template per line."""
     def dump(t):
@@ -651,8 +705,10 @@ def class_text(subclasses):
                               for sub in subclasses) + '\n]\n'
 
 
-def save(data, out_dir):
-    """Writes <out_dir>/<Class>.json for every class. Returns the total size in bytes."""
+def save(data, out_dir, sets=None):
+    """Writes <out_dir>/<Class>.json for every class and, given the sets, <out_dir>/sets.json and
+    <out_dir>/sets/<Set>/<Class>.json (and removes the files of sets and classes that are gone).
+    Returns the total size in bytes."""
     os.makedirs(out_dir, exist_ok=True)
     total = 0
     for (cls, _, _, _), subclasses in zip(CLASSES, data):
@@ -660,7 +716,65 @@ def save(data, out_dir):
         with open(os.path.join(out_dir, cls + '.json'), 'wb') as f:
             f.write(raw)
         total += len(raw)
+    if sets is None:
+        return total
+    with open(os.path.join(out_dir, 'sets.json'), 'wb') as f:
+        f.write(sets_index(sets).encode('utf-8'))
+    sets_out = os.path.join(out_dir, 'sets')
+    for n, classes in sets.items():
+        d = os.path.join(sets_out, n)
+        os.makedirs(d, exist_ok=True)
+        for cls, subclasses in classes.items():
+            raw = class_text(subclasses).encode('utf-8')
+            with open(os.path.join(d, cls + '.json'), 'wb') as f:
+                f.write(raw)
+            total += len(raw)
+    if os.path.isdir(sets_out):
+        for n in os.listdir(sets_out):
+            d = os.path.join(sets_out, n)
+            for f in os.listdir(d):
+                if f[:-len('.json')] not in sets.get(n, {}):
+                    os.remove(os.path.join(d, f))
+            if not os.listdir(d):
+                os.rmdir(d)
     return total
+
+
+def set_files(sets):
+    """(filePath, name) of every included file that the room sets need in Zelda.yyp."""
+    out = [('datafiles/data/rooms', 'sets.json')]
+    for n, classes in sets.items():
+        out += [('datafiles/data/rooms/sets/' + n, cls + '.json') for cls in classes]
+    return out
+
+
+INCLUDED = ('    {"$GMIncludedFile":"","%%Name":"%s","CopyToMask":-1,"filePath":"%s","name":"%s",'
+            '"resourceType":"GMIncludedFile","resourceVersion":"2.0",},\n')
+INCLUDED_ROW = re.compile(r'    \{"\$GMIncludedFile":"","%Name":"([^"]*)","CopyToMask":-1,"filePath":"([^"]*)"[^\n]*\n')
+
+
+def register_sets(sets, yyp=YYP):
+    """Makes the included files in Zelda.yyp match the room sets. Returns (added, removed)."""
+    s = open(yyp, encoding='utf-8').read()
+    want = set_files(sets)
+    have = [(fp, n) for n, fp in INCLUDED_ROW.findall(s)]
+    removed = 0
+    for fp, n in have:
+        if fp.startswith('datafiles/data/rooms/sets/') and (fp, n) not in want:
+            s = s.replace(INCLUDED % (n, fp, n), '')
+            removed += 1
+    added = 0
+    for fp, n in want:
+        if (fp, n) in have:
+            continue
+        rooms = [m for m in INCLUDED_ROW.finditer(s) if m.group(2).startswith('datafiles/data/rooms')]
+        at = rooms[-1].end()
+        s = s[:at] + INCLUDED % (n, fp, n) + s[at:]
+        added += 1
+    if added or removed:
+        with open(yyp, 'w', encoding='utf-8', newline='') as f:
+            f.write(s)
+    return added, removed
 
 
 def load(path):
@@ -683,17 +797,30 @@ def main():
     warnings = []
     try:
         data = convert(warnings)
+        sets = convert_sets(warnings)
     except ConvertError as e:
         print('error:', e)
         return 1
     for w in warnings:
         print('warning:', w)
-    size = save(data, a.out)
+    size = save(data, a.out, sets)
+    if os.path.abspath(a.out) == os.path.abspath(ROOMS_DIR):
+        added, removed = register_sets(sets)
+        if added or removed:
+            print('Zelda.yyp: %d included files added, %d removed (room sets)' % (added, removed))
+
+    def counts(ci, subclasses):
+        names = CLASSES[ci][3] or ['1x1', '1x2', '2x1'][:len(subclasses)]
+        return '%-11s %s' % (CLASSES[ci][0], ', '.join('%s %d' % (n, len(s)) for n, s in zip(names, subclasses)))
     if a.summary:
-        for ci, (cls, _, _, sub_types) in enumerate(CLASSES):
-            names = sub_types or ['1x1', '1x2', '2x1'][:len(data[ci])]
-            print('%-11s %s' % (cls, ', '.join('%s %d' % (n, len(s)) for n, s in zip(names, data[ci]))))
-    print('wrote %d files to %s (%.1f MB)' % (len(CLASSES), a.out, size / 1e6))
+        for ci in range(len(CLASSES)):
+            print(counts(ci, data[ci]))
+        for n, classes in sets.items():
+            print('set %s:' % n)
+            for cls, subclasses in classes.items():
+                print('  ' + counts([c[0] for c in CLASSES].index(cls), subclasses))
+    files = len(CLASSES) + 1 + sum(len(c) for c in sets.values())
+    print('wrote %d files to %s (%.1f MB)' % (files, a.out, size / 1e6))
     return 0
 
 

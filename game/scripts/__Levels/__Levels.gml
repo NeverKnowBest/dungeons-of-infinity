@@ -106,6 +106,8 @@ function Level_Create(_Index, _Name) constructor{
 	Class = DungeonClass.Castle;		// dungeon template class (global.Templates_Dungeon)
 	Template = -1;						// for DungeonClass.Special: index of the fixed layout
 	Transform = true;					// dungeon template may be flipped and rotated
+	RoomSet = "";						// room set (roadmap F11): the level's own room templates (rooms/sets/<RoomSet>), tried before the shared ones
+	RoomSetFallback = true;				// a room no template of the set fits takes a shared one; false: the level cannot be built
 	StartDir = (_Index mod 2 == 1) ? UP : DOWN;	// Link comes in from the bottom (UP) or the top (DOWN)
 	SaveBefore = false;					// a save level (rest stop) comes before this level
 	RunStart = false;					// first level of a run: front door and entrance wall, falling leaves, a sure bonus treasure, no kinstones, counts a game played

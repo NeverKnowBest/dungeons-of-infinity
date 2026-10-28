@@ -1,0 +1,1602 @@
+{
+ "compressionlevel": -1,
+ "editorsettings": {
+  "export": {
+   "format": "json"
+  }
+ },
+ "height": 16,
+ "infinite": false,
+ "layers": [
+  {
+   "draworder": "topdown",
+   "id": 1,
+   "name": "Rooms",
+   "objects": [
+    {
+     "height": 128,
+     "id": 1,
+     "name": "Basin",
+     "properties": [
+      {
+       "name": "Split_MainSectionIDs",
+       "type": "string",
+       "value": "0,0,0,0"
+      },
+      {
+       "name": "Symetry",
+       "type": "int",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 256,
+     "x": 0,
+     "y": 0
+    },
+    {
+     "height": 128,
+     "id": 25,
+     "name": "Ledges",
+     "properties": [
+      {
+       "name": "Split_MainSectionIDs",
+       "type": "string",
+       "value": "0,0,0,0"
+      },
+      {
+       "name": "Symetry",
+       "type": "int",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 256,
+     "x": 288,
+     "y": 0
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 2,
+   "name": "Water",
+   "objects": [],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 3,
+   "name": "CarpetsFull",
+   "objects": [],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 4,
+   "name": "Carpets",
+   "objects": [],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 5,
+   "name": "Spikes",
+   "objects": [],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 6,
+   "name": "WallsLower",
+   "objects": [
+    {
+     "height": 24,
+     "id": 8,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 40,
+     "y": 40,
+     "gid": 19
+    },
+    {
+     "height": 24,
+     "id": 9,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 192,
+     "y": 40,
+     "gid": 20
+    },
+    {
+     "height": 24,
+     "id": 10,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 128,
+     "x": 64,
+     "y": 40,
+     "gid": 28
+    },
+    {
+     "height": 64,
+     "id": 11,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 40,
+     "y": 64,
+     "gid": 26
+    },
+    {
+     "height": 64,
+     "id": 12,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 192,
+     "y": 64,
+     "gid": 27
+    },
+    {
+     "height": 24,
+     "id": 43,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 360,
+     "y": 40,
+     "gid": 19
+    },
+    {
+     "height": 24,
+     "id": 44,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 448,
+     "y": 40,
+     "gid": 20
+    },
+    {
+     "height": 24,
+     "id": 45,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 328,
+     "y": 72,
+     "gid": 19
+    },
+    {
+     "height": 24,
+     "id": 46,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 360,
+     "y": 72,
+     "gid": 23
+    },
+    {
+     "height": 24,
+     "id": 47,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 448,
+     "y": 72,
+     "gid": 24
+    },
+    {
+     "height": 24,
+     "id": 48,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 480,
+     "y": 72,
+     "gid": 20
+    },
+    {
+     "height": 24,
+     "id": 49,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 64,
+     "x": 384,
+     "y": 40,
+     "gid": 28
+    },
+    {
+     "height": 24,
+     "id": 50,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 8,
+     "x": 352,
+     "y": 72,
+     "gid": 28
+    },
+    {
+     "height": 24,
+     "id": 51,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 8,
+     "x": 472,
+     "y": 72,
+     "gid": 28
+    },
+    {
+     "height": 32,
+     "id": 52,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 328,
+     "y": 96,
+     "gid": 26
+    },
+    {
+     "height": 8,
+     "id": 53,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 360,
+     "y": 64,
+     "gid": 26
+    },
+    {
+     "height": 8,
+     "id": 54,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 448,
+     "y": 64,
+     "gid": 27
+    },
+    {
+     "height": 32,
+     "id": 55,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 480,
+     "y": 96,
+     "gid": 27
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 7,
+   "name": "WallsUpper",
+   "objects": [
+    {
+     "height": 24,
+     "id": 2,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 16,
+     "y": 16,
+     "gid": 11
+    },
+    {
+     "height": 24,
+     "id": 3,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 216,
+     "y": 16,
+     "gid": 12
+    },
+    {
+     "height": 24,
+     "id": 4,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 176,
+     "x": 40,
+     "y": 16,
+     "gid": 32
+    },
+    {
+     "height": 88,
+     "id": 5,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 16,
+     "y": 40,
+     "gid": 30
+    },
+    {
+     "height": 88,
+     "id": 6,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 216,
+     "y": 40,
+     "gid": 31
+    },
+    {
+     "height": 24,
+     "id": 26,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 336,
+     "y": 16,
+     "gid": 11
+    },
+    {
+     "height": 24,
+     "id": 27,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 472,
+     "y": 16,
+     "gid": 12
+    },
+    {
+     "height": 24,
+     "id": 28,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 304,
+     "y": 48,
+     "gid": 11
+    },
+    {
+     "height": 24,
+     "id": 29,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 336,
+     "y": 48,
+     "gid": 15
+    },
+    {
+     "height": 24,
+     "id": 30,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 472,
+     "y": 48,
+     "gid": 16
+    },
+    {
+     "height": 24,
+     "id": 31,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 504,
+     "y": 48,
+     "gid": 12
+    },
+    {
+     "height": 24,
+     "id": 32,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 112,
+     "x": 360,
+     "y": 16,
+     "gid": 32
+    },
+    {
+     "height": 24,
+     "id": 33,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 8,
+     "x": 328,
+     "y": 48,
+     "gid": 32
+    },
+    {
+     "height": 24,
+     "id": 34,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 8,
+     "x": 496,
+     "y": 48,
+     "gid": 32
+    },
+    {
+     "height": 56,
+     "id": 35,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 304,
+     "y": 72,
+     "gid": 30
+    },
+    {
+     "height": 8,
+     "id": 36,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 336,
+     "y": 40,
+     "gid": 30
+    },
+    {
+     "height": 8,
+     "id": 37,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 472,
+     "y": 40,
+     "gid": 31
+    },
+    {
+     "height": 56,
+     "id": 38,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 504,
+     "y": 72,
+     "gid": 31
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 8,
+   "name": "Doors",
+   "objects": [
+    {
+     "height": 24,
+     "id": 15,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 32,
+     "x": 152,
+     "y": 40,
+     "gid": 4
+    },
+    {
+     "height": 32,
+     "id": 16,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 192,
+     "y": 72,
+     "gid": 3
+    },
+    {
+     "height": 32,
+     "id": 17,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 192,
+     "y": 112,
+     "gid": 3
+    },
+    {
+     "height": 32,
+     "id": 18,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 40,
+     "y": 112,
+     "gid": 2
+    },
+    {
+     "height": 32,
+     "id": 19,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 40,
+     "y": 72,
+     "gid": 2
+    },
+    {
+     "height": 24,
+     "id": 20,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 32,
+     "x": 72,
+     "y": 40,
+     "gid": 4
+    },
+    {
+     "height": 24,
+     "id": 21,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 32,
+     "x": 112,
+     "y": 40,
+     "gid": 4
+    },
+    {
+     "height": 32,
+     "id": 58,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 480,
+     "y": 112,
+     "gid": 3
+    },
+    {
+     "height": 32,
+     "id": 59,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 328,
+     "y": 112,
+     "gid": 2
+    },
+    {
+     "height": 24,
+     "id": 60,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 32,
+     "x": 400,
+     "y": 40,
+     "gid": 4
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 9,
+   "name": "LowerFloor",
+   "objects": [
+    {
+     "height": 88,
+     "id": 7,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 176,
+     "x": 40,
+     "y": 40
+    },
+    {
+     "height": 32,
+     "id": 41,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 112,
+     "x": 360,
+     "y": 40
+    },
+    {
+     "height": 56,
+     "id": 42,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 176,
+     "x": 328,
+     "y": 72
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 10,
+   "name": "OutOfBounds",
+   "objects": [
+    {
+     "height": 32,
+     "id": 39,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 32,
+     "x": 304,
+     "y": 16
+    },
+    {
+     "height": 32,
+     "id": 40,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 32,
+     "x": 496,
+     "y": 16
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
+   "id": 11,
+   "name": "SplitConnections",
+   "objects": [
+    {
+     "height": 32,
+     "id": 13,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 40,
+     "y": 112
+    },
+    {
+     "height": 32,
+     "id": 14,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 192,
+     "y": 112
+    },
+    {
+     "height": 32,
+     "id": 56,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 328,
+     "y": 112
+    },
+    {
+     "height": 32,
+     "id": 57,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 25
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 480,
+     "y": 112
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "id": 25,
+   "layers": [
+    {
+     "id": 12,
+     "layers": [
+      {
+       "draworder": "topdown",
+       "id": 13,
+       "name": "Zones",
+       "objects": [],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 14,
+       "name": "Enemies",
+       "objects": [
+        {
+         "height": 48,
+         "id": 24,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 96,
+         "x": 80,
+         "y": 80
+        },
+        {
+         "height": 16,
+         "id": 67,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 25
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 96,
+         "x": 368,
+         "y": 112
+        }
+       ],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 15,
+       "name": "MovingSpikeBlocks",
+       "objects": [],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 16,
+       "name": "GuruBars",
+       "objects": [],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 17,
+       "name": "Altars",
+       "objects": [],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 18,
+       "name": "Kinstones",
+       "objects": [],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 19,
+       "name": "Monuments",
+       "objects": [],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 20,
+       "name": "Torches",
+       "objects": [],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 21,
+       "name": "Crystals",
+       "objects": [
+        {
+         "height": 16,
+         "id": 23,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 120,
+         "y": 96,
+         "gid": 36
+        },
+        {
+         "height": 16,
+         "id": 62,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 25
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 408,
+         "y": 96,
+         "gid": 36
+        }
+       ],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 22,
+       "name": "PotTreasures",
+       "objects": [
+        {
+         "height": 16,
+         "id": 65,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 25
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 384,
+         "y": 64,
+         "gid": 37
+        },
+        {
+         "height": 16,
+         "id": 66,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 25
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 432,
+         "y": 64,
+         "gid": 37
+        }
+       ],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 23,
+       "name": "Treasures",
+       "objects": [
+        {
+         "height": 16,
+         "id": 22,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 120,
+         "y": 96,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 61,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 25
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 408,
+         "y": 96,
+         "gid": 35
+        }
+       ],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "draworder": "topdown",
+       "id": 24,
+       "name": "Pots",
+       "objects": [
+        {
+         "height": 16,
+         "id": 63,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 25
+          },
+          {
+           "name": "SpawnDir",
+           "type": "string",
+           "value": "Full"
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 384,
+         "y": 64,
+         "gid": 34
+        },
+        {
+         "height": 16,
+         "id": 64,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 25
+          },
+          {
+           "name": "SpawnDir",
+           "type": "string",
+           "value": "Full"
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 432,
+         "y": 64,
+         "gid": 34
+        }
+       ],
+       "opacity": 1,
+       "type": "objectgroup",
+       "visible": true,
+       "x": 0,
+       "y": 0
+      }
+     ],
+     "name": "Main",
+     "opacity": 1,
+     "type": "group",
+     "visible": true,
+     "x": 0,
+     "y": 0
+    }
+   ],
+   "name": "Sections",
+   "opacity": 1,
+   "type": "group",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  }
+ ],
+ "nextlayerid": 26,
+ "nextobjectid": 68,
+ "orientation": "orthogonal",
+ "properties": [
+  {
+   "name": "Generator",
+   "type": "string",
+   "value": "tools/templates/make_rooms.py"
+  }
+ ],
+ "renderorder": "right-down",
+ "tiledversion": "1.10.1",
+ "tileheight": 8,
+ "tilesets": [
+  {
+   "firstgid": 1,
+   "source": "../../RoomTemplateTileset.json"
+  }
+ ],
+ "tilewidth": 8,
+ "type": "map",
+ "version": "1.10",
+ "width": 68
+}

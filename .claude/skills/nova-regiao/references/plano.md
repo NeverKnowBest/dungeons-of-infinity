@@ -11,7 +11,7 @@ Estado da spec: <estado>. Resultado do status.py: <READY | STOP: chaves | WAIT>
 1. Spec: <o que está pronto, o que ajustar>
 2. Gráficos (F6): <pasta, o que importar, prévia>
 3. Ficha e saídas (F4, F4b): <entrada nova com os campos; NextPool das fases do capítulo anterior com pesos; ExitLook>
-4. Salas (F5): <classe e templates; o que é novo>
+4. Salas (F11): <conjunto de salas (meias salas, seções) ou templates compartilhados; cobertura esperada>
 5. Inimigos (F7): <lista com objeto, peso, variante e de onde vêm os números>
 6. Clima, música, regras: <o que a spec prevê em "Mudanças no código">
 7. Testes (F3, F3b): <ref_NN_X, cenário da região, cenário da fase anterior, folha de contato, bateria e compare>

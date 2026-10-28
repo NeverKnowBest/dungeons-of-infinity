@@ -1,3 +1,5 @@
+#macro ROOMSET_MAXMISSES 4	// a room whose set templates fit but cannot hold its special objects this many times takes a shared one (roadmap F11)
+
 enum Mask{
 	OutOfBounds,
 	WallsUpper,
@@ -381,25 +383,83 @@ function RoomTemplates_Load(){
 	}
 	show_debug_message("Room templates loaded: " + json_stringify(global.Templates_Room_Count));
 
-	
+	RoomSets_Load(_ClassFiles);
+
 }
 
-function RoomTemplate_GetNextIndex(_Class, _SubClass){
-	
-	
-	if(ds_list_size(global.UnusedRoomTemplatesList[_Class][_SubClass]) == 0){
-		ds_list_destroy(global.UnusedRoomTemplatesList[_Class][_SubClass]);
-		global.UnusedRoomTemplatesList[_Class][_SubClass] = ds_list_create_sequence_shuffled(0, global.Templates_Room_Count[_Class][_SubClass] - 1);
+/// Room sets (roadmap F11): a level's own room templates, picked with RoomSet in the level sheet. sets.json (written
+/// by tools/templates/convert.py) lists the classes of each set; each class is one file in rooms/sets/<Set>/.
+/// global.RoomSets[$ set] = {Templates, Count, Unused}, each indexed [class][subclass]; a class the set has no file
+/// for is undefined (those rooms take the shared templates).
+function RoomSets_Load(_ClassFiles){
+	global.RoomSets = {};
+	var _Buffer = buffer_load(GAMEDIR_ROOMTEMPLATES + "sets.json");
+	if(_Buffer == -1) exit;
+	var _Index = json_parse(buffer_read(_Buffer, buffer_string));
+	buffer_delete(_Buffer);
+
+	var _Counts = {};
+	var _Names = variable_struct_get_names(_Index);
+	array_sort(_Names, true);
+	for(var i = 0; i < array_length(_Names); i++){
+		var _Name = _Names[i];
+		var _Set = {Templates : array_create(RoomTemplateClasses, undefined), Count : array_create(RoomTemplateClasses, undefined), Unused : array_create(RoomTemplateClasses, undefined)};
+		var _Classes = _Index[$ _Name];
+		for(var j = 0; j < array_length(_Classes); j++){
+			var _ClassIndex = array_get_index(_ClassFiles, _Classes[j]);
+			var _File = GAMEDIR_ROOMTEMPLATES + "sets\\" + _Name + "\\" + _Classes[j] + ".json";
+			_Buffer = (_ClassIndex == -1) ? -1 : buffer_load(_File);
+			if(_Buffer == -1){
+				Error("Room set file not found: " + _File, true);
+				return;
+			}
+			_Set.Templates[_ClassIndex] = json_parse(buffer_read(_Buffer, buffer_string));
+			buffer_delete(_Buffer);
+			var _SubClasses = array_length(_Set.Templates[_ClassIndex]);
+			_Set.Count[_ClassIndex] = array_create(_SubClasses);
+			_Set.Unused[_ClassIndex] = array_create(_SubClasses);
+			for(var _SubClassIndex = 0; _SubClassIndex < _SubClasses; _SubClassIndex++){
+				_Set.Count[_ClassIndex][_SubClassIndex] = array_length(_Set.Templates[_ClassIndex][_SubClassIndex]);
+				_Set.Unused[_ClassIndex][_SubClassIndex] = -1;	//made by RoomSet_For on first use, so loading a set shifts no ds numbers in levels without one
+			}
+			_Counts[$ _Name + "/" + _Classes[j]] = _Set.Count[_ClassIndex];
+		}
+		global.RoomSets[$ _Name] = _Set;
 	}
-	
-	var _NextIndex = global.UnusedRoomTemplatesList[_Class][_SubClass][| 0];
-	ds_list_delete(global.UnusedRoomTemplatesList[_Class][_SubClass], 0);
-	
-	return _NextIndex;
-	
+	if(array_length(_Names) > 0) show_debug_message("Room sets loaded: " + json_stringify(_Counts));
 }
 
-function RoomTemplates_Pick(_RoomIndex){
+/// The level's room set if it has templates for that class and subclass, else undefined
+function RoomSet_For(_Class, _SubClass){
+	var _Name = LevelDef.RoomSet;
+	if(_Name == "") return undefined;
+	var _Set = global.RoomSets[$ _Name];
+	if(_Set == undefined){
+		Error("Level " + LevelDef.Name + ": room set " + _Name + " not found (tools/templates/convert.py)", true);
+		return undefined;
+	}
+	var _Counts = _Set.Count[_Class];
+	if(_Counts == undefined || _SubClass >= array_length(_Counts) || _Counts[_SubClass] == 0) return undefined;
+	if(_Set.Unused[_Class][_SubClass] == -1) _Set.Unused[_Class][_SubClass] = ds_list_create();
+	return _Set;
+}
+
+function RoomTemplate_GetNextIndex(_Class, _SubClass, _Unused = global.UnusedRoomTemplatesList, _Counts = global.Templates_Room_Count){
+
+
+	if(ds_list_size(_Unused[_Class][_SubClass]) == 0){
+		ds_list_destroy(_Unused[_Class][_SubClass]);
+		_Unused[_Class][_SubClass] = ds_list_create_sequence_shuffled(0, _Counts[_Class][_SubClass] - 1);
+	}
+
+	var _NextIndex = _Unused[_Class][_SubClass][| 0];
+	ds_list_delete(_Unused[_Class][_SubClass], 0);
+
+	return _NextIndex;
+
+}
+
+function RoomTemplates_Pick(_RoomIndex, _UseSet = true){
 
 	gml_pragma("forceinline");
 	
@@ -503,10 +563,23 @@ function RoomTemplates_Pick(_RoomIndex){
 	}
 
 
+	// the level's room set first (roadmap F11); when none of its templates fits, the shared ones unless RoomSetFallback is false
+	var _Set = _UseSet ? RoomSet_For(Room.TemplateClass, Room.TemplateSubClass) : undefined;
+	if(_Set != undefined){
+		var _SetTemplate = RoomTemplates_PickFrom(_RoomIndex, _Set.Templates, _Set.Count, _Set.Unused);
+		if(_SetTemplate != -1 || !LevelDef.RoomSetFallback) return _SetTemplate;
+	}
+	return RoomTemplates_PickFrom(_RoomIndex, global.Templates_Room, global.Templates_Room_Count, global.UnusedRoomTemplatesList);
+
+}
+
+/// The next template of a shuffled list per class and subclass that fits the room (doors, section, zones), transformed
+function RoomTemplates_PickFrom(_RoomIndex, _Templates, _Counts, _Unused){
+
 	var _RoomTemplateClass = Room.TemplateClass;
 	var _RoomTemplateSubClass = Room.TemplateSubClass;
-	
-	var _TemplateCount = global.Templates_Room_Count[_RoomTemplateClass][_RoomTemplateSubClass];
+
+	var _TemplateCount = _Counts[_RoomTemplateClass][_RoomTemplateSubClass];
 
 	if(_TemplateCount == 0){
 		return -1; //no template available for that template class
@@ -517,9 +590,9 @@ function RoomTemplates_Pick(_RoomIndex){
 		
 		var TemplateOk = false;
 		
-		var _RoomTemplateIndex = RoomTemplate_GetNextIndex(_RoomTemplateClass, _RoomTemplateSubClass);	
+		var _RoomTemplateIndex = RoomTemplate_GetNextIndex(_RoomTemplateClass, _RoomTemplateSubClass, _Unused, _Counts);
 
-		var RoomTemplate = global.Templates_Room[_RoomTemplateClass][_RoomTemplateSubClass][_RoomTemplateIndex];
+		var RoomTemplate = _Templates[_RoomTemplateClass][_RoomTemplateSubClass][_RoomTemplateIndex];
 		var _Properties = RoomTemplate[$ "properties"];
 		
 

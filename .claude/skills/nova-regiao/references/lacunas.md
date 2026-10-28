@@ -4,32 +4,25 @@ O que uma região pode pedir e as ferramentas ainda não fazem (out/2026). Cada 
 
 Ao reportar uma lacuna ao Guilherme: diga o que a região pede, por que o fluxo não cobre, a etapa que resolveria e, se houver, uma alternativa dentro da direção de design que evita a lacuna (ele escolhe).
 
-## `templates-por-fase`: conjunto de salas só da região
+## `salas-classe`: salas que o ajudante ainda não escreve
 
-* **Reconhecer:** a spec pede uma subclasse ou um conjunto de templates próprio ("subclasse Rooftop", "salas só desta fase").
-* **Por que falta:** toda fase de dungeon sorteia dos mesmos templates (`Main_Upper`, `Main_Lower`, `Stairs`, `Obstacles`, `Sections`): `Dungeon_CreateStruct_Room` (`__Dungeon.gml`) escolhe a classe pelas portas e pela seção da sala e a subclasse pelo tamanho, e `RoomTemplates_Pick` (`__RoomTemplates.gml`) tira o próximo de uma lista embaralhada. Nenhum campo da ficha escolhe um conjunto, e no conversor a subclasse dessas classes é o tamanho (1x1, 1x2), não um tipo.
-* **Resolveria:** uma etapa de ferramenta: campo `RoomSet` (ou parecido) na ficha, o conversor separando os templates por conjunto (propriedade no retângulo do Tiled), o carregamento e o sorteio por conjunto, e os 14 de referência saindo iguais.
-* **Alternativa:** reaproveitar os templates de uma classe e mudar só a aparência pelo tema (`Theme`, ou `ForceWallTheme`/`ForceFloorTheme` por template). Perde as salas com forma própria.
-
-## `templates-novos`: templates de sala novos das classes Main
-
-* **Reconhecer:** a spec pede salas novas (formas, funções) em vez de reaproveitar as de uma classe.
-* **Por que falta:** os templates `Main_Upper`/`Main_Lower` são meias salas com seções, zonas, `SplitConnections` e `Symetry`, que o conversor junta. O Claude não usa o Tiled (é interface gráfica) e não há script que escreva esses templates (o `tools/hub/build3.py` só escreve salas fixas `Other/Unique`, com `tiledjson.py` e `gids.py`).
-* **Resolveria:** um ajudante em Python que escreva templates de dungeon no mapa do Tiled a partir de uma descrição curta (retângulo, paredes, portas nas posições de porta, zonas, inimigos), validado pelo `convert.py` e pela folha de contato; ou a F8 (sala do ALttP para template). Ou o Guilherme desenha no Tiled.
-* **Alternativa:** reaproveitar templates existentes.
+* **Reconhecer:** a spec pede salas próprias de uma classe que não é `Main_Upper` nem `Main_Lower` (escadas internas `Stairs`, obstáculos `Obstacles`, seções `Sections`, celas `Jails`), ou seções numa sala do andar de baixo.
+* **Por que falta:** o `tools/templates/make_rooms.py` (F11) escreve meias salas `Main_Upper` (com as seções 1, 2, 9 e 17) e `Main_Lower` (sem seções). O conjunto de salas e o sorteio por conjunto já valem para qualquer classe do sorteio genérico (`RoomTemplates_PickFrom`), mas os mapas dessas classes teriam de ser desenhados no Tiled.
+* **Resolveria:** ensinar a classe ao `make_rooms.py` (as camadas de cada classe estão em `convert.py`, `OBJ_TYPES` e `SECTION_OBJ_TYPES`), provado como na F11: comparar a geometria com templates reais da classe e um cenário com o conjunto.
+* **Alternativa:** essas salas ficam com os templates compartilhados (`RoomSetFallback`, o padrão), com a aparência do tema da fase. O Guilherme decide.
 
 ## `tileset`: tiles próprios da região
 
 * **Reconhecer:** `incoming/<regiao>/tileset.png`, ou a spec pede paredes, piso ou decoração de tile que nenhum tema tem (o `Theme` de outra fase não serve).
 * **Por que falta:** o `sTiles` está cheio (100 linhas) e o `LevelTilesY` deriva do índice do tema; o importador grava a faixa como `sTiles_<Regiao>`, mas nada liga essa faixa ao tileset do jogo (roadmap, Ideias, "Tileset de região").
-* **Resolveria:** aumentar a imagem do `sTiles`, acertar o `tile_count` do `tilesets/Tileset`, mapear o tema novo para a faixa nova e fazer o importador escrever nela. Os 14 de referência devem sair iguais.
+* **Resolveria:** a etapa F6b (PC de casa): aumentar a imagem do `sTiles`, acertar o `tile_count` do `tilesets/Tileset`, mapear o tema novo para a faixa nova e fazer o importador escrever nela. Os 14 de referência devem sair iguais.
 * **Alternativa:** usar o tema de uma fase existente (como o Castelo) e pôr o que for único em sprites de decoração (objetos), que o importador já faz.
 
 ## `sfx`: efeito sonoro novo
 
 * **Reconhecer:** a spec cita `Sound_X` (novo).
 * **Por que falta:** o importador só lê `music/*.wav` (vira `Music_X` e entra no `SongIndex`); não há `sounds/`. Em `tools/alttp/` o `musicdump.c` renderiza músicas, não os efeitos dos bancos de som.
-* **Resolveria:** `sounds/*.wav` no importador (vira `Sound_X`, sem `SongIndex`) e, para tirar da ROM, um modo de efeito no `musicdump.c` (PC de casa, que tem a ROM).
+* **Resolveria:** a etapa F6b (PC de casa): `sounds/*.wav` no importador (vira `Sound_X`, sem `SongIndex`) e, para tirar da ROM, um modo de efeito no `musicdump.c` (PC de casa, que tem a ROM).
 * **Alternativa:** o Guilherme entrega o `.wav` gravado de outra forma, e o som entra com `gm_assets.sound(...)` à mão; ou a região fica sem o som na primeira versão.
 
 ## `arquetipo`: movimento de inimigo que a F7 não tem
@@ -65,6 +58,7 @@ Ao reportar uma lacuna ao Guilherme: diga o que a região pede, por que o fluxo 
 
 ## Casos que não são lacuna (seguir)
 
+* Salas próprias `Main_Upper` e `Main_Lower` (formas, portas, seções, água, espinhos): conjunto de salas da região pelo `make_rooms.py` e `RoomSet` na ficha (F11, skill passo 4).
 * Inimigos que já existem, com os números do nível do `EnemyStats` ou, nos soldados e nos arquétipos, com variante na ficha (`EnemyVariants`).
 * `ExitLook` novo: entra em `ExitLooks_Init` sem mexer no gerador (receita "Estágio alternativo", passo 3). Pede prévia, por ser visual.
 * Música nova em `incoming/<regiao>/music/`.

@@ -51,6 +51,19 @@ Para mudanças que não deveriam mudar o jogo (refatoração, faxina, troca de t
 4. Confira no `git diff` que só mudou o arquivo da classe e só as linhas das salas novas ou alteradas (cada template é uma linha). Para comparar com uma versão anterior pelo conteúdo: `python tools/templates/compare.py <pasta antiga> game/datafiles/data/rooms`.
 5. Rode o validador (ele acusa se o mapa do Tiled mudou e as salas não foram geradas de novo) e teste no jogo.
 
+Os mapas de um conjunto de salas ficam em `data/room-templates/sets/<Conjunto>/`, com o mesmo nome e as mesmas camadas dos mapas compartilhados. Um mapa escrito pelo `make_rooms.py` tem a propriedade `Generator` e é refeito a partir do `rooms.json`; para desenhar à mão no Tiled, apague essa propriedade (o script deixa de mexer nele) e tire do `rooms.json` as meias salas daquela classe.
+
+## Conjunto de salas de uma região
+
+Salas próprias de uma fase (formas, portas, seções), sem desenhar no Tiled (roadmap F11). Detalhes em `docs/dev/engine-notes.md` ("Room sets"); formato da descrição em `tools/README.md` ("templates/").
+
+1. Nome do conjunto: o membro de `DungeonLevel` da fase (ex.: `CastleTop`). Crie `data/room-templates/sets/<Conjunto>/rooms.json` copiando o `sets/Example/rooms.json`.
+2. Descreva as meias salas (a metade de cima de cada sala; o conversor junta cada par que se encaixa, a de baixo espelhada). Para cobrir quase todas as salas da fase: pelo menos uma meia sala `Main_Upper` `1x1` e uma `1x2` com todas as portas e as quatro seções (`"sections": [1, 2, 9, 17]`), e uma `Main_Lower` `1x1` e uma `1x2`. As outras dão a forma da região: recortes (`cut`), água, espinhos, objetos, `props` (ex.: `ForceWallTheme`). Cada sala com uma função clara (direção de design).
+3. `python tools/templates/make_rooms.py <Conjunto>`: escreve os mapas e mostra, por classe e tamanho, quantas salas saem, as portas e as seções cobertas. Erros comuns: recorte que deixa menos de 48 px entre dois cantos, porta pedida fora de uma parede reta, água que separa o piso sem `zones`, seção sem as portas dela.
+4. `python tools/templates/convert.py --summary`: grava `game/datafiles/data/rooms/sets/<Conjunto>/` e o `sets.json` e registra os arquivos no `Zelda.yyp` (com o projeto aberto, o GameMaker pede para recarregar).
+5. Na ficha da fase: `RoomSet = "<Conjunto>";`. Antes de a fase existir, dá para testar numa fase qualquer pelo cenário (`"levels": {"Castle": {"RoomSet": "<Conjunto>"}}`, como em `tools/test/scenarios/room_sets.json`).
+6. Prova: o log tem `roomset <Conjunto> rooms=N/M` e as linhas `room ... set=<Conjunto>`; `expect` com `set_rooms_min`; a folha de contato mostra as salas; o validador passa (ele acusa mapa fora da descrição, arquivo do jogo velho e arquivo fora do `.yyp`).
+
 ## Imagem de sala a partir do ALttP
 
 1. Descubra o número da sala no ALttP (wikis e o próprio zelda3 ajudam).
@@ -116,7 +129,7 @@ Passos:
 2. Caminho: acrescente a fase nova na `NextPool` de cada fase do capítulo anterior, com o peso que dá a chance desejada (ex.: Hyrule Castle `[[DungeonLevel.CastleBasement, 2], [<nova>, 1]]` leva ao topo em 1 de cada 3 saídas). Isso já liga o sorteio de quantas saídas a fase tem e se a extra fica escondida (`ExitCount`, `ExitHidden`, padrão na ficha).
 3. Visual da saída: `ExitLook` na entrada da fase nova (`"StairsDown"` é o padrão, `"StairsUp"` a escadaria para cima). Para um visual que ainda não existe, acrescente uma entrada em `ExitLooks_Init` (`__Doors.gml`): uma função que desenha a viga e o vão da porta de saída em cima e embaixo, o som de saída, a animação do Link (`LinkAnim`: quatro sprites `global.LinkSpr_<LinkAnim>_Top1/_Bottom1/_Top2/_Bottom2` criadas em `LinkSprites_Construct` e apagadas em `LinkSprites_Destroy`; `LinkSprite_Remix` deriva uma de outra existente, escolhendo, deslocando e espelhando quadros), o som de chegada (`ArriveSound`), o vão por onde o Link chega na fase seguinte (`Entrance`, a coluna do tile de decoração em cima e embaixo) e o ícone do mapa. O Link deve sempre acompanhar os degraus desenhados no vão, na saída e na chegada. Nem o gerador nem o Link mudam.
 4. Layouts: no editor de dungeons (`editors/dungeon-editor`) ou gerando o JSON do `data_d` direto.
-5. Salas: templates novos no Tiled (`data/room-templates/`), convertidos para `game/datafiles/data/rooms/` com `tools/templates/convert.py` (veja "Template de sala no Tiled"). Para o topo do castelo dá para reaproveitar os templates do castelo e trocar o tema de parede/piso (propriedades `ForceWallTheme` e `ForceFloorTheme`).
+5. Salas: um conjunto de salas da região (receita "Conjunto de salas de uma região") e `RoomSet` na ficha. Sem conjunto, a fase usa os templates compartilhados com o tema dela.
 6. Clima: a chuva e o relâmpago do começo da run estão no `oIntro` (gotas `oRainDrop`, respingos `oRainSplash`, flash nos alarmes 1 e 2, som `Sound_Rain`). Para outra região, extraia a chuva do `oIntro` para um controlador próprio (veja `docs/regioes/topo-do-castelo.md`).
 7. Inimigos: reaproveite os do castelo; é só a lista `Enemies` da entrada, com `EnemyStats` de um nível onde eles existem. Os soldados funcionam em qualquer fase (pegam a variante padrão); para outra cor, energia ou ataque, ponha a variante na própria ficha: `EnemyVariants = {oEnemy_Soldier_Simple: {HeadIndex: SoldierHead.Normal, ColorIndex: SoldierColor.Red, Energy: 1, Attack: 0.5}}` (receita "Variante de inimigo por fase").
 8. Teste: antes de existir a fase, dá para ver o sorteio com uma ramificação temporária no cenário (chave `"levels"`, como em `tools/test/scenarios/branch_exits.json`); com ela pronta, folha de contato da fase anterior com várias sementes e o passo `exit` para atravessar cada saída.

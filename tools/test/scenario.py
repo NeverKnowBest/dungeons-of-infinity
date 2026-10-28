@@ -30,7 +30,7 @@ STEPS = {
     'give': {'item', 'index', 'amount'},
     'state': set(),
     'log': {'text'},
-    'expect': {'alive', 'level', 'room', 'enemies', 'kills_min', 'exit_level'},
+    'expect': {'alive', 'level', 'room', 'enemies', 'kills_min', 'exit_level', 'set_rooms_min'},
     'sheet': {'level', 'seeds'},
     'exit': {'which', 'frames'},
     'end': set(),
@@ -164,6 +164,12 @@ def exit_looks():
     return set(re.findall(r'^\t\t(\w+): \{Draw:', open(path, encoding='utf-8').read(), re.M))
 
 
+def room_sets():
+    """Room sets the game loads (roadmap F11)."""
+    path = os.path.join(REPO, 'game', 'datafiles', 'data', 'rooms', 'sets.json')
+    return json.load(open(path, encoding='utf-8')) if os.path.exists(path) else {}
+
+
 def _levels(changes, errors):
     """Scenario "levels" ({LevelName: {Field: value}}) into the list the game reads ([{level, Field: value}])."""
     if not isinstance(changes, dict):
@@ -180,6 +186,8 @@ def _levels(changes, errors):
                 value = [[_named(v[0], 'DungeonLevel', errors, where), v[1]] for v in value]
             if field == 'ExitLook' and looks and value not in looks:
                 errors.append('%s: unknown exit look "%s" (%s)' % (where, value, ', '.join(sorted(looks))))
+            if field == 'RoomSet' and value and value not in room_sets():
+                errors.append('%s: unknown room set "%s" (game/datafiles/data/rooms/sets.json)' % (where, value))
             entry[field] = value
         out.append(entry)
     return out

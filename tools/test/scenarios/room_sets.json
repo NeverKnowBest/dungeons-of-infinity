@@ -1,0 +1,30 @@
+{
+ "comment": "Room sets (roadmap F11): only in this test, Hyrule Castle and the Castle Basement take their rooms from the Example set (data/room-templates/sets/Example, written by tools/templates/make_rooms.py) before the shared templates. The 'roomset' log line counts the rooms built from the set and the 'room' lines end in set=Example; rooms the set has nothing for (sections it does not host, other classes) keep the shared templates. Contact sheets of both levels, a walk, and the main exit of a build with another seed.",
+ "name": "room_sets",
+ "seed": 1,
+ "level": "Castle",
+ "levels": {
+  "Castle": {"RoomSet": "Example"},
+  "CastleBasement": {"RoomSet": "Example"}
+ },
+ "cheats": ["Cheat_Inf_Health"],
+ "max_frames": 100000,
+ "steps": [
+  {"do": "wait", "frames": 60},
+  {"do": "state"},
+  {"do": "expect", "set_rooms_min": 3},
+  {"do": "hold", "keys": ["up"], "frames": 45},
+  {"do": "wait", "frames": 15},
+  {"do": "state"},
+  {"do": "shot", "name": "walked"},
+  {"do": "sheet", "level": "Castle", "seeds": [1, 2, 3]},
+  {"do": "sheet", "level": "CastleBasement", "seeds": [1, 2]},
+  {"do": "level", "level": "Castle", "seed": 4},
+  {"do": "wait", "frames": 30},
+  {"do": "expect", "set_rooms_min": 3},
+  {"do": "exit", "which": "main"},
+  {"do": "wait", "frames": 300},
+  {"do": "state"},
+  {"do": "end"}
+ ]
+}

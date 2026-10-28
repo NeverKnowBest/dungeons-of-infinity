@@ -1,0 +1,41 @@
+{
+ "comment": "Example room set (roadmap F11): five halves written by tools/templates/make_rooms.py, used only by the scenario room_sets (Hyrule Castle with RoomSet Example). Coordinates in pixels of the half room (256 wide, 128 or 256 tall), on the 8 px grid; the half is the top of the room and the converter joins it with a flipped half below.",
+ "halves": [
+  {
+   "name": "Hall",
+   "comment": "Plain hall with every door; hosts the four kinds of section (corner, middle, wide, strip).",
+   "class": "Main_Upper",
+   "size": "1x1",
+   "sections": [1, 2, 9, 17]
+  },
+  {
+   "name": "Notched",
+   "comment": "Top corners cut away (like template 11139), a pool on the middle line that the bottom half mirrors.",
+   "class": "Main_Upper",
+   "size": "1x1",
+   "cut": [[16, 16, 48, 48], [192, 16, 48, 48]],
+   "water": [[104, 88, 48, 40]]
+  },
+  {
+   "name": "Gallery",
+   "comment": "Tall half (the joined room is 1x2) with spike strips and the four kinds of section.",
+   "class": "Main_Upper",
+   "size": "1x2",
+   "sections": [1, 2, 9, 17],
+   "spikes": [[64, 192, 32, 16], [160, 192, 32, 16]]
+  },
+  {
+   "name": "Basin",
+   "comment": "Room on the lower floor: upper wall ring, lower walls and floor inside it, every lower door.",
+   "class": "Main_Lower",
+   "size": "1x1"
+  },
+  {
+   "name": "Ledges",
+   "comment": "Lower floor with its top corners cut (like template 40419): the upper walls follow it 24 px out.",
+   "class": "Main_Lower",
+   "size": "1x1",
+   "cut": [[40, 40, 32, 32], [184, 40, 32, 32]]
+  }
+ ]
+}

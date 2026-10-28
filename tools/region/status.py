@@ -60,7 +60,7 @@ def level_sheet():
     sheet = {}
     for name, value in members.items():
         if re.search(r'_L\[DungeonLevel\.%s\]\s*=\s*new Level_Create' % name, src):
-            sheet[name] = {'depth': value, 'next': '', 'pool': None, 'look': 'StairsDown', 'theme': name}
+            sheet[name] = {'depth': value, 'next': '', 'pool': None, 'look': 'StairsDown', 'theme': name, 'roomset': ''}
     for m in re.finditer(r'with\(_L\[DungeonLevel\.(\w+)\]\)\{(.*?)\n\t\}', src, re.S):
         d = sheet.get(m.group(1))
         if d is None:
@@ -81,6 +81,9 @@ def level_sheet():
         x = re.search(r'\bTheme\s*=\s*DungeonLevel\.(\w+)', body)
         if x:
             d['theme'] = x.group(1)
+        x = re.search(r'\bRoomSet\s*=\s*"(\w*)"', body)
+        if x:
+            d['roomset'] = x.group(1)
     by_value = {v: n for n, v in members.items()}
     for name, d in sheet.items():
         if d['next'] == '':
@@ -234,12 +237,25 @@ def main(argv):
             r.do('exit look %s is not in ExitLooks_Init and the line does not say "(novo)"' % w)
 
     # 4. Rooms
-    r.head('4. Rooms (Tiled and convert.py, F5)')
+    r.head('4. Rooms (room set, make_rooms.py and convert.py, F11)')
     salas = spec_section(text, 'Salas')
-    if re.search(r'subclasse|conjunto de (templates|salas)', salas, re.I) and NEW in salas:
-        r.gap('templates-por-fase', 'the spec asks for a room template set of its own, but every dungeon level draws from the same Main_Upper/Main_Lower/Stairs/Obstacles/Sections templates (by size): no level field picks a set, and convert.py has no subclass for it')
-    if re.search(r'templates? nov|salas novas|\(novo\)', salas, re.I):
-        r.gap('templates-novos', 'new room templates: the Main classes are half rooms with sections, zones and SplitConnections; no script writes them (build3.py only writes Other/Unique hub rooms) and Claude does not draw in Tiled')
+    if re.search(r'subclasse|conjunto de (templates|salas)|templates? nov|salas novas|\(novo\)', salas, re.I):
+        set_name = level or '<Fase>'
+        desc = os.path.join(REPO, 'data', 'room-templates', 'sets', set_name, 'rooms.json')
+        if os.path.exists(desc):
+            r.ok('room set %s described (data/room-templates/sets/%s/rooms.json)' % (set_name, set_name))
+        else:
+            r.do('room set %s: describe the halves in data/room-templates/sets/%s/rooms.json, then make_rooms.py %s and convert.py (receitas, "Conjunto de salas de uma região")' % (set_name, set_name, set_name))
+        if os.path.exists(os.path.join(REPO, 'game', 'datafiles', 'data', 'rooms', 'sets', set_name)):
+            r.ok('room set %s converted (game/datafiles/data/rooms/sets/%s)' % (set_name, set_name))
+        elif os.path.exists(desc):
+            r.do('python tools/templates/make_rooms.py %s && python tools/templates/convert.py' % set_name)
+        if level in sheet and sheet[level]['roomset'] == set_name:
+            r.ok('the level sheet has RoomSet "%s"' % set_name)
+        else:
+            r.do('RoomSet = "%s" in the level sheet' % set_name)
+        if re.search(r'\b(Stairs|Obstacles|Sections|Jails)\b|escadas? internas?|obst[áa]culos', salas):
+            r.gap('salas-classe', 'the spec asks for rooms of a class make_rooms.py does not write yet (it writes Main_Upper and Main_Lower halves); those rooms keep the shared templates until the helper learns it')
     if re.search(r'refer[êe]ncia para a F8|convers[ãa]o da F8', salas, re.I):
         r.note('rooms of reference for F8: only a reference, not needed to build the region')
     if re.search(r'(precisa|pede|depende) da F8', salas, re.I):

@@ -25,7 +25,7 @@ Em vez de entrar pelos corredores, o Link sobe pelos telhados e passarelas do ca
 
 ## Salas
 
-* Mesma classe de dungeon e mesmos layouts do castelo (`DungeonClass.Castle`, `data_d`); muda só o conjunto de templates de sala, que ganha uma subclasse "Rooftop" (novo) no Tiled.
+* Mesma classe de dungeon e mesmos layouts do castelo (`DungeonClass.Castle`, `data_d`); muda só o conjunto de salas: um conjunto de salas próprio, `CastleTop` (novo), escrito pelo `tools/templates/make_rooms.py` (F11) e escolhido por `RoomSet` na ficha.
 * Primeira versão: 6 a 8 templates (1x1, 2x1, 1x2 e um 2x2), cada um com função clara: passarela estreita, pátio entre torres, telhado aberto cercado de ameias, sala da escada de descida. Sem torres de parede (Beamos, canhão), como no castelo.
 * Salas especiais: entrada (Link chega subindo a escada da torre), saída (escada que desce para a prisão); as demais salas especiais (tesouro e outras que o castelo sorteie) iguais às do castelo.
 * Referência para a F8: salas da Torre de Agahnim e o exterior do castelo no ALttP (as ids saem na conversão).
@@ -70,14 +70,14 @@ A ficha de fase (F4) e os caminhos ramificados (F4b) já existem, então a regi�
 
 * `DungeonLevel` ganha o membro do topo (novo) e `Levels_Init` a entrada: `Depth` 2, `Next` e `NextPool` no Castle Prison, `Theme` e `EnemyStats` do castelo, `ExitLook` "StairsUp", a música e a lista de inimigos acima.
 * `NextPool` do Hyrule Castle: `[[DungeonLevel.CastleBasement, 2], [<topo>, 1]]`. Só isso liga o sorteio de saídas no castelo (quantas, escondida, destino); nenhuma outra fase muda.
-* Salas: subclasse Rooftop (novo) no Tiled e a escolha de templates por ela (`Dungeon_PickTemplateIndex` e o carregamento de templates).
+* Salas: conjunto de salas `CastleTop` (novo) em `data/room-templates/sets/CastleTop/rooms.json` e `RoomSet = "CastleTop"` na ficha (a escolha por conjunto já existe desde a F11).
 * Clima: criar `oWeather` (novo) no começo da fase e passar o `oIntro` a usá-lo para a chuva e o relâmpago.
 * Os soldados: confirmar se usam os números do castelo (`EnemyStats` do castelo, como decidido) agora que a fase está no capítulo 2, onde o porão usa os dele.
 * `tools/check/validate.py` e `docs/dev/engine-notes.md`: registrar o que for aprendido.
 
 ## Pronto quando
 
-* Em várias runs, o capítulo 2 aparece às vezes como o topo do castelo (por uma escadaria para cima no Hyrule Castle), com salas Rooftop, chuva, relâmpago e trovão, e o capítulo seguinte é a prisão normal.
+* Em várias runs, o capítulo 2 aparece às vezes como o topo do castelo (por uma escadaria para cima no Hyrule Castle), com as salas do conjunto CastleTop, chuva, relâmpago e trovão, e o capítulo seguinte é a prisão normal.
 * Cenários de teste da F3: começar no topo do castelo com semente fixa, andar até a escada de saída e conferir no log que as salas carregaram, os soldados apareceram e nada deu erro; folha de contato com 5 sementes mostrando as salas.
 * O validador passa e a entrada (nível `Start`) continua igual com o `oWeather` (novo).
 * O Guilherme joga uma run e aprova o visual.

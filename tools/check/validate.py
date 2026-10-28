@@ -31,6 +31,7 @@ Checks:
     import_region.py made is still in the project, and the sources did not
     change since then
 """
+import glob
 import json
 import os
 import re
@@ -354,6 +355,7 @@ def check_data(rep):
             if stale:
                 rep.error('game/datafiles/data/rooms is out of date with data/room-templates (%s); '
                           'run python tools/templates/convert.py' % ', '.join(stale))
+    check_room_sets(rep, convert)
     tdir = os.path.join(REPO, 'data', 'room-templates')
     for f in sorted(os.listdir(tdir)):
         if f.endswith('.json'):
@@ -365,6 +367,76 @@ def check_data(rep):
             ids = [o['id'] for l in d.get('layers', []) for o in l.get('objects', [])]
             if len(ids) != len(set(ids)):
                 rep.error('data/room-templates/%s has repeated object ids' % f)
+
+
+def check_control_chars(rep):
+    """Control characters in source and docs: a regex '\\b' written through a shell that eats one backslash
+    becomes a backspace and the regex silently stops matching (found in F11)."""
+    bad = re.compile(rb'[\x00-\x08\x0b\x0c\x0e-\x1f]')
+    globs = ['tools/**/*.py', 'game/scripts/**/*.gml', 'game/objects/**/*.gml', 'docs/**/*.md', '.claude/**/*.md',
+             'tools/**/*.md', 'data/room-templates/sets/**/*.json', 'tools/test/scenarios/*.json']
+    for g in globs:
+        for p in glob.glob(os.path.join(REPO, g), recursive=True):
+            raw = open(p, 'rb').read()
+            m = bad.search(raw)
+            if m:
+                rep.error('%s:%d has a control character (0x%02x); a backslash was probably lost'
+                          % (rel(p), raw.count(b'\n', 0, m.start()) + 1, raw[m.start()]))
+
+
+def check_room_sets(rep, convert):
+    """Room sets (roadmap F11): maps written by make_rooms.py match their description, the game files match the
+    maps, every set file is an included file in Zelda.yyp and every RoomSet in the level sheet exists."""
+    import make_rooms
+    try:
+        sets = convert.convert_sets([])
+    except convert.ConvertError as e:
+        rep.error('tools/templates/convert.py fails on a room set: %s' % e)
+        return
+    for n in sorted(os.listdir(convert.SETS_DIR)) if os.path.isdir(convert.SETS_DIR) else []:
+        if not os.path.exists(os.path.join(convert.SETS_DIR, n, 'rooms.json')):
+            continue
+        try:
+            halves = make_rooms.load_set(n)
+        except make_rooms.RoomError as e:
+            rep.error('room set %s: %s' % (n, e))
+            continue
+        by_class = {}
+        for h in halves:
+            by_class.setdefault(h.cls, []).append(h)
+        ci_of = {c[0]: i for i, c in enumerate(convert.CLASSES)}
+        for cls, hs in by_class.items():
+            p = convert.map_path(ci_of[cls], n)
+            text = json.dumps(make_rooms.build_map(cls, hs), indent=1) + '\n'
+            if not os.path.exists(p) or open(p, encoding='utf-8').read() != text:
+                rep.error('data/room-templates/sets/%s: the maps are out of date with rooms.json; '
+                          'run python tools/templates/make_rooms.py %s' % (n, n))
+                break
+    rooms = convert.ROOMS_DIR
+    index = os.path.join(rooms, 'sets.json')
+    if not os.path.exists(index) or open(index, encoding='utf-8').read() != convert.sets_index(sets):
+        rep.error('game/datafiles/data/rooms/sets.json is out of date; run python tools/templates/convert.py')
+    for n, classes in sets.items():
+        for cls, subclasses in classes.items():
+            p = os.path.join(rooms, 'sets', n, cls + '.json')
+            if not os.path.exists(p) or open(p, 'rb').read().decode('utf-8') != convert.class_text(subclasses):
+                rep.error('game/datafiles/data/rooms/sets/%s/%s.json is out of date; run python tools/templates/convert.py'
+                          % (n, cls))
+    included = {(f['filePath'], f['name']) for f in load_yy(YYP).get('IncludedFiles', [])}
+    for fp, name in convert.set_files(sets):
+        if (fp, name) not in included:
+            rep.error('game/%s/%s is not an included file in Zelda.yyp; run python tools/templates/convert.py' % (fp, name))
+    for fp, name in included:
+        if fp.startswith('datafiles/data/rooms/sets/') and (fp, name) not in convert.set_files(sets):
+            rep.error('Zelda.yyp includes game/%s/%s, which no room set makes; run python tools/templates/convert.py'
+                      % (fp, name))
+    src = open(os.path.join(GAME, 'scripts', '__Levels', '__Levels.gml'), encoding='utf-8').read()
+    for m in re.finditer(r'\bRoomSet\s*=\s*"([^"]*)"', COMMENT_RE.sub("", src)):
+        if m.group(1) and m.group(1) not in sets:
+            rep.error('__Levels.gml: RoomSet "%s" is not a room set (data/room-templates/sets)' % m.group(1))
+    diffs = make_rooms.selftest()
+    for d in diffs:
+        rep.error('tools/templates/make_rooms.py --selftest: %s' % d)
 
 
 def pt_docs():
@@ -547,6 +619,7 @@ def main():
     check_sprites_sounds(rep, registered)
     check_gml(rep, registered, orphans, object_gml)
     check_data(rep)
+    check_control_chars(rep)
     check_docs(rep)
     check_regions(rep, registered)
     check_exit_looks(rep)

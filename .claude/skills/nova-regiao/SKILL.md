@@ -9,7 +9,7 @@ Uma região é uma fase jogável inteira, variante de um capítulo da run (o `De
 
 ## Regra principal: parar em vez de improvisar
 
-Quando a região pedir algo que as ferramentas ainda não fazem, **pare antes de implementar** e diga ao Guilherme o que falta, qual etapa resolveria e quais as alternativas dentro da direção de design. Não invente meio caminho (um gerador de área externa às pressas, um movimento de inimigo escrito à mão dentro do objeto, templates desenhados por chute). A lista do que falta, com como reconhecer e o que resolve, está em `references/lacunas.md`. Leia-a no começo de todo uso desta skill.
+Quando a região pedir algo que as ferramentas ainda não fazem, **pare antes de implementar** e diga ao Guilherme o que falta, qual etapa resolveria e quais as alternativas dentro da direção de design. A resposta padrão é criar ou melhorar a ferramenta (uma etapa do plano), nunca simplificar a região nem fazer uma solução de uma vez só (decisão "Escalável e modular" no roadmap); as alternativas existem para o Guilherme escolher, não para o Claude pegar o atalho. Não invente meio caminho (um gerador de área externa às pressas, um movimento de inimigo escrito à mão dentro do objeto, templates desenhados por chute). A lista do que falta, com como reconhecer e o que resolve, está em `references/lacunas.md`. Leia-a no começo de todo uso desta skill.
 
 Três tipos de pendência, tratados de jeitos diferentes:
 
@@ -60,13 +60,16 @@ Receita "Estágio alternativo" (passos 1 a 3); detalhes em `docs/dev/engine-note
 4. Se a fase anterior for o Hyrule Castle e a nova tiver `SaveBefore`, pare: a sala de descanso logo depois do castelo tem um defeito conhecido (roadmap, Ideias).
 5. Prova: o validador (confere o `ExitLook`) e, no passo 7, o log `exits main-><fase>` na fase anterior.
 
-## Passo 4. Salas (Tiled e conversor, F5)
+## Passo 4. Salas (conjunto de salas da região, F11)
 
-Receita "Template de sala no Tiled".
+Receitas "Conjunto de salas de uma região" e "Template de sala no Tiled"; detalhes em `docs/dev/engine-notes.md` ("Room sets").
 
-* Reaproveitar os templates de uma classe existente não pede nada: a fase só escolhe `Class` e `Theme`.
-* Template novo ou conjunto de salas só da região: hoje é lacuna (ver `templates-novos` e `templates-por-fase`). Pare.
-* Quando houver como (ajudante de templates, F8): `python tools/templates/convert.py --summary`, `git diff --stat` mostrando só o arquivo da classe e as linhas das salas novas, validador (acusa Tiled sem conversão).
+* Reaproveitar os templates compartilhados não pede nada: a fase só escolhe `Class` e `Theme`.
+* Salas próprias da região: um conjunto com o nome da fase (o membro de `DungeonLevel`, ex.: `CastleTop`; `data/room-templates/sets/<Fase>/rooms.json`), descrito em meias salas (classe `Main_Upper` ou `Main_Lower`, tamanho `1x1` ou `1x2`, recortes do contorno, portas, seções, água, espinhos, zonas, objetos e propriedades como `ForceWallTheme`). Formato em `tools/README.md` ("templates/") e no exemplo `sets/Example/rooms.json`. Cada sala com uma função e uma forma que a diferencie (direção de design, "Salas").
+* `python tools/templates/make_rooms.py <Conjunto>` escreve os mapas do Tiled e mostra quantas salas saem, as portas e as seções cobertas; `python tools/templates/convert.py --summary` grava os arquivos do jogo e registra no `.yyp`. Na ficha, `RoomSet` com o nome. `RoomSetFallback` fica `true`: sala que nenhum template do conjunto serve (outra classe, seção que ele não tem, porta que falta) usa um compartilhado.
+* Cobertura: o log do cenário tem `roomset <Conjunto> rooms=N/M`. Para a fase parecer da região, a maioria das salas deve vir do conjunto: meias salas com todas as portas e as quatro seções cobrem quase tudo; `Main_Lower` e o tamanho `1x2` também contam. Olhe a folha de contato (é visual) antes de entregar.
+* O que o ajudante ainda não faz (ex.: classes `Stairs`, `Obstacles`, `Sections`; seções em `Main_Lower`) segue a regra principal: é lacuna, a resposta é melhorar o `make_rooms.py`, e as salas dessas classes ficam com os templates compartilhados até lá.
+* Prova: `make_rooms.py` sem erro, validador (acusa mapa fora da descrição, arquivo do jogo velho e arquivo fora do `.yyp`), `roomset` no log e a folha de contato.
 
 ## Passo 5. Inimigos (F7)
 

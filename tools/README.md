@@ -74,6 +74,8 @@ python tools/check/validate.py --strict   # warnings also fail
 | Every included file in `Zelda.yyp` exists on disk | error |
 | `data_d`, the room template files (`game/datafiles/data/rooms`) and the Tiled templates parse as JSON (LFS pointers are skipped) | error |
 | The room template files match what `templates/convert.py` makes from the Tiled maps right now (adds about 10 s) | error |
+| Control characters in scripts, GML, docs and scenario or room set JSON (a backslash lost on the way, e.g. a regex `\b` turned into a backspace) | error |
+| Room sets: `templates/make_rooms.py --selftest` is SAME, the maps it writes match their `rooms.json`, `rooms/sets.json` and `rooms/sets/<Set>/<Class>.json` match the set maps, every set file is an included file in `Zelda.yyp` (and no other file under `rooms/sets`), every `RoomSet` in `__Levels.gml` is a set | error |
 | A data file over 45 MB (GitHub warns at 50 MB) | warning |
 | Arrows or em dashes in the Portuguese docs (including `docs/ref/` and `docs/regioes/`) | warning |
 | Region spec (`docs/regioes/*.md`) has every `##` section and every header field (`* **Capítulo:**`...) of `_modelo.md` and a valid `**Estado:**` | error |
@@ -163,12 +165,12 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `give` | `item`, `index`, `amount` | Gives an item |
 | `state` | | Logs level, room, Link's position and health, enemies and kills |
 | `log` | `text` | Writes a note in the log |
-| `expect` | `alive`, `level`, `room` (`[x, y]`), `enemies`, `kills_min`, `exit_level` | Checks; a mismatch is a `FAIL` line. `"exit_level": true`: the current level is the one the last `exit` step's door leads to (not the rest stop) |
+| `expect` | `alive`, `level`, `room` (`[x, y]`), `enemies`, `kills_min`, `exit_level`, `set_rooms_min` | Checks; a mismatch is a `FAIL` line. `"exit_level": true`: the current level is the one the last `exit` step's door leads to (not the rest stop). `set_rooms_min`: at least that many rooms of the level come from its room set (roadmap F11) |
 | `exit` | `which` (`main` or `extra`), `frames` (default 60) | Puts Link 40 px in front of the level's main or extra exit (roadmap F4b) and walks into it for `frames`. Fails if there is no such exit |
 | `sheet` | `level`, `seeds` | Contact sheet (what `--sheet` runs): `sheet_<level>_<seed>.png` per seed and `sheet_<level>.png` with all of them at half size |
 | `end` | | Ends the test (it also ends after the last step) |
 
-Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>`, `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `trace <frame> <object> ...`, `arch <object> ...`, `state`, `expect ok`, `levels <index> "<name>" <field>=<value>` (scenario changes), `exits main-><level> count=1|2 extra=room <n> grid= Top|Bottom [secret]-><level> main=room <n> grid=` (only in levels whose exits can lead to more than one level), `exit main|extra room= -> level <n>`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
+Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>` (plus ` set=<Set>` when the template is of the level's room set), `roomset <Set> rooms=<from the set>/<all>` (after the `level` line, only in levels with a `RoomSet`), `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `trace <frame> <object> ...`, `arch <object> ...`, `state`, `expect ok`, `levels <index> "<name>" <field>=<value>` (scenario changes), `exits main-><level> count=1|2 extra=room <n> grid= Top|Bottom [secret]-><level> main=room <n> grid=` (only in levels whose exits can lead to more than one level), `exit main|extra room= -> level <n>`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
 
 ### `region/` (Python 3, standard library only)
 
@@ -190,15 +192,39 @@ python tools/templates/convert.py                  # Tiled maps in data/room-tem
 python tools/templates/convert.py -o out/rooms     # write somewhere else
 python tools/templates/convert.py --summary        # also print the template count per class and subclass
 python tools/templates/compare.py OLD NEW          # compare two rooms folders (or old data_r files) by content (exit code 1 if they differ)
+python tools/templates/make_rooms.py Example       # room set: data/room-templates/sets/Example/rooms.json -> that set's Tiled maps
+python tools/templates/make_rooms.py Example --dry-run   # only check the description
+python tools/templates/make_rooms.py --list        # sets with a description and their halves
+python tools/templates/make_rooms.py --selftest    # the outline model against ten shared templates (SAME or the differences)
 ```
 
 | File | What it does |
 |------|--------------|
-| `convert.py` | Reads the ten `Room Templates <Class>.json` maps, makes positions relative to each room, joins the Main Upper/Lower halves, computes door and zone codes and writes one file per class, one template per line (about 10 s). How the data works: `docs/dev/engine-notes.md`, "Room templates" |
+| `convert.py` | Reads the ten `Room Templates <Class>.json` maps, makes positions relative to each room, joins the Main Upper/Lower halves, computes door and zone codes and writes one file per class, one template per line (about 10 s). Also converts the room sets (`data/room-templates/sets/<Set>/`, roadmap F11) to `rooms/sets/<Set>/<Class>.json` plus `rooms/sets.json`, and registers those files as included files in `Zelda.yyp` (only when writing to the default folder). How the data works: `docs/dev/engine-notes.md`, "Room templates" and "Room sets" |
+| `make_rooms.py` | Room template helper (roadmap F11): writes the Tiled maps of a room set (`Main_Upper` and `Main_Lower` half rooms) from a short description, converts them like `convert.py` and prints, per class and size, how many rooms the halves make, the doors and the sections they cover. Never overwrites a map it did not write (maps it writes have the map property `Generator`) |
 | `rt_tables.py` | Transform tables (gid, door position, section id, rotation, pot and switch block directions), generated once from the GML `GetTransformed*` functions. Gid names resolve through the `TemplateObjGID` enum in the game's `__RoomTemplates.gml` |
 | `compare.py` | Content comparison of two sets of room templates (a rooms folder or an old single file `data_r`), ignoring key order and int versus float. Template order inside a subclass counts (it changes what a seed builds) |
 
 The output was checked equal to the last `data_r` written by the GameMaker parser (roadmap F5). The room files are plain git, not LFS, so `git diff` shows which templates changed (one line each).
+
+Room set description (`data/room-templates/sets/<Set>/rooms.json`; the set name is the level's `DungeonLevel` member and goes in `RoomSet` in the level sheet). Pixels of the half room, 256 wide, on the 8 px grid; the half is the top of a room, and the converter joins it with every half of the same class and size (flipped, below it) whose side walls meet the cut line at the same place:
+
+```
+{"halves": [
+  {"name": "Hall", "class": "Main_Upper", "size": "1x1",      # Main_Upper or Main_Lower; 1x1 (256x128 half) or 1x2 (256x256)
+   "cut": [[16, 16, 48, 48]],                                  # boxes taken out of the outline (walls follow; OutOfBounds over them)
+   "doors": "all",                                             # or a list: Main_Upper 11 12 1 (top) 10 9 (left) 2 3 (right),
+                                                               #   Main_Lower 23 24 13, 22 21, 14 15; 9 3 21 15 are on the cut line
+   "sections": [1, 2, 9, 17],                                  # Main_Upper: top left corner, top middle, wide left, top strip
+   "water": [[104, 88, 48, 40]], "spikes": [[64, 96, 32, 16]],
+   "zones": [[...]],                                           # only when water splits the floor (the script refuses it otherwise)
+   "objects": {"Torches": [[40, 40, 16, 16]], "Pots": [[40, 40, 48, 16, {"SpawnDir": "R"}]]},   # extra objects
+   "furnish": true,                                            # false: only the objects given
+   "props": {"ForceWallTheme": 3}}                             # more properties of the Tiled room
+]}
+```
+
+Walls (24 px thick, corner and inner corner pieces), OutOfBounds, the Main_Lower lower floor and the upper walls around it, the doors, the SplitConnections and `Symetry` come from the outline. With `furnish` (the default) every half and every section gets torches in the top corners, treasure and crystal spots, pot rows along the top wall, two monuments and an enemy area, off the door lanes, water and spikes; without them the generator cannot place keys and crystals. `--selftest` builds ten shared templates (Main_Upper and Main_Lower, with and without cuts) from descriptions and compares walls, doors, OutOfBounds, LowerFloor and SplitConnections with the real ones; the validator runs it too (`docs/dev/engine-notes.md`, "Room sets"). Not done yet: other classes (Stairs, Obstacles, Sections, Jails) and sections in Main_Lower (gap `salas-classe` of the `nova-regiao` skill).
 
 ### `import/` (Python 3, Pillow, numpy)
 
