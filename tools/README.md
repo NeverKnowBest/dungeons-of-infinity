@@ -75,7 +75,7 @@ python tools/check/validate.py --strict   # warnings also fail
 | `data_d`, the room template files (`game/datafiles/data/rooms`) and the Tiled templates parse as JSON (LFS pointers are skipped) | error |
 | The room template files match what `templates/convert.py` makes from the Tiled maps right now (adds about 10 s) | error |
 | Control characters in scripts, GML, docs and scenario or room set JSON (a backslash lost on the way, e.g. a regex `\b` turned into a backspace) | error |
-| Room sets: `templates/make_rooms.py --selftest` is SAME, the maps it writes match their `rooms.json`, `rooms/sets.json` and `rooms/sets/<Set>/<Class>.json` match the set maps, every set file is an included file in `Zelda.yyp` (and no other file under `rooms/sets`), every `RoomSet` in `__Levels.gml` is a set | error |
+| Room sets: `templates/make_rooms.py --selftest` is SAME (outlines, `motifs.json` up to date, loose compositions refused), the maps it writes match their `rooms.json`, `rooms/sets.json` and `rooms/sets/<Set>/<Class>.json` match the set maps, every set file is an included file in `Zelda.yyp` (and no other file under `rooms/sets`), every `RoomSet` in `__Levels.gml` is a set | error |
 | A data file over 45 MB (GitHub warns at 50 MB) | warning |
 | Arrows or em dashes in the Portuguese docs (including `docs/ref/` and `docs/regioes/`) | warning |
 | Region spec (`docs/regioes/*.md`) has every `##` section and every header field (`* **Capítulo:**`...) of `_modelo.md` and a valid `**Estado:**` | error |
@@ -195,13 +195,18 @@ python tools/templates/compare.py OLD NEW          # compare two rooms folders (
 python tools/templates/make_rooms.py Example       # room set: data/room-templates/sets/Example/rooms.json -> that set's Tiled maps
 python tools/templates/make_rooms.py Example --dry-run   # only check the description
 python tools/templates/make_rooms.py --list        # sets with a description and their halves
-python tools/templates/make_rooms.py --selftest    # the outline model against ten shared templates (SAME or the differences)
+python tools/templates/make_rooms.py Example --map # each half as text: walls, door lanes and the composed motifs
+python tools/templates/make_rooms.py --selftest    # outlines against ten shared templates, loose compositions refused
+python tools/templates/motifs.py                   # composition motifs measured in the shared templates -> data/room-templates/motifs.json
+python tools/templates/motifs.py --report          # the catalog layer by layer, with the rules it makes
+python tools/templates/motifs.py --check           # exit 1 when motifs.json is out of date
 ```
 
 | File | What it does |
 |------|--------------|
 | `convert.py` | Reads the ten `Room Templates <Class>.json` maps, makes positions relative to each room, joins the Main Upper/Lower halves, computes door and zone codes and writes one file per class, one template per line (about 10 s). Also converts the room sets (`data/room-templates/sets/<Set>/`, roadmap F11) to `rooms/sets/<Set>/<Class>.json` plus `rooms/sets.json`, and registers those files as included files in `Zelda.yyp` (only when writing to the default folder). How the data works: `docs/dev/engine-notes.md`, "Room templates" and "Room sets" |
 | `make_rooms.py` | Room template helper (roadmap F11): writes the Tiled maps of a room set (`Main_Upper` and `Main_Lower` half rooms) from a short description, converts them like `convert.py` and prints, per class and size, how many rooms the halves make, the doors and the sections they cover. Never overwrites a map it did not write (maps it writes have the map property `Generator`) |
+| `motifs.py` | Composition motifs (roadmap F11b): classifies every piece of the shared `Main_Upper` and `Main_Lower` halves by its anchor on the floor (`corner`, `top`, `top_center`, `side`, `axis`, `field`; `area` for enemy areas and full carpets) and writes `data/room-templates/motifs.json`: per class and layer, the motifs used by at least 3 halves with their sizes, insets, steps, lattice phase and properties, plus the shares that make the rules of `check_half` (mirror, door lane, touching). `--report` prints it and how many shared pieces it explains (96% in Main_Upper, 92% in Main_Lower) |
 | `rt_tables.py` | Transform tables (gid, door position, section id, rotation, pot and switch block directions), generated once from the GML `GetTransformed*` functions. Gid names resolve through the `TemplateObjGID` enum in the game's `__RoomTemplates.gml` |
 | `compare.py` | Content comparison of two sets of room templates (a rooms folder or an old single file `data_r`), ignoring key order and int versus float. Template order inside a subclass counts (it changes what a seed builds) |
 
@@ -216,15 +221,18 @@ Room set description (`data/room-templates/sets/<Set>/rooms.json`; the set name 
    "doors": "all",                                             # or a list: Main_Upper 11 12 1 (top) 10 9 (left) 2 3 (right),
                                                                #   Main_Lower 23 24 13, 22 21, 14 15; 9 3 21 15 are on the cut line
    "sections": [1, 2, 9, 17],                                  # Main_Upper: top left corner, top middle, wide left, top strip
-   "water": [[104, 88, 48, 40]], "spikes": [[64, 96, 32, 16]],
+   "motifs": [                                                 # decoration (F11b): "Layer/anchor" from motifs.json
+     "Torches/corner",                                         #   the catalog's first size, inset and step
+     {"motif": "Pots/corner", "size": [64, 16]},               #   or one of its sizes, insets [side, top] and steps [x, y]
+     {"motif": "Water/axis", "inset": [64, 56], "within": [80, 96, 96, 32]}],   # within: only inside this box
    "zones": [[...]],                                           # only when water splits the floor (the script refuses it otherwise)
-   "objects": {"Torches": [[40, 40, 16, 16]], "Pots": [[40, 40, 48, 16, {"SpawnDir": "R"}]]},   # extra objects
-   "furnish": true,                                            # false: only the objects given
+   "water": [[...]], "spikes": [[...]], "objects": {"Torches": [[40, 40, 16, 16]]},   # loose pieces: last resort, checked too
+   "furnish": true,                                            # false: no composition, only what is given
    "props": {"ForceWallTheme": 3}}                             # more properties of the Tiled room
 ]}
 ```
 
-Walls (24 px thick, corner and inner corner pieces), OutOfBounds, the Main_Lower lower floor and the upper walls around it, the doors, the SplitConnections and `Symetry` come from the outline. With `furnish` (the default) every half and every section gets torches in the top corners, treasure and crystal spots, pot rows along the top wall, two monuments and an enemy area, off the door lanes, water and spikes; without them the generator cannot place keys and crystals. `--selftest` builds ten shared templates (Main_Upper and Main_Lower, with and without cuts) from descriptions and compares walls, doors, OutOfBounds, LowerFloor and SplitConnections with the real ones; the validator runs it too (`docs/dev/engine-notes.md`, "Room sets"). Not done yet: other classes (Stairs, Obstacles, Sections, Jails) and sections in Main_Lower (gap `salas-classe` of the `nova-regiao` skill).
+Walls (24 px thick, corner and inner corner pieces), OutOfBounds, the Main_Lower lower floor and the upper walls around it, the doors, the SplitConnections and `Symetry` come from the outline. With `furnish` (the default) every half and every section is composed from motifs: the ones it names in `motifs` and, for the other layers of `DEFAULT_LAYERS` (torches, monuments, pots, pot treasures, treasure and crystal spots, full carpet, enemy area), the most used motif of the class; a named layer drops its default. The pieces go in mirrored pairs, furniture first, then water and spikes around it, then the spots and areas; without spots the generator cannot place keys and crystals. The composition check (`motifs.check_half`) then refuses a loose half: a piece no motif explains, a pair missing in a layer the shared templates mirror (Torches, Monuments, Pots, Treasures...), Torches or Monuments touching, water, guru bars or moving spike blocks on a door lane (the game drops the other layers next to a door in use), solid pieces cutting two doors apart. `--map` prints each half as text to judge the composition before the game. `--selftest` builds ten shared templates (Main_Upper and Main_Lower, with and without cuts) from descriptions and compares walls, doors, OutOfBounds, LowerFloor and SplitConnections with the real ones, checks that `motifs.json` is up to date and explains at least 90% of the shared pieces, and that six loose compositions (the F11 Example pool and gallery statues among them) are refused; the validator runs it too (`docs/dev/engine-notes.md`, "Room sets"). Not done yet: other classes (Stairs, Obstacles, Sections, Jails) and sections in Main_Lower (gap `salas-classe` of the `nova-regiao` skill).
 
 ### `import/` (Python 3, Pillow, numpy)
 

@@ -5,7 +5,7 @@
    "format": "json"
   }
  },
- "height": 16,
+ "height": 32,
  "infinite": false,
  "layers": [
   {
@@ -14,7 +14,7 @@
    "name": "Rooms",
    "objects": [
     {
-     "height": 128,
+     "height": 256,
      "id": 1,
      "name": "Basin",
      "properties": [
@@ -38,8 +38,8 @@
     },
     {
      "height": 128,
-     "id": 25,
-     "name": "Ledges",
+     "id": 49,
+     "name": "Vault",
      "properties": [
       {
        "name": "Split_MainSectionIDs",
@@ -58,6 +58,29 @@
      "width": 256,
      "x": 288,
      "y": 0
+    },
+    {
+     "height": 128,
+     "id": 84,
+     "name": "Ledges",
+     "properties": [
+      {
+       "name": "Split_MainSectionIDs",
+       "type": "string",
+       "value": "0,0,0,0"
+      },
+      {
+       "name": "Symetry",
+       "type": "int",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 256,
+     "x": 576,
+     "y": 0
     }
    ],
    "opacity": 1,
@@ -70,7 +93,141 @@
    "draworder": "topdown",
    "id": 2,
    "name": "Water",
-   "objects": [],
+   "objects": [
+    {
+     "height": 32,
+     "id": 22,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 32,
+     "x": 112,
+     "y": 160,
+     "gid": 93
+    },
+    {
+     "height": 32,
+     "id": 23,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 32,
+     "x": 112,
+     "y": 192,
+     "gid": 93
+    },
+    {
+     "height": 32,
+     "id": 24,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 32,
+     "x": 112,
+     "y": 224,
+     "gid": 93
+    },
+    {
+     "height": 32,
+     "id": 25,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 32,
+     "x": 80,
+     "y": 160,
+     "gid": 93
+    },
+    {
+     "height": 32,
+     "id": 26,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 32,
+     "x": 144,
+     "y": 160,
+     "gid": 93
+    },
+    {
+     "height": 32,
+     "id": 27,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 32,
+     "x": 80,
+     "y": 192,
+     "gid": 93
+    },
+    {
+     "height": 32,
+     "id": 28,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 32,
+     "x": 144,
+     "y": 192,
+     "gid": 93
+    }
+   ],
    "opacity": 1,
    "type": "objectgroup",
    "visible": true,
@@ -81,7 +238,65 @@
    "draworder": "topdown",
    "id": 3,
    "name": "CarpetsFull",
-   "objects": [],
+   "objects": [
+    {
+     "height": 184,
+     "id": 29,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 1
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 112,
+     "x": 72,
+     "y": 72,
+     "gid": 249
+    },
+    {
+     "height": 56,
+     "id": 70,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 112,
+     "x": 360,
+     "y": 72,
+     "gid": 249
+    },
+    {
+     "height": 24,
+     "id": 120,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 112,
+     "x": 648,
+     "y": 104,
+     "gid": 249
+    }
+   ],
    "opacity": 1,
    "type": "objectgroup",
    "visible": true,
@@ -173,7 +388,7 @@
      "gid": 28
     },
     {
-     "height": 64,
+     "height": 192,
      "id": 11,
      "name": "",
      "properties": [
@@ -192,7 +407,7 @@
      "gid": 26
     },
     {
-     "height": 64,
+     "height": 192,
      "id": 12,
      "name": "",
      "properties": [
@@ -212,51 +427,13 @@
     },
     {
      "height": 24,
-     "id": 43,
+     "id": 56,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
-      }
-     ],
-     "rotation": 0,
-     "type": "",
-     "visible": true,
-     "width": 24,
-     "x": 360,
-     "y": 40,
-     "gid": 19
-    },
-    {
-     "height": 24,
-     "id": 44,
-     "name": "",
-     "properties": [
-      {
-       "name": "Room",
-       "type": "object",
-       "value": 25
-      }
-     ],
-     "rotation": 0,
-     "type": "",
-     "visible": true,
-     "width": 24,
-     "x": 448,
-     "y": 40,
-     "gid": 20
-    },
-    {
-     "height": 24,
-     "id": 45,
-     "name": "",
-     "properties": [
-      {
-       "name": "Room",
-       "type": "object",
-       "value": 25
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -264,56 +441,18 @@
      "visible": true,
      "width": 24,
      "x": 328,
-     "y": 72,
+     "y": 40,
      "gid": 19
     },
     {
      "height": 24,
-     "id": 46,
+     "id": 57,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
-      }
-     ],
-     "rotation": 0,
-     "type": "",
-     "visible": true,
-     "width": 24,
-     "x": 360,
-     "y": 72,
-     "gid": 23
-    },
-    {
-     "height": 24,
-     "id": 47,
-     "name": "",
-     "properties": [
-      {
-       "name": "Room",
-       "type": "object",
-       "value": 25
-      }
-     ],
-     "rotation": 0,
-     "type": "",
-     "visible": true,
-     "width": 24,
-     "x": 448,
-     "y": 72,
-     "gid": 24
-    },
-    {
-     "height": 24,
-     "id": 48,
-     "name": "",
-     "properties": [
-      {
-       "name": "Room",
-       "type": "object",
-       "value": 25
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -321,139 +460,310 @@
      "visible": true,
      "width": 24,
      "x": 480,
-     "y": 72,
+     "y": 40,
      "gid": 20
     },
     {
      "height": 24,
-     "id": 49,
+     "id": 58,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 128,
+     "x": 352,
+     "y": 40,
+     "gid": 28
+    },
+    {
+     "height": 64,
+     "id": 59,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 328,
+     "y": 64,
+     "gid": 26
+    },
+    {
+     "height": 64,
+     "id": 60,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 480,
+     "y": 64,
+     "gid": 27
+    },
+    {
+     "height": 24,
+     "id": 102,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 648,
+     "y": 40,
+     "gid": 19
+    },
+    {
+     "height": 24,
+     "id": 103,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 736,
+     "y": 40,
+     "gid": 20
+    },
+    {
+     "height": 24,
+     "id": 104,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 616,
+     "y": 72,
+     "gid": 19
+    },
+    {
+     "height": 24,
+     "id": 105,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 648,
+     "y": 72,
+     "gid": 23
+    },
+    {
+     "height": 24,
+     "id": 106,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 736,
+     "y": 72,
+     "gid": 24
+    },
+    {
+     "height": 24,
+     "id": 107,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 768,
+     "y": 72,
+     "gid": 20
+    },
+    {
+     "height": 24,
+     "id": 108,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 64,
-     "x": 384,
+     "x": 672,
      "y": 40,
      "gid": 28
     },
     {
      "height": 24,
-     "id": 50,
+     "id": 109,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 8,
-     "x": 352,
+     "x": 640,
      "y": 72,
      "gid": 28
     },
     {
      "height": 24,
-     "id": 51,
+     "id": 110,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 8,
-     "x": 472,
+     "x": 760,
      "y": 72,
      "gid": 28
     },
     {
      "height": 32,
-     "id": 52,
+     "id": 111,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 24,
-     "x": 328,
+     "x": 616,
      "y": 96,
      "gid": 26
     },
     {
      "height": 8,
-     "id": 53,
+     "id": 112,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 24,
-     "x": 360,
+     "x": 648,
      "y": 64,
      "gid": 26
     },
     {
      "height": 8,
-     "id": 54,
+     "id": 113,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 24,
-     "x": 448,
+     "x": 736,
      "y": 64,
      "gid": 27
     },
     {
      "height": 32,
-     "id": 55,
+     "id": 114,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 24,
-     "x": 480,
+     "x": 768,
      "y": 96,
      "gid": 27
     }
@@ -527,7 +837,7 @@
      "gid": 32
     },
     {
-     "height": 88,
+     "height": 216,
      "id": 5,
      "name": "",
      "properties": [
@@ -546,7 +856,7 @@
      "gid": 30
     },
     {
-     "height": 88,
+     "height": 216,
      "id": 6,
      "name": "",
      "properties": [
@@ -566,51 +876,13 @@
     },
     {
      "height": 24,
-     "id": 26,
+     "id": 50,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
-      }
-     ],
-     "rotation": 0,
-     "type": "",
-     "visible": true,
-     "width": 24,
-     "x": 336,
-     "y": 16,
-     "gid": 11
-    },
-    {
-     "height": 24,
-     "id": 27,
-     "name": "",
-     "properties": [
-      {
-       "name": "Room",
-       "type": "object",
-       "value": 25
-      }
-     ],
-     "rotation": 0,
-     "type": "",
-     "visible": true,
-     "width": 24,
-     "x": 472,
-     "y": 16,
-     "gid": 12
-    },
-    {
-     "height": 24,
-     "id": 28,
-     "name": "",
-     "properties": [
-      {
-       "name": "Room",
-       "type": "object",
-       "value": 25
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -618,56 +890,18 @@
      "visible": true,
      "width": 24,
      "x": 304,
-     "y": 48,
+     "y": 16,
      "gid": 11
     },
     {
      "height": 24,
-     "id": 29,
+     "id": 51,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
-      }
-     ],
-     "rotation": 0,
-     "type": "",
-     "visible": true,
-     "width": 24,
-     "x": 336,
-     "y": 48,
-     "gid": 15
-    },
-    {
-     "height": 24,
-     "id": 30,
-     "name": "",
-     "properties": [
-      {
-       "name": "Room",
-       "type": "object",
-       "value": 25
-      }
-     ],
-     "rotation": 0,
-     "type": "",
-     "visible": true,
-     "width": 24,
-     "x": 472,
-     "y": 48,
-     "gid": 16
-    },
-    {
-     "height": 24,
-     "id": 31,
-     "name": "",
-     "properties": [
-      {
-       "name": "Room",
-       "type": "object",
-       "value": 25
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -675,139 +909,310 @@
      "visible": true,
      "width": 24,
      "x": 504,
-     "y": 48,
+     "y": 16,
      "gid": 12
     },
     {
      "height": 24,
-     "id": 32,
+     "id": 52,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 176,
+     "x": 328,
+     "y": 16,
+     "gid": 32
+    },
+    {
+     "height": 88,
+     "id": 53,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 304,
+     "y": 40,
+     "gid": 30
+    },
+    {
+     "height": 88,
+     "id": 54,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 504,
+     "y": 40,
+     "gid": 31
+    },
+    {
+     "height": 24,
+     "id": 85,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 624,
+     "y": 16,
+     "gid": 11
+    },
+    {
+     "height": 24,
+     "id": 86,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 760,
+     "y": 16,
+     "gid": 12
+    },
+    {
+     "height": 24,
+     "id": 87,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 592,
+     "y": 48,
+     "gid": 11
+    },
+    {
+     "height": 24,
+     "id": 88,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 624,
+     "y": 48,
+     "gid": 15
+    },
+    {
+     "height": 24,
+     "id": 89,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 760,
+     "y": 48,
+     "gid": 16
+    },
+    {
+     "height": 24,
+     "id": 90,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 792,
+     "y": 48,
+     "gid": 12
+    },
+    {
+     "height": 24,
+     "id": 91,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 112,
-     "x": 360,
+     "x": 648,
      "y": 16,
      "gid": 32
     },
     {
      "height": 24,
-     "id": 33,
+     "id": 92,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 8,
-     "x": 328,
+     "x": 616,
      "y": 48,
      "gid": 32
     },
     {
      "height": 24,
-     "id": 34,
+     "id": 93,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 8,
-     "x": 496,
+     "x": 784,
      "y": 48,
      "gid": 32
     },
     {
      "height": 56,
-     "id": 35,
+     "id": 94,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 24,
-     "x": 304,
+     "x": 592,
      "y": 72,
      "gid": 30
     },
     {
      "height": 8,
-     "id": 36,
+     "id": 95,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 24,
-     "x": 336,
+     "x": 624,
      "y": 40,
      "gid": 30
     },
     {
      "height": 8,
-     "id": 37,
+     "id": 96,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 24,
-     "x": 472,
+     "x": 760,
      "y": 40,
      "gid": 31
     },
     {
      "height": 56,
-     "id": 38,
+     "id": 97,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 24,
-     "x": 504,
+     "x": 792,
      "y": 72,
      "gid": 31
     }
@@ -858,7 +1263,7 @@
      "visible": true,
      "width": 24,
      "x": 192,
-     "y": 72,
+     "y": 112,
      "gid": 3
     },
     {
@@ -877,7 +1282,7 @@
      "visible": true,
      "width": 24,
      "x": 192,
-     "y": 112,
+     "y": 240,
      "gid": 3
     },
     {
@@ -896,7 +1301,7 @@
      "visible": true,
      "width": 24,
      "x": 40,
-     "y": 112,
+     "y": 240,
      "gid": 2
     },
     {
@@ -915,7 +1320,7 @@
      "visible": true,
      "width": 24,
      "x": 40,
-     "y": 72,
+     "y": 112,
      "gid": 2
     },
     {
@@ -957,14 +1362,52 @@
      "gid": 4
     },
     {
-     "height": 32,
-     "id": 58,
+     "height": 24,
+     "id": 63,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 32,
+     "x": 440,
+     "y": 40,
+     "gid": 4
+    },
+    {
+     "height": 32,
+     "id": 64,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 480,
+     "y": 72,
+     "gid": 3
+    },
+    {
+     "height": 32,
+     "id": 65,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -977,13 +1420,13 @@
     },
     {
      "height": 32,
-     "id": 59,
+     "id": 66,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -995,14 +1438,52 @@
      "gid": 2
     },
     {
-     "height": 24,
-     "id": 60,
+     "height": 32,
+     "id": 67,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 328,
+     "y": 72,
+     "gid": 2
+    },
+    {
+     "height": 24,
+     "id": 68,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 49
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 32,
+     "x": 360,
+     "y": 40,
+     "gid": 4
+    },
+    {
+     "height": 24,
+     "id": 69,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -1010,6 +1491,63 @@
      "visible": true,
      "width": 32,
      "x": 400,
+     "y": 40,
+     "gid": 4
+    },
+    {
+     "height": 32,
+     "id": 117,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 768,
+     "y": 112,
+     "gid": 3
+    },
+    {
+     "height": 32,
+     "id": 118,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 24,
+     "x": 616,
+     "y": 112,
+     "gid": 2
+    },
+    {
+     "height": 24,
+     "id": 119,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "Lower",
+     "visible": true,
+     "width": 32,
+     "x": 688,
      "y": 40,
      "gid": 4
     }
@@ -1026,7 +1564,7 @@
    "name": "LowerFloor",
    "objects": [
     {
-     "height": 88,
+     "height": 216,
      "id": 7,
      "name": "",
      "properties": [
@@ -1044,32 +1582,14 @@
      "y": 40
     },
     {
-     "height": 32,
-     "id": 41,
+     "height": 88,
+     "id": 55,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
-      }
-     ],
-     "rotation": 0,
-     "type": "",
-     "visible": true,
-     "width": 112,
-     "x": 360,
-     "y": 40
-    },
-    {
-     "height": 56,
-     "id": 42,
-     "name": "",
-     "properties": [
-      {
-       "name": "Room",
-       "type": "object",
-       "value": 25
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -1077,6 +1597,42 @@
      "visible": true,
      "width": 176,
      "x": 328,
+     "y": 40
+    },
+    {
+     "height": 32,
+     "id": 100,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 112,
+     "x": 648,
+     "y": 40
+    },
+    {
+     "height": 56,
+     "id": 101,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 176,
+     "x": 616,
      "y": 72
     }
    ],
@@ -1093,38 +1649,38 @@
    "objects": [
     {
      "height": 32,
-     "id": 39,
+     "id": 98,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 32,
-     "x": 304,
+     "x": 592,
      "y": 16
     },
     {
      "height": 32,
-     "id": 40,
+     "id": 99,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 84
       }
      ],
      "rotation": 0,
      "type": "",
      "visible": true,
      "width": 32,
-     "x": 496,
+     "x": 784,
      "y": 16
     }
    ],
@@ -1155,7 +1711,7 @@
      "visible": true,
      "width": 24,
      "x": 40,
-     "y": 112
+     "y": 240
     },
     {
      "height": 32,
@@ -1173,17 +1729,17 @@
      "visible": true,
      "width": 24,
      "x": 192,
-     "y": 112
+     "y": 240
     },
     {
      "height": 32,
-     "id": 56,
+     "id": 61,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -1195,13 +1751,13 @@
     },
     {
      "height": 32,
-     "id": 57,
+     "id": 62,
      "name": "",
      "properties": [
       {
        "name": "Room",
        "type": "object",
-       "value": 25
+       "value": 49
       }
      ],
      "rotation": 0,
@@ -1209,6 +1765,42 @@
      "visible": true,
      "width": 24,
      "x": 480,
+     "y": 112
+    },
+    {
+     "height": 32,
+     "id": 115,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 616,
+     "y": 112
+    },
+    {
+     "height": 32,
+     "id": 116,
+     "name": "",
+     "properties": [
+      {
+       "name": "Room",
+       "type": "object",
+       "value": 84
+      }
+     ],
+     "rotation": 0,
+     "type": "",
+     "visible": true,
+     "width": 24,
+     "x": 768,
      "y": 112
     }
    ],
@@ -1242,7 +1834,7 @@
        "objects": [
         {
          "height": 48,
-         "id": 24,
+         "id": 48,
          "name": "",
          "properties": [
           {
@@ -1254,27 +1846,45 @@
          "rotation": 0,
          "type": "",
          "visible": true,
-         "width": 96,
-         "x": 80,
-         "y": 80
+         "width": 80,
+         "x": 88,
+         "y": 88
         },
         {
-         "height": 16,
-         "id": 67,
+         "height": 40,
+         "id": 83,
          "name": "",
          "properties": [
           {
            "name": "Room",
            "type": "object",
-           "value": 25
+           "value": 49
           }
          ],
          "rotation": 0,
          "type": "",
          "visible": true,
-         "width": 96,
-         "x": 368,
-         "y": 112
+         "width": 80,
+         "x": 376,
+         "y": 88
+        },
+        {
+         "height": 8,
+         "id": 142,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 80,
+         "x": 664,
+         "y": 120
         }
        ],
        "opacity": 1,
@@ -1331,7 +1941,103 @@
        "draworder": "topdown",
        "id": 19,
        "name": "Monuments",
-       "objects": [],
+       "objects": [
+        {
+         "height": 32,
+         "id": 32,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 32,
+         "x": 72,
+         "y": 72,
+         "gid": 41
+        },
+        {
+         "height": 32,
+         "id": 33,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 32,
+         "x": 152,
+         "y": 72,
+         "gid": 41
+        },
+        {
+         "height": 32,
+         "id": 73,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 32,
+         "x": 360,
+         "y": 72,
+         "gid": 41
+        },
+        {
+         "height": 32,
+         "id": 74,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 32,
+         "x": 440,
+         "y": 72,
+         "gid": 41
+        },
+        {
+         "height": 32,
+         "id": 125,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 32,
+         "x": 688,
+         "y": 72,
+         "gid": 41
+        }
+       ],
        "opacity": 1,
        "type": "objectgroup",
        "visible": true,
@@ -1342,7 +2048,160 @@
        "draworder": "topdown",
        "id": 20,
        "name": "Torches",
-       "objects": [],
+       "objects": [
+        {
+         "height": 16,
+         "id": 30,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 64,
+         "y": 64,
+         "gid": 265
+        },
+        {
+         "height": 16,
+         "id": 31,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 176,
+         "y": 64,
+         "gid": 265
+        },
+        {
+         "height": 16,
+         "id": 71,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 352,
+         "y": 64,
+         "gid": 265
+        },
+        {
+         "height": 16,
+         "id": 72,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 464,
+         "y": 64,
+         "gid": 265
+        },
+        {
+         "height": 16,
+         "id": 121,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 672,
+         "y": 64,
+         "gid": 265
+        },
+        {
+         "height": 16,
+         "id": 122,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 720,
+         "y": 64,
+         "gid": 265
+        },
+        {
+         "height": 16,
+         "id": 123,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 640,
+         "y": 96,
+         "gid": 265
+        },
+        {
+         "height": 16,
+         "id": 124,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 752,
+         "y": 96,
+         "gid": 265
+        }
+       ],
        "opacity": 1,
        "type": "objectgroup",
        "visible": true,
@@ -1356,7 +2215,7 @@
        "objects": [
         {
          "height": 16,
-         "id": 23,
+         "id": 46,
          "name": "",
          "properties": [
           {
@@ -1369,27 +2228,141 @@
          "type": "",
          "visible": true,
          "width": 16,
-         "x": 120,
-         "y": 96,
+         "x": 72,
+         "y": 120,
          "gid": 36
         },
         {
          "height": 16,
-         "id": 62,
+         "id": 47,
          "name": "",
          "properties": [
           {
            "name": "Room",
            "type": "object",
-           "value": 25
+           "value": 1
           }
          ],
          "rotation": 0,
          "type": "",
          "visible": true,
          "width": 16,
-         "x": 408,
-         "y": 96,
+         "x": 168,
+         "y": 120,
+         "gid": 36
+        },
+        {
+         "height": 16,
+         "id": 81,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 360,
+         "y": 72,
+         "gid": 36
+        },
+        {
+         "height": 16,
+         "id": 82,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 456,
+         "y": 72,
+         "gid": 36
+        },
+        {
+         "height": 16,
+         "id": 138,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 680,
+         "y": 72,
+         "gid": 36
+        },
+        {
+         "height": 16,
+         "id": 139,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 712,
+         "y": 72,
+         "gid": 36
+        },
+        {
+         "height": 16,
+         "id": 140,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 648,
+         "y": 104,
+         "gid": 36
+        },
+        {
+         "height": 16,
+         "id": 141,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 744,
+         "y": 104,
          "gid": 36
         }
        ],
@@ -1406,40 +2379,154 @@
        "objects": [
         {
          "height": 16,
-         "id": 65,
+         "id": 36,
          "name": "",
          "properties": [
           {
            "name": "Room",
            "type": "object",
-           "value": 25
+           "value": 1
           }
          ],
          "rotation": 0,
          "type": "",
          "visible": true,
-         "width": 16,
-         "x": 384,
+         "width": 48,
+         "x": 64,
          "y": 64,
          "gid": 37
         },
         {
          "height": 16,
-         "id": 66,
+         "id": 37,
          "name": "",
          "properties": [
           {
            "name": "Room",
            "type": "object",
-           "value": 25
+           "value": 1
           }
          ],
          "rotation": 0,
          "type": "",
          "visible": true,
-         "width": 16,
+         "width": 48,
+         "x": 144,
+         "y": 64,
+         "gid": 37
+        },
+        {
+         "height": 16,
+         "id": 77,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 48,
+         "x": 352,
+         "y": 64,
+         "gid": 37
+        },
+        {
+         "height": 16,
+         "id": 78,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 48,
          "x": 432,
          "y": 64,
+         "gid": 37
+        },
+        {
+         "height": 16,
+         "id": 130,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 48,
+         "x": 672,
+         "y": 64,
+         "gid": 37
+        },
+        {
+         "height": 16,
+         "id": 131,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 48,
+         "x": 688,
+         "y": 64,
+         "gid": 37
+        },
+        {
+         "height": 16,
+         "id": 132,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 48,
+         "x": 640,
+         "y": 96,
+         "gid": 37
+        },
+        {
+         "height": 16,
+         "id": 133,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 48,
+         "x": 720,
+         "y": 96,
          "gid": 37
         }
        ],
@@ -1456,7 +2543,7 @@
        "objects": [
         {
          "height": 16,
-         "id": 22,
+         "id": 38,
          "name": "",
          "properties": [
           {
@@ -1469,27 +2556,255 @@
          "type": "",
          "visible": true,
          "width": 16,
-         "x": 120,
-         "y": 96,
+         "x": 72,
+         "y": 128,
          "gid": 35
         },
         {
          "height": 16,
-         "id": 61,
+         "id": 39,
          "name": "",
          "properties": [
           {
            "name": "Room",
            "type": "object",
-           "value": 25
+           "value": 1
           }
          ],
          "rotation": 0,
          "type": "",
          "visible": true,
          "width": 16,
-         "x": 408,
-         "y": 96,
+         "x": 168,
+         "y": 128,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 40,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 72,
+         "y": 144,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 41,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 168,
+         "y": 144,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 42,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 72,
+         "y": 224,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 43,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 168,
+         "y": 224,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 44,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 72,
+         "y": 240,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 45,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 1
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 168,
+         "y": 240,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 79,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 360,
+         "y": 72,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 80,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 456,
+         "y": 72,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 134,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 680,
+         "y": 72,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 135,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 712,
+         "y": 72,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 136,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 648,
+         "y": 104,
+         "gid": 35
+        },
+        {
+         "height": 16,
+         "id": 137,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 744,
+         "y": 104,
          "gid": 35
         }
        ],
@@ -1505,51 +2820,195 @@
        "name": "Pots",
        "objects": [
         {
-         "height": 16,
-         "id": 63,
+         "height": 48,
+         "id": 34,
          "name": "",
          "properties": [
           {
            "name": "Room",
            "type": "object",
-           "value": 25
+           "value": 1
           },
           {
            "name": "SpawnDir",
            "type": "string",
-           "value": "Full"
+           "value": "D"
           }
          ],
          "rotation": 0,
          "type": "",
          "visible": true,
          "width": 16,
-         "x": 384,
+         "x": 64,
          "y": 64,
          "gid": 34
         },
         {
-         "height": 16,
-         "id": 64,
+         "height": 48,
+         "id": 35,
          "name": "",
          "properties": [
           {
            "name": "Room",
            "type": "object",
-           "value": 25
+           "value": 1
           },
           {
            "name": "SpawnDir",
            "type": "string",
-           "value": "Full"
+           "value": "D"
           }
          ],
          "rotation": 0,
          "type": "",
          "visible": true,
          "width": 16,
-         "x": 432,
+         "x": 176,
          "y": 64,
+         "gid": 34
+        },
+        {
+         "height": 48,
+         "id": 75,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          },
+          {
+           "name": "SpawnDir",
+           "type": "string",
+           "value": "D"
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 352,
+         "y": 64,
+         "gid": 34
+        },
+        {
+         "height": 48,
+         "id": 76,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 49
+          },
+          {
+           "name": "SpawnDir",
+           "type": "string",
+           "value": "D"
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 464,
+         "y": 64,
+         "gid": 34
+        },
+        {
+         "height": 32,
+         "id": 126,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          },
+          {
+           "name": "SpawnDir",
+           "type": "string",
+           "value": "D"
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 672,
+         "y": 64,
+         "gid": 34
+        },
+        {
+         "height": 32,
+         "id": 127,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          },
+          {
+           "name": "SpawnDir",
+           "type": "string",
+           "value": "D"
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 720,
+         "y": 64,
+         "gid": 34
+        },
+        {
+         "height": 32,
+         "id": 128,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          },
+          {
+           "name": "SpawnDir",
+           "type": "string",
+           "value": "D"
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 640,
+         "y": 96,
+         "gid": 34
+        },
+        {
+         "height": 32,
+         "id": 129,
+         "name": "",
+         "properties": [
+          {
+           "name": "Room",
+           "type": "object",
+           "value": 84
+          },
+          {
+           "name": "SpawnDir",
+           "type": "string",
+           "value": "D"
+          }
+         ],
+         "rotation": 0,
+         "type": "",
+         "visible": true,
+         "width": 16,
+         "x": 752,
+         "y": 96,
          "gid": 34
         }
        ],
@@ -1577,7 +3036,7 @@
   }
  ],
  "nextlayerid": 26,
- "nextobjectid": 68,
+ "nextobjectid": 143,
  "orientation": "orthogonal",
  "properties": [
   {
@@ -1598,5 +3057,5 @@
  "tilewidth": 8,
  "type": "map",
  "version": "1.10",
- "width": 68
+ "width": 104
 }

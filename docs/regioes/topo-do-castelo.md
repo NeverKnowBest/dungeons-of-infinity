@@ -9,7 +9,7 @@ Piloto do plano de ferramentas: a primeira região feita pelo fluxo novo (spec, 
 * **Capítulo:** variante do capítulo 2 (`Depth` 2), ao lado do Castle Basement. Vem depois do capítulo 1 (Hyrule Castle, a entrada do castelo) e segue para o capítulo 3 (Castle Prison, com o chefe)
 * **Pools de saída:** entra na `NextPool` do Hyrule Castle com peso 1, ao lado do Castle Basement com peso 2 (cada saída do castelo leva ao topo em 1 de cada 3 sorteios). A `NextPool` dele é só o Castle Prison; `ExitCount` e `ExitHidden` no padrão da ficha
 * **Visual da saída:** escadaria para cima (`StairsUp`, já existe: é a escada da entrada de toda fase)
-* **Gráficos:** `incoming/topo-do-castelo/` (novo): ameias, telhado e piso de pedra externa extraídos da ROM no PC de casa (área do castelo no mundo da luz e a entrada da Torre de Agahnim)
+* **Gráficos:** `incoming/topo-do-castelo/` (novo): ameias, telhado e piso de pedra externa extraídos da ROM (área do castelo no mundo da luz e a entrada da Torre de Agahnim)
 
 ## Ideia
 

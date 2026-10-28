@@ -1,41 +1,80 @@
 {
- "comment": "Example room set (roadmap F11): five halves written by tools/templates/make_rooms.py, used only by the scenario room_sets (Hyrule Castle with RoomSet Example). Coordinates in pixels of the half room (256 wide, 128 or 256 tall), on the 8 px grid; the half is the top of the room and the converter joins it with a flipped half below.",
+ "comment": "Example room set (roadmap F11, recomposed with motifs in F11b): five halves written by tools/templates/make_rooms.py, used only by the scenario room_sets (Hyrule Castle and the Castle Basement with RoomSet Example). The outline is in pixels of the half room (256 wide, 128 or 256 tall), on the 8 px grid; the half is the top of the room and the converter joins it with a flipped half below. The decoration comes from the motifs of data/room-templates/motifs.json (tools/templates/motifs.py --report lists them): each half names the motifs that make its function, the other layers take the most used motif of the shared templates.",
  "halves": [
   {
    "name": "Hall",
-   "comment": "Plain hall with every door; hosts the four kinds of section (corner, middle, wide, strip).",
+   "comment": "Great hall with every door, hosting the four kinds of section: lamps and statues in the top corners, pot rows along the top wall, a full carpet.",
    "class": "Main_Upper",
    "size": "1x1",
-   "sections": [1, 2, 9, 17]
+   "sections": [1, 2, 9, 17],
+   "motifs": [
+    "Torches/corner",
+    "Monuments/corner",
+    {"motif": "Pots/corner", "size": [64, 16]},
+    {"motif": "Pots/top_center", "size": [48, 16]},
+    {"motif": "Treasures/field", "step": [64, 40]},
+    "Crystals/axis",
+    "CarpetsFull/area"
+   ]
   },
   {
    "name": "Notched",
-   "comment": "Top corners cut away (like template 11139), a pool on the middle line that the bottom half mirrors.",
+   "comment": "Pool room with the top corners cut away (like template 11139): one statue in the narrow top, lamps in the notch corners, a pool on the middle line that the bottom half mirrors.",
    "class": "Main_Upper",
    "size": "1x1",
    "cut": [[16, 16, 48, 48], [192, 16, 48, 48]],
-   "water": [[104, 88, 48, 40]]
+   "motifs": [
+    "Monuments/top_center",
+    {"motif": "Pots/corner", "size": [16, 48]},
+    {"motif": "Water/axis", "inset": [64, 56], "within": [80, 96, 96, 32]},
+    {"motif": "Water/top", "inset": [40, 8], "within": [80, 96, 96, 32]}
+   ]
   },
   {
    "name": "Gallery",
-   "comment": "Tall half (the joined room is 1x2) with spike strips and the four kinds of section.",
+   "comment": "Tall half (the joined room is 1x2): statues and lamps along the side walls, spike strips at their feet, treasure spots down the middle; hosts the four kinds of section.",
    "class": "Main_Upper",
    "size": "1x2",
    "sections": [1, 2, 9, 17],
-   "spikes": [[64, 192, 32, 16], [160, 192, 32, 16]]
+   "motifs": [
+    "Torches/corner",
+    {"motif": "Torches/side", "inset": [0, 48]},
+    {"motif": "Monuments/side", "inset": [8, 16]},
+    {"motif": "Monuments/side", "inset": [8, 64]},
+    {"motif": "Pots/top_center", "size": [80, 16]},
+    {"motif": "Spikes/side", "size": [16, 32], "inset": [8, 64], "step": [16, 32]},
+    {"motif": "Treasures/axis", "step": [0, 40]},
+    "Crystals/axis"
+   ]
   },
   {
    "name": "Basin",
-   "comment": "Room on the lower floor: upper wall ring, lower walls and floor inside it, every lower door.",
+   "comment": "Tall room on the lower floor (the joined room is 1x2) around a basin: water down the middle line and on both sides of it below the side doors, lamps and statues in the corners.",
+   "class": "Main_Lower",
+   "size": "1x2",
+   "motifs": [
+    "Torches/corner",
+    "Monuments/corner",
+    {"motif": "Water/axis", "inset": [16, 16], "within": [80, 160, 96, 96]},
+    {"motif": "Water/field", "step": [64, 32], "within": [80, 160, 96, 96]}
+   ]
+  },
+  {
+   "name": "Vault",
+   "comment": "Plain room on the lower floor with every lower door; it names no motif, so every layer takes the motif the shared templates use most.",
    "class": "Main_Lower",
    "size": "1x1"
   },
   {
    "name": "Ledges",
-   "comment": "Lower floor with its top corners cut (like template 40419): the upper walls follow it 24 px out.",
+   "comment": "Lower floor with its top corners cut (like template 40419): the upper walls follow it 24 px out; spikes guard the corners.",
    "class": "Main_Lower",
    "size": "1x1",
-   "cut": [[40, 40, 32, 32], [184, 40, 32, 32]]
+   "cut": [[40, 40, 32, 32], [184, 40, 32, 32]],
+   "motifs": [
+    "Torches/corner",
+    {"motif": "Pots/corner", "size": [16, 32]}
+   ]
   }
  ]
 }

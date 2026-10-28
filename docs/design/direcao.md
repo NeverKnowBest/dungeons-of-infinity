@@ -16,6 +16,7 @@ Este documento é o guia para as decisões artísticas e de design. O Guilherme 
 * **Paleta.** Cores do SNES (32 níveis por canal, passos de cerca de 8), contorno escuro (quase preto) nos sprites, poucas cores por objeto (4 a 7). Ao trazer sprites de outros jogos (GBA, Game Boy), ajuste para essas regras: contorno escuro, paleta limitada, sem degradês suaves. O kit de importação (`incoming/README.md`) faz esse ajuste sozinho e avisa o que não conseguiu.
 * **Assets.** Primeiro a ROM do ALttP, depois o DoI, depois outros Zeldas 2D. Desenhar do zero é o último recurso e deve imitar o estilo (veja os vasos e a toalha da banca do Flute Boy).
 * **Salas.** Formas simples e quase sempre simétricas, com o tamanho de 1 ou 2 telas. Portas no meio das paredes. Decoração conta a função da sala: igreja tem bancos e vitrais; galeria tem pedestais e lamparinas; loja tem balcão e prateleiras.
+* **Composição das salas.** Nada fica solto no meio do piso: cada peça segue um motivo das salas originais (cantos de cima, parede de cima, eixo do meio, paredes laterais, grade simétrica), em pares espelhados, com as portas e os caminhos livres. As salas criadas pelas ferramentas usam o catálogo de motivos medido nas salas do DoI (`tools/templates/motifs.py`); disposição nova entra no catálogo a partir de salas reais (do DoI, do ALttP ou de outro Zelda), nunca como coordenada inventada.
 * **Luz e vida.** Elementos animados com moderação (fogo das lamparinas, água, chuva). Nada gira, pisca ou se mexe sem motivo dentro do mundo do jogo.
 
 ## Câmera e salas

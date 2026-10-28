@@ -60,16 +60,18 @@ Receita "Estágio alternativo" (passos 1 a 3); detalhes em `docs/dev/engine-note
 4. Se a fase anterior for o Hyrule Castle e a nova tiver `SaveBefore`, pare: a sala de descanso logo depois do castelo tem um defeito conhecido (roadmap, Ideias).
 5. Prova: o validador (confere o `ExitLook`) e, no passo 7, o log `exits main-><fase>` na fase anterior.
 
-## Passo 4. Salas (conjunto de salas da região, F11)
+## Passo 4. Salas (conjunto de salas da região, F11 e F11b)
 
 Receitas "Conjunto de salas de uma região" e "Template de sala no Tiled"; detalhes em `docs/dev/engine-notes.md` ("Room sets").
 
 * Reaproveitar os templates compartilhados não pede nada: a fase só escolhe `Class` e `Theme`.
-* Salas próprias da região: um conjunto com o nome da fase (o membro de `DungeonLevel`, ex.: `CastleTop`; `data/room-templates/sets/<Fase>/rooms.json`), descrito em meias salas (classe `Main_Upper` ou `Main_Lower`, tamanho `1x1` ou `1x2`, recortes do contorno, portas, seções, água, espinhos, zonas, objetos e propriedades como `ForceWallTheme`). Formato em `tools/README.md` ("templates/") e no exemplo `sets/Example/rooms.json`. Cada sala com uma função e uma forma que a diferencie (direção de design, "Salas").
+* Salas próprias da região: um conjunto com o nome da fase (o membro de `DungeonLevel`, ex.: `CastleTop`; `data/room-templates/sets/<Fase>/rooms.json`), descrito em meias salas (classe `Main_Upper` ou `Main_Lower`, tamanho `1x1` ou `1x2`, recortes do contorno, portas, seções, zonas e propriedades como `ForceWallTheme`). Formato em `tools/README.md` ("templates/") e no exemplo `sets/Example/rooms.json`. Cada sala com uma função e uma forma que a diferencie (direção de design, "Salas").
+* Decoração por motivos (F11b), nunca por coordenadas: cada meia sala nomeia em `motifs` os motivos que dão a função dela (ex.: `Water/axis` e `Water/top` para um lago, `Monuments/side` para uma galeria), escolhidos no catálogo (`python tools/templates/motifs.py --report` lista âncoras, tamanhos, recuos e passos medidos nas salas compartilhadas); as outras camadas pegam o motivo mais usado. `within` limita um motivo a uma caixa (simétrica). `objects`, `water` e `spikes` soltos só em último caso: passam pela mesma checagem.
+* O `make_rooms.py` recusa composição solta (peça que nenhum motivo explica, camada espelhada sem o par, peças que nunca se tocam encostadas, água ou barra no vão de porta, peças sólidas que separam duas portas). Se um motivo "não acha lugar", troque o recuo, o tamanho ou a âncora (o erro lista os do catálogo); se a região pede uma disposição que o catálogo não tem, é lacuna (`salas-motivo`), não uma coordenada solta.
 * `python tools/templates/make_rooms.py <Conjunto>` escreve os mapas do Tiled e mostra quantas salas saem, as portas e as seções cobertas; `python tools/templates/convert.py --summary` grava os arquivos do jogo e registra no `.yyp`. Na ficha, `RoomSet` com o nome. `RoomSetFallback` fica `true`: sala que nenhum template do conjunto serve (outra classe, seção que ele não tem, porta que falta) usa um compartilhado.
 * Cobertura: o log do cenário tem `roomset <Conjunto> rooms=N/M`. Para a fase parecer da região, a maioria das salas deve vir do conjunto: meias salas com todas as portas e as quatro seções cobrem quase tudo; `Main_Lower` e o tamanho `1x2` também contam. Olhe a folha de contato (é visual) antes de entregar.
 * O que o ajudante ainda não faz (ex.: classes `Stairs`, `Obstacles`, `Sections`; seções em `Main_Lower`) segue a regra principal: é lacuna, a resposta é melhorar o `make_rooms.py`, e as salas dessas classes ficam com os templates compartilhados até lá.
-* Prova: `make_rooms.py` sem erro, validador (acusa mapa fora da descrição, arquivo do jogo velho e arquivo fora do `.yyp`), `roomset` no log e a folha de contato.
+* Prova: `make_rooms.py` sem erro (inclui a checagem de composição), validador (acusa mapa fora da descrição, catálogo velho, arquivo do jogo velho e arquivo fora do `.yyp`), `roomset` no log e a folha de contato.
 
 ## Passo 5. Inimigos (F7)
 

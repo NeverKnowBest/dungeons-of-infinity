@@ -11,18 +11,25 @@ Ao reportar uma lacuna ao Guilherme: diga o que a região pede, por que o fluxo 
 * **Resolveria:** ensinar a classe ao `make_rooms.py` (as camadas de cada classe estão em `convert.py`, `OBJ_TYPES` e `SECTION_OBJ_TYPES`), provado como na F11: comparar a geometria com templates reais da classe e um cenário com o conjunto.
 * **Alternativa:** essas salas ficam com os templates compartilhados (`RoomSetFallback`, o padrão), com a aparência do tema da fase. O Guilherme decide.
 
+## `salas-motivo`: disposição de decoração que o catálogo não tem
+
+* **Reconhecer:** a spec pede uma disposição de peças que nenhum motivo de `data/room-templates/motifs.json` faz (`python tools/templates/motifs.py --report`), por exemplo estátuas ladeando uma porta lateral ou tochas no meio do piso; o `make_rooms.py` recusa a peça como "loose piece", ou o motivo pedido "finds no place" com qualquer recuo e tamanho do catálogo.
+* **Por que falta:** o catálogo (F11b) só tem o que pelo menos 3 meias salas compartilhadas do DoI fazem, e a checagem recusa o resto de propósito, para nenhuma sala sair com peça solta.
+* **Resolveria:** uma fonte nova de motivos para o `motifs.py`: as salas do ALttP pelo `tools/alttp/roomdump.c` (precisa da ROM e do zelda3, nos dois PCs fora do repositório; se faltarem, peça ao Guilherme) ou de outro Zelda top down, medidas com as mesmas âncoras. Ou uma âncora nova (ex.: `door`, ao lado de uma porta) medida nas salas que já existem. Prova como na F11b: o catálogo cobre as salas de origem e a checagem recusa o que continua solto.
+* **Alternativa:** um motivo parecido do catálogo (outra âncora ou recuo), ou a sala sem essa peça. O Guilherme decide.
+
 ## `tileset`: tiles próprios da região
 
 * **Reconhecer:** `incoming/<regiao>/tileset.png`, ou a spec pede paredes, piso ou decoração de tile que nenhum tema tem (o `Theme` de outra fase não serve).
 * **Por que falta:** o `sTiles` está cheio (100 linhas) e o `LevelTilesY` deriva do índice do tema; o importador grava a faixa como `sTiles_<Regiao>`, mas nada liga essa faixa ao tileset do jogo (roadmap, Ideias, "Tileset de região").
-* **Resolveria:** a etapa F6b (PC de casa): aumentar a imagem do `sTiles`, acertar o `tile_count` do `tilesets/Tileset`, mapear o tema novo para a faixa nova e fazer o importador escrever nela. Os 14 de referência devem sair iguais.
+* **Resolveria:** a etapa F6b: aumentar a imagem do `sTiles`, acertar o `tile_count` do `tilesets/Tileset`, mapear o tema novo para a faixa nova e fazer o importador escrever nela. Os 14 de referência devem sair iguais.
 * **Alternativa:** usar o tema de uma fase existente (como o Castelo) e pôr o que for único em sprites de decoração (objetos), que o importador já faz.
 
 ## `sfx`: efeito sonoro novo
 
 * **Reconhecer:** a spec cita `Sound_X` (novo).
 * **Por que falta:** o importador só lê `music/*.wav` (vira `Music_X` e entra no `SongIndex`); não há `sounds/`. Em `tools/alttp/` o `musicdump.c` renderiza músicas, não os efeitos dos bancos de som.
-* **Resolveria:** a etapa F6b (PC de casa): `sounds/*.wav` no importador (vira `Sound_X`, sem `SongIndex`) e, para tirar da ROM, um modo de efeito no `musicdump.c` (PC de casa, que tem a ROM).
+* **Resolveria:** a etapa F6b: `sounds/*.wav` no importador (vira `Sound_X`, sem `SongIndex`) e, para tirar da ROM, um modo de efeito no `musicdump.c` (precisa da ROM).
 * **Alternativa:** o Guilherme entrega o `.wav` gravado de outra forma, e o som entra com `gm_assets.sound(...)` à mão; ou a região fica sem o som na primeira versão.
 
 ## `arquetipo`: movimento de inimigo que a F7 não tem
@@ -48,12 +55,12 @@ Ao reportar uma lacuna ao Guilherme: diga o que a região pede, por que o fluxo 
 
 * **Reconhecer:** a spec quer peças do overworld do ALttP (exterior do castelo, telhados, campina) como tiles. O `status.py` não detecta; leia a seção Visual.
 * **Por que falta:** em `tools/alttp/`, o `roomdump.c` e o `z3room.py` renderizam salas de dungeon e o `sprdump.c` só os sprites (OBJ) de uma área externa; nada renderiza o fundo (BG, map16) do overworld.
-* **Resolveria:** um `owdump.c` no PC de casa (com a ROM), no molde do `roomdump.c`. Ou o Guilherme recorta as peças de outra fonte e entrega em `incoming/`.
+* **Resolveria:** um `owdump.c` (com a ROM), no molde do `roomdump.c`. Ou o Guilherme recorta as peças de outra fonte e entrega em `incoming/`.
 * **Alternativa:** peças de salas de dungeon (ex.: a entrada da Torre de Agahnim, que é sala de dungeon e o `roomdump.c` já tira).
 
 ## Entregas do Guilherme (`WAIT`, não é lacuna de ferramenta)
 
-* **Gráficos:** `incoming/<regiao>/` não existe e a spec não diz "só assets que já existem". Extrações da ROM são no PC de casa. Peça a pasta seguindo `incoming/README.md`.
+* **Gráficos:** `incoming/<regiao>/` não existe e a spec não diz "só assets que já existem". Extrações da ROM funcionam nos dois PCs (a ROM e o zelda3 ficam fora do repositório; se faltarem no PC, peça ao Guilherme). Peça a pasta seguindo `incoming/README.md`.
 * **Decisões:** escolha de alternativa a uma lacuna, peso de pool fora da direção, mecânica nova de chefe. Pergunte.
 
 ## Casos que não são lacuna (seguir)

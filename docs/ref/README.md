@@ -17,7 +17,7 @@ Números e comportamentos de inimigos, chefes e itens, pesquisados uma vez e gua
 
 ## Lacunas conhecidas
 
-* **Vulnerabilidade por arma no ALttP.** O dano que cada arma causa depende de uma tabela por inimigo (`enemy_damage_data`, 16 classes de arma por sprite) que fica nos assets extraídos da ROM, não no código do zelda3. As fichas usam a classe padrão (a da maioria dos inimigos comuns). Para chefes e inimigos especiais, os golpes reais podem ser bem diferentes de vida dividida pelo dano. Para preencher: um harness em `tools/alttp/` que carregue o `zelda3_assets.dat` e imprima `enemy_damage_data` (precisa da ROM, então só no PC de casa).
+* **Vulnerabilidade por arma no ALttP.** O dano que cada arma causa depende de uma tabela por inimigo (`enemy_damage_data`, 16 classes de arma por sprite) que fica nos assets extraídos da ROM, não no código do zelda3. As fichas usam a classe padrão (a da maioria dos inimigos comuns). Para chefes e inimigos especiais, os golpes reais podem ser bem diferentes de vida dividida pelo dano. Para preencher: um harness em `tools/alttp/` que carregue o `zelda3_assets.dat` e imprima `enemy_damage_data` (precisa da ROM, que fica nos dois PCs fora do repositório).
 * **Velocidades marcadas com "~"** foram lidas das tabelas de velocidade da função do sprite e podem variar por estado. A função do zelda3 de cada inimigo está na ficha para conferir.
 
 ## Como acrescentar um jogo novo
