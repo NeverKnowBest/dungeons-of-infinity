@@ -368,6 +368,10 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 		if(Doors[_DoorIndex].Level == LOWER) LowerDoors = true;
 		
 		Doors[_DoorIndex].Status = DungeonRoom.Doors[_DoorIndex].Status;		
+		//outdoors there is no door that shuts until the enemies die: it is the open passage (docs/design/direcao.md)
+		if(LevelDef.Layout == LevelLayout.Outdoor && (Doors[_DoorIndex].Status == DoorStatus.Closed || Doors[_DoorIndex].Status == DoorStatus.ClosedHalf)){
+			Doors[_DoorIndex].Status = DoorStatus.Open;
+		}
 		switch(Doors[_DoorIndex].Status){
 			case DoorStatus.Entrance:
 				global.Level.RoomIndex_Entrance = _RoomIndex;
@@ -694,6 +698,7 @@ function Dungeon_InitLevel(_LevelIndex){
 		
 	}
 
+	Dungeon_ExitToTop();
 	Dungeon_PlanExits();
 
 	//set up secret room. This has to be done in a seperate loop after all the rooms have been initialised
@@ -1064,7 +1069,7 @@ function Dungeon_PlanExits(){
 		if(_Main2 != _Middle2 && sign(_Room2 - _Middle2) != -sign(_Main2 - _Middle2)) continue;
 
 		var _Walls = [["Top", 12, Room.GridY - 1], ["Bottom", 6, Room.GridY + Room.GridH]];
-		for(var w = 0; w < 2; w++){
+		for(var w = 0; w < (LevelDef.ExitWall == "Top" ? 1 : 2); w++){
 			var _BehindY = _Walls[w][2];
 			if(_BehindY >= 0 && _BehindY < DungeonGridW && global.Level.Map_RoomIndex[_BehindY][Room.GridX] != -1) continue;
 			var _Free = true;
@@ -1121,6 +1126,37 @@ function Dungeon_DropExtraExit(_RoomIndex){
 	_Exits.ExtraRoom = -1;
 	_Exits.ExtraPosition = -1;
 	_Exits.ExtraSecret = false;
+}
+
+/// ExitWall "Top" (the castle rooftops: their exit is a gate, which only fits a top wall): the main exit, a door of the
+/// layout in the bottom wall, moves to the middle of the top wall of the same 1x1 room when no room is above it and no
+/// door of the room is there or beside it. Otherwise it stays where it is (the stairs of OwnExitLooks.Bottom).
+function Dungeon_ExitToTop(){
+	if(LevelDef.ExitWall != "Top") exit;
+	for(var _RoomIndex = 0; _RoomIndex < global.Level.RoomCount; _RoomIndex++){
+		if(Room.GridW != 1 || Room.GridH != 1) continue;
+		for(var d = 0; d < Room.DoorCount; d++){
+			var _Door = Room.Doors[d];
+			if(_Door.Status != DoorStatus.Exit || _Door.Location != "Bottom") continue;
+			var _Free = Room.GridY > 0 && global.Level.Map_RoomIndex[Room.GridY - 1][Room.GridX] == -1;
+			for(var e = 0; e < Room.DoorCount; e++){
+				var _P = Room.Doors[e].Position;
+				if(Room.Doors[e].Status != DoorStatus.Unused && (_P == 11 || _P == 12 || _P == 1)) _Free = false;
+			}
+			if(!_Free){
+				Test_Event("exits main stays in the bottom wall room=" + string(_RoomIndex));
+				continue;
+			}
+			Room.DoorCode = Room.DoorCode & ~power(2, _Door.Position - 1);
+			_Door.Position = 12;
+			_Door.Location = "Top";
+			_Door.x = global.DoorCoordinates[Room.SizeIndex][12].x;
+			_Door.y = global.DoorCoordinates[Room.SizeIndex][12].y;
+			_Door.Level = RoomTemplates_GetDoorLevel(_Door.x, _Door.y);
+			Room.DoorCode = Room.DoorCode | power(2, 12 - 1);
+			Test_Event("exits main moved to the top wall room=" + string(_RoomIndex));
+		}
+	}
 }
 
 /// Makes the only door of a special room, and the door on the other side, secret doors

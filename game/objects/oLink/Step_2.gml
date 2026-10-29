@@ -22,7 +22,14 @@ if(InitNewDungeon){
 		Dungeon_InitLevel(_NextLevel);		
 	}
 	
-	sprite_index = ExitLook_LinkSprite(ExitLook, 2, global.Level.StartDir == UP ? BOTTOM : TOP);	//the look of the exit Link took
+	//the look of the exit Link took, or the level's own way in where its entrance has it painted (ArriveLook: the gate)
+	var _Arrive = global.ExitLooks[$ LevelDef.ArriveLook];
+	if(_Arrive != undefined){
+		with(oDoor){
+			if(Entrance && Door_HasGate(id)) other.ExitLook = _Arrive;
+		}
+	}
+	sprite_index = ExitLook_LinkSprite(ExitLook, 2, global.Level.StartDir == UP ? BOTTOM : TOP);
 				
 	with(oDoor){
 		
@@ -30,6 +37,11 @@ if(InitNewDungeon){
 		
 		var _LinkPosY = y + (global.Level.StartDir == UP ? 15 : 23);
 		other.y = _LinkPosY;
+		
+		if(other.ExitLook[$ "Arrive"] != undefined && Door_HasGate(id)){
+			other.ExitLook.Arrive(id);	//the gate opens and shuts behind him
+			continue;
+		}
 		
 		//manually draw the Down2 tiles since otherwise it can only draw the next frame using the oDoor updating code, so it flashes for a frame if done that way
 		var TMID = (FloorLevel == UPPER ? global.TMID_Decor_Upper : global.TMID_Decor_Lower);

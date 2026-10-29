@@ -6,25 +6,34 @@ A room set's rooms.json may have, beside its "halves", a "kit" and a list of "pa
       "tiles": "CastleTop",                     # region tileset (data/room-templates/tilesets/<Name>.json, imported)
       "area": "1B",                             # ALttP area the pieces are cut from (tiles/areas.json of the region)
       "pieces": {                               # cells of that area, 16x16 blocks: [col, row, w, h] or rows of [col, row]
-        "floor": [15, 7, 1, 1],                 #   ([col, row, "m"] is that cell mirrored)
-        "bottom_left": [[[11, 6], [12, 6], [17, 8]], ...]},
+        "floor": [15, 7, 1, 1],                 #   ([col, row, "m"] is that cell mirrored, "v" flipped, and any other
+        "bottom_left": [[[16, 0], ...]]},       #   word a recolored copy from the region's tiles/extra.json)
       "frame": {"top": ["top_left", "top_mid", "top_right"],          # the walls: left and right pieces at the corners,
                 "middle": ["side_left", "floor", "side_right"],       #   the mid piece repeated across; the middle row
                 "bottom": ["bottom_left", "bottom_mid", "bottom_right"]},   # repeated down between top and bottom
-      "openings": {"Top": "open_top", "Bottom": "open_bottom"}        # painted on RegionOpen over a door in use,
-    },                                                                #   16 px left of the door cell, at the wall
+      "frames": {"view_left": {...}},           # other frames a room may take ("frame": "view_left")
+      "openings": {"Top": "open_top", "Bottom": "open_bottom"},       # painted on RegionOpen over a door in use,
+                                                                      #   16 px left of the door cell, at the wall
+      "gate": {"piece": "gate", "at": [-32, 16]},                     # RegionGate: the entrance or exit of the level in
+                                                                      #   a top door, px from the door cell's x (and y)
+      "grass": {"full": [16, 44], "top": [48, 57, "floor"], ...},     # grass spreading over the floor (nature motifs)
+      "nature": {"tree": "tree", "bush": "bush", "tufts": ["tuft"]}   # the pieces of the nature motifs
+    },
     "painted": [
       {"name": "Terrace", "size": "1x1", "doors": [12, 6],           # 1x1, 1x2 or 2x1; door positions of the room (DOOR_XY)
        "decor": [{"piece": "tower", "at": [48, 16], "pair": true},    # px on the 8 px grid; pair: mirrored copy too
                  {"piece": "crest", "at": [112, 112]}],
+       "nature": ["Nature/trees"],                                    # nature motifs (see NATURE_MOTIFS)
+       "frame": "view_left",                                          # optional, a frame of kit "frames"
        "transforms": "None,FlipH",                                    # optional; that is the default
        "props": {...}}
     ]
 
-The room becomes a Whole Main_Upper template with the tile layers Region (the room, every door closed) and
-RegionOpen (the passage of each door), its Doors, an enemy area and a treasure and crystal spot on the floor. The
-game paints it with the transform it picks and makes the walls from the tile classes (RegionRoom_Paint). Pieces are
-cells of a real ALttP area, so the walls, their ends and the decoration keep the original light and perspective.
+The room becomes a Whole Main_Upper template with the tile layers Region (the room, every door closed),
+RegionOpen (the passage of each door) and RegionGate (the gate of each top door that has room for it), its Doors,
+an enemy area and a treasure and crystal spot on the floor. The game paints it with the transform it picks and makes
+the walls from the tile classes (RegionRoom_Paint). Pieces are cells of a real ALttP area, so the walls, their ends
+and the decoration keep the original light and perspective.
 """
 import json
 import os
@@ -33,8 +42,15 @@ import convert
 
 GRID = 8
 SIZES = {'1x1': (256, 256, 0), '1x2': (256, 512, 1), '2x1': (512, 256, 2)}    # w, h, RoomSize
-ROOM_KEYS = {'name', 'size', 'doors', 'decor', 'transforms', 'props', 'comment'}
-KIT_KEYS = {'tiles', 'area', 'pieces', 'frame', 'openings', 'comment'}
+ROOM_KEYS = {'name', 'size', 'doors', 'decor', 'transforms', 'props', 'comment', 'frame', 'nature'}
+SPECIAL_KEYS = {'frame', 'comment'}
+SPECIAL_LAYERS = ('Water', 'FloorObjs', 'Objs')      # the objects of a special room that are copied into its painted copy
+KIT_KEYS = {'tiles', 'area', 'pieces', 'frame', 'frames', 'openings', 'gate', 'grass', 'nature', 'comment'}
+GRASS_KEYS = ('full', 'top', 'bottom', 'left', 'corner', 'inner')
+# Nature motifs (docs/design/direcao.md, "Natureza invadindo"): solid pieces on a patch of grass that spreads over the
+# floor. Trees: one in the middle of each half of a 2x1 or 1x2 room (a pair); bushes: a 2x2 clump on each side of the
+# middle axis (a mirrored pair), at the first height that keeps the door lanes free. Tufts go on the grass only.
+NATURE_MOTIFS = ('Nature/trees', 'Nature/bushes')
 DECOR_KEYS = {'piece', 'at', 'pair', 'mirror'}
 TILESETS_DIR = os.path.join(convert.TEMPLATE_DIR, 'tilesets')
 TILED_H, TILED_V = 0x80000000, 0x40000000
@@ -61,6 +77,9 @@ class Kit:
         folder = os.path.dirname(os.path.normpath(os.path.join(TILESETS_DIR, tsj['image'])))
         tiles = json.load(open(os.path.join(folder, 'tiles.json'), encoding='utf-8'))
         self.blocks = [b['tiles'] for b in tiles['blocks']]
+        # recolored copies of area cells (tiles/extra.json): (map16, recolor name) -> block
+        self.recolored = {(b['map16'], b['recolor']): i for i, b in enumerate(tiles['blocks']) if b.get('recolor')}
+        self.block_map16 = [b['map16'] for b in tiles['blocks']]
         data = os.path.join(convert.REPO, 'game', 'datafiles', 'data', 'tiles', self.name + '.json')
         self.solid = json.load(open(data, encoding='utf-8'))['solid']
         areas = json.load(open(os.path.join(folder, 'areas.json'), encoding='utf-8'))
@@ -69,34 +88,71 @@ class Kit:
                              % (where, d.get('area'), os.path.relpath(folder, convert.REPO), ', '.join(areas)))
         self.area = areas[d['area']]
         self.pieces = {n: self.piece(v, '%s piece %s' % (where, n)) for n, v in (d.get('pieces') or {}).items()}
-        self.frame = d.get('frame') or {}
-        for row in ('top', 'middle', 'bottom'):
-            names = self.frame.get(row)
-            if not (isinstance(names, list) and len(names) == 3):
-                raise PaintError('%s: frame "%s" needs three pieces (left, middle, right)' % (where, row))
-            for n in names:
-                self.get(n, where)
+        self.frames = {'': self.check_frame(d.get('frame') or {}, where)}
+        for name, f in (d.get('frames') or {}).items():
+            self.frames[name] = self.check_frame(f, '%s frame %s' % (where, name))
+        self.frame = self.frames['']
         self.openings = d.get('openings') or {}
         for loc, n in self.openings.items():
             if loc not in ('Top', 'Bottom', 'Left', 'Right'):
                 raise PaintError('%s: openings are Top, Bottom, Left or Right, not %s' % (where, loc))
             self.get(n, where)
+        # the level's entrance and exit in a door of the wall (a gate in the top wall, stairs down through the bottom)
+        self.gate = {}
+        for loc, g in (d.get('gate') or {}).items():
+            if loc not in ('Top', 'Bottom') or not isinstance(g, dict) or set(g) - {'piece', 'at'}:
+                raise PaintError('%s: gate is {"Top" or "Bottom": {"piece", "at": [dx, dy]}} (dy from the top edge, or '
+                                 'from the bottom edge for Bottom)' % where)
+            self.get(g.get('piece'), where)
+            self.gate[loc] = g
+        self.grass = {}
+        if d.get('grass'):
+            for k in GRASS_KEYS:
+                if k not in d['grass']:
+                    raise PaintError('%s: grass needs %s' % (where, ', '.join(GRASS_KEYS)))
+                self.grass[k] = self.piece([[d['grass'][k]]], '%s grass %s' % (where, k))[0][0]
+        self.nature = d.get('nature') or {}
+        for k, n in self.nature.items():
+            for name in (n if isinstance(n, list) else [n]):
+                self.get(name, where)
+
+    def check_frame(self, f, where):
+        for row in ('top', 'middle', 'bottom'):
+            names = f.get(row)
+            if not (isinstance(names, list) and len(names) == 3):
+                raise PaintError('%s: frame "%s" needs three pieces (left, middle, right)' % (where, row))
+            for n in names:
+                self.get(n, where)
+        return f
+
+    def cell(self, cell, where):
+        """(block, mirrored, flipped) of [col, row, flags...]: "m" mirrored, "v" flipped, any other word the copy of
+        that cell recolored by the region's tiles/extra.json."""
+        c, r = cell[0], cell[1]
+        block = self.area[r][c]
+        m = v = False
+        for f in cell[2:]:
+            if f == 'm':
+                m = True
+            elif f == 'v':
+                v = True
+            else:
+                key = (self.block_map16[block], f)
+                if key not in self.recolored:
+                    raise PaintError('%s: cell %d,%d has no "%s" copy (add it to "recolor" in the region\'s '
+                                     'tiles/extra.json and run tools/alttp/owdump.py tiles)' % (where, c, r, f))
+                block = self.recolored[key]
+        return (block, m, v)
 
     def piece(self, v, where):
-        """Rows of (block, mirrored)."""
+        """Rows of (block, mirrored, flipped)."""
         try:
             if len(v) == 4 and all(isinstance(x, int) for x in v):
                 c, r, w, h = v
                 cells = [[[c + i, r + j] for i in range(w)] for j in range(h)]
             else:
                 cells = v
-            out = []
-            for row in cells:
-                line = []
-                for cell in row:
-                    c, r = cell[0], cell[1]
-                    line.append((self.area[r][c], len(cell) > 2 and cell[2] == 'm'))
-                out.append(line)
+            out = [[self.cell(cell, where) for cell in row] for row in cells]
         except (TypeError, IndexError, ValueError):
             raise PaintError('%s: a piece is [col, row, w, h] or rows of [col, row] (cells of the area)' % where)
         if not out or any(len(r) != len(out[0]) for r in out):
@@ -115,15 +171,19 @@ class Painted:
     symmetric = True
     split_ids = [0]
 
-    def __init__(self, d, kit, where):
+    def __init__(self, d, kit, where, special=None):
         self.d, self.kit, self.where = d, kit, where
+        # special: a painted copy of a shared special room ({"type", "objects": {layer: [Tiled objects]}, "props"}):
+        # class Special, one door in use at a time (so any two may touch), its own objects instead of enemies and spots
+        self.special = special
         for k in d:
             if k not in ROOM_KEYS:
                 raise PaintError('%s: unknown key "%s" (keys: %s)' % (where, k, ', '.join(sorted(ROOM_KEYS))))
         self.name = d.get('name')
         if not self.name:
             raise PaintError('%s: needs a "name"' % where)
-        self.cls = 'Main_Upper'
+        self.cls = 'Special' if special else 'Main_Upper'
+        self.room_type = special['type'] if special else ''
         if d.get('size', '1x1') not in SIZES:
             raise PaintError('%s: size must be 1x1, 1x2 or 2x1' % where)
         self.w, self.h, self.size_index = SIZES[d.get('size', '1x1')]
@@ -131,6 +191,11 @@ class Painted:
         self.layers, self.groups = {}, {}
         self.base = [[None] * (self.cw * 2) for _ in range(self.ch * 2)]     # 8x8 tiles: (tile, flags) or None
         self.open = [[None] * (self.cw * 2) for _ in range(self.ch * 2)]
+        self.gate = [[None] * (self.cw * 2) for _ in range(self.ch * 2)]
+        self.gate_doors = []
+        self.gate_boxes = []
+        self.object_boxes = [(o['x'], o['y'], o['width'], o['height']) for objs in (special or {}).get('objects', {}).values()
+                             for o in objs]
         self.build()
 
     # ---------------------------------------------------------------- painting
@@ -142,12 +207,14 @@ class Painted:
         w = len(piece[0])
         for j, row in enumerate(piece):
             for i in range(w):
-                block, m = row[w - 1 - i] if mirror else row[i]
+                block, m, v = row[w - 1 - i] if mirror else row[i]
                 m = m != mirror
                 for k, (tile, fl) in enumerate(self.kit.blocks[block]):
                     tx, ty = k % 2, k // 2
                     if m:
                         tx, fl = 1 - tx, fl ^ 1
+                    if v:
+                        ty, fl = 1 - ty, fl ^ 2
                     gx, gy = x // GRID + i * 2 + tx, y // GRID + j * 2 + ty
                     if 0 <= gy < len(grid) and 0 <= gx < len(grid[0]):
                         grid[gy][gx] = (tile, fl) if tile else None
@@ -167,7 +234,10 @@ class Painted:
     def build(self):
         k, d, where = self.kit, self.d, self.where
         W, H = self.w, self.h
-        top, mid, bot = ([k.get(n, where) for n in k.frame[r]] for r in ('top', 'middle', 'bottom'))
+        if d.get('frame', '') not in k.frames:
+            raise PaintError('%s: no frame "%s" in the kit (frames: %s)' % (where, d.get('frame'), ', '.join(sorted(k.frames))))
+        frame = k.frames[d.get('frame', '')]
+        top, mid, bot = ([k.get(n, where) for n in frame[r]] for r in ('top', 'middle', 'bottom'))
         th, bh = len(top[0]) * 16, len(bot[0]) * 16
         lw, rw = len(mid[0][0]) * 16, len(mid[2][0]) * 16
         self.inner = (lw, th, W - rw, H - bh)          # the floor between the walls
@@ -200,11 +270,13 @@ class Painted:
             ox = {'Top': (x - 16, 0), 'Bottom': (x - 16, H - ph), 'Left': (0, y - 16), 'Right': (W - pw, y - 16)}[loc]
             self.stamp(self.open, piece, ox[0], ox[1], where=where)
             boxes.append((p, (ox[0], ox[1], pw, ph)))
-        for i, (p, a) in enumerate(boxes):
+        for i, (p, a) in enumerate([] if self.special else boxes):
             for q, b in boxes[i + 1:]:
                 if convert.rect_overlap((a[0], a[1], a[0] + a[2], a[1] + a[3]), (b[0], b[1], b[0] + b[2], b[1] + b[3])):
                     raise PaintError('%s: the passages of doors %d and %d touch' % (where, p, q))
 
+        self.decor_boxes = []
+        self.bare = [row[:] for row in self.base]      # the frame without decoration (what a gate shows around it)
         for dd in d.get('decor', []):
             if not isinstance(dd, dict) or any(key not in DECOR_KEYS for key in dd):
                 raise PaintError('%s: decor is {"piece", "at": [x, y], "pair", "mirror"}' % where)
@@ -219,9 +291,209 @@ class Painted:
                     if convert.rect_overlap((sx, sy, sx + pw - 1, sy + ph - 1), (b[0], b[1], b[0] + b[2] - 1, b[1] + b[3] - 1)):
                         raise PaintError('%s: decor %s at %d,%d covers the passage of door %d' % (where, dd['piece'], sx, sy, p))
                 self.stamp(self.base, piece, sx, sy, m, where)
+                self.decor_boxes.append((sx, sy, pw, ph))
 
+        self.gates()
+        for motif in d.get('nature', []):
+            self.nature(motif)
         self.check_passages()
-        self.furnish()
+        if self.special:
+            self.copy_objects()
+        else:
+            self.furnish()
+
+    def copy_objects(self):
+        """The special room's own objects (shop, rupees, chests, fountain...), refused where they would stand on the
+        painted walls."""
+        for layer in SPECIAL_LAYERS:
+            for o in self.special['objects'].get(layer, []):
+                x, y, w, h = o['x'], o['y'], o['width'], o['height']
+                for gy in range(max(0, y // GRID), min(len(self.base), (y + h + GRID - 1) // GRID)):
+                    for gx in range(max(0, x // GRID), min(len(self.base[0]), (x + w + GRID - 1) // GRID)):
+                        if self.solid_at(self.base, gx, gy):
+                            raise PaintError('%s: object of %s at %d,%d stands on the painted walls' % (self.where, layer, x, y))
+                props = {q['name']: q['value'] for q in o.get('properties', []) if q['name'] != 'Room'}
+                self.add(layer, o.get('gid'), (x, y, w, h), props, obj_type=o.get('type', ''))
+
+    def gates(self):
+        """RegionGate: the gate (top wall) or stairs (bottom wall) of each door, painted by the game in place of the
+        passage when the door is the level's entrance or exit. The gate wins over the decoration: any piece it
+        touches is painted bare (the frame without it) on the same layer, so it goes whole. A door whose gate would
+        reach into the side walls gets none (the game then leaves the plain passage there)."""
+        k = self.kit
+        x0 = self.inner[0]
+        x1 = self.inner[2]
+        frame_gate = k.frames[self.d.get('frame', '')].get('gate', {})
+        for p, (loc, (x, y, w, h)) in sorted(self.doors.items()):
+            g = frame_gate.get(loc) or k.gate.get(loc)
+            if not g:
+                continue
+            piece = k.get(g['piece'], self.where)
+            pw, ph = len(piece[0]) * 16, len(piece) * 16
+            gx = x + g['at'][0]
+            gy = g['at'][1] if loc == 'Top' else self.h + g['at'][1]
+            if gx < x0 - 16 or gx + pw > x1 + 16:
+                continue
+            box = (gx, gy, gx + pw - 1, gy + ph - 1)
+            if any(convert.rect_overlap(box, (b[0], b[1], b[0] + b[2] - 1, b[1] + b[3] - 1)) for b in self.object_boxes):
+                continue                # a gate never covers the objects of a special room
+            for b in self.decor_boxes:
+                if convert.rect_overlap(box, (b[0], b[1], b[0] + b[2] - 1, b[1] + b[3] - 1)):
+                    for gy2 in range(b[1] // GRID, (b[1] + b[3]) // GRID):
+                        for gx2 in range(b[0] // GRID, (b[0] + b[2]) // GRID):
+                            self.gate[gy2][gx2] = self.bare[gy2][gx2]
+            self.stamp(self.gate, piece, gx, gy, where=self.where)
+            self.gate_doors.append(p)
+            self.gate_boxes.append((gx, gy, pw, ph))
+
+    # ---------------------------------------------------------------- nature (motifs)
+
+    def lanes(self):
+        """8x8 cells that must stay free for walking: each door's lane from its cell to the middle of the room, and
+        the middle (treasure spot)."""
+        x0, y0, x1, y1 = self.inner
+        cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
+        out = set()
+
+        def box(a0, b0, a1, b1):
+            for gx in range(min(a0, a1) // GRID, (max(a0, a1) + GRID - 1) // GRID):
+                for gy in range(min(b0, b1) // GRID, (max(b0, b1) + GRID - 1) // GRID):
+                    out.add((gx, gy))
+        for p, (loc, (x, y, w, h)) in self.doors.items():
+            if loc in ('Top', 'Bottom'):
+                box(x, y, x + 32, cy + 16)
+            else:
+                box(x, y, cx + 16, y + 32)
+        box(cx - 24, cy - 24, cx + 24, cy + 24)
+        return out
+
+    def nature(self, motif):
+        """A nature motif: solid pieces in a symmetric layout off the door lanes, on a patch of grass spreading over
+        the floor around them (marching squares over a grid of corners; the kit's grass pieces are the edges)."""
+        k, where = self.kit, self.where
+        if motif not in NATURE_MOTIFS:
+            raise PaintError('%s: nature motif "%s" (motifs: %s)' % (where, motif, ', '.join(NATURE_MOTIFS)))
+        if not k.grass:
+            raise PaintError('%s: nature motifs need "grass" in the kit' % where)
+        x0, y0, x1, y1 = self.inner
+        lanes = self.lanes()
+        name = {'Nature/trees': 'tree', 'Nature/bushes': 'bush'}[motif]
+        piece = k.get(k.nature.get(name), where)
+        pw, ph = len(piece[0]) * 16, len(piece) * 16
+        if name == 'bush':
+            piece = [row * 2 for row in piece] * 2       # a 2x2 clump
+            pw, ph = pw * 2, ph * 2
+        # where the pieces go: one in each half (trees, a 2x1 or 1x2 room), or a pair on the two sides of the middle
+        # axis (bushes); of the spots whose pieces keep the door lanes and the decoration free, the nearest to the
+        # middle of the half (trees) or to a quarter of the room (bushes)
+        cands = []
+        if name == 'tree':
+            # one tree in each half, mirrored (2x1) or repeated half a room lower (1x2), nearest the middle of the half
+            if self.w > self.h:
+                ideal = ((3 * x0 + x1) // 4 - pw // 2, (y0 + y1 - ph) // 2)
+                for sx in range(x0 + 8, (x0 + x1) // 2 - pw, 16):
+                    for sy in range(y0 + 8, y1 - ph - 7, 16):
+                        cands.append([(sx, sy), (self.w - sx - pw, sy)])
+            elif self.h > self.w:
+                ideal = ((x0 + x1 - pw) // 2, (3 * y0 + y1) // 4 - ph // 2)
+                for sx in range(x0 + 8, x1 - pw - 7, 16):
+                    for sy in range(y0 + 8, self.h // 2 - ph, 16):
+                        cands.append([(sx, sy), (sx, sy + self.h // 2 - 32)])
+            else:
+                raise PaintError('%s: Nature/trees needs a 2x1 or 1x2 room (a tree is too big for half a 1x1 room)' % where)
+        else:
+            ideal = ((3 * x0 + x1) // 4 - pw // 2, (y0 + y1 - ph) // 2)
+            for sy in range(y0 + 16, y1 - ph - 8, 16):
+                for sx in range(x0 + 16, (x0 + x1) // 2 - pw, 16):
+                    cands.append([(sx, sy), (self.w - sx - pw, sy)])
+        cands = [[(sx // 16 * 16, sy // 16 * 16) for sx, sy in c] for c in cands]
+        cands.sort(key=lambda c: (abs(c[0][0] - ideal[0]) + abs(c[0][1] - ideal[1]), c[0][1], c[0][0]))
+
+        def fits(spots):
+            for sx, sy in spots:
+                if sx < x0 + 8 or sy < y0 + 8 or sx + pw > x1 - 8 or sy + ph > y1 - 8:
+                    return False
+                cells = {(gx, gy) for gx in range(sx // GRID, (sx + pw) // GRID) for gy in range(sy // GRID, (sy + ph) // GRID)}
+                if cells & lanes:
+                    return False
+                if any(convert.rect_overlap((sx, sy, sx + pw - 1, sy + ph - 1), (b[0], b[1], b[0] + b[2] - 1, b[1] + b[3] - 1))
+                       for b in self.decor_boxes + self.gate_boxes):
+                    return False
+            return True
+        spots = next((c for c in cands if fits(c)), None)
+        if spots is None:
+            raise PaintError('%s: motif %s finds no place off the door lanes and the decoration' % (where, motif))
+        # the grass: corners of the 16 px cells inside an ellipse around each piece and two smaller lobes, so the
+        # patch looks grown rather than drawn; never on the walls or the decoration
+        corners = set()
+        fx0, fy0, fx1, fy1 = x0 // 16, y0 // 16, x1 // 16, y1 // 16
+        for sx, sy in spots:
+            ccx, ccy = (sx + pw / 2) / 16, (sy + ph / 2) / 16
+            rx, ry = pw / 32 + 1.6, ph / 32 + 1.4
+            for lx, ly, sc in ((0, 0, 1.0), (-rx * 0.8, ry * 0.4, 0.55), (rx * 0.7, -ry * 0.5, 0.5)):
+                for gx in range(fx0, fx1 + 1):
+                    for gy in range(fy0, fy1 + 1):
+                        if ((gx - ccx - lx) / (rx * sc)) ** 2 + ((gy - ccy - ly) / (ry * sc)) ** 2 <= 1:
+                            corners.add((gx, gy))
+        corners = {(gx, gy) for gx, gy in corners if fx0 < gx < fx1 and fy0 < gy < fy1}
+        # the grass goes round the decoration with its edge (a crest stays on the floor), never in a straight cut
+        corners = {(gx, gy) for gx, gy in corners
+                   if not any(b[0] <= gx * 16 <= b[0] + b[2] and b[1] <= gy * 16 <= b[1] + b[3]
+                              for b in self.decor_boxes + self.gate_boxes)}
+        changed = True
+        while changed:                  # a cell with only two opposite grass corners has no piece: fill it
+            changed = False
+            for gx in range(fx0, fx1):
+                for gy in range(fy0, fy1):
+                    q = [(gx, gy) in corners, (gx + 1, gy) in corners, (gx, gy + 1) in corners, (gx + 1, gy + 1) in corners]
+                    if q in ([True, False, False, True], [False, True, True, False]):
+                        corners |= {(gx, gy), (gx + 1, gy), (gx, gy + 1), (gx + 1, gy + 1)}
+                        changed = True
+        G = k.grass
+
+        def turn(b, m=False, v=False):
+            return (b[0], b[1] != m, b[2] != v)
+        T = {(1, 1, 1, 1): G['full'], (1, 1, 0, 0): G['top'], (0, 0, 1, 1): G['bottom'],
+             (1, 0, 1, 0): G['left'], (0, 1, 0, 1): turn(G['left'], m=True),
+             (0, 0, 1, 0): G['corner'], (0, 0, 0, 1): turn(G['corner'], m=True),
+             (1, 0, 0, 0): turn(G['corner'], v=True), (0, 1, 0, 0): turn(G['corner'], m=True, v=True),
+             (1, 1, 0, 1): G['inner'], (1, 1, 1, 0): turn(G['inner'], m=True),
+             (0, 1, 1, 1): turn(G['inner'], v=True), (1, 0, 1, 1): turn(G['inner'], m=True, v=True)}
+        full = set()
+        for gx in range(fx0, fx1):
+            for gy in range(fy0, fy1):
+                q = tuple(int(c in corners) for c in ((gx, gy), (gx + 1, gy), (gx, gy + 1), (gx + 1, gy + 1)))
+                if sum(q) == 0:
+                    continue
+                if any(self.base[gy * 2 + j][gx * 2 + i] is None or self.kit.solid[self.base[gy * 2 + j][gx * 2 + i][0]]
+                       for i in (0, 1) for j in (0, 1)):
+                    continue            # never over a wall
+                if any(convert.rect_overlap((gx * 16, gy * 16, gx * 16 + 15, gy * 16 + 15),
+                                            (b[0], b[1], b[0] + b[2] - 1, b[1] + b[3] - 1)) for b in self.decor_boxes):
+                    continue            # nor over the decoration
+                self.stamp(self.base, [[T[q]]], gx * 16, gy * 16, where=where)
+                if q == (1, 1, 1, 1):
+                    full.add((gx, gy))
+        used = set()
+        for sx, sy in spots:
+            cells = {(gx, gy) for gx in range(sx // 16, (sx + pw) // 16) for gy in range(sy // 16, (sy + ph) // 16)}
+            if not cells <= full:
+                raise PaintError('%s: the grass of %s does not cover its pieces' % (where, motif))
+            used |= cells
+            self.stamp(self.base, piece, sx, sy, where=where)
+            self.decor_boxes.append((sx, sy, pw, ph))
+        # tufts on the grass, mirrored about the middle axis, off the pieces
+        tufts = [k.get(n, where) for n in (k.nature.get('tufts') or [])]
+        n = 0
+        for gx, gy in sorted(full, key=lambda c: (c[1], c[0])):
+            mx = self.w // 16 - 1 - gx
+            if not tufts or gx >= mx or (gx, gy) in used or (mx, gy) in used or (mx, gy) not in full or (gx + 2 * gy) % 3:
+                continue
+            t = tufts[n % len(tufts)]
+            self.stamp(self.base, t, gx * 16, gy * 16, where=where)
+            self.stamp(self.base, t, mx * 16, gy * 16, True, where=where)
+            used |= {(gx, gy), (mx, gy)}
+            n += 1
 
     def solid_at(self, grid, gx, gy):
         t = grid[gy][gx]
@@ -281,6 +553,10 @@ class Painted:
         dst.setdefault(layer, []).append((gid, tuple(box), dict(props or {}), obj_type))
 
     def room_props(self):
+        if self.special:
+            p = dict(self.special['props'])
+            p['Transforms'] = 'None'            # special rooms are picked untransformed (RoomTemplates_PickSpecial)
+            return p
         p = {'Whole': 1, 'Transforms': self.d.get('transforms', ','.join(convert.DEFAULT_PAINTED_TRANSFORMS))}
         p.update(self.d.get('props') or {})
         return p
@@ -300,6 +576,57 @@ class Painted:
         return out
 
 
+def specials(d, kit, where):
+    """Painted copies of the shared special rooms (shop, treasure, rupees, fairy...), so that they match the region
+    (docs/design/direcao.md, "Salas especiais seguem a área"): each 1x1 room of the shared Special map whose floor
+    is one level and open (no lower floor, no walls inside) and whose objects keep clear of the painted walls,
+    painted with the kit's frame d["specials"]["frame"], all twelve doors (one is in use) and its objects.
+    Returns ([Painted], {type: [skipped room ids]})."""
+    spec = d['specials']
+    if not isinstance(spec, dict) or set(spec) - SPECIAL_KEYS:
+        raise PaintError('%s: specials is {"frame": <a frame of the kit>}' % where)
+    ci = [c[0] for c in convert.CLASSES].index('Special')
+    js = json.load(open(convert.map_path(ci), encoding='utf-8'))
+    layers = {l['name']: l for l in js['layers']}
+    rooms = layers['Rooms']['objects']
+
+    def room_of(o):
+        for q in o.get('properties', []):
+            if q['name'] == 'Room':
+                return q['value']
+    content = {r['id']: {} for r in rooms}
+    for name, l in layers.items():
+        if name == 'Rooms' or l.get('type') != 'objectgroup':
+            continue
+        for o in l['objects']:
+            rid = room_of(o)
+            if rid in content:
+                content[rid].setdefault(name, []).append(o)
+    out, skipped = [], {}
+    for r in sorted(rooms, key=lambda r: (r['type'], r['id'])):
+        c = content[r['id']]
+        x0, y0 = r['x'], r['y']
+        inner_walls = any(40 <= o['x'] - x0 and 40 <= o['y'] - y0 and o['x'] - x0 + o['width'] <= 216 and
+                          o['y'] - y0 + o['height'] <= 216 for o in c.get('WallsUpper', []))
+        if r['width'] != 256 or r['height'] != 256 or c.get('LowerFloor') or c.get('WallsLower') or inner_walls:
+            skipped.setdefault(r['type'], []).append(r['id'])
+            continue
+        objects = {}
+        for layer in SPECIAL_LAYERS:
+            for o in c.get(layer, []):
+                q = dict(o)
+                q['x'], q['y'] = o['x'] - x0, o['y'] - y0
+                objects.setdefault(layer, []).append(q)
+        props = {q['name']: q['value'] for q in r.get('properties', [])}
+        room = {'name': '%s%d' % (r['type'], r['id']), 'size': '1x1', 'doors': list(range(1, 13)), 'frame': spec.get('frame', '')}
+        try:
+            out.append(Painted(room, kit, '%s special %s' % (where, room['name']),
+                               {'type': r['type'], 'objects': objects, 'props': props}))
+        except PaintError:
+            skipped.setdefault(r['type'], []).append(r['id'])
+    return out, skipped
+
+
 def load(d, where):
     """(kit, [Painted]) of a rooms.json, or (None, [])."""
     rooms = d.get('painted', [])
@@ -316,6 +643,12 @@ def load(d, where):
             raise PaintError('%s: the name is used twice' % w)
         names.add(r.get('name'))
         out.append(Painted(r, kit, w))
+    if d.get('specials'):
+        sp, skipped = specials(d, kit, where)
+        missing = sorted({r for r in skipped} - {p.room_type for p in sp})
+        if missing:
+            raise PaintError('%s: no special room of %s fits the frame "%s"' % (where, ', '.join(missing), d['specials'].get('frame', '')))
+        out += sp
     return kit, out
 
 
@@ -343,6 +676,8 @@ def render(rooms, path, scale=2):
         for gy in range(len(room.base)):
             for gx in range(len(room.base[0])):
                 t = room.open[gy][gx] if with_open and room.open[gy][gx] is not None else room.base[gy][gx]
+                if with_open and room.gate[gy][gx] is not None:
+                    t = room.gate[gy][gx]
                 if t is not None:
                     im.paste(tile(*t), (gx * GRID, gy * GRID))
         if with_open:

@@ -492,7 +492,8 @@ def generate_door_codes(tpl, cls, name):
 
 # ---------------------------------------------------------------- painted rooms (roadmap F12b)
 
-REGION_LAYERS = ('Region', 'RegionOpen')    # tile layers of a region tileset: the room, and its open door passages
+REGION_LAYERS = ('Region', 'RegionOpen', 'RegionGate')   # tile layers of a region tileset: the room, its open door
+#   passages, and the gates (the level's entrance or exit) of the doors that have one
 TILED_FLIP_H, TILED_FLIP_V, TILED_FLIP_D = 0x80000000, 0x40000000, 0x20000000
 DEFAULT_PAINTED_TRANSFORMS = ['None', 'FlipH']   # turning ALttP art upside down or sideways puts the wall faces wrong
 
@@ -537,7 +538,7 @@ def region_cells(layer, room, tilesets, where):
 
 
 def add_region(t, room, layers, tilesets, where):
-    """Region: {tileset, w, h, base, open} (tiles of 8x8, row by row) of a painted room, from its tile layers."""
+    """Region: {tileset, w, h, base, open[, gate]} (tiles of 8x8, row by row) of a painted room, from its tile layers."""
     found = {l['name']: l for l in layers if l.get('name') in REGION_LAYERS and l.get('type') == 'tilelayer'}
     if 'Region' not in found:
         return
@@ -551,6 +552,12 @@ def add_region(t, room, layers, tilesets, where):
             raise ConvertError('%s: room %s: Region and RegionOpen use two tilesets' % (where, gm_str(room['id'])))
     t['Region'] = {'tileset': name, 'w': float(int(room['width']) // 8), 'h': float(int(room['height']) // 8),
                    'base': base, 'open': opened}
+    if 'RegionGate' in found:
+        n3, gate = region_cells(found['RegionGate'], room, tilesets, where)
+        if n3 not in (None, name):
+            raise ConvertError('%s: room %s: Region and RegionGate use two tilesets' % (where, gm_str(room['id'])))
+        if any(gate):
+            t['Region']['gate'] = gate
 
 
 def painted_transforms(t, where):

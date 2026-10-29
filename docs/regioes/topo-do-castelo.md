@@ -3,12 +3,13 @@
 Piloto do plano de ferramentas: a primeira região feita pelo fluxo novo (spec, importação, ficha de fase, templates, inimigos, validador, teste). Reaproveita os inimigos do castelo, então o risco fica nas ferramentas e não em mecânicas novas.
 
 * **Estado:** em produção
+* **Revisão em andamento:** a rodada de out/2026 fez os 7 itens das prévias 1 a 4, o Guilherme jogou e ainda não está satisfeito; o que falta está em "Pendências"
 * **Origem:** ALttP, Castelo de Hyrule na noite da chuva (abertura do jogo), parte de fora e alta do castelo
 * **Tipo:** telhado do castelo visto de cima (área 0x1B do overworld do ALttP), montado como uma dungeon (`Layout` Outdoor, layouts do castelo)
 * **Fase:** `DungeonLevel.CastleTop` (novo), nome no jogo "Castle Rooftops"
 * **Capítulo:** variante do capítulo 2 (`Depth` 2), ao lado do Castle Basement. Vem depois do capítulo 1 (Hyrule Castle, a entrada do castelo) e segue para o capítulo 3 (Castle Prison, com o chefe)
 * **Pools de saída:** entra na `NextPool` do Hyrule Castle com peso 1, ao lado do Castle Basement com peso 2 (cada saída do castelo leva ao topo em 1 de cada 3 sorteios). A `NextPool` dele é só o Castle Prison; `ExitCount` e `ExitHidden` no padrão da ficha
-* **Visual da saída:** escadaria para cima (`StairsUp`, já existe: é a escada da entrada de toda fase)
+* **Visual da saída:** no Hyrule Castle, a saída que leva ao topo é a escadaria para cima (`StairsUp`). No topo, a chegada e a saída são o portão do ALttP que leva à Torre de Agahnim (`ArriveLook` e `OwnExitLooks` "Gate"); a saída que não cabe na parede de cima desce pela escada da frente do castelo (`GateStairs`)
 * **Gráficos:** `incoming/topo-do-castelo/`: o tileset `ts_CastleTop` (área 0x1B cortada da ROM pelo `owdump.py tiles`) e o trovão (`Sound_Thunder`)
 
 ## Ideia
@@ -19,16 +20,19 @@ Em vez de entrar pelos corredores, o Link sobe pelos telhados e passarelas do ca
 
 * O telhado do Castelo de Hyrule como na área 0x1B do ALttP: o terraço verde-azulado é o piso, o alto creme pontilhado e a face bege com rebites das muretas são as paredes. As salas são pintadas tile a tile com o `ts_CastleTop` (salas pintadas, F12b-1), com peças recortadas da própria área, então a luz e a perspectiva são as do original.
 * Passagem é um corte reto na mureta (em cima, embaixo e dos lados), sem moldura de porta.
-* Decoração: torres de lâmpada verde encostadas na mureta de cima, o brasão de Hyrule no piso e o portão da Torre de Agahnim na mureta de cima.
+* A mureta continua de uma sala para a outra: a borda da sala não tem face externa nem ponta, e os cantos são células inteiras da área, com o contorno escuro.
+* Decoração: torres de lâmpada verde (com o pé sobre o piso) encostadas na mureta de cima e o brasão de Hyrule no piso. O portão da Torre de Agahnim não é mais decoração: é a entrada e a saída da fase.
+* Natureza invadindo: árvores e moitas sobre manchas irregulares de grama que tomam o piso (motivos `Nature/trees` e `Nature/bushes`; as bordas são as da trilha de terra da 0x1B com a terra trocada pelo piso).
+* Salas com vista para baixo (Overlook, LongOverlook, WideOverlook): a face externa do castelo cai na grama, com árvores e moitas lá embaixo.
 * A noite é a mesma da entrada (nível `Start`): tela azulada e escura, chuva caindo e relâmpagos que clareiam tudo, com o trovão logo depois.
-* Portas trancadas, fechadas, secretas, de entrada e de saída usam o desenho das portas do castelo dentro do corte da mureta (veja Decisões).
+* Sem portas de dungeon (revisão de out/2026): a porta fechada vira passagem aberta, a trancada é o corte com dois blocos de fechadura, a secreta é a mureta rachada que abre com bomba. O portão abre (fechado, abrindo, aberto) quando o Link entra e fecha atrás dele quando chega.
 
 ## Salas
 
 * Mesma classe de dungeon e mesmos layouts do castelo (`DungeonClass.Castle`, `data_d`); muda o conjunto de salas: `CastleTop`, escrito pelo `tools/templates/make_rooms.py` e escolhido por `RoomSet` na ficha.
-* 12 salas pintadas, cada uma com um conjunto de portas e uma decoração: 1x1 Terrace (a da prévia aprovada), Crossroads, TwinGates, Rampart, TowerGate, LampCourt e LowGates; 1x2 LongTerrace e LongRampart; 2x1 WideTerrace, WideRampart e WideCourt. Os conjuntos de portas são os menores que cobrem todas as salas que os layouts do castelo deram em 12 sementes (cenário `castle_top_layouts`): 136 de 156 salas saem pintadas.
+* 16 salas pintadas, cada uma com um conjunto de portas e uma decoração: 1x1 Terrace (a da prévia aprovada), Crossroads (moitas), TwinGates, Rampart, SideTower, LampCourt, LowGates e Overlook (vista); 1x2 LongTerrace, LongRampart e LongOverlook (vista); 2x1 WideTerrace, WideGarden (moitas), WideCourt (moitas), Grove (árvores) e WideOverlook (vista). Os conjuntos de portas são os menores que cobrem todas as salas que os layouts do castelo deram em 12 sementes (cenário `castle_top_layouts`): 136 de 156 salas saem pintadas.
 * Sem salas de obstáculo (`ObstacleRooms = false`): são quebra-cabeças de dungeon.
-* Salas especiais (loja, tesouro e as outras que o castelo sorteia) e salas com seção (parte da sala separada no layout) usam as salas compartilhadas com o tema do castelo: são o interior das torres.
+* Salas especiais (loja, tesouro, rupias, fada e as outras) são cópias pintadas das salas especiais compartilhadas (`specials` no `rooms.json`, moldura de topo mais baixo): 21 das 66 cabem, todas as subclasses cobertas. Salas com seção (parte da sala separada no layout) continuam com as salas compartilhadas do tema do castelo.
 * Referência para a F8: salas da Torre de Agahnim e o exterior do castelo no ALttP (as ids saem na conversão).
 
 ## Inimigos
@@ -76,6 +80,15 @@ A ficha de fase (F4) e os caminhos ramificados (F4b) já existem, então a regi�
 * Os soldados: confirmar se usam os números do castelo (`EnemyStats` do castelo, como decidido) agora que a fase está no capítulo 2, onde o porão usa os dele.
 * `tools/check/validate.py` e `docs/dev/engine-notes.md`: registrar o que for aprendido.
 
+## Pendências (out/2026, Guilherme jogou a rodada da revisão)
+
+A rodada fez: portas ao ar livre (fechada vira passagem, trancada com blocos de fechadura, secreta como mureta rachada), portão da Torre de Agahnim na chegada e na saída com a animação da ROM e a saída na parede de cima, torre com o pé, mureta que continua além da borda da sala com cantos inteiros da ROM, salas com vista para baixo, natureza com grama tomando o piso e salas especiais pintadas pela ferramenta (21 de 66). Ainda falta:
+
+1. **Salas especiais de interior de torre:** as que continuam com o castelo por dentro (ex.: a sala grande em forma de L com piso cinza e paredes douradas) não combinam com o telhado. São as que a ferramenta ainda não pinta: andar de baixo, paredes internas, objetos sob a mureta de cima (45 das 66 compartilhadas), além das salas de seção.
+2. **Muretas de salas vizinhas não se encaixam:** uma sala tem borda e a vizinha não, e a transição fica errada. As paredes devem formar uma estrutura só (salas pintadas ao lado de salas compartilhadas, cortes de passagem, cantos que não casam com a vizinha).
+3. **Porta de entrada e saída parece bugada:** o portão (RegionGate, `Gate`, `GateStairs`) precisa ser revisto jogando: posição, animação, o Link atravessando, as salas sem portão (portas 11 e 1 de salas 1x1, salas compartilhadas).
+4. **Chuva e noite não aparecem:** no ALttP chove e é noite antes de o Link entrar no castelo, então no topo também deveria. O `oWeather` com `{Thunder: true}` está na ficha e o cenário `castle_top` registra `weather level=14`, mas o Guilherme não viu chuva nem noite jogando: investigar.
+
 ## Pronto quando
 
 * Em várias runs, o capítulo 2 aparece às vezes como o topo do castelo (por uma escadaria para cima no Hyrule Castle), com as salas do conjunto CastleTop, chuva, relâmpago e trovão, e o capítulo seguinte é a prisão normal.
@@ -84,6 +97,8 @@ A ficha de fase (F4) e os caminhos ramificados (F4b) já existem, então a regi�
 * O Guilherme joga uma run e aprova o visual.
 
 ## Decisões
+
+* Revisão do Guilherme (out/2026, prévias 1 a 4 aprovadas): sem portas de dungeon ao ar livre; portão da Torre de Agahnim na chegada e na saída, com a animação da ROM, e a saída na parede de cima (ou a escada da frente do castelo quando não cabe); torre com o pé; mureta contínua entre salas, com peças inteiras; salas com vista para baixo; natureza em cima do telhado, com grama tomando o piso; salas especiais pintadas como a região. Poças de chuva ficaram de fora (o ALttP não tem).
 
 * Mesmos inimigos do castelo, chuva e relâmpagos como no começo da run (roadmap, out/2026).
 * É o piloto do plano de ferramentas: só começa depois das etapas F1 a F10, para testar o fluxo inteiro.

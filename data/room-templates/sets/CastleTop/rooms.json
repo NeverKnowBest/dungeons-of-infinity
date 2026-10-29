@@ -1,38 +1,89 @@
 {
- "comment": "Castle rooftops (docs/regioes/topo-do-castelo.md): rooms painted tile by tile with ts_CastleTop, written by tools/templates/make_rooms.py (roadmap F12b-1 and the rest of the pilot). The kit's pieces are cells of ALttP area 0x1B (the top of Hyrule Castle; col, row of 16x16 blocks, incoming/topo-do-castelo/tiles/areas.json): the teal roof terrace is the floor, the cream wall tops and the riveted beige faces are walls, as on the original. A passage is a straight cut through the wall, as in the approved preview. The door sets are the fewest that cover every 1x1 and 1x2 room the Castle layouts gave in 12 seeds (scenario castle_top_layouts): passages of neighbouring positions touch, so a 1x1 room takes no two neighbours on the ring 1..12.",
+ "comment": "Castle rooftops (docs/regioes/topo-do-castelo.md): rooms painted tile by tile with ts_CastleTop, written by tools/templates/make_rooms.py (roadmap F12b-1, the pilot and its review). The kit's pieces are cells of ALttP area 0x1B (the top of Hyrule Castle; col, row of 16x16 blocks, incoming/topo-do-castelo/tiles/areas.json): the teal roof terrace is the floor, the cream wall tops and the riveted beige faces are walls, as on the original. The walls go on past the edge of the room (no outer face, no wall end at the edge), so neighbouring rooms join; every corner is a whole cell of the area with its dark outline (Guilherme's review, oct/2026). A passage is a straight cut through the wall. The door sets are the fewest that cover every 1x1, 1x2 and 2x1 room the Castle layouts gave in 12 seeds (scenario castle_top_layouts): passages of neighbouring positions touch, so a 1x1 room takes no two neighbours on the ring 1..12. The gate of a top door is the level's entrance or exit (the palace door of the area, animated by the game); a bottom door's gate is the stairs down out of the front gate of the area, for an exit that cannot go in the top wall.",
  "halves": [],
+ "specials": {"frame": "special", "comment": "Every shared special room that fits is painted with the rooftops' frame (docs/design/direcao.md: special rooms match their area)."},
  "kit": {
   "tiles": "CastleTop",
   "area": "1B",
   "pieces": {
    "floor": [15, 7, 1, 1],
-   "top_left": [11, 0, 3, 4],
+   "top_left": [[[16, 0], [12, 0], [13, 0]], [[16, 0], [12, 1], [13, 1]], [[16, 0], [12, 2], [13, 2]], [[16, 0], [12, 3], [13, 3]]],
    "top_mid": [14, 0, 2, 4],
-   "top_right": [50, 0, 3, 4],
-   "side_left": [11, 6, 3, 1],
-   "side_right": [50, 6, 3, 1],
-   "bottom_left": [[[11, 6], [12, 6], [17, 8]], [[11, 6], [12, 6], [17, 9]], [[11, 6], [12, 6], [13, 2]]],
-   "bottom_mid": [17, 8, 1, 3],
-   "bottom_right": [[[17, 8], [51, 6], [52, 6]], [[17, 9], [51, 6], [52, 6]], [[50, 2], [51, 6], [52, 6]]],
+   "top_right": [[[50, 0], [51, 0], [16, 0]], [[50, 1], [51, 1], [16, 0]], [[50, 2], [51, 2], [16, 0]], [[50, 3], [51, 3], [16, 0]]],
+   "side_left": [[[16, 0], [12, 6], [13, 6]]],
+   "side_right": [[[50, 6], [51, 6], [16, 0]]],
+   "bottom_left": [[[16, 0], [12, 38], [13, 38]], [[16, 0], [16, 0], [16, 0]], [[16, 0], [16, 0], [16, 0]]],
+   "bottom_mid": [[[17, 8]], [[16, 0]], [[16, 0]]],
+   "bottom_right": [[[50, 38], [51, 38], [16, 0]], [[16, 0], [16, 0], [16, 0]], [[16, 0], [16, 0], [16, 0]]],
    "open_top": [[[50, 0], [15, 7], [15, 7], [13, 0]], [[50, 1], [15, 7], [15, 7], [13, 1]], [[50, 2], [15, 7], [15, 7], [13, 2]], [[50, 3], [15, 7], [15, 7], [13, 3]]],
-   "open_bottom": [[[17, 8], [15, 7], [15, 7], [17, 8]], [[17, 9], [15, 7], [15, 7], [17, 9]], [[50, 2], [15, 7], [15, 7], [13, 2]]],
-   "tower": [22, 14, 3, 3],
+   "open_bottom": [[[17, 8], [15, 7], [15, 7], [17, 8]], [[16, 0], [15, 7], [15, 7], [16, 0]], [[16, 0], [15, 7], [15, 7], [16, 0]]],
+   "open_left": [[[16, 0], [12, 6], [13, 6]], [[15, 7], [15, 7], [15, 7]], [[15, 7], [15, 7], [15, 7]], [[16, 0], [12, 6], [13, 6]]],
+   "open_right": [[[50, 6], [51, 6], [16, 0]], [[15, 7], [15, 7], [15, 7]], [[15, 7], [15, 7], [15, 7]], [[50, 6], [51, 6], [16, 0]]],
+   "tower": [26, 4, 3, 4],
    "crest": [31, 8, 2, 3],
-   "open_left": [[[11, 6], [12, 6], [13, 6]], [[15, 7], [15, 7], [15, 7]], [[15, 7], [15, 7], [15, 7]], [[11, 6], [12, 6], [13, 6]]],
-   "open_right": [[[50, 6], [51, 6], [52, 6]], [[15, 7], [15, 7], [15, 7]], [[15, 7], [15, 7], [15, 7]], [[50, 6], [51, 6], [52, 6]]],
-   "gate": [30, 5, 4, 2]
+   "gate": [29, 4, 6, 4],
+   "stairs": [30, 17, 4, 2],
+   "vl_top_left": [[[16, 44], [16, 44], [11, 0], [12, 0], [13, 0]], [[16, 44], [16, 44], [11, 1], [12, 1], [13, 1]], [[16, 44], [16, 44], [11, 2], [12, 2], [13, 2]], [[16, 44], [16, 44], [11, 3], [12, 3], [13, 3]]],
+   "vl_side_left": [[[16, 44], [16, 44], [11, 6], [12, 6], [13, 6]]],
+   "vl_bottom_left": [[[16, 44], [16, 44], [11, 6], [12, 38], [13, 38]], [[16, 44], [16, 44], [11, 6], [16, 0], [16, 0]], [[16, 44], [16, 44], [11, 6], [16, 0], [16, 0]]],
+   "vb_bottom_left": [[[16, 0], [12, 38], [13, 38]], [[16, 0], [16, 0], [16, 0]], [[18, 39], [18, 39], [18, 39]], [[18, 40], [18, 40], [18, 40]], [[18, 41], [18, 41], [18, 41]], [[18, 42], [18, 42], [18, 42]], [[16, 44], [16, 44], [16, 44]]],
+   "vb_bottom_mid": [[[17, 8]], [[16, 0]], [[18, 39]], [[18, 40]], [[18, 41]], [[18, 42]], [[16, 44]]],
+   "vb_bottom_right": [[[50, 38], [51, 38], [16, 0]], [[16, 0], [16, 0], [16, 0]], [[18, 39], [18, 39], [18, 39]], [[18, 40], [18, 40], [18, 40]], [[18, 41], [18, 41], [18, 41]], [[18, 42], [18, 42], [18, 42]], [[16, 44], [16, 44], [16, 44]]],
+   "s_top_left": [[[16, 0], [12, 1], [13, 1]], [[16, 0], [12, 2], [13, 2]], [[16, 0], [12, 3], [13, 3]]],
+   "s_top_mid": [14, 1, 2, 3],
+   "s_top_right": [[[50, 1], [51, 1], [16, 0]], [[50, 2], [51, 2], [16, 0]], [[50, 3], [51, 3], [16, 0]]],
+   "tree_half": [23, 19, 2, 5],
+   "bushes_low": [12, 44, 2, 1],
+   "tree": [21, 19, 4, 5],
+   "bush": [26, 32, 1, 1],
+   "tuft": [6, 13, 1, 1],
+   "flower": [5, 18, 1, 1]
   },
   "frame": {
    "top": ["top_left", "top_mid", "top_right"],
    "middle": ["side_left", "floor", "side_right"],
    "bottom": ["bottom_left", "bottom_mid", "bottom_right"]
   },
+  "frames": {
+   "view_left": {
+    "comment": "The outer wall of the castle on the left: its riveted face drops to the grass and trees below (mirrored by the game for the right).",
+    "top": ["vl_top_left", "top_mid", "top_right"],
+    "middle": ["vl_side_left", "floor", "side_right"],
+    "bottom": ["vl_bottom_left", "bottom_mid", "bottom_right"]
+   },
+   "special": {
+    "comment": "The special rooms (shop, treasure, rupees, fairy...): the top wall one row lower, so their objects, laid out for the dungeon walls, keep clear of it.",
+    "top": ["s_top_left", "s_top_mid", "s_top_right"],
+    "middle": ["side_left", "floor", "side_right"],
+    "bottom": ["bottom_left", "bottom_mid", "bottom_right"],
+    "gate": {"Top": {"piece": "gate", "at": [-32, 0]}}
+   },
+   "view_bottom": {
+    "comment": "The outer wall of the castle at the bottom: its riveted face drops to the grass and bushes below.",
+    "top": ["top_left", "top_mid", "top_right"],
+    "middle": ["side_left", "floor", "side_right"],
+    "bottom": ["vb_bottom_left", "vb_bottom_mid", "vb_bottom_right"]
+   }
+  },
   "openings": {
    "Top": "open_top",
    "Bottom": "open_bottom",
    "Left": "open_left",
    "Right": "open_right"
-  }
+  },
+  "gate": {
+   "Top": {"piece": "gate", "at": [-32, 16]},
+   "Bottom": {"piece": "stairs", "at": [-16, -32]}
+  },
+  "grass": {
+   "full": [16, 44],
+   "top": [48, 57, "floor"],
+   "bottom": [48, 58, "floor"],
+   "left": [50, 59, "floor"],
+   "corner": [50, 58, "floor"],
+   "inner": [51, 57, "floor"]
+  },
+  "nature": {"tree": "tree", "bush": "bush", "tufts": ["tuft", "flower"]}
  },
  "painted": [
   {
@@ -44,10 +95,11 @@
   },
   {
    "name": "Crossroads",
-   "comment": "Where the walkways of the four sides meet: the crest in the middle, towers either side of the top passage.",
+   "comment": "Where the walkways of the four sides meet: the crest in the middle, towers either side of the top passage, bushes on the grass growing over the terrace between the walkways.",
    "size": "1x1",
    "doors": [12, 3, 6, 9],
-   "decor": [{"piece": "tower", "at": [48, 16], "pair": true}, {"piece": "crest", "at": [112, 112]}]
+   "decor": [{"piece": "tower", "at": [48, 16], "pair": true}, {"piece": "crest", "at": [112, 112]}],
+   "nature": ["Nature/bushes"]
   },
   {
    "name": "TwinGates",
@@ -64,11 +116,11 @@
    "decor": [{"piece": "tower", "at": [104, 16]}]
   },
   {
-   "name": "TowerGate",
-   "comment": "The gate of Agahnim's tower set in the top wall, the passage to the right of it.",
+   "name": "SideTower",
+   "comment": "A lamp tower beside the passage near the corner of the top wall, the crest in the middle. It was TowerGate, whose decorative gate looked like the level's exit; its doors leave no room for a mirrored pair of bushes.",
    "size": "1x1",
    "doors": [1, 4, 6, 8, 10],
-   "decor": [{"piece": "gate", "at": [48, 32]}, {"piece": "crest", "at": [112, 112]}]
+   "decor": [{"piece": "tower", "at": [48, 16]}, {"piece": "crest", "at": [112, 112]}]
   },
   {
    "name": "LampCourt",
@@ -85,6 +137,21 @@
    "decor": [{"piece": "tower", "at": [48, 16], "pair": true}, {"piece": "crest", "at": [112, 112]}]
   },
   {
+   "name": "Gatehouse",
+   "comment": "Passages on every side but the corners: the room of an exit moved to the top wall (position 12) beside a side passage near the top; towers either side of the top passage, the crest in the middle.",
+   "size": "1x1",
+   "doors": [12, 2, 4, 6, 8, 10],
+   "decor": [{"piece": "tower", "at": [48, 16], "pair": true}, {"piece": "crest", "at": [112, 112]}]
+  },
+  {
+   "name": "Overlook",
+   "comment": "The outer wall of the castle on the left side: past its riveted face, the grass and trees down below (the game mirrors it for the right side). No passage on that side.",
+   "size": "1x1",
+   "doors": [12, 2, 4, 6],
+   "frame": "view_left",
+   "decor": [{"piece": "tree_half", "at": [0, 56]}, {"piece": "tree_half", "at": [0, 152]}, {"piece": "crest", "at": [128, 112]}]
+  },
+  {
    "name": "LongTerrace",
    "comment": "A terrace two rooms long with passages all along the sides; towers by the top passage, the crest in the middle.",
    "size": "1x2",
@@ -93,10 +160,18 @@
   },
   {
    "name": "LongRampart",
-   "comment": "A long terrace with passages near the corners and along the sides; a tower in the middle of the top wall.",
+   "comment": "A long terrace with passages near the corners and along the sides; a tower in the middle of the top wall (its walkways leave no room for nature).",
    "size": "1x2",
    "doors": [11, 1, 2, 3, 4, 5, 7, 8, 9, 10],
    "decor": [{"piece": "tower", "at": [104, 16]}]
+  },
+  {
+   "name": "LongOverlook",
+   "comment": "Two rooms long along the outer wall of the castle, the grass and trees down below on the left (mirrored for the right).",
+   "size": "1x2",
+   "doors": [12, 2, 3, 4, 6],
+   "frame": "view_left",
+   "decor": [{"piece": "tree_half", "at": [0, 56]}, {"piece": "tree_half", "at": [0, 152]}, {"piece": "tree_half", "at": [0, 248]}, {"piece": "tree_half", "at": [0, 344]}, {"piece": "crest", "at": [128, 240]}]
   },
   {
    "name": "WideTerrace",
@@ -106,18 +181,36 @@
    "decor": [{"piece": "tower", "at": [168, 16], "pair": true}, {"piece": "crest", "at": [240, 112]}]
   },
   {
-   "name": "WideRampart",
-   "comment": "A wide stretch of parapet with passages near the corners of the sides; the gate of Agahnim's tower between the top passages.",
+   "name": "WideGarden",
+   "comment": "A wide stretch of parapet with passages near the corners of the sides; towers between the top passages and bushes on the grass between the walkways. It was WideRampart, whose decorative gates looked like the level's exit.",
    "size": "2x1",
    "doors": [11, 12, 1, 2, 4, 5, 6, 7, 8, 10],
-   "decor": [{"piece": "gate", "at": [160, 32]}, {"piece": "gate", "at": [288, 32]}]
+   "decor": [{"piece": "tower", "at": [168, 16], "pair": true}],
+   "nature": ["Nature/bushes"]
   },
   {
    "name": "WideCourt",
-   "comment": "A wide court open to one side near the top and to the other in the middle; towers between the top passages over a bare terrace.",
+   "comment": "A wide court open to one side near the top and to the other in the middle; towers between the top passages, bushes on the grass.",
    "size": "2x1",
    "doors": [11, 12, 1, 2, 5, 6, 7, 9],
-   "decor": [{"piece": "tower", "at": [168, 16], "pair": true}]
+   "decor": [{"piece": "tower", "at": [168, 16], "pair": true}],
+   "nature": ["Nature/bushes"]
+  },
+  {
+   "name": "Grove",
+   "comment": "A wide terrace taken over by nature: a tree in each half on the grass growing over the floor, towers between the top passages. Few passages, so the trees have room (it serves the wide rooms with those doors only).",
+   "size": "2x1",
+   "doors": [11, 1, 6],
+   "decor": [{"piece": "tower", "at": [168, 16], "pair": true}],
+   "nature": ["Nature/trees"]
+  },
+  {
+   "name": "WideOverlook",
+   "comment": "The outer wall of the castle at the bottom: past its riveted face, the grass and bushes down below. No passage in the bottom wall, nor low on the sides.",
+   "size": "2x1",
+   "doors": [11, 12, 1, 3, 9],
+   "frame": "view_bottom",
+   "decor": [{"piece": "tower", "at": [168, 16], "pair": true}, {"piece": "bushes_low", "at": [48, 240], "pair": true}, {"piece": "bushes_low", "at": [160, 240], "pair": true}]
   }
  ]
 }

@@ -43,7 +43,7 @@ TILE_CLASSES = {'floor', 'solid', 'slope', 'deep_water', 'shallow_water', 'tall_
 # "solid" (1 or 0 per tile) from this, and tools/templates/paint_rooms.py reads it back.
 TILE_WALKABLE = {'floor', 'shallow_water', 'tall_grass', 'stairs', 'entrance', 'dig', 'warp'}
 TILES_KEYS = {'source', 'areas', 'tile', 'columns', 'transparent', 'attributes', 'classes', 'class', 'blocks',
-              'animated', 'animation_speed'}
+              'animated', 'animation_speed', 'named'}
 
 
 class ImportError_(Exception):
@@ -638,8 +638,12 @@ def read_tiles(d, manifest):
                 all(0 < f < count for f in a['frames'])):
             raise ImportError_('tiles/tiles.json: an animation needs a "name" and "frames" (tiles of tiles.png)')
         anims.append({'name': a['name'], 'frames': [int(f) for f in a['frames']]})
+    named = js.get('named', {})
+    for k, v in named.items():
+        if not (re.match(r'^[A-Za-z][A-Za-z0-9_]*$', k) and isinstance(v, list) and all(0 <= b < len(blocks) for b in v)):
+            raise ImportError_('tiles/tiles.json: named "%s" must be a list of blocks' % k)
     data = {'columns': cols, 'count': count, 'class': classes, 'blocks': blocks, 'animated': anims,
-            'animation_speed': float(js.get('animation_speed', 8)), 'source': js.get('source', '')}
+            'animation_speed': float(js.get('animation_speed', 8)), 'source': js.get('source', ''), 'named': named}
     return im, data
 
 
@@ -702,7 +706,7 @@ def tiles_data_text(region, data):
     """data/tiles/<Region>.json, what the game reads (RegionTiles_Get): the class of every tile, one block per line."""
     head = {'name': region, 'tileset': 'ts_' + region, 'columns': data['columns'], 'source': data['source'],
             'class': data['class'], 'solid': [0] + [0 if c in TILE_WALKABLE else 1 for c in data['class'][1:]],
-            'animated': data['animated']}
+            'animated': data['animated'], 'named': data.get('named', {})}
     s = json.dumps(head, separators=(',', ':'))[:-1]
     return s + ',\n"blocks":[\n' + ',\n'.join(json.dumps(b, separators=(',', ':')) for b in data['blocks']) + '\n]}\n'
 

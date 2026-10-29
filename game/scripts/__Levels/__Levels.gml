@@ -142,6 +142,11 @@ function Level_Create(_Index, _Name) constructor{
 	ExitHidden = [[false, 1], [true, 1]];	// whether the extra exit is in a secret room behind a bombable wall
 	ExitMinDistance = 2;				// grid columns between the two exits, which are also on opposite sides of the map's middle
 	ExitLook = "StairsDown";			// how the exits that lead to this level look: a key of global.ExitLooks (__Doors)
+	OwnExitLooks = undefined;			// {Top, Bottom}: looks of this level's own exits, in place of the destination's, where
+										// the room has them painted (outdoor levels: a gate out of the wall, Door_ExitLook)
+	ArriveLook = "";					// the look Link arrives through in this level, in place of the exit he took ("" keeps it)
+	ExitWall = "";						// "Top": the main exit moves to the top wall of its room where nothing is behind it, and
+										// the extra exit only goes there (Dungeon_ExitToTop)
 
 	// Boss
 	Boss = false;
@@ -396,6 +401,11 @@ function Levels_Init(){
 		ObstacleRooms = false;
 		SecretDoorType = SecretDoor.Crack;
 		ExitLook = "StairsUp";
+		// in and out by the palace door of area 0x1B (the way to Agahnim's tower), which only fits the top wall; an
+		// exit that cannot go there leaves by the stairs out of the castle's front gate (Guilherme, oct/2026)
+		OwnExitLooks = {Top: "Gate", Bottom: "GateStairs"};
+		ArriveLook = "Gate";
+		ExitWall = "Top";
 		Enemies = [[oEnemy_Soldier_Advanced, 2], [oEnemy_Soldier_Simple, 3], [oEnemy_Keese, 1]];
 	}
 

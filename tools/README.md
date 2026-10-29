@@ -244,17 +244,34 @@ Painted rooms (roadmap F12b, module `paint_rooms.py`): beside its `halves`, a `r
 
 ```
 "kit": {"tiles": "CastleTop", "area": "1B",                       # region tileset (data/room-templates/tilesets/<Name>.json) and area
-        "pieces": {"floor": [15, 7, 1, 1],                        # [col, row, w, h] of the area, or rows of [col, row] ([col, row, "m"] mirrored)
-                   "bottom_left": [[[11, 6], [12, 6], [17, 8]], ...], ...},
+        "pieces": {"floor": [15, 7, 1, 1],                        # [col, row, w, h] of the area, or rows of [col, row]: [col, row, "m"]
+                   "bottom_left": [[[16, 0], [12, 38], [13, 38]], ...], ...},   #   mirrored, "v" flipped, any other word the
+                                                                  #   recolored copy of tiles/extra.json (owdump.py tiles)
         "frame": {"top": ["top_left", "top_mid", "top_right"],     # left and right at the corners, the middle repeated across;
                   "middle": ["side_left", "floor", "side_right"],  #   the middle row repeated down between the top and the bottom
                   "bottom": ["bottom_left", "bottom_mid", "bottom_right"]},
-        "openings": {"Top": "open_top", "Bottom": "open_bottom"}}, # painted on RegionOpen at a door, 16 px left of its cell, at the wall
+        "frames": {"view_left": {...}, "special": {..., "gate": {...}}},   # other frames a room names ("frame"); a frame may
+                                                                  #   move the gate ("gate")
+        "openings": {"Top": "open_top", "Bottom": "open_bottom"}, # painted on RegionOpen at a door, 16 px left of its cell, at the wall
+        "gate": {"Top": {"piece": "gate", "at": [-32, 16]},       # RegionGate: the level's entrance or exit in that door (px from the
+                 "Bottom": {"piece": "stairs", "at": [-16, -32]}},#   door cell's x; y from the top, or from the bottom for Bottom)
+        "grass": {"full": [16, 44], "top": [48, 57, "floor"], "bottom": ..., "left": ..., "corner": ..., "inner": ...},
+        "nature": {"tree": "tree", "bush": "bush", "tufts": ["tuft", "flower"]}},
+"specials": {"frame": "special"},                                 # painted copies of the shared special rooms (see below)
 "painted": [{"name": "Terrace", "size": "1x1",                    # 1x1, 1x2 or 2x1 (never turned)
              "doors": [12, 6],                                    # door positions (DOOR_XY); their wall needs an opening in the kit
              "decor": [{"piece": "tower", "at": [48, 16], "pair": true}],   # px on the 8 px grid; pair: the mirrored copy too
+             "nature": ["Nature/trees"],                          # nature motifs: Nature/trees (one in each half of a 2x1 or
+                                                                  #   1x2 room), Nature/bushes (a mirrored pair of 2x2 clumps)
+             "frame": "view_left",                                # optional: a frame of "frames"
              "transforms": "None,FlipH", "props": {}}]            # transforms the game may use (default None,FlipH)
 ```
+
+Gates (the rooftops' review, oct/2026): every door of the kit's `gate` walls gets the gate piece on a third tile layer, `RegionGate`, which the game paints instead of the passage when that door is the level's entrance or exit (`RegionRoom_Paint`). The gate wins over the decoration: a piece it touches is painted bare (the frame without it) on the same layer, so it goes whole; a gate that would reach into the side walls, or cover the objects of a special room, is left out (the game keeps the plain passage there).
+
+Nature motifs (docs/design/direcao.md, "Natureza invadindo"): the pieces go in a symmetric layout off the door lanes (each door's straight way to the middle, and the middle) and the decoration, at the free spot nearest the middle of each half (trees) or a quarter of the room (bushes); a patch of grass grows around them over the floor (ellipses on a grid of 16 px cell corners, drawn by marching squares with the kit's `grass` pieces: `top` is grass in the top half of the cell, `left` in the left half, `corner` only in the bottom left corner, `inner` everywhere but the bottom left corner; the others are their mirrored and flipped copies) and must cover the pieces; tufts go on the grass, mirrored. "finds no place" means the doors leave no room: use the motif in a room with fewer or symmetric doors.
+
+Special rooms (`specials`): every 1x1 room of the shared `Room Templates Special.json` with one floor level, no walls inside and objects that keep clear of the painted walls becomes a painted room of class `Special` (same subclass, its `Water`, `FloorObjs` and `Objs`, all twelve doors since one is in use, no transform) in the set's Special map. The game picks a level's special rooms from its set first (`RoomTemplates_PickSpecial`). The script fails if a subclass has no room that fits the frame. The rooftops keep 21 of 66 (the others have a lower floor, walls inside or objects under the top wall).
 
 The room goes into the set's Main Upper map with `Whole` 1 and `Transforms`, its Doors, an enemy area over the floor between the walls and a treasure and a crystal spot in the middle, plus the tile layers `Region` (every door closed) and `RegionOpen` (the passages) over the region's Tiled tileset (firstgid after the object tileset, rounded up to a thousand). Refused: decoration over a passage, passages that touch, a door whose passage is not open floor from the middle of the room to the edge, a middle that is not floor. `--map` prints the room as text (`#` wall, `.` floor, `o` passage, `D` door cell); `--png <file>` draws every painted room of the set, all doors closed beside all doors open with the door cells outlined (needs Pillow), the preview to show before the game. A 2x1 room is 512x256 and goes with the 1x2 templates (`SizeIndex` 2); a painted room only fits rooms of its own size. Passages of neighbouring door positions touch, so choose door sets with no two neighbours (in a 1x1 room the 12 positions make a ring). `convert.py` turns the layers into `Region` (`docs/dev/engine-notes.md`, "Painted rooms").
 
@@ -321,10 +338,12 @@ python tools/alttp/owdump.py stats                    # composition per area: di
 python tools/alttp/owdump.py png 0x2c 0x1b --scale 0.5
 python tools/alttp/owdump.py world --scale 0.25       # the whole light world (--world dark)
 python tools/alttp/owdump.py vocab --top 64           # the most used map32 blocks, drawn
-python tools/alttp/owdump.py tiles 0x1b --region topo-do-castelo   # the area's blocks as a region tileset (F6b)
+python tools/alttp/owdump.py tiles 0x1b --region topo-do-castelo   # the area's blocks as a region tileset (F6b), plus tiles/extra.json
 ```
 
 `tiles` (roadmap F6b) cuts the map16 blocks of the areas into `incoming/<region>/tiles/tiles.png` (8x8 tiles already colored, 32 per row, tile 0 empty; a tile is kept once, its mirrored and flipped copies point to it) and `tiles.json` (`attributes`: the ROM attribute of each tile, `classes`: attribute to class, the short names `floor`, `solid`, `slope`, `deep_water`, `ledge_s`... of the attribute table above; `blocks`: one per distinct map16 of each area, `{"area", "map16", "tiles": [[tile, flags] x 4]}`, flags 1 mirrored, 2 flipped; `animated`: empty for now). Run again with more areas and the old tiles and blocks keep their numbers (the new ones come after), so whatever paints with them stays right; `--fresh` starts over, `--transparent` makes color 0 transparent instead of the area's backdrop. The blocks are drawn in order in `out/tiles_<region>_blocks.png`, and `tiles/areas.json` keeps each area as rows of block numbers (the source of the painted rooms' pieces, `templates/paint_rooms.py`, so they need no ROM). `import_region.py` makes the folder a tileset.
+
+`incoming/<region>/tiles/extra.json` (optional, read by `tiles`) adds blocks that are not in the areas: `"map16": {"<Name>": {"area": "0x1B", "map16": ["0xdb6", ...]}}` draws those map16 numbers with the area's graphics (the frames of a door animation; tiles.json `named` lists their blocks, and the game reads them as `named` in `data/tiles/<Region>.json`), and `"recolor": {"<name>": {"area", "from": [[r, g, b], ...], "to": [r, g, b], "cells": [[col, row], ...]}}` copies area cells with those colors swapped (grass edges over dirt become grass edges over the region's floor). The new blocks go after the old ones, so every index already used keeps its meaning.
 
 `build.py` compiles a harness with whatever C compiler there is (gcc, clang, or the clang inside the `ziglang` Python package: `python -m pip install --user ziglang`, no installer), into `tools/alttp/out/<name>.exe`; it rebuilds only when a source is newer. It leaves out zelda3's `src/main.c`, `config.c`, `opengl.c` and `glsl_shader.c` (SDL, OpenGL, config reader) and `stub/` stands in for what they and opus give. The harnesses read `zelda3_assets.dat` in the zelda3 folder: make it once with zelda3's `python assets/restool.py --extract-from-rom` (needs PyYAML).
 

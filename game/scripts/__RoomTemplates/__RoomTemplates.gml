@@ -911,6 +911,21 @@ function RoomTemplates_PickSpecial(_RoomIndex){
 			ds_list_delete(SubClassList, 0);
 		}
 		
+		//the level's room set first: its special rooms match the area (painted copies of these, tools/templates/paint_rooms.py)
+		var _Set = RoomSet_For(RoomTemplateClass.Special, Room.TemplateSubClass);
+		if(_Set != undefined){
+			repeat(_Set.Count[RoomTemplateClass.Special][Room.TemplateSubClass] * 2){
+				var _SetIndex = RoomTemplate_GetNextIndex(RoomTemplateClass.Special, Room.TemplateSubClass, _Set.Unused, _Set.Count);
+				var _SetTemplate = _Set.Templates[RoomTemplateClass.Special][Room.TemplateSubClass][_SetIndex];
+				if((_SetTemplate.DoorCode[ObjTransformation.None] & Room.DoorCode) == Room.DoorCode){
+					Room.TemplateIndex = _SetIndex;
+					ds_list_destroy(SubClassList);
+					if(Room.TemplateSubClass == RoomTemplateClass_Special.TreasureLarge) global.Level.LargeTreasureRoom = true;
+					return _SetTemplate;
+				}
+			}
+		}
+		
 		for(var _Tries = 0; _Tries < global.Templates_Room_Count[RoomTemplateClass.Special][Room.TemplateSubClass] * 2; _Tries++){
 		
 			var RoomTemplateIndex = RoomTemplate_GetNextIndex(RoomTemplateClass.Special, Room.TemplateSubClass);

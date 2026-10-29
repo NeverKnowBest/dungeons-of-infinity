@@ -47,8 +47,49 @@ function ExitLooks_Init(){
 		// the usual exit
 		StairsDown: {Draw: ExitLook_DrawStairsDown, Sound: Sound_StairsFloorDown, LinkAnim: "Descending", ArriveSound: Sound_StairsDown, Entrance: [58, 60], MapIcon: sLargeMap_Down},
 		// the stairway a level's entrance shows; Link climbs it
-		StairsUp: {Draw: ExitLook_DrawStairsUp, Sound: Sound_StairsUp, LinkAnim: "Ascending", ArriveSound: Sound_StairsUp, Entrance: [60, 58], MapIcon: sLargeMap_Down}
+		StairsUp: {Draw: ExitLook_DrawStairsUp, Sound: Sound_StairsUp, LinkAnim: "Ascending", ArriveSound: Sound_StairsUp, Entrance: [60, 58], MapIcon: sLargeMap_Down},
+		// outdoor levels (OwnExitLooks, ArriveLook): the palace door of ALttP's area 0x1B in the top wall, painted with the
+		// room (RegionGate). Link walks in as it opens (Leave) and out as it closes behind him (Arrive); at the next level
+		// he arrives by the usual stairway (ArriveAnim, Entrance)
+		Gate: {Draw: ExitLook_DrawPainted, Sound: Sound_DoorOpen, LinkAnim: "Walk", ArriveAnim: "Walk", ArriveSound: Sound_DoorOpen, Entrance: [58, 60], MapIcon: sLargeMap_Down, Leave: ExitLook_GateLeave, Arrive: ExitLook_GateArrive},
+		// the stairs down out of the castle's front gate, painted in a bottom wall passage (an exit that cannot be a gate)
+		GateStairs: {Draw: ExitLook_DrawPainted, Sound: Sound_StairsFloorDown, LinkAnim: "Descending", ArriveSound: Sound_StairsDown, Entrance: [58, 60], MapIcon: sLargeMap_Down}
 	};
+}
+
+/// A look painted with the room (RegionGate): nothing to draw on the dungeon tile layers
+function ExitLook_DrawPainted(_Door, _Tiles){
+}
+
+/// Link leaves through a gate: it opens in front of him (ExitLook.Leave, from the Descending state)
+function ExitLook_GateLeave(_DoorInst){
+	var _Room = _DoorInst.RoomIndex;
+	var _X = _DoorInst.x - global.Level.Rooms[_Room].x;
+	var _Y = _DoorInst.y - global.Level.Rooms[_Room].y;
+	RegionGate_Frame(_Room, _X, _Y, 1);
+	var _Ctx = {R : _Room, X : _X, Y : _Y, G : global.Level.Rooms[_Room].RegionGrid};
+	call_later(6, time_source_units_frames, method(_Ctx, function(){ if(RegionGate_Same(R, G)) RegionGate_Frame(R, X, Y, 2); }));
+}
+
+/// Link arrives through a gate: it is open, and shuts behind him once he has walked out (ExitLook.Arrive)
+function ExitLook_GateArrive(_DoorInst){
+	var _Room = _DoorInst.RoomIndex;
+	var _X = _DoorInst.x - global.Level.Rooms[_Room].x;
+	var _Y = _DoorInst.y - global.Level.Rooms[_Room].y;
+	RegionGate_Frame(_Room, _X, _Y, 2);
+	//the calls check that the room is still the one painted (Link may leave the level before they run)
+	var _Ctx = {R : _Room, X : _X, Y : _Y, G : global.Level.Rooms[_Room].RegionGrid};
+	call_later(40, time_source_units_frames, method(_Ctx, function(){ if(RegionGate_Same(R, G)) RegionGate_Frame(R, X, Y, 1); }));
+	call_later(46, time_source_units_frames, method(_Ctx, function(){
+		if(!RegionGate_Same(R, G)) return;
+		RegionGate_Frame(R, X, Y, 0);
+		audio_play_sound(Sound_DoorClose, 1, false);
+	}));
+}
+
+/// Whether room _Room of the current level is still painted with grid _G (a delayed gate frame after a level change)
+function RegionGate_Same(_Room, _G){
+	return _Room < array_length(global.Level.Rooms) && global.Level.Rooms[_Room][$ "RegionGrid"] == _G;
 }
 
 function ExitLook_DrawStairsDown(_Door, _Tiles){
@@ -80,7 +121,10 @@ function ExitLook_DrawStairsUp(_Door, _Tiles){
 /// Link's sprite going through an exit with look _Look: _Phase 1 leaving, 2 arriving; _Location TOP or BOTTOM, the wall
 /// of the stairway
 function ExitLook_LinkSprite(_Look, _Phase, _Location){
-	return variable_global_get("LinkSpr_" + _Look.LinkAnim + (_Location == TOP ? "_Top" : "_Bottom") + string(_Phase));
+	var _Anim = (_Phase == 2) ? (_Look[$ "ArriveAnim"] ?? _Look.LinkAnim) : _Look.LinkAnim;
+	//through a door Link just walks: in, facing the wall; out, facing away from it
+	if(_Anim == "Walk") return ((_Location == TOP) == (_Phase == 1)) ? global.LinkSpr_Walk_Up : global.LinkSpr_Walk_Down;
+	return variable_global_get("LinkSpr_" + _Anim + (_Location == TOP ? "_Top" : "_Bottom") + string(_Phase));
 }
 
 /// Level an exit door leads to
@@ -93,11 +137,27 @@ function Door_ExitDest(_DoorInst){
 	return global.Level.Exits.Dest;
 }
 
-/// Look of an exit door: the ExitLook of the level it leads to
+/// Look of an exit door: the ExitLook of the level it leads to, or the level's own look for that wall where the room
+/// has it painted (OwnExitLooks: the gate out of the rooftops)
 function Door_ExitLook(_DoorInst){
+	if(LevelDef.OwnExitLooks != undefined && Door_HasGate(_DoorInst)){
+		var _Own = global.ExitLooks[$ LevelDef.OwnExitLooks[$ _DoorInst.Location] ?? ""];
+		if(_Own != undefined) return _Own;
+	}
 	var _Def = Level_Get(Door_ExitDest(_DoorInst));
 	var _Look = (_Def == undefined) ? undefined : global.ExitLooks[$ _Def.ExitLook];
 	return _Look ?? global.ExitLooks.StairsDown;
+}
+
+/// Whether a door instance has the gate of its painted room (RegionRoom_Paint keeps the doors that took one)
+function Door_HasGate(_DoorInst){
+	var _R = global.Level.Rooms[_DoorInst.RoomIndex];
+	var _G = _R[$ "RegionGrid"];
+	if(_G == undefined) return false;
+	for(var g = 0; g < array_length(_G.Gates); g++){
+		if(_G.Gates[g].X == _DoorInst.x - _R.x && _G.Gates[g].Y == _DoorInst.y - _R.y) return true;
+	}
+	return false;
 }
 
 #endregion
@@ -328,12 +388,36 @@ function Door_DrawTiles(Inst){
 		var TilesY = global.Level.Rooms[RoomIndex].ForcedTheme != -1 && global.Level.Rooms[RoomIndex].ForcedTheme <= 11 ? 4 + (global.Level.Rooms[RoomIndex].ForcedTheme * 6) : LevelTilesY_Base;
 		var TMID_Beam = (FloorLevel == UPPER ? global.TMID_Tiles_Highest : global.TMID_Walls_Upper);
 		
-		//outdoor levels (roadmap F12b): an open door of a painted room is the passage it leaves in its walls, no frame
-		//(a room of the shared templates keeps its door frames, since its walls are the dungeon's)
-		if(LevelDef.Layout == LevelLayout.Outdoor && RegionRoom_Is(RoomIndex) && (Status == DoorStatus.Open || Status == DoorStatus.Curtain)){
-			ClearTileBlock(TMID_Decor, x, y, 4, 4);
-			ClearTileBlock(TMID_Beam, x, y, 4, 4);
-			exit;
+		//outdoor levels (roadmap F12b): no dungeon doors in a painted room (a room of the shared templates keeps them,
+		//since its walls are the dungeon's). An open door is the passage it leaves in the walls; a locked one is that
+		//passage with the key blocks in it (oDoor Draw); a secret one is the wall, cracked or not, until it is bombed;
+		//the entrance and the exit are the gate painted with the room (RegionGate)
+		if(LevelDef.Layout == LevelLayout.Outdoor && RegionRoom_Is(RoomIndex)){
+			var _Painted = false;
+			switch(Status){
+				case DoorStatus.Open:
+				case DoorStatus.Curtain:
+				case DoorStatus.Locked:
+				case DoorStatus.LockedHalf:
+				case DoorStatus.Secret_Open:
+					_Painted = true;
+					break;
+				case DoorStatus.Entrance:
+				case DoorStatus.Exit:
+					_Painted = Door_HasGate(id);
+					break;
+				case DoorStatus.Secret_Closed:
+					_Painted = true;
+					ClearTileBlock(TMID_Decor, x, y, 4, 4);
+					ClearTileBlock(TMID_Beam, x, y, 4, 4);
+					if(SecretType == SecretDoor.Crack) DrawTileBlock(TMID_Decor, x + 8, y + (Location == "Top" ? 24 : 8), 94, TilesY + 4, 2, 2);
+					exit;
+			}
+			if(_Painted){
+				ClearTileBlock(TMID_Decor, x, y, 4, 4);
+				ClearTileBlock(TMID_Beam, x, y, 4, 4);
+				exit;
+			}
 		}
 		
 		switch(Location){

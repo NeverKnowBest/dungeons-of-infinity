@@ -705,6 +705,7 @@ function UpdateState(NewState, var1 = undefined){
 			x = floor(x); y = floor(y);
 			var snd = audio_play_sound(ExitLook.Sound, 1, false);	//ExitLook: set by CheckDoors
 			audio_sound_gain(snd, 0, 2000);
+			if(ExitLook[$ "Leave"] != undefined && instance_exists(ExitDoor)) ExitLook.Leave(ExitDoor);	//a gate opens in front of him
 			var NextLevelSongIndex = global.LevelDefs[Level_NextIndex()].Song;
 			if(oMusic.SongPlaying_Index != NextLevelSongIndex) Music_Fade(0, SongFadeLen_NextLevel, SongIndex.None);
 
@@ -1223,6 +1224,7 @@ function CheckDoors(){
 		if(DoorInst.Status == DoorStatus.Exit){
 			//its animation and sounds, leaving and arriving (roadmap F4b); before UpdateState, which sets the sprite first
 			ExitLook = Door_ExitLook(DoorInst);
+			ExitDoor = DoorInst;
 			if(DoorInst.Location == "Top" && y < DoorInst.y + 24){
 				global.RunPath.Next = Door_ExitDest(DoorInst);	//this exit's branch of the run (roadmap F4b)
 				DescendingLocation = TOP;

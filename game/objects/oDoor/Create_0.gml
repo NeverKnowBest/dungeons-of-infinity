@@ -31,3 +31,5 @@ PassageArea = array_create(4, 0);  //This will hold the 4 coordinates of the pas
 WallInst = noone; //Wall if door is locked or closed
 
 UpdateStatus = true;
+
+visible = (LevelDef.Layout == LevelLayout.Outdoor);	//outdoors a locked door draws its key blocks (Draw)

@@ -13,6 +13,8 @@ and the logic mirrors zelda3's `src/overworld.c`, `src/load_gfx.c` and
   python tools/alttp/owdump.py world [--world dark] [--scale 0.25]
   python tools/alttp/owdump.py vocab [--world light] [--top 64]   # most used map32 blocks, rendered
   python tools/alttp/owdump.py tiles 0x1b --region topo-do-castelo  # cut the blocks into a region tileset (F6b)
+      (plus tiles/extra.json of the region, if there is one: blocks that are not in the areas, such as the
+      frames of a door animation, and copies of area cells with some colors swapped)
 
 Options: --zelda3 <dir> (default: $ZELDA3_DIR, else the zelda3 folder next to the
 repository), --rom <file> (default: <zelda3>/zelda3.sfc), --out <dir> (default
@@ -610,12 +612,18 @@ def flipped(px, hf, vf):
     return tuple(px[(7 - r if vf else r) * 8 + (7 - c if hf else c)] for r in range(8) for c in range(8))
 
 
-def cut_tiles(areas, old, transparent):
+def block_key(b_):
+    """A block's identity in tiles.json: its area and map16, plus the color swap of a recolored copy."""
+    return (b_['area'], b_['map16'], b_.get('recolor'))
+
+
+def cut_tiles(areas, old, transparent, extra=None):
     """Cuts the map16 blocks of the areas into colored 8x8 tiles (kept once, flips reused) and blocks of four.
 
     old: a previous tiles.json, whose tiles and blocks keep their indices (the new ones are added after them), so
-    the templates that paint with the tileset stay valid when areas are added. Returns (tiles, blocks), tiles as
-    [(pixels, attribute)], blocks as dicts."""
+    the templates that paint with the tileset stay valid when areas are added. extra: the region's tiles/extra.json
+    (see cmd_tiles). Returns (tiles, blocks, named), tiles as [(pixels, attribute)], blocks as dicts, named as
+    {name: [block, ...]}."""
     t8, at = map16_to_map8(), map8_attr()
     tiles = [(tuple([(0, 0, 0, 0)] * 64), None)]         # tile 0 is empty: GameMaker draws nothing for it
     index = {}
@@ -626,7 +634,7 @@ def cut_tiles(areas, old, transparent):
             index.setdefault((px, a), (i, 0))
         for b_ in old['blocks']:
             blocks.append(b_)
-            bindex[(b_['area'], b_['map16'])] = len(blocks) - 1
+            bindex[block_key(b_)] = len(blocks) - 1
 
     def tile_id(px, a):
         for f in (0, FLIP_H, FLIP_V, FLIP_H | FLIP_V):
@@ -638,28 +646,54 @@ def cut_tiles(areas, old, transparent):
         index[(px, a)] = (len(tiles) - 1, 0)
         return len(tiles) - 1, 0
 
-    for a in areas:
+    def cut(a, v, swap=None, name=None):
+        """The block of map16 v drawn with area a's graphics (swap: {rgb: rgb} applied to its pixels)."""
+        key = (hx(a), v, name)
+        if key in bindex:
+            return bindex[key]
         vram = area_tiles(a)
         pal, back = area_palette(a)
+        quad = []
+        for k in range(4):
+            m8 = t8[v * 4 + k]
+            tile = vram[m8 & 0x1ff] if (m8 & 0x3ff) < 512 else None
+            attr = at[m8 & 0x1ff]
+            if 0x10 <= attr < 0x1c: attr |= (m8 >> 14) & 1
+            px = tile_pixels(tile, (m8 >> 10) & 7, m8 >> 14 & 1, m8 >> 15 & 1, pal, back, transparent)
+            if swap:
+                px = tuple(swap.get(p[:3], p[:3]) + (p[3],) if p[3] else p for p in px)
+            quad.append(list(tile_id(px, attr)))
+        b_ = {'area': hx(a), 'map16': v, 'tiles': quad}
+        if name:
+            b_['recolor'] = name
+        blocks.append(b_)
+        bindex[key] = len(blocks) - 1
+        return bindex[key]
+
+    for a in areas:
         seen = []
         for row in area_map16(a):
             for v in row:
                 if v not in seen:
                     seen.append(v)
         for v in seen:
-            if (hx(a), v) in bindex:
-                continue
-            quad = []
-            for k in range(4):
-                m8 = t8[v * 4 + k]
-                tile = vram[m8 & 0x1ff] if (m8 & 0x3ff) < 512 else None
-                attr = at[m8 & 0x1ff]
-                if 0x10 <= attr < 0x1c: attr |= (m8 >> 14) & 1
-                px = tile_pixels(tile, (m8 >> 10) & 7, m8 >> 14 & 1, m8 >> 15 & 1, pal, back, transparent)
-                quad.append(list(tile_id(px, attr)))
-            blocks.append({'area': hx(a), 'map16': v, 'tiles': quad})
-            bindex[(hx(a), v)] = len(blocks) - 1
-    return tiles, blocks
+            cut(a, v)
+
+    # extra.json: named blocks that are not in the areas (map16 numbers drawn with an area's graphics), and copies
+    # of area cells with colors swapped (a grass edge over dirt becomes a grass edge over the region's floor)
+    named = {}
+    extra = extra or {}
+    for name, spec in extra.get('map16', {}).items():
+        a = int(spec['area'], 0)
+        named[name] = [cut(a, int(v, 0) if isinstance(v, str) else v) for v in spec['map16']]
+    for name, spec in extra.get('recolor', {}).items():
+        a = int(spec['area'], 0)
+        to = tuple(spec['to'])
+        swap = {tuple(c): to for c in spec['from']}
+        m16 = area_map16(a)
+        for c, r in spec['cells']:
+            cut(a, m16[r][c], swap, name)
+    return tiles, blocks, named
 
 
 def cmd_tiles(args):
@@ -687,7 +721,9 @@ def cmd_tiles(args):
     if not areas:
         sys.exit('tiles needs the areas to cut (e.g. 0x1b 0x2c)')
     transparent = args.transparent if old is None else old.get('transparent', False)
-    tiles, blocks = cut_tiles(areas, old, transparent)
+    ep = os.path.join(d, 'extra.json')
+    extra = json.load(open(ep, encoding='utf-8')) if os.path.exists(ep) else None
+    tiles, blocks, named = cut_tiles(areas, old, transparent, extra)
     rows = (len(tiles) + TILES_COLUMNS - 1) // TILES_COLUMNS
     img = Image.new('RGBA', (TILES_COLUMNS * 8, rows * 8), (0, 0, 0, 0))
     for i, (px, _) in enumerate(tiles):
@@ -702,11 +738,13 @@ def cmd_tiles(args):
            'attributes': ['--'] + [hx(a) for _, a in tiles[1:]],
            'classes': {k: classes[k] for k in sorted(classes)},
            'blocks': blocks, 'animated': old.get('animated', []) if old else []}
+    if named:
+        out['named'] = named
     with open(jp, 'w', newline='\n') as f:
         f.write(dump_tiles_json(out))
     # each area as block indices, the source the room composer cuts its pieces from (make_rooms.py "painted")
-    bindex = {(b_['area'], b_['map16']): i for i, b_ in enumerate(blocks)}
-    maps = {hx(a): [[bindex[(hx(a), v)] for v in row] for row in area_map16(a)] for a in areas}
+    bindex = {block_key(b_): i for i, b_ in enumerate(blocks)}
+    maps = {hx(a): [[bindex[(hx(a), v, None)] for v in row] for row in area_map16(a)] for a in areas}
     with open(os.path.join(d, 'areas.json'), 'w', newline='\n') as f:
         f.write('{\n' + ',\n'.join(' "%s": [\n%s\n ]' % (k, ',\n'.join('  ' + json.dumps(r, separators=(',', ':'))
                                                                    for r in v)) for k, v in maps.items()) + '\n}\n')

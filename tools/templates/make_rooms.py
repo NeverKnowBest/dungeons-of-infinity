@@ -869,7 +869,8 @@ def build_map(cls, halves):
         for k, v in sorted(extra.items()):
             props.append({'name': k, 'type': 'string' if isinstance(v, str) else 'int', 'value': v})
         props.sort(key=lambda p: p['name'])
-        rooms.append({'height': half.h, 'id': rid, 'name': half.name, 'properties': props, 'rotation': 0, 'type': '',
+        rooms.append({'height': half.h, 'id': rid, 'name': half.name, 'properties': props, 'rotation': 0,
+                      'type': getattr(half, 'room_type', ''),
                       'visible': True, 'width': getattr(half, 'w', 256), 'x': ox, 'y': 0})
         for layer, items in half.layers.items():
             for gid, box, p, ot in items:
@@ -890,8 +891,9 @@ def build_map(cls, halves):
     for g in group_names:
         groups.append({'id': next_id('layer'), 'layers': [objgroup(n, sec_layers[g][n]) for n in sec_types],
                        'name': g, 'opacity': 1, 'type': 'group', 'visible': True, 'x': 0, 'y': 0})
-    out.append({'id': next_id('layer'), 'layers': groups, 'name': 'Sections', 'opacity': 1, 'type': 'group',
-                'visible': True, 'x': 0, 'y': 0})
+    if sec_types:                       # classes without sections (Special) have no Sections group
+        out.append({'id': next_id('layer'), 'layers': groups, 'name': 'Sections', 'opacity': 1, 'type': 'group',
+                    'visible': True, 'x': 0, 'y': 0})
     height = max(h.h for h in halves)
     tilesets = [{'firstgid': 1, 'source': '../../RoomTemplateTileset.json'}]
     painted = [(i, h) for i, h in enumerate(halves) if getattr(h, 'painted', False)]
@@ -904,7 +906,7 @@ def build_map(cls, halves):
         firstgid = (firstgid + 999) // 1000 * 1000 + 1
         tilesets.append({'firstgid': firstgid, 'source': '../../tilesets/%s.json' % kit.name})
         mw, mh = width // GRID, height // GRID
-        for name, attr in (('Region', 'base'), ('RegionOpen', 'open')):
+        for name, attr in (('Region', 'base'), ('RegionOpen', 'open'), ('RegionGate', 'gate')):
             data = [0] * (mw * mh)
             for i, h in painted:
                 for gy, row in enumerate(h.gids(getattr(h, attr), firstgid)):
@@ -973,6 +975,10 @@ def check_converted(name, by_class, warnings):
                 union |= int(t['DoorCode'][0])
             doors = [p + 1 for p in range(24) if union & (1 << p)]
             sections = sorted({int(s) for t in sub for s in t['Split_MainSectionIDs'] if s})
+            names = convert.CLASSES[ci_of[cls]][3]
+            if names:                   # classes picked by subclass (Special): the subclass, not the size
+                lines.append('  %s %s: %d rooms; doors %s' % (cls, names[si], len(sub), ','.join(map(str, doors))))
+                continue
             lines.append('  %s %s: %d rooms from %d halves and painted rooms; doors %s; sections %s'
                          % (cls, ['1x1', '1x2 and 2x1'][si], len(sub), len([h for h in by_class[cls] if min(h.size_index, 1) == si]),
                             ','.join(map(str, doors)), ','.join(map(str, sections)) or 'none'))
