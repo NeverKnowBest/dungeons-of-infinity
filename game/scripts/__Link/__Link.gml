@@ -1198,6 +1198,17 @@ function CheckRoomTransition(){
 	}		
 }
 
+/// Link goes through exit _DoorInst in the wall at _Location (TOP or BOTTOM): CheckDoors, or a gate he walked into
+/// (RegionGate_Push)
+function Link_TakeExit(_DoorInst, _Location){
+	//its animation and sounds, leaving and arriving (roadmap F4b); before UpdateState, which sets the sprite first
+	ExitLook = Door_ExitLook(_DoorInst);
+	ExitDoor = _DoorInst;
+	global.RunPath.Next = Door_ExitDest(_DoorInst);	//this exit's branch of the run (roadmap F4b)
+	DescendingLocation = _Location;
+	UpdateState(LinkState.Descending);
+}
+
 function CheckDoors(){
 	
 	var DoorInst = instance_place(x + vx, y + vy, oDoor);
@@ -1222,19 +1233,12 @@ function CheckDoors(){
 		}
 		
 		if(DoorInst.Status == DoorStatus.Exit){
-			//its animation and sounds, leaving and arriving (roadmap F4b); before UpdateState, which sets the sprite first
-			ExitLook = Door_ExitLook(DoorInst);
-			ExitDoor = DoorInst;
 			if(DoorInst.Location == "Top" && y < DoorInst.y + 24){
-				global.RunPath.Next = Door_ExitDest(DoorInst);	//this exit's branch of the run (roadmap F4b)
-				DescendingLocation = TOP;
-				UpdateState(LinkState.Descending);
+				Link_TakeExit(DoorInst, TOP);
 				return 1;
 			}
 			else if(DoorInst.Location == "Bottom" && y > DoorInst.y + 4){
-				global.RunPath.Next = Door_ExitDest(DoorInst);
-				DescendingLocation = BOTTOM;
-				UpdateState(LinkState.Descending);
+				Link_TakeExit(DoorInst, BOTTOM);
 				return 1;
 			}		
 		}

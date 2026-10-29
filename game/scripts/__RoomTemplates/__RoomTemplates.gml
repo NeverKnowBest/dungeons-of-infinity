@@ -393,6 +393,7 @@ function RoomTemplates_Load(){
 /// for is undefined (those rooms take the shared templates).
 function RoomSets_Load(_ClassFiles){
 	global.RoomSets = {};
+	global.RoomSetFallbackPass = false;	// RoomTemplates_Pick: true while a set's Fallback rooms may be picked
 	var _Buffer = buffer_load(GAMEDIR_ROOMTEMPLATES + "sets.json");
 	if(_Buffer == -1) exit;
 	var _Index = json_parse(buffer_read(_Buffer, buffer_string));
@@ -403,7 +404,7 @@ function RoomSets_Load(_ClassFiles){
 	array_sort(_Names, true);
 	for(var i = 0; i < array_length(_Names); i++){
 		var _Name = _Names[i];
-		var _Set = {Templates : array_create(RoomTemplateClasses, undefined), Count : array_create(RoomTemplateClasses, undefined), Unused : array_create(RoomTemplateClasses, undefined)};
+		var _Set = {Templates : array_create(RoomTemplateClasses, undefined), Count : array_create(RoomTemplateClasses, undefined), Unused : array_create(RoomTemplateClasses, undefined), HasFallback : false};
 		var _Classes = _Index[$ _Name];
 		for(var j = 0; j < array_length(_Classes); j++){
 			var _ClassIndex = array_get_index(_ClassFiles, _Classes[j]);
@@ -421,6 +422,10 @@ function RoomSets_Load(_ClassFiles){
 			for(var _SubClassIndex = 0; _SubClassIndex < _SubClasses; _SubClassIndex++){
 				_Set.Count[_ClassIndex][_SubClassIndex] = array_length(_Set.Templates[_ClassIndex][_SubClassIndex]);
 				_Set.Unused[_ClassIndex][_SubClassIndex] = -1;	//made by RoomSet_For on first use, so loading a set shifts no ds numbers in levels without one
+				for(var t = 0; t < _Set.Count[_ClassIndex][_SubClassIndex]; t++){
+					var _P = _Set.Templates[_ClassIndex][_SubClassIndex][t][$ "properties"];
+					if(_P != undefined && GetPropertyValue(_P, "Fallback") != -1) _Set.HasFallback = true;
+				}
 			}
 			_Counts[$ _Name + "/" + _Classes[j]] = _Set.Count[_ClassIndex];
 		}
@@ -567,6 +572,12 @@ function RoomTemplates_Pick(_RoomIndex, _UseSet = true){
 	var _Set = _UseSet ? RoomSet_For(Room.TemplateClass, Room.TemplateSubClass) : undefined;
 	if(_Set != undefined){
 		var _SetTemplate = RoomTemplates_PickFrom(_RoomIndex, _Set.Templates, _Set.Count, _Set.Unused);
+		// a set's Fallback rooms (every door, the sections) only when none of its other rooms fits
+		if(_SetTemplate == -1 && _Set.HasFallback){
+			global.RoomSetFallbackPass = true;
+			_SetTemplate = RoomTemplates_PickFrom(_RoomIndex, _Set.Templates, _Set.Count, _Set.Unused);
+			global.RoomSetFallbackPass = false;
+		}
 		if(_SetTemplate != -1 || !LevelDef.RoomSetFallback) return _SetTemplate;
 	}
 	return RoomTemplates_PickFrom(_RoomIndex, global.Templates_Room, global.Templates_Room_Count, global.UnusedRoomTemplatesList);
@@ -594,6 +605,7 @@ function RoomTemplates_PickFrom(_RoomIndex, _Templates, _Counts, _Unused){
 
 		var RoomTemplate = _Templates[_RoomTemplateClass][_RoomTemplateSubClass][_RoomTemplateIndex];
 		var _Properties = RoomTemplate[$ "properties"];
+		if(!global.RoomSetFallbackPass && _Properties != undefined && GetPropertyValue(_Properties, "Fallback") != -1) continue;	//RoomTemplates_Pick
 		
 
 		if(_RoomTemplateClass == RoomTemplateClass.Sections){

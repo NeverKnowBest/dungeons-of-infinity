@@ -1,3 +1,6 @@
+//an exit gate of an outdoor level opens when Link pushes it and takes him in (RegionGate_Push, __Doors)
+if(Status == DoorStatus.Exit && Location == "Top" && LevelDef.Layout == LevelLayout.Outdoor && RegionRoom_Is(RoomIndex)) RegionGate_Push(id);
+
 if(Open){
 	
 	if(Status == DoorStatus.Closed && !audio_is_playing(Sound_DoorOpen)) audio_play_sound(Sound_DoorOpen, 1, false);

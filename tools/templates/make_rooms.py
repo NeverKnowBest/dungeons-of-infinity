@@ -906,10 +906,14 @@ def build_map(cls, halves):
         firstgid = (firstgid + 999) // 1000 * 1000 + 1
         tilesets.append({'firstgid': firstgid, 'source': '../../tilesets/%s.json' % kit.name})
         mw, mh = width // GRID, height // GRID
-        for name, attr in (('Region', 'base'), ('RegionOpen', 'open'), ('RegionGate', 'gate')):
+        grids = [('Region', lambda h: h.base), ('RegionOpen', lambda h: h.open), ('RegionGate', lambda h: h.gate)]
+        if any(getattr(h, 'section_grids', None) for _, h in painted):
+            # the low walls of the sections, one layer per section group (paint_sections)
+            grids += [('RegionSection%d' % (g + 1), lambda h, g=g: h.section_grid(g)) for g in range(4)]
+        for name, get in grids:
             data = [0] * (mw * mh)
             for i, h in painted:
-                for gy, row in enumerate(h.gids(getattr(h, attr), firstgid)):
+                for gy, row in enumerate(h.gids(get(h), firstgid)):
                     for gx, v in enumerate(row):
                         data[gy * mw + offsets[i] // GRID + gx] = v
             out.append({'data': data, 'height': mh, 'id': next_id('layer'), 'name': name, 'opacity': 1,

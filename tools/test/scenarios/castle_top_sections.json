@@ -1,0 +1,48 @@
+{
+ "comment": "Castle rooftops, rooms with a section (docs/regioes/topo-do-castelo.md, third round): seed 27 has a 1x1 room with section 10 and the level's key in it. The room is painted with the set's WalledCorner room and its low wall (paint_sections.py); the painted step checks tile by tile that the parapet's tiles are walls and nothing else is. Seed 2 has a 1x2 room with section 18.",
+ "name": "castle_top_sections",
+ "seed": 27,
+ "level": "CastleTop",
+ "cheats": [
+  "Cheat_Inf_Health"
+ ],
+ "max_frames": 3000,
+ "steps": [
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "painted",
+   "index": 1,
+   "at": "center"
+  },
+  {
+   "do": "expect",
+   "free": true
+  },
+  {
+   "do": "shot",
+   "name": "section_1x1"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 2
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "expect",
+   "set_rooms_min": 14
+  }
+ ]
+}

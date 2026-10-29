@@ -27,17 +27,20 @@ switch(State){
 				if(image_index > image_number - 1){
 						
 					var StartDir = Dungeon_StartDir(global.Level.Index);
+					//out of a gate (ExitLook.Arrive): far enough to clear its doorway before it shuts, and no dungeon
+					//door closes behind him (the gate does, ExitLook_GateArrive)
+					var _Gate = ExitLook[$ "Arrive"] != undefined;
 					if(StartDir == UP){
 						Link_SetAutoMove (0, -1, WalkSpeed, 12);
 					}else{
-						Link_SetAutoMove (0, 1, WalkSpeed, 10);
+						Link_SetAutoMove (0, 1, WalkSpeed, _Gate ? 24 : 10);
 					}
 						
 					FallSpawnX = x + (AutoMoveFrames * WalkSpeed * AutoMoveDirX);
 					FallSpawnY = y + (AutoMoveFrames * WalkSpeed * AutoMoveDirY);
 					FallSpawnFacing = StartDir;
 					FallSpawnFloorLevel = FloorLevel;
-					if(LevelDef.Special != LevelSpecial.Intro) GoingThruClosedDoor = true;
+					if(LevelDef.Special != LevelSpecial.Intro && !_Gate) GoingThruClosedDoor = true;
 					oHUD.CheckPendentSecret = true;
 					DescendingPhase = 0;
 						

@@ -61,15 +61,47 @@ function ExitLooks_Init(){
 function ExitLook_DrawPainted(_Door, _Tiles){
 }
 
-/// Link leaves through a gate: it opens in front of him (ExitLook.Leave, from the Descending state)
+/// Link leaves through a gate (ExitLook.Leave, from the Descending state): he pushed it open already (RegionGate_Push)
 function ExitLook_GateLeave(_DoorInst){
+	RegionGate_Open(_DoorInst);
+}
+
+/// The exit gate opens in front of Link, as ALttP's palace door: half open, then open, and its doorway lets him in
+function RegionGate_Open(_DoorInst){
 	var _Room = _DoorInst.RoomIndex;
 	var _X = _DoorInst.x - global.Level.Rooms[_Room].x;
 	var _Y = _DoorInst.y - global.Level.Rooms[_Room].y;
+	var _Gt = RegionGate_Get(_Room, _X, _Y);
+	if(_Gt == undefined || _Gt[$ "Opening"] == true) return;
+	_Gt.Opening = true;
 	RegionGate_Frame(_Room, _X, _Y, 1);
+	audio_play_sound(Sound_DoorOpen, 1, false);
 	var _Ctx = {R : _Room, X : _X, Y : _Y, G : global.Level.Rooms[_Room].RegionGrid};
-	call_later(6, time_source_units_frames, method(_Ctx, function(){ if(RegionGate_Same(R, G)) RegionGate_Frame(R, X, Y, 2); }));
+	call_later(8, time_source_units_frames, method(_Ctx, function(){
+		if(!RegionGate_Same(R, G)) return;
+		RegionGate_Frame(R, X, Y, 2);
+		RegionGate_SetOpen(R, X, Y, true);
+	}));
 }
+
+/// oDoor Step of an exit with a gate: Link facing it at its foot pushes it open; once it is open, he leaves as soon as
+/// he is in its doorway (the stairs wait for him at the door cell, above it: through a gate he would cross the wall)
+function RegionGate_Push(_DoorInst){
+	if(!instance_exists(oLink) || global.Paused) return;
+	var _Gt = RegionGate_Get(_DoorInst.RoomIndex, _DoorInst.x - global.Level.Rooms[_DoorInst.RoomIndex].x, _DoorInst.y - global.Level.Rooms[_DoorInst.RoomIndex].y);
+	if(_Gt == undefined) return;
+	with(oLink){
+		if(Facing != UP || (State != LinkState.Standing && State != LinkState.Walking && State != LinkState.Pushing)) return;
+		if(abs(x - (_DoorInst.x + 16)) > 8 || y > _DoorInst.y + 74) return;
+		if(!_Gt.Open){
+			if(y >= _DoorInst.y + 56) RegionGate_Open(_DoorInst);
+		}else if(y < _DoorInst.y + 60){
+			Link_TakeExit(_DoorInst, TOP);
+		}
+	}
+}
+
+#macro GATE_SHUT_FRAMES 64	// a gate Link arrives through shuts this long after the level is built: his stair frames and 24 walking
 
 /// Link arrives through a gate: it is open, and shuts behind him once he has walked out (ExitLook.Arrive)
 function ExitLook_GateArrive(_DoorInst){
@@ -78,12 +110,18 @@ function ExitLook_GateArrive(_DoorInst){
 	var _Y = _DoorInst.y - global.Level.Rooms[_Room].y;
 	RegionGate_Frame(_Room, _X, _Y, 2);
 	//the calls check that the room is still the one painted (Link may leave the level before they run)
-	var _Ctx = {R : _Room, X : _X, Y : _Y, G : global.Level.Rooms[_Room].RegionGrid};
-	call_later(40, time_source_units_frames, method(_Ctx, function(){ if(RegionGate_Same(R, G)) RegionGate_Frame(R, X, Y, 1); }));
-	call_later(46, time_source_units_frames, method(_Ctx, function(){
+	var _Ctx = {R : _Room, X : _X, Y : _Y, G : global.Level.Rooms[_Room].RegionGrid, D : _DoorInst};
+	call_later(GATE_SHUT_FRAMES - 6, time_source_units_frames, method(_Ctx, function(){ if(RegionGate_Same(R, G)) RegionGate_Frame(R, X, Y, 1); }));
+	call_later(GATE_SHUT_FRAMES, time_source_units_frames, method(_Ctx, function(){
 		if(!RegionGate_Same(R, G)) return;
 		RegionGate_Frame(R, X, Y, 0);
+		RegionGate_SetOpen(R, X, Y, false);
 		audio_play_sound(Sound_DoorClose, 1, false);
+		//the way back is shut like a dungeon entrance behind Link (no dungeon door is drawn over a gate, Door_DrawTiles)
+		if(instance_exists(D) && D.Status == DoorStatus.Entrance){
+			D.Status = DoorStatus.Closed;
+			D.UpdateStatus = true;
+		}
 	}));
 }
 
@@ -404,6 +442,8 @@ function Door_DrawTiles(Inst){
 					break;
 				case DoorStatus.Entrance:
 				case DoorStatus.Exit:
+				case DoorStatus.Closed:			//the entrance once its gate has shut behind Link (ExitLook_GateArrive)
+				case DoorStatus.ClosedHalf:
 					_Painted = Door_HasGate(id);
 					break;
 				case DoorStatus.Secret_Closed:

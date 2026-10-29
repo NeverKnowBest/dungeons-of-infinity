@@ -3,7 +3,7 @@
 Piloto do plano de ferramentas: a primeira região feita pelo fluxo novo (spec, importação, ficha de fase, templates, inimigos, validador, teste). Reaproveita os inimigos do castelo, então o risco fica nas ferramentas e não em mecânicas novas.
 
 * **Estado:** em produção
-* **Revisão em andamento:** a rodada de out/2026 fez os 7 itens das prévias 1 a 4, o Guilherme jogou e ainda não está satisfeito; o que falta está em "Pendências"
+* **Revisão em andamento:** a terceira rodada (out/2026) resolveu as quatro pendências da segunda (salas com seção pintadas, muretas que se encaixam, portão, clima conferido); falta o Guilherme jogar e aprovar
 * **Origem:** ALttP, Castelo de Hyrule na noite da chuva (abertura do jogo), parte de fora e alta do castelo
 * **Tipo:** telhado do castelo visto de cima (área 0x1B do overworld do ALttP), montado como uma dungeon (`Layout` Outdoor, layouts do castelo)
 * **Fase:** `DungeonLevel.CastleTop` (novo), nome no jogo "Castle Rooftops"
@@ -30,9 +30,10 @@ Em vez de entrar pelos corredores, o Link sobe pelos telhados e passarelas do ca
 ## Salas
 
 * Mesma classe de dungeon e mesmos layouts do castelo (`DungeonClass.Castle`, `data_d`); muda o conjunto de salas: `CastleTop`, escrito pelo `tools/templates/make_rooms.py` e escolhido por `RoomSet` na ficha.
-* 16 salas pintadas, cada uma com um conjunto de portas e uma decoração: 1x1 Terrace (a da prévia aprovada), Crossroads (moitas), TwinGates, Rampart, SideTower, LampCourt, LowGates e Overlook (vista); 1x2 LongTerrace, LongRampart e LongOverlook (vista); 2x1 WideTerrace, WideGarden (moitas), WideCourt (moitas), Grove (árvores) e WideOverlook (vista). Os conjuntos de portas são os menores que cobrem todas as salas que os layouts do castelo deram em 12 sementes (cenário `castle_top_layouts`): 136 de 156 salas saem pintadas.
+* 16 salas pintadas, cada uma com um conjunto de portas e uma decoração: 1x1 Terrace (a da prévia aprovada), Crossroads (moitas), TwinGates, Rampart, SideTower, LampCourt, LowGates e Overlook (vista); 1x2 LongTerrace, LongRampart e LongOverlook (vista); 2x1 WideTerrace, WideGarden (moitas), WideCourt (moitas), Grove (árvores) e WideOverlook (vista). Os conjuntos de portas são os menores que cobrem todas as salas que os layouts do castelo deram em 12 sementes (cenário `castle_top_layouts`). Uma sala lisa de cada tamanho com todas as portas (OpenTerrace, LongOpenTerrace, WideOpenTerrace) fica de reserva, escolhida só quando nenhuma outra serve (`Fallback`).
 * Sem salas de obstáculo (`ObstacleRooms = false`): são quebra-cabeças de dungeon.
-* Salas especiais (loja, tesouro, rupias, fada e as outras) são cópias pintadas das salas especiais compartilhadas (`specials` no `rooms.json`, moldura de topo mais baixo): 21 das 66 cabem, todas as subclasses cobertas. Salas com seção (parte da sala separada no layout) continuam com as salas compartilhadas do tema do castelo.
+* Salas especiais (loja, tesouro, rupias, fada e as outras) são cópias pintadas das salas especiais compartilhadas (`specials` no `rooms.json`, moldura de topo mais baixo): 21 das 66 cabem, todas as subclasses cobertas.
+* Salas com seção (parte da sala separada no layout): a seção fica atrás de uma mureta baixa pintada com as peças da própria moldura (`paint_sections.py`), em todas as formas que os layouts dão (cantos, meios, cantos largos, faixas, nos três tamanhos): WalledCorner, WalledLow, WalledSide e WalledTall (1x1), LongWalledTop e LongWalledLow (1x2), WideWalledA a WideWalledD (2x1). Com elas e as salas de reserva, todas as salas da fase saem do telhado: 156 de 156 em 12 sementes e 718 de 718 em 60.
 * Referência para a F8: salas da Torre de Agahnim e o exterior do castelo no ALttP (as ids saem na conversão).
 
 ## Inimigos
@@ -84,10 +85,10 @@ A ficha de fase (F4) e os caminhos ramificados (F4b) já existem, então a regi�
 
 A rodada fez: portas ao ar livre (fechada vira passagem, trancada com blocos de fechadura, secreta como mureta rachada), portão da Torre de Agahnim na chegada e na saída com a animação da ROM e a saída na parede de cima, torre com o pé, mureta que continua além da borda da sala com cantos inteiros da ROM, salas com vista para baixo, natureza com grama tomando o piso e salas especiais pintadas pela ferramenta (21 de 66). Ainda falta:
 
-1. **Salas especiais de interior de torre:** as que continuam com o castelo por dentro (ex.: a sala grande em forma de L com piso cinza e paredes douradas) não combinam com o telhado. São as que a ferramenta ainda não pinta: andar de baixo, paredes internas, objetos sob a mureta de cima (45 das 66 compartilhadas), além das salas de seção.
-2. **Muretas de salas vizinhas não se encaixam:** uma sala tem borda e a vizinha não, e a transição fica errada. As paredes devem formar uma estrutura só (salas pintadas ao lado de salas compartilhadas, cortes de passagem, cantos que não casam com a vizinha).
-3. **Porta de entrada e saída parece bugada:** o portão (RegionGate, `Gate`, `GateStairs`) precisa ser revisto jogando: posição, animação, o Link atravessando, as salas sem portão (portas 11 e 1 de salas 1x1, salas compartilhadas).
-4. **Chuva e noite não aparecem:** no ALttP chove e é noite antes de o Link entrar no castelo, então no topo também deveria. O `oWeather` com `{Thunder: true}` está na ficha e o cenário `castle_top` registra `weather level=14`, mas o Guilherme não viu chuva nem noite jogando: investigar.
+1. **Salas com seção de interior de torre** (resolvida na terceira rodada, out/2026): a sala em L de piso cinza e paredes douradas era uma sala com seção (parte da sala separada no layout), que nenhuma sala pintada servia. Agora a seção fica atrás de uma mureta baixa do telhado e todas as salas da fase são pintadas (prévia aprovada pelo Guilherme, opção "mureta de pedra").
+2. **Muretas de salas vizinhas** (resolvida na terceira rodada): entre salas pintadas a mureta já formava uma estrutura só; quem quebrava a junção eram as salas que ainda vinham do castelo por dentro (as com seção e 17 de 718 salas com combinações de portas que nenhuma sala pintada tinha). Com as salas com seção e as de reserva, nenhuma sala da fase usa mais as paredes de dungeon.
+3. **Porta de entrada e saída** (corrigida na terceira rodada, out/2026): o Link chegava em cima da mureta, ficava parado no vão e a porta de dungeon do castelo se fechava atrás dele por cima do portão (o bloco marrom com pedras azuis); na saída, ele atravessava o portão fechado e só depois ele abria. Agora ele sai do vão aberto, o portão fecha atrás dele, e na saída o portão abre quando o Link encosta nele de frente (como a porta do palácio do ALttP) e ele entra pelo vão. Prova: cenário `castle_top_gate` (fotos da chegada e da saída).
+4. **Chuva e noite** (conferido na terceira rodada): as fotos do jogo no cenário `castle_top_gate` mostram a chuva, os respingos e a tinta azul da noite no topo, chegando pelo Hyrule Castle. Se o Guilherme ainda não vir jogando, falta saber por qual caminho ele chegou (run nova pelo hub, continuar um jogo salvo).
 
 ## Pronto quando
 
@@ -98,6 +99,7 @@ A rodada fez: portas ao ar livre (fechada vira passagem, trancada com blocos de 
 
 ## Decisões
 
+* Terceira rodada (out/2026, Guilherme escolheu a opção A na prévia): salas com seção pintadas com uma mureta de pedra do telhado, em vez de tirar as seções do topo. Como a mureta grossa do ALttP não cabe entre as portas de uma sala 1x1, ela segue a linha dos trilhos do DoI, 24 px de altura e 16 de largura, feita com as peças da própria moldura. O portão de saída abre quando o Link encosta nele de frente, como a porta do palácio do ALttP.
 * Revisão do Guilherme (out/2026, prévias 1 a 4 aprovadas): sem portas de dungeon ao ar livre; portão da Torre de Agahnim na chegada e na saída, com a animação da ROM, e a saída na parede de cima (ou a escada da frente do castelo quando não cabe); torre com o pé; mureta contínua entre salas, com peças inteiras; salas com vista para baixo; natureza em cima do telhado, com grama tomando o piso; salas especiais pintadas como a região. Poças de chuva ficaram de fora (o ALttP não tem).
 
 * Mesmos inimigos do castelo, chuva e relâmpagos como no começo da run (roadmap, out/2026).

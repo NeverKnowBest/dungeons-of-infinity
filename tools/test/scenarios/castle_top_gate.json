@@ -1,0 +1,319 @@
+{
+ "comment": "Castle rooftops gate and weather (docs/regioes/topo-do-castelo.md, third round): Hyrule Castle seed 3, its main exit leads to the rooftops. Shots every few frames while Link arrives through the gate (it is open and shuts behind him), after he walks away, and while he leaves through the exit gate in the top wall; the rain and the night tint show on every shot.",
+ "name": "castle_top_gate",
+ "seed": 3,
+ "level": "Castle",
+ "cheats": [
+  "Cheat_Inf_Health"
+ ],
+ "max_frames": 6000,
+ "steps": [
+  {
+   "do": "wait",
+   "frames": 60
+  },
+  {
+   "do": "exit",
+   "which": "main",
+   "frames": 40
+  },
+  {
+   "do": "wait",
+   "frames": 60
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_00"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_01"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_02"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_03"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_04"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_05"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_06"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_07"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_08"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_09"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_10"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_11"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_12"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_13"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_14"
+  },
+  {
+   "do": "wait",
+   "frames": 6
+  },
+  {
+   "do": "shot",
+   "name": "arrive_15"
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "expect",
+   "free": true
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "down"
+   ],
+   "frames": 30
+  },
+  {
+   "do": "shot",
+   "name": "walked"
+  },
+  {
+   "do": "exit",
+   "which": "main",
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_00"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_01"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_02"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_03"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_04"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_05"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_06"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_07"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_08"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_09"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_10"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 4
+  },
+  {
+   "do": "shot",
+   "name": "leave_11"
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 60
+  },
+  {
+   "do": "wait",
+   "frames": 200
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "expect",
+   "exit_level": true
+  }
+ ]
+}

@@ -365,11 +365,20 @@ function RegionRoom_Paint(_RoomIndex){
 	var _Base = array_create(_RW * _RH, 0);
 	var _Open = array_create(_RW * _RH, 0);
 	var _Gate = array_create(_RW * _RH, 0);
+	var _Sec = array_create(_RW * _RH, 0);
 	var _GateSrc = _Reg[$ "gate"];
+	// the low wall of the room's section (paint_sections.py), over the room: one tile layer per section group
+	var _SecSrc = undefined;
+	var _Secs = _Reg[$ "sections"];
+	if(_Secs != undefined && _R.Section_ID > 0 && _R.Section_WallType == SectionWallType.Rail){
+		var _SG = RegionRoom_SectionGroup(_R.Section_ID);
+		if(_SG < array_length(_Secs) && array_length(_Secs[_SG]) > 0) _SecSrc = _Secs[_SG];
+	}
 	for(var j = 0; j < _H; j++){
 		for(var i = 0; i < _W; i++){
 			var _Cell = RegionTiles_TransformCell(i, j, _W, _H, _Tr);
-			var _V = _Reg.base[j * _W + i];
+			var _V = (_SecSrc != undefined && _SecSrc[j * _W + i] != 0) ? _SecSrc[j * _W + i] : _Reg.base[j * _W + i];
+			if(_SecSrc != undefined && _SecSrc[j * _W + i] != 0) _Sec[_Cell[1] * _RW + _Cell[0]] = 1;
 			if(_V != 0) _Base[_Cell[1] * _RW + _Cell[0]] = (_V & 0xFFFF) | (RegionTiles_TransformFlags(_V >> 16, _Tr) << 16);
 			_V = _Reg.open[j * _W + i];
 			if(_V != 0) _Open[_Cell[1] * _RW + _Cell[0]] = (_V & 0xFFFF) | (RegionTiles_TransformFlags(_V >> 16, _Tr) << 16);
@@ -377,7 +386,7 @@ function RegionRoom_Paint(_RoomIndex){
 			if(_V != 0) _Gate[_Cell[1] * _RW + _Cell[0]] = (_V & 0xFFFF) | (RegionTiles_TransformFlags(_V >> 16, _Tr) << 16);
 		}
 	}
-	_R.RegionGrid = {W : _RW, H : _RH, Tiles : _Base, Open : _Open, Gate : _Gate, Gates : [], Walls : []};
+	_R.RegionGrid = {W : _RW, H : _RH, Tiles : _Base, Open : _Open, Gate : _Gate, Section : _Sec, Gates : [], Walls : []};
 	var _TM = RegionTiles_Tilemap(UPPER);
 	for(var k = 0; k < _RW * _RH; k++){
 		tilemap_set_at_pixel(_TM, _Base[k] == 0 ? 0 : RegionTiles_TileData(_Base[k]), _R.x + (k mod _RW) * 8, _R.y + (k div _RW) * 8);
@@ -388,13 +397,23 @@ function RegionRoom_Paint(_RoomIndex){
 		var _Door = _R.Doors[d];
 		if(_Door.Status == DoorStatus.Unused || _Door.Status == DoorStatus.Secret_Closed) continue;
 		if((_Door.Status == DoorStatus.Entrance || _Door.Status == DoorStatus.Exit) && RegionRoom_OpenPassage(_RoomIndex, _Door.x, _Door.y, false, true) > 0){
-			array_push(_R.RegionGrid.Gates, {X : _Door.x, Y : _Door.y, Location : _Door.Location});
+			//Open: Link walks through its doorway (the entrance until it shuts behind him; the exit once he has pushed it open)
+			array_push(_R.RegionGrid.Gates, {X : _Door.x, Y : _Door.y, Location : _Door.Location, Open : _Door.Status == DoorStatus.Entrance});
 			continue;
 		}
 		RegionRoom_OpenPassage(_RoomIndex, _Door.x, _Door.y, false);
 	}
 	RegionRoom_Walls(_RoomIndex);
 	return true;
+}
+
+/// The section group of a section id (Split_MainSectionIDs order): 1 corners, 2 middles, 3 wide, 4 strips
+function RegionRoom_SectionGroup(_SectionID){
+	switch(_SectionID){
+		case 1: case 3: case 6: case 8: return 1;
+		case 2: case 4: case 5: case 7: return 2;
+	}
+	return (_SectionID <= 16) ? 3 : 4;
 }
 
 /// Paints the passage of the door whose 32x32 cell is at _DX, _DY of the room: the open tiles connected to that cell
@@ -417,6 +436,19 @@ function RegionRoom_OpenPassage(_RoomIndex, _DX, _DY, _RemakeWalls = true, _Gate
 		var _K = array_pop(_Todo);
 		if(_Seen[_K] || _Src[_K] == 0) continue;
 		_Seen[_K] = true;
+		//a passage stays in the 64x64 box of its opening: in a room with every door (a set's fallback) the openings
+		//of neighbouring positions touch, and one would open the next (a gate is wider and keeps its own tiles)
+		if(!_Gate){
+			var _PX = (_K mod _G.W) * 8;
+			var _PY = (_K div _G.W) * 8;
+			if(_PX < _DX - 16 || _PX >= _DX + 48 || _PY < _DY - 16 || _PY >= _DY + 48) continue;
+			//where the low wall of the room's section meets the frame, it stays: the passage opens only the lane Link
+			//walks through (the 32 px of the door cell across)
+			if(_G.Section[_K] != 0){
+				var _Across = (_DY <= 16 || _DY >= _G.H * 8 - 48);	//a door in the top or bottom wall
+				if(_Across ? (_PX < _DX || _PX >= _DX + 32) : (_PY < _DY || _PY >= _DY + 32)) continue;
+			}
+		}
 		_Count++;
 		_G.Tiles[_K] = _Src[_K];
 		tilemap_set_at_pixel(_TM, RegionTiles_TileData(_Src[_K]), _R.x + (_K mod _G.W) * 8, _R.y + (_K div _G.W) * 8);
@@ -493,14 +525,14 @@ function RegionRoom_Walls(_RoomIndex){
 	if(_Asleep) for(var n = 0; n < array_length(_G.Walls); n++) instance_deactivate_object(_G.Walls[n]);
 }
 
-/// Whether tile i, j of a painted room is a wall: a solid tile, except in the doorway of a gate in the top wall (its
-/// closed door is solid on the ROM; Link walks into it and it opens, RegionGate_Frame)
+/// Whether tile i, j of a painted room is a wall: a solid tile, except in the doorway of an open gate in the top wall
+/// (its closed door is solid on the ROM; Link pushes it and it opens, RegionGate_Push)
 function RegionRoom_SolidAt(_G, _Solid, i, j){
 	var _T = _G.Tiles[j * _G.W + i];
 	if(_T == 0 || _Solid[_T & 0xFFFF] == 0) return false;
 	for(var g = 0; g < array_length(_G.Gates); g++){
 		var _Gt = _G.Gates[g];
-		if(_Gt.Location == "Top" && i >= _Gt.X div 8 && i < (_Gt.X + 32) div 8 && j < (_Gt.Y + 48) div 8) return false;
+		if(_Gt.Open && _Gt.Location == "Top" && i >= _Gt.X div 8 && i < (_Gt.X + 32) div 8 && j < (_Gt.Y + 48) div 8) return false;
 	}
 	return true;
 }
@@ -528,6 +560,24 @@ function RegionGate_Frame(_RoomIndex, _DX, _DY, _Frame){
 			RegionTiles_PaintBlock(_Blocks[k], _R.x + _X, _R.y + _Y);
 		}
 	}
+}
+
+/// The gate of the door whose cell is at _DX, _DY of painted room _RoomIndex (RegionRoom_Paint), or undefined
+function RegionGate_Get(_RoomIndex, _DX, _DY){
+	var _G = global.Level.Rooms[_RoomIndex][$ "RegionGrid"];
+	if(_G == undefined) return undefined;
+	for(var g = 0; g < array_length(_G.Gates); g++){
+		if(_G.Gates[g].X == _DX && _G.Gates[g].Y == _DY) return _G.Gates[g];
+	}
+	return undefined;
+}
+
+/// Opens or shuts a gate for Link (its doorway stops being a wall or becomes one again; the walls are made again)
+function RegionGate_SetOpen(_RoomIndex, _DX, _DY, _Open){
+	var _Gt = RegionGate_Get(_RoomIndex, _DX, _DY);
+	if(_Gt == undefined || _Gt.Open == _Open) return;
+	_Gt.Open = _Open;
+	RegionRoom_Walls(_RoomIndex);
 }
 
 /// Class of the region tile at a pixel ("" where none is painted): what the outdoor rooms will collide with (F12b)

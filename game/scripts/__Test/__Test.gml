@@ -365,7 +365,8 @@ function Test_GotoExit(_Extra){
 		var _Door = _R.Doors[i];
 		if(_Door.Status != DoorStatus.Exit || (_Door.Location != "Top" && _Door.Location != "Bottom") || (_Extra && _Door.Position != _Exits.ExtraPosition)) continue;
 		var _Top = (_Door.Location == "Top");
-		Test_PlaceLink(_RoomIndex, [_R.x + _Door.x + 16, _R.y + _Door.y + 16 + (_Top ? 40 : -40)]);
+		var _Front = (_Top && RegionGate_Get(_RoomIndex, _Door.x, _Door.y) != undefined) ? 64 : 40;	//below a gate's doorway (solid until he pushes it)
+		Test_PlaceLink(_RoomIndex, [_R.x + _Door.x + 16, _R.y + _Door.y + 16 + (_Top ? _Front : -40)]);
 		global.TestExitDest = _Extra ? _Door.ExitDest : (global.SaveLevel ? Level_NextIndex() : _Exits.Dest);
 		Test_Log("exit " + (_Extra ? "extra" : "main") + " room=" + string(_RoomIndex) + " " + _Door.Location + " -> level " + string(global.TestExitDest));
 		return _Top ? "up" : "down";

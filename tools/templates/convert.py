@@ -492,8 +492,10 @@ def generate_door_codes(tpl, cls, name):
 
 # ---------------------------------------------------------------- painted rooms (roadmap F12b)
 
-REGION_LAYERS = ('Region', 'RegionOpen', 'RegionGate')   # tile layers of a region tileset: the room, its open door
-#   passages, and the gates (the level's entrance or exit) of the doors that have one
+REGION_SECTION_LAYERS = ('RegionSection1', 'RegionSection2', 'RegionSection3', 'RegionSection4')
+REGION_LAYERS = ('Region', 'RegionOpen', 'RegionGate') + REGION_SECTION_LAYERS   # tile layers of a region tileset:
+#   the room, its open door passages, the gates (the level's entrance or exit) of the doors that have one, and the low
+#   wall of the room's section of each section group (paint_sections.py)
 TILED_FLIP_H, TILED_FLIP_V, TILED_FLIP_D = 0x80000000, 0x40000000, 0x20000000
 DEFAULT_PAINTED_TRANSFORMS = ['None', 'FlipH']   # turning ALttP art upside down or sideways puts the wall faces wrong
 
@@ -558,6 +560,17 @@ def add_region(t, room, layers, tilesets, where):
             raise ConvertError('%s: room %s: Region and RegionGate use two tilesets' % (where, gm_str(room['id'])))
         if any(gate):
             t['Region']['gate'] = gate
+    # sections: [[], group 1, ..., group 4] (index = the section group of Split_MainSectionIDs), [] where none
+    secs = [[]]
+    for ln in REGION_SECTION_LAYERS:
+        cells = []
+        if ln in found:
+            n4, cells = region_cells(found[ln], room, tilesets, where)
+            if n4 not in (None, name):
+                raise ConvertError('%s: room %s: Region and %s use two tilesets' % (where, gm_str(room['id']), ln))
+        secs.append(cells if any(cells) else [])
+    if any(secs):
+        t['Region']['sections'] = secs
 
 
 def painted_transforms(t, where):

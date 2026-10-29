@@ -39,13 +39,14 @@ import json
 import os
 
 import convert
+import paint_sections
 
 GRID = 8
 SIZES = {'1x1': (256, 256, 0), '1x2': (256, 512, 1), '2x1': (512, 256, 2)}    # w, h, RoomSize
-ROOM_KEYS = {'name', 'size', 'doors', 'decor', 'transforms', 'props', 'comment', 'frame', 'nature'}
+ROOM_KEYS = {'name', 'size', 'doors', 'decor', 'transforms', 'props', 'comment', 'frame', 'nature', 'sections', 'fallback'}
 SPECIAL_KEYS = {'frame', 'comment'}
 SPECIAL_LAYERS = ('Water', 'FloorObjs', 'Objs')      # the objects of a special room that are copied into its painted copy
-KIT_KEYS = {'tiles', 'area', 'pieces', 'frame', 'frames', 'openings', 'gate', 'grass', 'nature', 'comment'}
+KIT_KEYS = {'tiles', 'area', 'pieces', 'frame', 'frames', 'openings', 'gate', 'grass', 'nature', 'parapet', 'comment'}
 GRASS_KEYS = ('full', 'top', 'bottom', 'left', 'corner', 'inner')
 # Nature motifs (docs/design/direcao.md, "Natureza invadindo"): solid pieces on a patch of grass that spreads over the
 # floor. Trees: one in the middle of each half of a 2x1 or 1x2 room (a pair); bushes: a 2x2 clump on each side of the
@@ -111,6 +112,7 @@ class Kit:
                 if k not in d['grass']:
                     raise PaintError('%s: grass needs %s' % (where, ', '.join(GRASS_KEYS)))
                 self.grass[k] = self.piece([[d['grass'][k]]], '%s grass %s' % (where, k))[0][0]
+        self.parapet = d.get('parapet')     # the low wall of a section (paint_sections)
         self.nature = d.get('nature') or {}
         for k, n in self.nature.items():
             for name in (n if isinstance(n, list) else [n]):
@@ -250,8 +252,13 @@ class Painted:
         # doors: the Doors objects and the passages painted on RegionOpen
         coords = convert.DOOR_XY[self.size_index]
         doors = d.get('doors')
+        # "all": every position, a room for whatever doors the layout gives (passages of neighbouring positions touch,
+        # but the layouts never use two neighbours); it is picked only when no other room of the set fits (fallback)
+        self.all_doors = doors == 'all'
+        if self.all_doors:
+            doors = list(range(1, 13))
         if not isinstance(doors, list) or not doors:
-            raise PaintError('%s: "doors" lists the door positions of the room (1 to 12)' % where)
+            raise PaintError('%s: "doors" lists the door positions of the room (1 to 12), or is "all"' % where)
         self.doors = {}
         boxes = []
         for p in doors:
@@ -270,7 +277,7 @@ class Painted:
             ox = {'Top': (x - 16, 0), 'Bottom': (x - 16, H - ph), 'Left': (0, y - 16), 'Right': (W - pw, y - 16)}[loc]
             self.stamp(self.open, piece, ox[0], ox[1], where=where)
             boxes.append((p, (ox[0], ox[1], pw, ph)))
-        for i, (p, a) in enumerate([] if self.special else boxes):
+        for i, (p, a) in enumerate([] if self.special or self.all_doors else boxes):
             for q, b in boxes[i + 1:]:
                 if convert.rect_overlap((a[0], a[1], a[0] + a[2], a[1] + a[3]), (b[0], b[1], b[0] + b[2], b[1] + b[3])):
                     raise PaintError('%s: the passages of doors %d and %d touch' % (where, p, q))
@@ -301,6 +308,7 @@ class Painted:
             self.copy_objects()
         else:
             self.furnish()
+            self.sections()
 
     def copy_objects(self):
         """The special room's own objects (shop, rupees, chests, fountain...), refused where they would stand on the
@@ -548,6 +556,106 @@ class Painted:
         self.add('Treasures', 'Treasure', (cx, cy, 16, 16), group='main')
         self.add('Crystals', 'Crystal', (cx, cy, 16, 16), group='main')
 
+    # ---------------------------------------------------------------- sections (paint_sections)
+
+    def sections(self):
+        """The sections the room can have ("sections": ids, one per group): the low wall of each on its own tile
+        layer (RegionSection<group>, painted by the game over the room when the section is the room's), and its
+        section group (area, enemies outside it, a treasure and a crystal spot in it and outside it)."""
+        self.section_grids = {}
+        ids = self.d.get('sections') or []
+        if not ids:
+            return
+        size = (self.w, self.h)
+        try:
+            shapes = paint_sections.shapes(size)
+            par = paint_sections.Parapet(self.kit, self.kit.frames[self.d.get('frame', '')], self.where)
+        except paint_sections.SectionError as e:
+            raise PaintError(str(e))
+        cols, rows = paint_sections.BANDS[size]
+        self.split_ids = [0, 0, 0, 0]
+        for sid in ids:
+            where = '%s section %s' % (self.where, sid)
+            if sid not in shapes:
+                raise PaintError('%s: a %s room has sections %s' % (where, self.d.get('size', '1x1'), sorted(shapes)))
+            g = paint_sections.GROUP_OF_ID[sid]
+            if self.split_ids[g]:
+                raise PaintError('%s: sections %d and %d are of the same group' % (where, self.split_ids[g], sid))
+            self.split_ids[g] = sid
+            sec, wall = shapes[sid]
+            missing = [p for p in paint_sections.doors_of(sec) if p not in self.doors]
+            if missing:
+                raise PaintError('%s: the section needs doors %s' % (where, missing))
+            grid = [[None] * len(self.base[0]) for _ in self.base]
+            try:
+                par.paint(grid, wall, cols, rows, self.w, self.h)
+            except paint_sections.SectionError as e:
+                raise PaintError(str(e))
+            self.section_grids[g] = grid
+
+            def bbox(cells):
+                return (min(cols[i][0] for i, _ in cells), min(rows[j][0] for _, j in cells),
+                        max(cols[i][1] for i, _ in cells), max(rows[j][1] for _, j in cells))
+            sx0, sy0, sx1, sy1 = bbox(sec)
+            self.add('SectionArea', None, (sx0, sy0, sx1 - sx0, sy1 - sy0), group=g)
+            # the main floor: the largest box of band cells outside the section and its wall
+            free = {(i, j) for i in range(5) for j in range(5)} - sec - wall
+            best = None
+            for i0 in range(5):
+                for j0 in range(5):
+                    for i1 in range(i0, 5):
+                        for j1 in range(j0, 5):
+                            cells = {(i, j) for i in range(i0, i1 + 1) for j in range(j0, j1 + 1)}
+                            if cells <= free:
+                                b = bbox(cells)
+                                a = (b[2] - b[0]) * (b[3] - b[1])
+                                if best is None or a > best[0]:
+                                    best = (a, b)
+            mx0, my0, mx1, my1 = best[1]
+            self.add('Enemies', None, (mx0 + 8, my0 + 8, mx1 - mx0 - 16, my1 - my0 - 16), group=g, obj_type='Area')
+            for x0, y0, x1, y1 in ((sx0, sy0, sx1, sy1), (mx0, my0, mx1, my1)):
+                # the middle, and in a long area its two ends too (more places for a key or a crystal)
+                # in a low area (a strip under the top wall) 8 px down: a spot within 16 px of a door is refused (SpawnObj)
+                cx = ((x0 + x1) // 2 - 8) // GRID * GRID
+                cy = y0 + 8 if y1 - y0 < 40 else ((y0 + y1) // 2 - 8) // GRID * GRID
+                spots = [(cx, cy)]
+                if x1 - x0 >= 96:
+                    spots += [(x0 + 8, cy), ((x1 - 24) // GRID * GRID, cy)]
+                elif y1 - y0 >= 96:
+                    spots += [(cx, y0 + 8), (cx, (y1 - 24) // GRID * GRID)]
+                for spot in spots:
+                    self.add('Treasures', 'Treasure', spot + (16, 16), group=g)
+                    self.add('Crystals', 'Crystal', spot + (16, 16), group=g)
+                    if x0 == sx0 and y0 == sy0:
+                        # a pot too: a chest wants 16 px free around it, more than a strip under the top wall has,
+                        # and a key may go in a pot (SpawnPots)
+                        self.add('Pots', 'Pot', spot + (16, 16), group=g)
+            self.check_section(sid, grid, (sx0, sy0, sx1, sy1), (mx0, my0, mx1, my1))
+
+    def check_section(self, sid, grid, sbox, mbox):
+        """With every door open and the section's wall up, its area and the main floor do not meet."""
+        def solid(gx, gy):
+            for layer in (grid, self.open, self.base):
+                t = layer[gy][gx]
+                if t is not None:
+                    return self.kit.solid[t[0]] == 1
+            return False
+        start = ((sbox[0] + sbox[2]) // 2 // GRID, (sbox[1] + sbox[3]) // 2 // GRID)
+        goal = ((mbox[0] + mbox[2]) // 2 // GRID, (mbox[1] + mbox[3]) // 2 // GRID)
+        x0, y0, x1, y1 = (v // GRID for v in self.inner)
+        seen, todo = {start}, [start]
+        while todo:
+            x, y = todo.pop()
+            for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if x0 <= n[0] < x1 and y0 <= n[1] < y1 and n not in seen and not solid(*n):
+                    seen.add(n)
+                    todo.append(n)
+        if goal in seen:
+            raise PaintError('%s section %d: its low wall leaves a way between the section and the room' % (self.where, sid))
+
+    def section_grid(self, g):
+        return self.section_grids.get(g) or [[None] * len(self.base[0]) for _ in self.base]
+
     def add(self, layer, gid, box, props=None, group=None, obj_type=''):
         dst = self.layers if group is None else self.groups.setdefault(group, {})
         dst.setdefault(layer, []).append((gid, tuple(box), dict(props or {}), obj_type))
@@ -558,6 +666,8 @@ class Painted:
             p['Transforms'] = 'None'            # special rooms are picked untransformed (RoomTemplates_PickSpecial)
             return p
         p = {'Whole': 1, 'Transforms': self.d.get('transforms', ','.join(convert.DEFAULT_PAINTED_TRANSFORMS))}
+        if self.d.get('fallback', self.all_doors):
+            p['Fallback'] = 1       # picked only when no other room of the set fits (RoomTemplates_Pick)
         p.update(self.d.get('props') or {})
         return p
 
