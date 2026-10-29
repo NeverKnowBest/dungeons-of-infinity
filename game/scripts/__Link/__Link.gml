@@ -709,6 +709,7 @@ function UpdateState(NewState, var1 = undefined){
 			if(oMusic.SongPlaying_Index != NextLevelSongIndex) Music_Fade(0, SongFadeLen_NextLevel, SongIndex.None);
 
 			if(audio_is_playing(global.RainSound)) audio_sound_gain(global.RainSound, 0, 1000);
+			Weather_StopLightning();
 			
 			with(oCape) instance_destroy(id);
 			

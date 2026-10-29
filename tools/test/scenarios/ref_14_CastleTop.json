@@ -1,0 +1,58 @@
+{
+ "comment": "Reference scenario for CastleTop (roadmap F4): dumps of three builds of the level, the level-dependent enemies of this level, a short walk and a contact sheet. tools/test/baseline.py runs every ref_* scenario and compares two versions of the code.",
+ "name": "ref_14_CastleTop",
+ "seed": 1,
+ "level": "CastleTop",
+ "dump": true,
+ "cheats": [
+  "Cheat_Inf_Health"
+ ],
+ "max_frames": 100000,
+ "steps": [
+  {
+   "do": "wait",
+   "frames": 60
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "shot",
+   "name": "start"
+  },
+  {
+   "do": "probe",
+   "enemies": [
+    "oEnemy_Keese",
+    "oEnemy_Soldier_Advanced",
+    "oEnemy_Soldier_Simple"
+   ]
+  },
+  {
+   "do": "hold",
+   "keys": [
+    "up"
+   ],
+   "frames": 45
+  },
+  {
+   "do": "wait",
+   "frames": 15
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "shot",
+   "name": "walked"
+  },
+  {
+   "do": "sheet",
+   "level": "CastleTop",
+   "seeds": [
+    2,
+    3
+   ]
+  }
+ ]
+}

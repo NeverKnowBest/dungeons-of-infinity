@@ -248,8 +248,7 @@ if(Castle_Entering && oLink.State != LinkState.AutoMove && global.DB_Inst == noo
 	Link_SetAutoMove(0, -1, 0.4);
 	Music_Fade(0, SongFadeLen_House, SongIndex.Castle);
 	oRender.FadeOut();
-	oIntro.alarm[1] = -1; //turn off lightning, it looks glitchy as screen is fading
-	oIntro.alarm[2] = -1;
+	Weather_StopLightning(); //turn off lightning, it looks glitchy as screen is fading
 	global.GlobalLighting = true;
 
 }

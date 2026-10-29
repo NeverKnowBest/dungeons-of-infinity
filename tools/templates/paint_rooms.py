@@ -14,7 +14,7 @@ A room set's rooms.json may have, beside its "halves", a "kit" and a list of "pa
       "openings": {"Top": "open_top", "Bottom": "open_bottom"}        # painted on RegionOpen over a door in use,
     },                                                                #   16 px left of the door cell, at the wall
     "painted": [
-      {"name": "Terrace", "size": "1x1", "doors": [12, 6],           # door positions of the room (DOOR_XY)
+      {"name": "Terrace", "size": "1x1", "doors": [12, 6],           # 1x1, 1x2 or 2x1; door positions of the room (DOOR_XY)
        "decor": [{"piece": "tower", "at": [48, 16], "pair": true},    # px on the 8 px grid; pair: mirrored copy too
                  {"piece": "crest", "at": [112, 112]}],
        "transforms": "None,FlipH",                                    # optional; that is the default
@@ -32,7 +32,7 @@ import os
 import convert
 
 GRID = 8
-SIZES = {'1x1': (256, 0), '1x2': (512, 1)}
+SIZES = {'1x1': (256, 256, 0), '1x2': (256, 512, 1), '2x1': (512, 256, 2)}    # w, h, RoomSize
 ROOM_KEYS = {'name', 'size', 'doors', 'decor', 'transforms', 'props', 'comment'}
 KIT_KEYS = {'tiles', 'area', 'pieces', 'frame', 'openings', 'comment'}
 DECOR_KEYS = {'piece', 'at', 'pair', 'mirror'}
@@ -125,9 +125,9 @@ class Painted:
             raise PaintError('%s: needs a "name"' % where)
         self.cls = 'Main_Upper'
         if d.get('size', '1x1') not in SIZES:
-            raise PaintError('%s: size must be 1x1 or 1x2' % where)
-        self.h, self.size_index = SIZES[d.get('size', '1x1')]
-        self.cw, self.ch = 256 // 16, self.h // 16          # 16x16 cells
+            raise PaintError('%s: size must be 1x1, 1x2 or 2x1' % where)
+        self.w, self.h, self.size_index = SIZES[d.get('size', '1x1')]
+        self.cw, self.ch = self.w // 16, self.h // 16       # 16x16 cells
         self.layers, self.groups = {}, {}
         self.base = [[None] * (self.cw * 2) for _ in range(self.ch * 2)]     # 8x8 tiles: (tile, flags) or None
         self.open = [[None] * (self.cw * 2) for _ in range(self.ch * 2)]
@@ -166,7 +166,7 @@ class Painted:
 
     def build(self):
         k, d, where = self.kit, self.d, self.where
-        W, H = 256, self.h
+        W, H = self.w, self.h
         top, mid, bot = ([k.get(n, where) for n in k.frame[r]] for r in ('top', 'middle', 'bottom'))
         th, bh = len(top[0]) * 16, len(bot[0]) * 16
         lw, rw = len(mid[0][0]) * 16, len(mid[2][0]) * 16
@@ -317,6 +317,51 @@ def load(d, where):
         names.add(r.get('name'))
         out.append(Painted(r, kit, w))
     return kit, out
+
+
+def render(rooms, path, scale=2):
+    """Preview without the game: each room twice, every door closed and every door open (with its door cells
+    outlined), side by side, one row per room. Needs Pillow (python -m pip install --user pillow)."""
+    from PIL import Image, ImageDraw
+    if not rooms:
+        return
+    kit = rooms[0].kit
+    tsj = json.load(open(kit.tileset_path, encoding='utf-8'))
+    sheet = Image.open(os.path.normpath(os.path.join(TILESETS_DIR, tsj['image']))).convert('RGBA')
+    cols = tsj['columns']
+
+    def tile(t, fl):
+        im = sheet.crop(((t % cols) * GRID, (t // cols) * GRID, (t % cols + 1) * GRID, (t // cols + 1) * GRID))
+        if fl & 1:
+            im = im.transpose(Image.FLIP_LEFT_RIGHT)
+        if fl & 2:
+            im = im.transpose(Image.FLIP_TOP_BOTTOM)
+        return im
+
+    def paint(room, with_open):
+        im = Image.new('RGBA', (room.w, room.h), (0, 0, 0, 255))
+        for gy in range(len(room.base)):
+            for gx in range(len(room.base[0])):
+                t = room.open[gy][gx] if with_open and room.open[gy][gx] is not None else room.base[gy][gx]
+                if t is not None:
+                    im.paste(tile(*t), (gx * GRID, gy * GRID))
+        if with_open:
+            d = ImageDraw.Draw(im)
+            for p, (loc, (x, y, w, h)) in room.doors.items():
+                d.rectangle((x, y, x + w - 1, y + h - 1), outline=(255, 0, 255, 255))
+        return im
+
+    W, H = max(r.w for r in rooms) * 2 + 16, sum(r.h + 16 for r in rooms)
+    out = Image.new('RGBA', (W, H), (40, 40, 40, 255))
+    y = 0
+    for r in rooms:
+        out.paste(paint(r, False), (0, y))
+        out.paste(paint(r, True), (r.w + 16, y))
+        ImageDraw.Draw(out).text((2, y + r.h + 2), '%s %s doors %s' % (r.name, r.d.get('size', '1x1'), r.d.get('doors')),
+                                 fill=(255, 255, 255, 255))
+        y += r.h + 16
+    out = out.resize((W * scale, H * scale), Image.NEAREST)
+    out.save(path)
 
 
 def text_map(room):

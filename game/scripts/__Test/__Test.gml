@@ -515,6 +515,18 @@ function Test_DoStep(_S){
 			Test_LogState();
 			return true;
 
+		case "rooms":	// one "layout" line per room of the level: template class, size, doors in use (position:status), special object
+			for(var _RI = 0; _RI < global.Level.RoomCount; _RI++){
+				var _LR = global.Level.Rooms[_RI];
+				var _LD = "";
+				for(var _DI = 0; _DI < array_length(_LR.Doors); _DI++){
+					var _LDoor = _LR.Doors[_DI];
+					if(_LDoor.Status != DoorStatus.Unused) _LD += (_LD == "" ? "" : ",") + string(_LDoor.Position) + ":" + string(_LDoor.Status);
+				}
+				Test_Log("layout " + Test_RoomStr(_RI) + " doors=" + _LD + " special=" + string(_LR.SpecialObject) + " section=" + string(_LR.Section_ID));
+			}
+			return true;
+
 		case "log":
 			Test_Log("note " + string(_S[$ "text"] ?? ""));
 			return true;

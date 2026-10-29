@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__Weather",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__Weather",
+  "parent":{
+    "name":"Intro",
+    "path":"folders/Objects/System/Intro.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

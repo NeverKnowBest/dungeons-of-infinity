@@ -22,6 +22,7 @@ function Map_GenerateRoomSprite(_RoomIndex){
 	if(!global.Level.IsBossLevel && TemplateCheck(_RoomIndex, RoomTemplateClass.Other, RoomTemplateClass_Other.Boss)) exit;
 
 	RoomTemplates_Parse_GenerateObjGrids(_RoomIndex);
+	RegionRoom_MapWalls(_RoomIndex);	//a painted room's walls are its solid tiles (roadmap F12b), once it is painted
 	
 	var RoomSprSurface = surface_create(Room.MapW, Room.MapH);
 	var RoomSprSurface_Visited = surface_create(Room.MapW, Room.MapH);

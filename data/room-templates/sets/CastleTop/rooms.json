@@ -1,5 +1,5 @@
 {
- "comment": "Castle rooftops (docs/regioes/topo-do-castelo.md), roadmap F12b-1: rooms painted tile by tile with ts_CastleTop, written by tools/templates/make_rooms.py. The kit's pieces are cells of ALttP area 0x1B (the top of Hyrule Castle; col, row of 16x16 blocks, incoming/topo-do-castelo/tiles/areas.json): the teal roof terrace is the floor, the cream wall tops and the riveted beige faces are walls, as on the original. Only the terrace of the approved preview for now; the other rooms of the level come with the rest of the pilot.",
+ "comment": "Castle rooftops (docs/regioes/topo-do-castelo.md): rooms painted tile by tile with ts_CastleTop, written by tools/templates/make_rooms.py (roadmap F12b-1 and the rest of the pilot). The kit's pieces are cells of ALttP area 0x1B (the top of Hyrule Castle; col, row of 16x16 blocks, incoming/topo-do-castelo/tiles/areas.json): the teal roof terrace is the floor, the cream wall tops and the riveted beige faces are walls, as on the original. A passage is a straight cut through the wall, as in the approved preview. The door sets are the fewest that cover every 1x1 and 1x2 room the Castle layouts gave in 12 seeds (scenario castle_top_layouts): passages of neighbouring positions touch, so a 1x1 room takes no two neighbours on the ring 1..12.",
  "halves": [],
  "kit": {
   "tiles": "CastleTop",
@@ -17,14 +17,22 @@
    "open_top": [[[50, 0], [15, 7], [15, 7], [13, 0]], [[50, 1], [15, 7], [15, 7], [13, 1]], [[50, 2], [15, 7], [15, 7], [13, 2]], [[50, 3], [15, 7], [15, 7], [13, 3]]],
    "open_bottom": [[[17, 8], [15, 7], [15, 7], [17, 8]], [[17, 9], [15, 7], [15, 7], [17, 9]], [[50, 2], [15, 7], [15, 7], [13, 2]]],
    "tower": [22, 14, 3, 3],
-   "crest": [31, 8, 2, 3]
+   "crest": [31, 8, 2, 3],
+   "open_left": [[[11, 6], [12, 6], [13, 6]], [[15, 7], [15, 7], [15, 7]], [[15, 7], [15, 7], [15, 7]], [[11, 6], [12, 6], [13, 6]]],
+   "open_right": [[[50, 6], [51, 6], [52, 6]], [[15, 7], [15, 7], [15, 7]], [[15, 7], [15, 7], [15, 7]], [[50, 6], [51, 6], [52, 6]]],
+   "gate": [30, 5, 4, 2]
   },
   "frame": {
    "top": ["top_left", "top_mid", "top_right"],
    "middle": ["side_left", "floor", "side_right"],
    "bottom": ["bottom_left", "bottom_mid", "bottom_right"]
   },
-  "openings": {"Top": "open_top", "Bottom": "open_bottom"}
+  "openings": {
+   "Top": "open_top",
+   "Bottom": "open_bottom",
+   "Left": "open_left",
+   "Right": "open_right"
+  }
  },
  "painted": [
   {
@@ -32,10 +40,84 @@
    "comment": "Roof terrace between the castle walls, as in the preview approved by Guilherme (oct/2026): towers with green lamps either side of the top passage, the Hylian crest in the middle.",
    "size": "1x1",
    "doors": [12, 6],
-   "decor": [
-    {"piece": "tower", "at": [48, 16], "pair": true},
-    {"piece": "crest", "at": [112, 112]}
-   ]
+   "decor": [{"piece": "tower", "at": [48, 16], "pair": true}, {"piece": "crest", "at": [112, 112]}]
+  },
+  {
+   "name": "Crossroads",
+   "comment": "Where the walkways of the four sides meet: the crest in the middle, towers either side of the top passage.",
+   "size": "1x1",
+   "doors": [12, 3, 6, 9],
+   "decor": [{"piece": "tower", "at": [48, 16], "pair": true}, {"piece": "crest", "at": [112, 112]}]
+  },
+  {
+   "name": "TwinGates",
+   "comment": "Two passages through the top wall with a lamp tower between them.",
+   "size": "1x1",
+   "doors": [11, 1, 3, 6, 9],
+   "decor": [{"piece": "tower", "at": [104, 16]}, {"piece": "crest", "at": [112, 112]}]
+  },
+  {
+   "name": "Rampart",
+   "comment": "A long stretch of parapet: passages near the corners, a tower in the middle of the top wall, a bare terrace.",
+   "size": "1x1",
+   "doors": [11, 1, 3, 5, 8],
+   "decor": [{"piece": "tower", "at": [104, 16]}]
+  },
+  {
+   "name": "TowerGate",
+   "comment": "The gate of Agahnim's tower set in the top wall, the passage to the right of it.",
+   "size": "1x1",
+   "doors": [1, 4, 6, 8, 10],
+   "decor": [{"piece": "gate", "at": [48, 32]}, {"piece": "crest", "at": [112, 112]}]
+  },
+  {
+   "name": "LampCourt",
+   "comment": "Lamp towers either side of the top passage over a bare terrace; side passages near the corners.",
+   "size": "1x1",
+   "doors": [12, 2, 4, 7, 9],
+   "decor": [{"piece": "tower", "at": [48, 16], "pair": true}]
+  },
+  {
+   "name": "LowGates",
+   "comment": "Two passages through the bottom wall, towers either side of the top one.",
+   "size": "1x1",
+   "doors": [12, 3, 5, 7, 9],
+   "decor": [{"piece": "tower", "at": [48, 16], "pair": true}, {"piece": "crest", "at": [112, 112]}]
+  },
+  {
+   "name": "LongTerrace",
+   "comment": "A terrace two rooms long with passages all along the sides; towers by the top passage, the crest in the middle.",
+   "size": "1x2",
+   "doors": [12, 2, 3, 4, 6, 8, 9, 10],
+   "decor": [{"piece": "tower", "at": [48, 16], "pair": true}, {"piece": "crest", "at": [112, 240]}]
+  },
+  {
+   "name": "LongRampart",
+   "comment": "A long terrace with passages near the corners and along the sides; a tower in the middle of the top wall.",
+   "size": "1x2",
+   "doors": [11, 1, 2, 3, 4, 5, 7, 8, 9, 10],
+   "decor": [{"piece": "tower", "at": [104, 16]}]
+  },
+  {
+   "name": "WideTerrace",
+   "comment": "A terrace two rooms wide: three passages in the top and bottom walls, side passages in the middle; lamp towers between the top passages, the crest in the middle.",
+   "size": "2x1",
+   "doors": [11, 12, 1, 3, 5, 6, 7, 9],
+   "decor": [{"piece": "tower", "at": [168, 16], "pair": true}, {"piece": "crest", "at": [240, 112]}]
+  },
+  {
+   "name": "WideRampart",
+   "comment": "A wide stretch of parapet with passages near the corners of the sides; the gate of Agahnim's tower between the top passages.",
+   "size": "2x1",
+   "doors": [11, 12, 1, 2, 4, 5, 6, 7, 8, 10],
+   "decor": [{"piece": "gate", "at": [160, 32]}, {"piece": "gate", "at": [288, 32]}]
+  },
+  {
+   "name": "WideCourt",
+   "comment": "A wide court open to one side near the top and to the other in the middle; towers between the top passages over a bare terrace.",
+   "size": "2x1",
+   "doors": [11, 12, 1, 2, 5, 6, 7, 9],
+   "decor": [{"piece": "tower", "at": [168, 16], "pair": true}]
   }
  ]
 }

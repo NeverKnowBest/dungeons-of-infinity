@@ -422,6 +422,21 @@ function RegionRoom_OpenPassage(_RoomIndex, _DX, _DY, _RemakeWalls = true){
 /// The room's walls from its solid tiles, as few oWall as rows of equal runs allow (made again after a passage opens).
 /// The old walls go by their ids: a bombed secret door opens the passage of the room behind it too, which is asleep
 /// (Dungeon_RoomDeActivate), and `with(oWall)` would not see its walls. The new ones sleep if the old ones did.
+/// Marks the solid tiles of a painted room as walls on its map grid (Map_GenerateRoomSprite: a map pixel per 8x8 tile)
+function RegionRoom_MapWalls(_RoomIndex){
+	var _R = global.Level.Rooms[_RoomIndex];
+	var _G = _R[$ "RegionGrid"];
+	if(_G == undefined) return;
+	var _Solid = RegionTiles_Get(LevelDef.RegionTiles).solid;
+	var _Walls = _R.TemplateObjGrid.WallsUpper;
+	for(var j = 0; j < min(_G.H, array_length(_Walls)); j++){
+		for(var i = 0; i < min(_G.W, array_length(_Walls[j])); i++){
+			var _T = _G.Tiles[j * _G.W + i];
+			_Walls[j][i] = (_T != 0 && _Solid[_T & 0xFFFF] == 1);
+		}
+	}
+}
+
 function RegionRoom_Walls(_RoomIndex){
 	var _R = global.Level.Rooms[_RoomIndex];
 	var _G = _R.RegionGrid;

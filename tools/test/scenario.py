@@ -29,6 +29,7 @@ STEPS = {
     'arch': {'enemy', 'state', 'move', 'time'},
     'give': {'item', 'index', 'amount'},
     'state': set(),
+    'rooms': set(),
     'log': {'text'},
     'expect': {'alive', 'level', 'room', 'enemies', 'kills_min', 'exit_level', 'set_rooms_min', 'free'},
     'sheet': {'level', 'seeds'},

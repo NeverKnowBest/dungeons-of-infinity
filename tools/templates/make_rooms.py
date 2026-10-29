@@ -8,6 +8,7 @@ data/room-templates/sets/<Set>/rooms.json instead, so a region can get its own r
     python tools/templates/make_rooms.py Example --dry-run  # checks only, writes nothing
     python tools/templates/make_rooms.py --list             # sets and what each description makes
     python tools/templates/make_rooms.py Example --map      # each half as text: walls, door lanes, the composed motifs
+    python tools/templates/make_rooms.py CastleTop --png out.png   # painted rooms drawn, closed and open (Pillow)
     python tools/templates/make_rooms.py --selftest         # outlines against shared templates, loose compositions refused
 
 Then python tools/templates/convert.py writes the game files (the script says so). A map the script did not write
@@ -857,8 +858,10 @@ def build_map(cls, halves):
     group_names = ['Main'] + (GROUPS if cls == 'Main_Upper' else [])
     sec_layers = {g: {n: [] for n in sec_types} for g in group_names}
     width = 0
+    offsets = []                        # x of each half in the map: side by side, 32 px apart
     for i, half in enumerate(halves):
-        ox = i * 288
+        ox = width + 32 if i else 0
+        offsets.append(ox)
         rid = next_id('obj')
         props = [{'name': 'Split_MainSectionIDs', 'type': 'string', 'value': ','.join(str(s) for s in half.split_ids)},
                  {'name': 'Symetry', 'type': 'int', 'value': 1 if half.symmetric else 0}]
@@ -867,7 +870,7 @@ def build_map(cls, halves):
             props.append({'name': k, 'type': 'string' if isinstance(v, str) else 'int', 'value': v})
         props.sort(key=lambda p: p['name'])
         rooms.append({'height': half.h, 'id': rid, 'name': half.name, 'properties': props, 'rotation': 0, 'type': '',
-                      'visible': True, 'width': 256, 'x': ox, 'y': 0})
+                      'visible': True, 'width': getattr(half, 'w', 256), 'x': ox, 'y': 0})
         for layer, items in half.layers.items():
             for gid, box, p, ot in items:
                 layers[layer].append(obj(gid, box, p, rid, ot, ox))
@@ -879,7 +882,7 @@ def build_map(cls, halves):
                     raise RoomError('%s: %s has no layer %s in a section' % (half.where, cls, layer))
                 for gid, box, p, ot in items:
                     sec_layers[gname][layer].append(obj(gid, box, p, rid, ot, ox))
-        width = ox + 256
+        width = ox + getattr(half, 'w', 256)
     for layer in layers:
         layers[layer].sort(key=lambda o: o['id'])
     out = [objgroup('Rooms', rooms)] + [objgroup(n, layers[n]) for n in obj_types]
@@ -906,7 +909,7 @@ def build_map(cls, halves):
             for i, h in painted:
                 for gy, row in enumerate(h.gids(getattr(h, attr), firstgid)):
                     for gx, v in enumerate(row):
-                        data[gy * mw + i * 288 // GRID + gx] = v
+                        data[gy * mw + offsets[i] // GRID + gx] = v
             out.append({'data': data, 'height': mh, 'id': next_id('layer'), 'name': name, 'opacity': 1,
                         'type': 'tilelayer', 'visible': True, 'width': mw, 'x': 0, 'y': 0})
     return {'compressionlevel': -1, 'editorsettings': {'export': {'format': 'json'}}, 'height': height // GRID,
@@ -971,7 +974,7 @@ def check_converted(name, by_class, warnings):
             doors = [p + 1 for p in range(24) if union & (1 << p)]
             sections = sorted({int(s) for t in sub for s in t['Split_MainSectionIDs'] if s})
             lines.append('  %s %s: %d rooms from %d halves and painted rooms; doors %s; sections %s'
-                         % (cls, ['1x1', '1x2'][si], len(sub), len([h for h in by_class[cls] if h.size_index == si]),
+                         % (cls, ['1x1', '1x2 and 2x1'][si], len(sub), len([h for h in by_class[cls] if min(h.size_index, 1) == si]),
                             ','.join(map(str, doors)), ','.join(map(str, sections)) or 'none'))
     return lines
 
@@ -1131,6 +1134,7 @@ def main():
     ap.add_argument('--dry-run', action='store_true', help='check the description, write nothing')
     ap.add_argument('--list', action='store_true', help='list the sets that have a description')
     ap.add_argument('--map', action='store_true', help='print each half as text (walls, lanes, motifs), write nothing')
+    ap.add_argument('--png', metavar='FILE', help='draw the painted rooms of the set (closed and open) into FILE, write nothing')
     ap.add_argument('--selftest', action='store_true', help='compare the outline model with shared templates')
     a = ap.parse_args()
     if a.selftest:
@@ -1151,6 +1155,15 @@ def main():
                               for h in hs)))
                     except RoomError as e:
                         print('%s: error: %s' % (n, e))
+        return 0
+    if a.png:
+        try:
+            rooms = [h for h in load_set(a.set) if getattr(h, 'painted', False)]
+        except RoomError as e:
+            print('error:', e)
+            return 1
+        paint_rooms.render(rooms, a.png)
+        print('%s: %d painted rooms drawn in %s' % (a.set, len(rooms), a.png))
         return 0
     if a.map:
         try:

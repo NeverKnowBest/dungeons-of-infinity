@@ -68,6 +68,7 @@ python tools/check/validate.py --strict   # warnings also fail
 | Global function defined in two scripts | error |
 | Asset style name (`sX`, `oX`, `Sound_X`, `Music_X`) used in GML that does not exist | warning (error if it only exists as an orphan) |
 | Array literal starting with `#RRGGBB` | error |
+| A variable or struct field named like a constant macro (`Night = ...`, `Cfg.Night`, `{Night: ...}`: the macro's value takes its place; `Night` is 3 in `__Chess`) | error |
 | Lower case text drawn with `global.Font_Small` | warning |
 | `a[i] = ...i++` (GML evaluates the right side first) | warning |
 | Level rule on `global.Level.Index` (`switch`, comparison or formula) outside `__Levels` and `__Test`: read a `LevelDef` field instead | warning |
@@ -165,6 +166,7 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `arch` | `enemy`, `state` (`EnemyState` name), `move`, `time` (`[min, max]`) | Changes a state of an archetype enemy (`scripts/__EnemyArch`) for this test only, e.g. a rat that chases Link (`scenarios/arch_patterns.json`) |
 | `give` | `item`, `index`, `amount` | Gives an item |
 | `state` | | Logs level, room, Link's position and health, enemies and kills |
+| `rooms` | | Logs a `layout` line per room of the level: `layout <index> grid= size= template=<class>/<subclass>/<name>#<id> [set=<Set>] doors=<position>:<DoorStatus>,... special=<SpecialDungeonObj> section=<Section_ID>`; for measuring what a room set covers (scenario `castle_top_layouts`) |
 | `log` | `text` | Writes a note in the log |
 | `expect` | `alive`, `level`, `room` (`[x, y]`), `enemies`, `kills_min`, `exit_level`, `set_rooms_min`, `free` | Checks; a mismatch is a `FAIL` line. `"exit_level": true`: the current level is the one the last `exit` step's door leads to (not the rest stop). `set_rooms_min`: at least that many rooms of the level come from its room set (roadmap F11). `"free": true`: Link does not stand in a wall that blocks him (roadmap F12b) |
 | `exit` | `which` (`main` or `extra`), `frames` (default 60) | Puts Link 40 px in front of the level's main or extra exit (roadmap F4b) and walks into it for `frames`. Fails if there is no such exit |
@@ -173,7 +175,7 @@ Scenario format (JSON). Strings like `"Swords.Master"` become the GML enum value
 | `sheet` | `level`, `seeds` | Contact sheet (what `--sheet` runs): `sheet_<level>_<seed>.png` per seed and `sheet_<level>.png` with all of them at half size |
 | `end` | | Ends the test (it also ends after the last step) |
 
-Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>` (plus ` set=<Set>` when the template is of the level's room set), `roomset <Set> rooms=<from the set>/<all>` (after the `level` line, only in levels with a `RoomSet`), `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `trace <frame> <object> ...`, `arch <object> ...`, `state`, `expect ok`, `levels <index> "<name>" <field>=<value>` (scenario changes), `exits main-><level> count=1|2 extra=room <n> grid= Top|Bottom [secret]-><level> main=room <n> grid=` (only in levels whose exits can lead to more than one level), `exit main|extra room= -> level <n>`, `painted room= ...`, `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
+Log lines start with the frame (`f152`): `start`, `level <index> "<name>" rooms= dungeon=`, `room <index> grid= size= template=<class>/<subclass>/<name>#<id>` (plus ` set=<Set>` when the template is of the level's room set), `roomset <Set> rooms=<from the set>/<all>` (after the `level` line, only in levels with a `RoomSet`), `kill <object>`, `damage`, `dead`, `boss defeated`, `shot`, `dump <file>`, `probe <object> ...`, `trace <frame> <object> ...`, `arch <object> ...`, `state`, `expect ok`, `levels <index> "<name>" <field>=<value>` (scenario changes), `exits main-><level> count=1|2 extra=room <n> grid= Top|Bottom [secret]-><level> main=room <n> grid=` (only in levels whose exits can lead to more than one level), `exit main|extra room= -> level <n>`, `painted room= ...`, `layout ...` (step `rooms`), `weather level=<n> {fields}` (a level's `oWeather` starts), `FAIL ...`, `crash ...` (a GML error, with the stack) and last `end ok|timeout|crash|error`.
 
 ### `region/` (Python 3, standard library only)
 
@@ -199,6 +201,7 @@ python tools/templates/make_rooms.py Example       # room set: data/room-templat
 python tools/templates/make_rooms.py Example --dry-run   # only check the description
 python tools/templates/make_rooms.py --list        # sets with a description and their halves
 python tools/templates/make_rooms.py Example --map # each half as text: walls, door lanes and the composed motifs
+python tools/templates/make_rooms.py CastleTop --png out.png   # painted rooms drawn, every door closed and open (Pillow)
 python tools/templates/make_rooms.py --selftest    # outlines against ten shared templates, loose compositions refused
 python tools/templates/motifs.py                   # composition motifs measured in the shared templates -> data/room-templates/motifs.json
 python tools/templates/motifs.py --report          # the catalog layer by layer, with the rules it makes
@@ -247,13 +250,13 @@ Painted rooms (roadmap F12b, module `paint_rooms.py`): beside its `halves`, a `r
                   "middle": ["side_left", "floor", "side_right"],  #   the middle row repeated down between the top and the bottom
                   "bottom": ["bottom_left", "bottom_mid", "bottom_right"]},
         "openings": {"Top": "open_top", "Bottom": "open_bottom"}}, # painted on RegionOpen at a door, 16 px left of its cell, at the wall
-"painted": [{"name": "Terrace", "size": "1x1",                    # 1x1 or 1x2
+"painted": [{"name": "Terrace", "size": "1x1",                    # 1x1, 1x2 or 2x1 (never turned)
              "doors": [12, 6],                                    # door positions (DOOR_XY); their wall needs an opening in the kit
              "decor": [{"piece": "tower", "at": [48, 16], "pair": true}],   # px on the 8 px grid; pair: the mirrored copy too
              "transforms": "None,FlipH", "props": {}}]            # transforms the game may use (default None,FlipH)
 ```
 
-The room goes into the set's Main Upper map with `Whole` 1 and `Transforms`, its Doors, an enemy area over the floor between the walls and a treasure and a crystal spot in the middle, plus the tile layers `Region` (every door closed) and `RegionOpen` (the passages) over the region's Tiled tileset (firstgid after the object tileset, rounded up to a thousand). Refused: decoration over a passage, passages that touch, a door whose passage is not open floor from the middle of the room to the edge, a middle that is not floor. `--map` prints the room as text (`#` wall, `.` floor, `o` passage, `D` door cell). `convert.py` turns the layers into `Region` (`docs/dev/engine-notes.md`, "Painted rooms").
+The room goes into the set's Main Upper map with `Whole` 1 and `Transforms`, its Doors, an enemy area over the floor between the walls and a treasure and a crystal spot in the middle, plus the tile layers `Region` (every door closed) and `RegionOpen` (the passages) over the region's Tiled tileset (firstgid after the object tileset, rounded up to a thousand). Refused: decoration over a passage, passages that touch, a door whose passage is not open floor from the middle of the room to the edge, a middle that is not floor. `--map` prints the room as text (`#` wall, `.` floor, `o` passage, `D` door cell); `--png <file>` draws every painted room of the set, all doors closed beside all doors open with the door cells outlined (needs Pillow), the preview to show before the game. A 2x1 room is 512x256 and goes with the 1x2 templates (`SizeIndex` 2); a painted room only fits rooms of its own size. Passages of neighbouring door positions touch, so choose door sets with no two neighbours (in a 1x1 room the 12 positions make a ring). `convert.py` turns the layers into `Region` (`docs/dev/engine-notes.md`, "Painted rooms").
 
 ### `import/` (Python 3, Pillow, numpy)
 

@@ -121,8 +121,8 @@ if(FadeToGame){
 			oLink.image_speed = 1;
 		}
 		Music_Play(LastSongIndex, 10);
-		if(instance_exists(oIntro)){
-			global.RainSound = audio_play_sound(Sound_Rain, 1, true, 0.3);
+		with(oWeather){
+			if(Cfg.Rain) global.RainSound = audio_play_sound(Sound_Rain, 1, true, Cfg.Volume);
 		}
 		global.Paused = false;
 		instance_destroy(self);

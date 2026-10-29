@@ -609,6 +609,9 @@ function RoomTemplates_PickFrom(_RoomIndex, _Templates, _Counts, _Unused){
 		
 		if(_RoomIndex == global.Level.RoomIndex_BossAdjacent && array_length(RoomTemplate[$ "Holes"]) > 0) continue; //Don't pick a template with holes next to boss Room, since holes might take away entrance tiles
 		
+		var _Painted = (RoomTemplate[$ "Region"] != undefined);
+		if(_Painted && RoomTemplate.SizeIndex != Room.SizeIndex) continue; //a painted room is never turned (roadmap F12b): a 1x2 one fits 1x2 rooms only, a 2x1 one 2x1 rooms
+		
 		ds_list_shuffle(global.RoomTransformTypeList);
 
 		for(var _TransformTypeIndex = 0; _TransformTypeIndex < TransformTypes; _TransformTypeIndex++){
@@ -625,7 +628,7 @@ function RoomTemplates_PickFrom(_RoomIndex, _Templates, _Counts, _Unused){
 				if(GetPropertyValue(_Properties, "NoBossAdjacent") != -1) continue;
 			}
 			
-			if( (_RoomTemplateClass == RoomTemplateClass.Main_Upper || _RoomTemplateClass == RoomTemplateClass.Main_Lower) && _RoomTemplateSubClass != RoomSize._1x1){
+			if(!_Painted && (_RoomTemplateClass == RoomTemplateClass.Main_Upper || _RoomTemplateClass == RoomTemplateClass.Main_Lower) && _RoomTemplateSubClass != RoomSize._1x1){
 				
 				switch(Room.SizeIndex){
 					case RoomSize._1x2:

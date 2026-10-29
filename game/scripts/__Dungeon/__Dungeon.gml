@@ -108,6 +108,7 @@ function Dungeon_Clear(){
 	with(oItem_Kinstone_Main) instance_destroy(id);
 	with(oRodCharger) instance_destroy(id);
 	with(oWarp) instance_destroy(id);
+	with(oWeather) instance_destroy(id);
 	with(oCursed) instance_destroy(id);
 	with(oDeadHungryGuy) instance_destroy(id);
 	with(oMap) instance_destroy(id);
@@ -540,7 +541,7 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 	}else if(UpperDoors && !LowerDoors){
 		
 		//eventually remove the SizeIndex == RoomSize._1x1 condition and make sure there are 1x2 and 2x1 obstacle templates
-		TemplateClass = (Section_ID == 0 && SizeIndex == RoomSize._1x1 && _RoomIndex != global.Level.RoomIndex_BossAdjacent && _RoomIndex != global.Level.RoomIndex_Entrance && Prob(Chance_ObstacleTemplate) ? RoomTemplateClass.Obstacles : RoomTemplateClass.Main_Upper);
+		TemplateClass = (LevelDef.ObstacleRooms && Section_ID == 0 && SizeIndex == RoomSize._1x1 && _RoomIndex != global.Level.RoomIndex_BossAdjacent && _RoomIndex != global.Level.RoomIndex_Entrance && Prob(Chance_ObstacleTemplate) ? RoomTemplateClass.Obstacles : RoomTemplateClass.Main_Upper);
 		
 	}else if(!UpperDoors && LowerDoors){
 		TemplateClass = RoomTemplateClass.Main_Lower;
@@ -835,6 +836,7 @@ function Dungeon_InitLevel(_LevelIndex){
 		Dungeon_Draw_Walls(_RoomIndex);
 		
 		var _Painted = RegionRoom_Paint(_RoomIndex);	//a room painted with the region tileset, walls from its tiles (roadmap F12b)
+		if(_Painted) Map_GenerateRoomSprite(_RoomIndex);	//again, now with the painted walls
 		
 		if(LevelDef.Ceiling && !_Painted && !TemplateCheck(_RoomIndex, RoomTemplateClass.Village, RoomTemplateClass_Village.Main)){
 			Dungeon_Draw_Ceiling(GetTileID(8, LevelTilesY + 2), Room.TileX, Room.TileY, Room.TileX, Room.TileY, Room.TileX + Room.TileW, Room.TileY + Room.TileH);
@@ -986,6 +988,7 @@ function Dungeon_InitLevel(_LevelIndex){
 	if(LevelDef.Special == LevelSpecial.Intro){
 		var _inst = instance_create_layer(-100, -100, "System", oIntro);		
 	}
+	Weather_Start();	// the level's rain and lightning (the intro's is already there, made by oIntro)
 	
 	if(LevelDef.RunStart){
 		if(audio_is_playing(global.RainSound)){

@@ -618,9 +618,8 @@ def parse_class(ci, warnings, set_name=None):
         if whole:
             if cls != 'Main_Upper':
                 raise ConvertError('%s: room %s: Whole rooms are only Main_Upper for now' % (where, gm_str(t['id'])))
-            if t['SizeIndex'] >= n_sub:
-                raise ConvertError('%s: room %s: a Whole Main_Upper room is 1x1 or 1x2 (a 2x1 room turns a 1x2 one)'
-                                   % (where, gm_str(t['id'])))
+            if t['SizeIndex'] > 2:
+                raise ConvertError('%s: room %s: a Whole Main_Upper room is 1x1, 1x2 or 2x1' % (where, gm_str(t['id'])))
             t['Whole'] = True
             t.setdefault('Split_MainSectionIDs', [0.0])
         elif 'Region' in t and cls in ('Main_Upper', 'Main_Lower'):
@@ -672,7 +671,7 @@ def parse_class(ci, warnings, set_name=None):
     target = None
     for mi, main in enumerate(temps):
         if sub_types is None:
-            target = final[main['SizeIndex']]
+            target = final[min(main['SizeIndex'], 1) if main.get('Whole') else main['SizeIndex']]
         elif main.get('type') in sub_types:
             target = final[sub_types.index(main['type'])]
         else:
@@ -690,7 +689,7 @@ def parse_class(ci, warnings, set_name=None):
             target.append(copy.deepcopy(main))
         elif main.get('Whole'):   # a whole painted room (roadmap F12b): no halves to join
             generate_door_codes(main, cls, where)
-            target = final[main['SizeIndex']]
+            target = final[min(main['SizeIndex'], 1)]     # a 2x1 one goes with the 1x2 rooms, as 2x1 rooms look there
             target.append(copy.deepcopy(main))
         elif cls in ('Obstacles', 'Sections', 'Special'):
             generate_door_codes(main, cls, where)

@@ -1,0 +1,151 @@
+{
+ "comment": "Room coverage of the castle rooftops (room set CastleTop): builds the level in seeds 1 to 12 and logs every room (step rooms: template class, size, doors in use with their status, special object, section) with the roomset line. Read with grep layout: rooms without set= took a shared template. Used to choose the door sets of the painted rooms.",
+ "name": "castle_top_layouts",
+ "seed": 1,
+ "level": "CastleTop",
+ "max_frames": 30000,
+ "steps": [
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 2
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 3
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 4
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 5
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 6
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 7
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 8
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 9
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 10
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 11
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 12
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "end"
+  }
+ ]
+}

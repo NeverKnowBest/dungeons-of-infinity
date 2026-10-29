@@ -241,12 +241,15 @@ def check_gml(rep, registered, orphans, object_gml):
 
     # global functions, macros, enums
     funcs = {}
+    macros = {}
     known = set(n for (_, n) in registered)
     for f in script_gml:
         for m in re.finditer(r'^function\s+([A-Za-z_]\w*)', code[f], re.M):
             funcs.setdefault(m.group(1), []).append(rel(f))
-        for m in re.finditer(r'^\s*#macro\s+(\w+)', sources[f], re.M):
+        for m in re.finditer(r'^\s*#macro\s+(\w+)[ \t]*(.*)', sources[f], re.M):
             known.add(m.group(1))
+            if re.match(r'(-?[\d.]+|"[^"]*"|true|false)\s*(//.*)?$', m.group(2).strip()):
+                macros[m.group(1)] = rel(f)     # a constant, not an expression that can take a value (LinkHealth)
         for m in re.finditer(r'\benum\s+(\w+)', code[f]):
             known.add(m.group(1))
     for fn, where in funcs.items():
@@ -276,8 +279,16 @@ def check_gml(rep, registered, orphans, object_gml):
             rep.warn('%s looks like an asset but does not exist: %s' % (n, ', '.join(where[:3])))
 
     # gotchas
+    names = '|'.join(sorted(macros, key=len, reverse=True))
+    macro_re = re.compile(r'(?:(?:^|[{,;])[ \t]*(%s)[ \t]*(?:=(?!=)|:(?!=))|\.(%s)\b)' % (names, names), re.M) if macros else None
     for f in files:
         c = code[f]
+        # a variable or struct field named like a macro is replaced by the macro's value (Night is 3, __Chess)
+        for m in (macro_re.finditer(c) if macro_re else []):
+            name = m.group(1) or m.group(2)
+            line = c.count('\n', 0, m.start()) + 1
+            rep.error('%s:%d %s is a macro (%s): a variable or field of that name is replaced by its value'
+                      % (rel(f), line, name, macros[name]))
         for m in re.finditer(r'\[\s*#[0-9A-Fa-f]{6}', sources[f]):
             line = sources[f].count('\n', 0, m.start()) + 1
             rep.error('%s:%d array literal starts with a #RRGGBB colour ([# is a ds_grid accessor); use make_colour_rgb'

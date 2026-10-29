@@ -132,6 +132,7 @@ function Level_Create(_Index, _Name) constructor{
 	ShopKeeperSprite = -1;				// sprite of every shop keeper, -1 for the usual random ones
 	JustinShop = false;					// the first shop keeper of the level is Justin (once per run)
 	Curses = true;						// treasures may be cursed
+	ObstacleRooms = true;				// rooms may take an obstacle template (false: a Main_Upper one, e.g. the painted rooms of an outdoor level)
 	Obstacles = [RoomObstacle.Holes];	// obstacle templates, picked at random (repeat one to make it more likely)
 	MovingFloors = [];					// added to Obstacles in rooms without special objects
 
@@ -155,6 +156,7 @@ function Level_Create(_Index, _Name) constructor{
 	Dark = LevelDark.Normal;
 	DarkBonus = 0;
 	Water = LevelWater.None;
+	Weather = undefined;				// {Rain, Leaves, Lightning, Thunder, Tint, ...}: oWeather over the level, fields missing take Weather_Defaults (__Weather)
 	WaterChance = 0.75;
 	WaterNeedsGore = false;				// the water is blood: none when gore is off
 	WaterTileX = 86;
@@ -200,6 +202,7 @@ function Levels_Init(){
 		Ceiling = false;
 		Song = SongIndex.Start;
 		Dark = LevelDark.Never;
+		Weather = {Leaves: true};	// the rainy night (oWeather, made by oIntro)
 	}
 
 	with(_L[DungeonLevel.Castle]){
@@ -212,6 +215,7 @@ function Levels_Init(){
 		Dark = LevelDark.Low;
 		SecretDoorType = SecretDoor.Crack;
 		Enemies = [[oEnemy_Soldier_Advanced, 2], [oEnemy_Soldier_Simple, 3]];
+		NextPool = [[DungeonLevel.CastleBasement, 2], [DungeonLevel.CastleTop, 1]];	// each exit leads to the rooftops 1 time in 3
 	}
 
 	with(_L[DungeonLevel.CastleBasement]){
@@ -369,8 +373,8 @@ function Levels_Init(){
 	}
 
 	// Chapter 2 variant: the castle rooftops in the rain (docs/regioes/topo-do-castelo.md), seen from above like ALttP's
-	// overworld area 0x1B, its rooms painted with ts_CastleTop (room set CastleTop, roadmap F12b-1). Waits for the rest
-	// of the pilot: no NextPool leads to it yet (Hyrule Castle will take it with weight 1 beside the basement's 2).
+	// overworld area 0x1B, its rooms painted with ts_CastleTop (room set CastleTop, roadmap F12b-1). Hyrule Castle's
+	// exits lead to it with weight 1 beside the basement's 2; it rains and thunders like the night of the run's start.
 	with(_L[DungeonLevel.CastleTop]){
 		Depth = 2;
 		Next = DungeonLevel.CastleJails;
@@ -388,6 +392,8 @@ function Levels_Init(){
 		FairyRooms = false;
 		Song = SongIndex.Castle;
 		Dark = LevelDark.Never;
+		Weather = {Thunder: true};
+		ObstacleRooms = false;
 		SecretDoorType = SecretDoor.Crack;
 		ExitLook = "StairsUp";
 		Enemies = [[oEnemy_Soldier_Advanced, 2], [oEnemy_Soldier_Simple, 3], [oEnemy_Keese, 1]];

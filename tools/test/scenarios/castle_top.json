@@ -1,0 +1,89 @@
+{
+ "comment": "Castle rooftops (docs/regioes/topo-do-castelo.md), the pilot of the tools plan: Hyrule Castle seed 3 has two exits, the main one to the rooftops (stairs up) and the extra one to the basement (NextPool [[CastleBasement, 2], [CastleTop, 1]]). Link takes the main exit and comes to the rooftops, where it rains and thunders (log line weather level=14) and most rooms are painted rooms of the set CastleTop; he takes the rooftops' exit to the Castle Prison. Then a new build of the castle seed 3 and the extra exit, to the basement.",
+ "name": "castle_top",
+ "seed": 3,
+ "level": "Castle",
+ "cheats": [
+  "Cheat_Inf_Health"
+ ],
+ "max_frames": 20000,
+ "steps": [
+  {
+   "do": "wait",
+   "frames": 60
+  },
+  {
+   "do": "exit",
+   "which": "main"
+  },
+  {
+   "do": "wait",
+   "frames": 300
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "expect",
+   "exit_level": true,
+   "set_rooms_min": 8
+  },
+  {
+   "do": "rooms"
+  },
+  {
+   "do": "shot",
+   "name": "rooftops"
+  },
+  {
+   "do": "wait",
+   "frames": 200
+  },
+  {
+   "do": "shot",
+   "name": "rain"
+  },
+  {
+   "do": "exit",
+   "which": "main"
+  },
+  {
+   "do": "wait",
+   "frames": 300
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "expect",
+   "exit_level": true
+  },
+  {
+   "do": "level",
+   "level": "Castle",
+   "seed": 3
+  },
+  {
+   "do": "wait",
+   "frames": 60
+  },
+  {
+   "do": "exit",
+   "which": "extra"
+  },
+  {
+   "do": "wait",
+   "frames": 300
+  },
+  {
+   "do": "state"
+  },
+  {
+   "do": "expect",
+   "exit_level": true
+  },
+  {
+   "do": "end"
+  }
+ ]
+}
