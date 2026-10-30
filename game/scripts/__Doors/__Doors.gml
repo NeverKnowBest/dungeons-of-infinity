@@ -398,6 +398,17 @@ function Dungeon_CreateDoors(_RoomIndex){
 				break;
 			
 		}
+		//a painted room has no door frame beside the blocker: it covers the whole 32 px of the door cell, so a lock
+		//closes all of the passage (RegionRoom_OffLane walls the room's edge beside the door cell)
+		if(global.Level.Rooms[_RoomIndex].Template[$ "Region"] != undefined){
+			if(Position == TOP || Position == BOTTOM){
+				WallX = TLCornerX;
+				ScaleX = 4;
+			}else{
+				WallY = TLCornerY;
+				ScaleY = 4;
+			}
+		}
 		var inst = WallObj_Create("Objs_" + FloorLevelStr, WallX, WallY, ScaleX, ScaleY, _DoorInst.Location, WallGID);
 		inst.FloorLevel = _DoorInst.FloorLevel;
 		inst.BlockLink = false;

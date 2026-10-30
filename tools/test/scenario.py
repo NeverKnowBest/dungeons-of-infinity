@@ -36,6 +36,9 @@ STEPS = {
     'paint': {'x', 'y', 'w', 'h', 'blocks', 'mirror', 'flip', 'transform'},
     'painted': {'index', 'at', 'remake'},
     'seams': set(),
+    'lock': {'side', 'frames', 'optional'},
+    'at': {'index', 'x', 'y'},
+    'grid': {'cells', 'x', 'y', 'w', 'name'},
     'exit': {'which', 'frames'},
     'end': set(),
 }

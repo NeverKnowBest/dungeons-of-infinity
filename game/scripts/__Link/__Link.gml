@@ -1152,7 +1152,10 @@ function CheckRoomTransition(){
 			}
 		}else{
 			//if no door is detected it means we're walking off the edge of an open Room with no wall (village)
-			
+			//a painted room is walled all round: it is left only through a door (RegionRoom_OffLane); this transition
+			//would put to sleep the room Link is still standing in
+			if(RegionRoom_Is(global.CurrentRoomIndex)) exit;
+
 			
 			if(vx < 0 && x < global.CurrentRoom.x + 16){
 				AutoMoveSpeed = 0.8;

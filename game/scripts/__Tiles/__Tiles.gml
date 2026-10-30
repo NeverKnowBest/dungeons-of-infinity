@@ -389,7 +389,11 @@ function RegionRoom_Paint(_RoomIndex){
 	//GateDY: how far below its door cell the gate's doorway is (16 for a gate under the door cell; the rooms painted
 	//from a frame put the 0x1B palace door in a slice of its facade, 64 px down: paint_auto.py, roadmap F12b-2)
 	_R.RegionGrid = {W : _RW, H : _RH, Tiles : _Base, Open : _Open, Gate : _Gate, Section : _Sec, Gates : [], Walls : [],
-		GateDY : _Reg[$ "gate_dy"] ?? 16};
+		GateDY : _Reg[$ "gate_dy"] ?? 16, Lanes : []};
+	//Lanes: the door cells (px in the room) of the doors the room uses; the only way across its outermost 8 px
+	for(var d = 0; d < array_length(_R.Doors); d++){
+		if(_R.Doors[d].Status != DoorStatus.Unused) array_push(_R.RegionGrid.Lanes, {X : _R.Doors[d].x, Y : _R.Doors[d].y, Location : _R.Doors[d].Location});
+	}
 	var _TM = RegionTiles_Tilemap(UPPER);
 	for(var k = 0; k < _RW * _RH; k++){
 		tilemap_set_at_pixel(_TM, _Base[k] == 0 ? 0 : RegionTiles_TileData(_Base[k]), _R.x + (k mod _RW) * 8, _R.y + (k div _RW) * 8);
@@ -534,10 +538,29 @@ function RegionRoom_Walls(_RoomIndex){
 /// (its closed door is solid on the ROM; Link pushes it and it opens, RegionGate_Push)
 function RegionRoom_SolidAt(_G, _Solid, i, j){
 	var _T = _G.Tiles[j * _G.W + i];
-	if(_T == 0 || _Solid[_T & 0xFFFF] == 0) return false;
+	if(_T == 0 || _Solid[_T & 0xFFFF] == 0) return RegionRoom_OffLane(_G, i, j);
 	for(var g = 0; g < array_length(_G.Gates); g++){
 		var _Gt = _G.Gates[g];
 		if(_Gt.Open && _Gt.Location == "Top" && i >= _Gt.X div 8 && i < (_Gt.X + 32) div 8 && j < (_Gt.Y + _G.GateDY + 32) div 8) return false;
+	}
+	return true;
+}
+
+/// Whether walkable tile i, j of a painted room is on its outermost 8 px off every door lane: a wall, so Link crosses the
+/// room's edge only through a door cell (32 px), where the door's blocker closes all of it when locked or shut. A
+/// passage painted wider than its door would let him walk around the lock and off the room without a door, into an
+/// "open" camera transition that leaves him in the room it puts to sleep (oLink deactivated, R1 fourth round)
+function RegionRoom_OffLane(_G, i, j){
+	var _Top = (j == 0), _Bottom = (j == _G.H - 1), _Left = (i == 0), _Right = (i == _G.W - 1);
+	if(!_Top && !_Bottom && !_Left && !_Right) return false;
+	var _Lanes = _G[$ "Lanes"];
+	if(_Lanes == undefined) return false;
+	for(var n = 0; n < array_length(_Lanes); n++){
+		var _L = _Lanes[n];
+		var _Across = (_L.Location == "Top" || _L.Location == "Bottom");
+		if(_Across ? (i < _L.X div 8 || i >= (_L.X + 32) div 8) : (j < _L.Y div 8 || j >= (_L.Y + 32) div 8)) continue;
+		if((_Top && _L.Location != "Top") || (_Bottom && _L.Location != "Bottom") || (_Left && _L.Location != "Left") || (_Right && _L.Location != "Right")) continue;
+		return false;
 	}
 	return true;
 }

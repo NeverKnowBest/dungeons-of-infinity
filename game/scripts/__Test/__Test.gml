@@ -405,6 +405,8 @@ function Test_CheckPainted(_RoomIndex){
 		if(_T != 0) _Tiles++;
 		var _IsSolid = (_T != 0 && _Solid[_T & 0xFFFF] == 1);
 		if(_IsSolid) _SolidCells++;
+		//a wall: a solid tile, or a walkable one on the room's outermost 8 px off its door lanes (RegionRoom_OffLane)
+		var _Want = _IsSolid || RegionRoom_OffLane(_G, k mod _G.W, k div _G.W);
 		var _PX = _R.x + (k mod _G.W) * 8 + 4;
 		var _PY = _R.y + (k div _G.W) * 8 + 4;
 		var _InWall = false;
@@ -412,7 +414,7 @@ function Test_CheckPainted(_RoomIndex){
 			var _I = _Walls[w];
 			_InWall = (_PX >= _I.x && _PX < _I.x + _I.sprite_width && _PY >= _I.y && _PY < _I.y + _I.sprite_height);
 		}
-		if(_InWall != _IsSolid){
+		if(_InWall != _Want){
 			_Bad++;
 			if(_First == "") _First = " first=" + string(k mod _G.W) + "," + string(k div _G.W);
 		}
@@ -715,6 +717,83 @@ function Test_DoStep(_S){
 			}
 			if(StepFrames < 10) return false;	// the room wakes up
 			Test_CheckPainted(PaintedRoom);
+			return true;
+
+		case "at":	// Link to "x", "y" px of room "index" (a photo of that spot; camera follows him)
+			if(StepFrames == 1){
+				//mid camera transition the game would put the new room to sleep when it ends, with Link in it
+				if(oCamera.RoomTransition != NONE){
+					Test_Fail("at: a room transition is under way (wait for it to end)");
+					return true;
+				}
+				var _AR = _S[$ "index"] ?? global.CurrentRoomIndex;
+				if(_AR < 0 || _AR >= global.Level.RoomCount){
+					Test_Fail("no room " + string(_AR));
+					return true;
+				}
+				Test_PlaceLink(_AR, [global.Level.Rooms[_AR].x + (_S[$ "x"] ?? 128), global.Level.Rooms[_AR].y + (_S[$ "y"] ?? 128)]);
+				Test_Log("at room=" + string(_AR) + " " + Test_RoomStr(_AR));
+				return false;
+			}
+			return StepFrames >= 10;	// the room wakes up and the camera gets there
+
+		case "grid":	// a preview painted over Link's room (R1): "cells" block * 2 + mirror, "w" x "h" blocks of 16x16 at "x", "y"; pictures only, the walls stay
+			var _GR = global.Level.Rooms[global.CurrentRoomIndex];
+			var _GCells = _S[$ "cells"] ?? [];
+			var _GW = _S[$ "w"] ?? 16;
+			var _GPainted = 0;
+			for(var _k = 0; _k < array_length(_GCells); _k++){
+				if(_GCells[_k] < 0) continue;	// left as it is
+				if(RegionTiles_PaintBlock(_GCells[_k] div 2, _GR.x + (_S[$ "x"] ?? 0) + (_k mod _GW) * 16, _GR.y + (_S[$ "y"] ?? 0) + (_k div _GW) * 16, UPPER, (_GCells[_k] mod 2) == 1, false)) _GPainted++;
+			}
+			Test_Log("grid " + string(_S[$ "name"] ?? "") + " blocks=" + string(_GPainted));
+			return true;
+
+		case "lock":	// a locked door of a painted room (R1): Link "side" px across from its middle, 32 px inside, walks into it for "frames" (default 120); he must stay in the room, out of the walls, with no camera transition
+			if(StepFrames == 1){
+				LockRoom = -1;
+				LockVerb = "";
+				for(var i = 0; LockVerb == "" && i < global.Level.RoomCount; i++){
+					if(!RegionRoom_Is(i)) continue;
+					var _LR = global.Level.Rooms[i];
+					for(var d = 0; d < array_length(_LR.Doors); d++){
+						var _LD = _LR.Doors[d];
+						if(_LD.Status != DoorStatus.Locked) continue;
+						var _Side = _S[$ "side"] ?? 0;
+						var _LX = _LR.x + _LD.x + 16, _LY = _LR.y + _LD.y + 16;
+						switch(_LD.Location){
+							case "Top":		_LX += _Side; _LY += 32; LockVerb = "up"; break;
+							case "Bottom":	_LX += _Side; _LY -= 32; LockVerb = "down"; break;
+							case "Left":	_LY += _Side; _LX += 32; LockVerb = "left"; break;
+							default:		_LY += _Side; _LX -= 32; LockVerb = "right"; break;
+						}
+						LockRoom = i;
+						Test_PlaceLink(i, [_LX, _LY]);
+						Test_Log("lock room=" + string(i) + " door=" + string(_LD.Position) + " " + _LD.Location + " side=" + string(_Side));
+						break;
+					}
+				}
+				if(LockVerb == ""){
+					if(_S[$ "optional"] ?? false) Test_Log("lock none");
+					else Test_Fail("no locked door in a painted room");
+				}
+				return LockVerb == "";
+			}
+			if(StepFrames <= (_S[$ "frames"] ?? 120)){
+				Test_HoldVerbs([LockVerb]);
+				return false;
+			}
+			var _LBad = "";
+			if(!instance_exists(oLink)) _LBad += " no_link";
+			else{
+				if(Test_LinkInWall()) _LBad += " in_wall";
+				var _LRm = global.Level.Rooms[LockRoom];
+				if(oLink.x < _LRm.x || oLink.x >= _LRm.x + _LRm.width || oLink.y < _LRm.y || oLink.y >= _LRm.y + _LRm.height) _LBad += " outside(" + string(round(oLink.x)) + "," + string(round(oLink.y)) + ")";
+			}
+			if(global.CurrentRoomIndex != LockRoom) _LBad += " room(" + string(global.CurrentRoomIndex) + ")";
+			if(oCamera.RoomTransition != NONE) _LBad += " transition";
+			if(_LBad == "") Test_Log("lock held x=" + string(round(oLink.x)) + " y=" + string(round(oLink.y)));
+			else Test_Fail("lock passed:" + _LBad);
 			return true;
 
 		case "seams":	// the seams between neighbouring painted rooms (roadmap F12b-2): every 2x2 window of blocks across the edge of two of them fits the set's rules (sets/<Set>/Fit.json)

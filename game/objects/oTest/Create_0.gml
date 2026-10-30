@@ -8,6 +8,8 @@ ActivateAll = false;	// set by steps that build a level: oTest's Step activates 
 
 ExitVerb = "";		// verb the "exit" step holds to walk into the exit
 PaintedRoom = -1;	// room the "painted" step checks
+LockRoom = -1;		// room the "lock" step walks in, and the verb it holds
+LockVerb = "";
 
 LastLevel = undefined;
 LastRoom = -1;
