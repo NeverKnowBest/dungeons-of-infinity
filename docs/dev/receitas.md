@@ -82,6 +82,18 @@ Sala inteira pintada tile a tile com peças de uma área do ALttP, com colisão 
 11. Salas especiais da região: `specials` no `rooms.json` com uma moldura (o topo do castelo usa uma de topo mais baixo, para os objetos caberem). O `make_rooms.py` gera o mapa `Special` do conjunto e falha se alguma subclasse ficar sem sala.
 12. Prova: passo `painted` de um cenário (vai à primeira sala pintada e confere tile a tile: linha `painted ... mismatch=0`), `expect` com `free` depois de andar contra as paredes, e uma foto. Para achar uma semente em que a sala aparece, monte a fase em várias sementes (`level` com `seed`) e leia as linhas `roomset <Conjunto> rooms=N/M`. Exemplo: `tools/test/scenarios/castle_top_room.json`. Cobertura da fase: a linha `roomset` do cenário de medição, antes e depois, e a folha de contato.
 
+### Conjunto pintado por moldura (F12b-2, o jeito atual)
+
+As salas saem de regras aprendidas na ROM, não de peças recortadas: nenhuma emenda inválida chega ao jogo. Detalhes em `docs/dev/engine-notes.md` ("Automatic painting") e `tools/README.md` ("Rooms from a frame").
+
+1. Regras da região: `python tools/templates/tile_rules.py <regiao>` (grava `incoming/<regiao>/tiles/rules.json`; o validador acusa se ficar velho).
+2. Moldura (`data/room-templates/sets/<Conjunto>/frame.json`): a sala de referência que se emenda consigo mesma, a passagem de cada posição de porta (56, 112, 168 e 240 px) e o portão e a escada. Ela quase sempre precisa de junções (janelas 2x2 que a ROM não mostra): proponha em `incoming/<regiao>/tiles/joins.json` ("proposed"), mostre a folha numerada e só passe para "approved" o que o Guilherme aprovar. Recusadas ficam em "refused" para sempre. Emenda feia não se aprova por padrão: se uma emenda não fecha, evite o caso no gerador (decisão "Nada de vão nem de cruz nas emendas").
+3. No `rooms.json`: `kit` com `"auto": {"frame": "frame.json", "seeds": {...}}` (sementes de material, células da área, para o miolo das salas 1x2 e 2x1) e as salas em `painted` (nome, tamanho, portas, `"doors": "all"` para as de reserva).
+4. `python tools/templates/make_rooms.py <Conjunto>` (pinta, confere cada sala fechada, com cada porta aberta e com o portão, e para com a mensagem se algo não encaixa; grava `solver_cache.json`) e `python tools/templates/convert.py` (grava também `rooms/sets/<Conjunto>/Fit.json`).
+5. `python tools/check/validate.py`: zero erros de encaixe ("misfits", "border").
+6. Costuras: copie `tools/test/scenarios/castle_top_seams.json` para a fase e rode (`misfits=0` nas 12 sementes). Na falha, as linhas `seams edge` e `seams doors` dizem se é a moldura (bloco diferente na borda) ou uma porta aberta de um lado só (entrada ou saída encostada numa sala).
+7. Folha de contato: `python tools/test/run.py --sheet <Fase> --seeds 5`.
+
 ## Clima de uma fase (chuva, folhas, relâmpago, trovão, noite)
 
 1. Na ficha, `Weather = {...}` com os campos que mudam do padrão (`Weather_Defaults` em `scripts/__Weather`: `Rain`, `Leaves`, `Lightning`, `Thunder`, `ThunderDelay`, `ThunderGain`, `Tint`, `Volume`). Ex.: o topo do castelo tem `{Thunder: true}`, a entrada `{Leaves: true}`.

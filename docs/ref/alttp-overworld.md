@@ -75,6 +75,7 @@ Contagens do `stats` e medidas tiradas das imagens do `owdump.py png` sobre a gr
 * **Água.** Rios de 48 a 96 px com margem desenhada, lagos com margem recortada, pontes de 32 a 48 px nos caminhos.
 * **Casas.** Telhado de cerca de 96x64 com a porta no meio de baixo, um quintal com arbustos espelhados e às vezes cerca. Kakariko põe as casas numa grade, com sebes entre elas.
 * **Simetria.** As áreas são orgânicas no todo, mas os marcos são simétricos: casa e quintal, jardim do castelo, entrada de dungeon com estátuas dos dois lados.
+* **Muretas do castelo (0x1B, medido pelas regras de encaixe da F12b-2).** A mureta alta, com face, nunca é cortada: a passagem por ela é o portão ou uma escada. As muretas do fosso têm 1 a 2 blocos de 16 px, e do lado de fora vem o jardim ou a face externa do castelo; o creme grosso só existe em cima (a massa do castelo). Uma moldura creme em volta de uma sala inteira não existe na área.
 
 ## Outros Zeldas top down (só o que ajuda a decidir)
 

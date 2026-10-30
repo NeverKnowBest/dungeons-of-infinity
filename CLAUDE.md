@@ -43,7 +43,7 @@ O Guilherme diz qual é a etapa (e, se importar, em qual PC está). Leia os docu
 
 ## Git
 
-* O Guilherme faz o commit e o push no fim da entrega (GitHub Desktop). Repositório: `github.com/NeverKnowBest/dungeons-of-infinity`.
+* O Guilherme faz o commit e o push no fim da entrega (GitHub Desktop). Repositório: `github.com/NeverKnowBest/dungeons-of-infinity-gx`.
 * Ao trocar de PC, ele faz pull antes de começar. Se o `git status` mostrar mudanças pendentes ou o `git log` estiver atrás do `origin/main`, avise antes de editar.
 * Não crie branch nem faça commit por conta própria.
 

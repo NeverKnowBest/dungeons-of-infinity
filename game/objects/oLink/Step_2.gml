@@ -36,7 +36,7 @@ if(InitNewDungeon){
 		if(!Entrance) continue;
 		
 		//through a gate Link comes out of its doorway (RegionGate: the doorway is 32 to 64 px below the door cell)
-		var _LinkPosY = y + (other.ExitLook[$ "Arrive"] != undefined && Door_HasGate(id) ? 56 : (global.Level.StartDir == UP ? 15 : 23));
+		var _LinkPosY = y + (other.ExitLook[$ "Arrive"] != undefined && Door_HasGate(id) ? RegionGate_DY(id) + 40 : (global.Level.StartDir == UP ? 15 : 23));
 		other.y = _LinkPosY;
 		
 		if(other.ExitLook[$ "Arrive"] != undefined && Door_HasGate(id)){

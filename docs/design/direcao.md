@@ -2,6 +2,17 @@
 
 Este documento é o guia para as decisões artísticas e de design. O Guilherme dá liberdade criativa, desde que tudo pareça ter saído de um Zelda 2D, em especial de A Link to the Past. Quando algo não estiver coberto aqui, a pergunta é: "isso existiria no ALttP ou num Zelda 2D da Nintendo?". Se a resposta for não, repense.
 
+## Conceito (Guilherme, out/2026)
+
+**O DoI é um Zelda top down novo a cada run.** É o lugar onde o fã de Zelda experimenta tudo o que há na franquia num jogo só, com infinitas combinações. Quando o Zelda e o roguelike brigam, o Zelda ganha.
+
+* **A fantasia é explorar e descobrir**, não montar uma build. O prazer de uma boa run é ter achado segredos e entendido os lugares, não ter ficado forte demais.
+* **Itens como nos Zeldas.** Cada item se comporta quase exatamente como no jogo de origem: uns abrem caminhos, outros mudam o combate. Adaptação só quando o formato pede (como as kinstones do Minish Cap).
+* **Itens abrem segredos, nunca a progressão.** Nenhum item é necessário para terminar uma fase ou a run. Eles abrem lugares opcionais com recompensa: a varinha de fogo que o jogador escolheu levar na fase 1 acende as tochas de um puzzle opcional na fase 7, que leva a um item ou outro prêmio. O inventário limitado é parte do jogo (quase um survival horror): escolher o que carregar é uma aposta.
+* **Um jogo como espinha por run.** Cada run tem um Zelda como espinha, e os outros entram como desvios e ramificações pelas saídas da fase (saída X, Y ou as duas, e o jogador escolhe). Cada área tem as suas áreas seguintes e os seus ramos.
+* **Formato da run mantido.** O tamanho atual da run está bom, e salvar no meio continua como hoje.
+* **Morreu, acabou.** Sem rede de segurança além das que o próprio Zelda tem (fada na garrafa).
+
 ## Pilares
 
 1. **Parece ALttP.** Quem jogou o original reconhece salas, sons, menus e o jeito dos personagens.
@@ -19,6 +30,7 @@ Este documento é o guia para as decisões artísticas e de design. O Guilherme 
 * **Composição das salas.** Nada fica solto no meio do piso: cada peça segue um motivo das salas originais (cantos de cima, parede de cima, eixo do meio, paredes laterais, grade simétrica), em pares espelhados, com as portas e os caminhos livres. As salas criadas pelas ferramentas usam o catálogo de motivos medido nas salas do DoI (`tools/templates/motifs.py`); disposição nova entra no catálogo a partir de salas reais (do DoI, do ALttP ou de outro Zelda), nunca como coordenada inventada.
 * **Salas pintadas com arte do ALttP.** A sala é montada com peças recortadas de uma área real (moldura, aberturas, decoração), para manter a luz e a perspectiva do original: as faces das muretas olham para o sul e a sombra cai do lado em que cai no ALttP. Por isso a sala pintada só aparece no original ou espelhada na horizontal; virar de cabeça para baixo ou girar fica para peças que não têm lado (Guilherme aprovou a sala do telhado assim, out/2026).
 * **Mureta contínua e peças inteiras.** Numa sala pintada, a parede continua além da borda da sala, como no overworld do ALttP: duas salas vizinhas se ligam sem borda no meio. Toda peça vem inteira da ROM, com o contorno escuro; canto ou ponta montado com cor lisa parece cortado (Guilherme, out/2026).
+* **Emendas só como a ROM mostra.** Entre salas pintadas vizinhas, cada encontro de blocos tem de existir no mapa original ou ser uma junção aprovada pelo Guilherme uma a uma. Emenda que não fecha não vira junção por padrão: o gerador evita o caso (muda a porta de lugar, sorteia outra disposição). Vão encostado em mureta e quinas cruzadas foram recusados (out/2026).
 * **Salas especiais seguem a área.** Loja, tesouro, rupias, fada e as outras salas especiais combinam com a área onde aparecem: numa dungeon, o tema dela; numa região pintada, a moldura da região com os objetos da sala. Isso é feito pela ferramenta para toda região, não à mão (Guilherme, out/2026).
 * **Natureza invadindo.** Numa construção ao ar livre, a natureza pode tomar parte do piso: manchas irregulares de grama com moitas ou uma árvore no meio, sempre como motivo de composição (eixo, pares espelhados, caminhos das portas livres), nunca peça solta. As bordas da grama vêm da ROM, com o chão de baixo trocado pelo piso da região (Guilherme, out/2026).
 * **Ao ar livre, sem portas de dungeon.** Passagem é um corte na mureta; trancada vira bloco com fechadura no corte, secreta vira parede rachada ou lisa que abre com bomba, e a porta que fecha até matar os inimigos não existe. Entrada e saída usam uma porta do overworld do ALttP com a animação dela (Guilherme, out/2026).

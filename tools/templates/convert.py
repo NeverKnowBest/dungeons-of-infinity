@@ -560,6 +560,10 @@ def add_region(t, room, layers, tilesets, where):
             raise ConvertError('%s: room %s: Region and RegionGate use two tilesets' % (where, gm_str(room['id'])))
         if any(gate):
             t['Region']['gate'] = gate
+            # how far below its door cell the gate's doorway is (paint_auto: the 0x1B facade's palace door, 64 px)
+            gd = get_prop(room.get('properties'), 'GateDY')
+            if gd != -1:
+                t['Region']['gate_dy'] = float(gd)
     # sections: [[], group 1, ..., group 4] (index = the section group of Split_MainSectionIDs), [] where none
     secs = [[]]
     for ln in REGION_SECTION_LAYERS:
@@ -840,15 +844,28 @@ def save(data, out_dir, sets=None):
             with open(os.path.join(d, cls + '.json'), 'wb') as f:
                 f.write(raw)
             total += len(raw)
+        fit = fit_text(n)
+        if fit is not None:
+            with open(os.path.join(d, FIT + '.json'), 'wb') as f:
+                f.write(fit.encode('utf-8'))
     if os.path.isdir(sets_out):
         for n in os.listdir(sets_out):
             d = os.path.join(sets_out, n)
             for f in os.listdir(d):
-                if f[:-len('.json')] not in sets.get(n, {}):
+                if f[:-len('.json')] not in sets.get(n, {}) and not (f == FIT + '.json' and fit_text(n) is not None):
                     os.remove(os.path.join(d, f))
             if not os.listdir(d):
                 os.rmdir(d)
     return total
+
+
+FIT = 'Fit'     # sets/<Set>/Fit.json: the fitting rules of a set painted from a frame (tile_rules.fit_text)
+
+
+def fit_text(name):
+    """Fit.json of a room set painted from a frame (roadmap F12b-2), or None."""
+    import tile_rules
+    return tile_rules.fit_text(os.path.join(SETS_DIR, name))
 
 
 def set_files(sets):
@@ -856,6 +873,8 @@ def set_files(sets):
     out = [('datafiles/data/rooms', 'sets.json')]
     for n, classes in sets.items():
         out += [('datafiles/data/rooms/sets/' + n, cls + '.json') for cls in classes]
+        if fit_text(n) is not None:
+            out.append(('datafiles/data/rooms/sets/' + n, FIT + '.json'))
     return out
 
 

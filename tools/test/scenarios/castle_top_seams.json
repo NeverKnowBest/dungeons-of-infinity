@@ -1,0 +1,148 @@
+{
+ "comment": "Seams of the castle rooftops (roadmap F12b-2): builds the level in seeds 1 to 12 and checks, with the step seams, every 2x2 window of blocks across the edge of two neighbouring painted rooms against the fitting rules of the set (rooms/sets/CastleTop/Fit.json: the maps of area 0x1B and the approved joins). Line: seams pairs=N windows=N misfits=0.",
+ "name": "castle_top_seams",
+ "seed": 1,
+ "level": "CastleTop",
+ "max_frames": 30000,
+ "steps": [
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 2
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 3
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 4
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 5
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 6
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 7
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 8
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 9
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 10
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 11
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  },
+  {
+   "do": "level",
+   "level": "CastleTop",
+   "seed": 12
+  },
+  {
+   "do": "wait",
+   "frames": 30
+  },
+  {
+   "do": "seams"
+  }
+ ]
+}

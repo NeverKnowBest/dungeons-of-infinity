@@ -35,6 +35,7 @@ STEPS = {
     'sheet': {'level', 'seeds'},
     'paint': {'x', 'y', 'w', 'h', 'blocks', 'mirror', 'flip', 'transform'},
     'painted': {'index', 'at', 'remake'},
+    'seams': set(),
     'exit': {'which', 'frames'},
     'end': set(),
 }

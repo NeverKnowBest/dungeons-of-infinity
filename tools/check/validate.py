@@ -328,7 +328,7 @@ def check_gml(rep, registered, orphans, object_gml):
 def check_data(rep):
     for f in load_yy(YYP).get('IncludedFiles', []):
         p = os.path.join(GAME, f['filePath'], f['name'])
-        if not os.path.exists(p):
+        if resolve(p) is None:     # by resolve: the project says datafiles/Data where the disk has data (Linux)
             rep.error('included file in Zelda.yyp is missing on disk: game/%s/%s' % (f['filePath'], f['name']))
 
     data_files = [('data_d', os.path.join(GAME, 'datafiles', 'data', 'data_d'))]
@@ -339,6 +339,7 @@ def check_data(rep):
     parsed = {}
     for name, p in data_files:
         shown = os.path.relpath(p, REPO).replace(os.sep, '/')
+        p = resolve(p) or p
         if not os.path.exists(p):
             rep.error('missing %s' % shown)
         elif is_lfs_pointer(p):
@@ -458,6 +459,26 @@ def check_room_sets(rep, convert):
     diffs = make_rooms.selftest()
     for d in diffs:
         rep.error('tools/templates/make_rooms.py --selftest: %s' % d)
+    # sets painted from a frame (roadmap F12b-2): every room fits the rules and the approved joins, and repeats the
+    # frame's border (the seams between rooms); the fitting rules up to date with the region's tiles
+    import tile_rules
+    for n in sorted(sets):
+        sd = os.path.join(convert.TEMPLATE_DIR, 'sets', n)
+        rp = os.path.join(sd, 'rooms.json')
+        auto = (json.load(open(rp, encoding='utf-8')).get('kit') or {}).get('auto') if os.path.exists(rp) else None
+        if auto is None:
+            continue
+        frame = json.load(open(os.path.join(sd, auto.get('frame', 'frame.json')), encoding='utf-8'))
+        if not tile_rules.up_to_date(frame['region']):
+            rep.error('incoming/%s/tiles/rules.json is out of date; run python tools/templates/tile_rules.py %s'
+                      % (frame['region'], frame['region']))
+        # Fit.json (the step seams reads it) must hold the rules and joins of now
+        fp = os.path.join(convert.ROOMS_DIR, 'sets', n, convert.FIT + '.json')
+        if not os.path.exists(fp) or open(fp, encoding='utf-8').read() != tile_rules.fit_text(sd):
+            rep.error('room set %s: rooms/sets/%s/%s.json is out of date (run python tools/templates/convert.py)'
+                      % (n, n, convert.FIT))
+        for msg in tile_rules.check_set(sd, os.path.join(convert.ROOMS_DIR, 'sets', n)):
+            rep.error('room set %s: %s' % (n, msg))
 
 
 def check_tiles(rep, registered):

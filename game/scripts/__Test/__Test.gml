@@ -302,6 +302,96 @@ function Test_LinkInWall(){
 	return _In;
 }
 
+/// The block of the 16x16 cell (_BX, _BY) of a painted room, from its tiles as painted (RegionGrid, doors in use
+/// open): its number in the set's Fit.json quads, or -1
+function Test_SeamBlock(_Quads, _RoomIndex, _BX, _BY){
+	var _G = global.Level.Rooms[_RoomIndex].RegionGrid;
+	var _Key = "";
+	for(var t = 0; t < 4; t++){
+		var _V = _G.Tiles[(_BY * 2 + (t div 2)) * _G.W + _BX * 2 + (t mod 2)];
+		_Key += (t == 0 ? "" : ",") + string(_V & 0xFFFF) + ":" + string(_V >> 16);
+	}
+	return _Quads[$ _Key] ?? -1;
+}
+
+/// Every seam between two neighbouring painted rooms of the level (roadmap F12b-2): each 2x2 window of blocks across
+/// the edge (one column or row of each room, two blocks along it) must be on the region's maps or an approved join
+/// (rooms/sets/<Set>/Fit.json, tools/templates/tile_rules.py). Windows where four rooms meet are skipped: the screen
+/// never shows four rooms at once. Logs "seams pairs=N windows=N misfits=N" and fails on a misfit.
+function Test_CheckSeams(){
+	var _Buffer = buffer_load(GAMEDIR_ROOMTEMPLATES + "sets\\" + LevelDef.RoomSet + "\\Fit.json");
+	if(_Buffer == -1){
+		Test_Fail("seams: the level's room set has no Fit.json");
+		return;
+	}
+	var _Fit = json_parse(buffer_read(_Buffer, buffer_string));
+	buffer_delete(_Buffer);
+	var _Ok = {};
+	for(var i = 0; i < array_length(_Fit.fit); i++) _Ok[$ _Fit.fit[i]] = true;
+	var _M = global.Level.Map_RoomIndex;
+	var _Pairs = 0, _Windows = 0, _Bad = 0, _First = "";
+	for(var _GY = 0; _GY < array_length(_M); _GY++){
+		for(var _GX = 0; _GX < array_length(_M[_GY]); _GX++){
+			var _A = _M[_GY][_GX];
+			if(_A < 0 || !RegionRoom_Is(_A)) continue;
+			var _RA = global.Level.Rooms[_A];
+			for(var _Dir = 0; _Dir < 2; _Dir++){	// 0: the room to the right, 1: the room below
+				var _NX = _GX + (_Dir == 0), _NY = _GY + (_Dir == 1);
+				if(_NY >= array_length(_M) || _NX >= array_length(_M[_NY])) continue;
+				var _B = _M[_NY][_NX];
+				if(_B < 0 || _B == _A || !RegionRoom_Is(_B)) continue;
+				var _RB = global.Level.Rooms[_B];
+				_Pairs++;
+				// the 16 blocks of this grid cell along the edge, the window from each to the next
+				for(var k = 0; k < 16; k++){
+					var _Cells = [];	// [room, block x, block y] top left, top right, bottom left, bottom right
+					for(var q = 0; q < 2; q++){
+						var _Along = k + q;
+						var _CellA = (_Dir == 0) ? [_GX, _GY + (_Along div 16)] : [_GX + (_Along div 16), _GY];
+						var _CellB = (_Dir == 0) ? [_NX, _NY + (_Along div 16)] : [_NX + (_Along div 16), _NY];
+						if(_CellA[1] >= array_length(_M) || _CellA[0] >= array_length(_M[_CellA[1]]) || _CellB[1] >= array_length(_M) || _CellB[0] >= array_length(_M[_CellB[1]])) break;
+						if(_M[_CellA[1]][_CellA[0]] != _A || _M[_CellB[1]][_CellB[0]] != _B) break;	// four rooms meet
+						var _AX = (_CellA[0] - _RA.GridX) * 16, _AY = (_CellA[1] - _RA.GridY) * 16;
+						var _BXo = (_CellB[0] - _RB.GridX) * 16, _BYo = (_CellB[1] - _RB.GridY) * 16;
+						var _L = _Along mod 16;
+						if(_Dir == 0){
+							array_push(_Cells, [_A, _AX + 15, _AY + _L], [_B, _BXo, _BYo + _L]);
+						}else{
+							array_push(_Cells, [_A, _AX + _L, _AY + 15], [_B, _BXo + _L, _BYo]);
+						}
+					}
+					if(array_length(_Cells) < 4) continue;
+					// window order: top left, top right, bottom left, bottom right
+					var _W = (_Dir == 0) ? [_Cells[0], _Cells[1], _Cells[2], _Cells[3]] : [_Cells[0], _Cells[2], _Cells[1], _Cells[3]];
+					var _Key = "";
+					for(var t = 0; t < 4; t++) _Key += (t == 0 ? "" : ",") + string(Test_SeamBlock(_Fit.quads, _W[t][0], _W[t][1], _W[t][2]));
+					_Windows++;
+					if(!(_Ok[$ _Key] ?? false)){
+						_Bad++;
+						if(_First == "") _First = " first=rooms " + string(_A) + "/" + string(_B) + " (" + string(_RA.TemplateName) + "/" + string(_RB.TemplateName) + ") at " + string(_W[0][1]) + "," + string(_W[0][2]) + " blocks " + _Key;
+						if(_Bad == 1){	// both rooms' blocks along the edge, for finding which of them is off
+							var _RowA = "", _RowB = "";
+							for(var _I = 0; _I < 16; _I++){
+								var _LA = (_Dir == 0) ? [_W[0][1], _W[0][2] - (_W[0][2] mod 16) + _I] : [_W[0][1] - (_W[0][1] mod 16) + _I, _W[0][2]];
+								var _LB = (_Dir == 0) ? [_W[1][1], _W[1][2] - (_W[1][2] mod 16) + _I] : [_W[2][1] - (_W[2][1] mod 16) + _I, _W[2][2]];
+								_RowA += " " + string(Test_SeamBlock(_Fit.quads, _A, _LA[0], _LA[1]));
+								_RowB += " " + string(Test_SeamBlock(_Fit.quads, _B, _LB[0], _LB[1]));
+							}
+							Test_Log("seams edge A:" + _RowA + " B:" + _RowB);
+							var _DS = "";
+							for(var _I = 0; _I < array_length(_RA.Doors); _I++) _DS += " A" + _RA.Doors[_I].Location + "@" + string(_RA.Doors[_I].x) + "," + string(_RA.Doors[_I].y) + "=" + string(_RA.Doors[_I].Status);
+							for(var _I = 0; _I < array_length(_RB.Doors); _I++) _DS += " B" + _RB.Doors[_I].Location + "@" + string(_RB.Doors[_I].x) + "," + string(_RB.Doors[_I].y) + "=" + string(_RB.Doors[_I].Status);
+							Test_Log("seams doors" + _DS);
+						}
+					}
+				}
+			}
+		}
+	}
+	Test_Log("seams pairs=" + string(_Pairs) + " windows=" + string(_Windows) + " misfits=" + string(_Bad) + _First);
+	if(_Bad > 0) Test_Fail("seams misfits=" + string(_Bad));
+}
+
 /// Checks a painted room (roadmap F12b): every 8x8 cell of a solid tile is in one of the room's walls and no other is
 function Test_CheckPainted(_RoomIndex){
 	var _R = global.Level.Rooms[_RoomIndex];
@@ -365,7 +455,8 @@ function Test_GotoExit(_Extra){
 		var _Door = _R.Doors[i];
 		if(_Door.Status != DoorStatus.Exit || (_Door.Location != "Top" && _Door.Location != "Bottom") || (_Extra && _Door.Position != _Exits.ExtraPosition)) continue;
 		var _Top = (_Door.Location == "Top");
-		var _Front = (_Top && RegionGate_Get(_RoomIndex, _Door.x, _Door.y) != undefined) ? 64 : 40;	//below a gate's doorway (solid until he pushes it)
+		//below a gate's doorway (solid until he pushes it; GateDY under the door cell, 64 px in the rooms painted from a frame)
+		var _Front = (_Top && RegionGate_Get(_RoomIndex, _Door.x, _Door.y) != undefined) ? _R.RegionGrid.GateDY + 48 : 40;
 		Test_PlaceLink(_RoomIndex, [_R.x + _Door.x + 16, _R.y + _Door.y + 16 + (_Top ? _Front : -40)]);
 		global.TestExitDest = _Extra ? _Door.ExitDest : (global.SaveLevel ? Level_NextIndex() : _Exits.Dest);
 		Test_Log("exit " + (_Extra ? "extra" : "main") + " room=" + string(_RoomIndex) + " " + _Door.Location + " -> level " + string(global.TestExitDest));
@@ -624,6 +715,10 @@ function Test_DoStep(_S){
 			}
 			if(StepFrames < 10) return false;	// the room wakes up
 			Test_CheckPainted(PaintedRoom);
+			return true;
+
+		case "seams":	// the seams between neighbouring painted rooms (roadmap F12b-2): every 2x2 window of blocks across the edge of two of them fits the set's rules (sets/<Set>/Fit.json)
+			Test_CheckSeams();
 			return true;
 
 		case "sheet":

@@ -1160,7 +1160,7 @@ def main():
                 if os.path.exists(os.path.join(convert.SETS_DIR, n, 'rooms.json')):
                     try:
                         hs = load_set(n)
-                        print('%s: %s' % (n, ', '.join('%s (%s %s%s)' % (h.name, h.cls, ['1x1', '1x2'][h.size_index],
+                        print('%s: %s' % (n, ', '.join('%s (%s %s%s)' % (h.name, h.cls, ['1x1', '1x2', '2x1'][h.size_index],
                               ', sections ' + ','.join(str(s) for s in h.split_ids if s) if any(h.split_ids) else '')
                               for h in hs)))
                     except RoomError as e:
@@ -1199,6 +1199,11 @@ def main():
     except (RoomError, convert.ConvertError) as e:
         print('error:', e)
         return 1
+    kits = {getattr(h, 'kit', None) for h in halves if getattr(h, 'painted', False)}
+    for k in kits:
+        if k is not None and k.auto is not None:
+            k.auto.save_cache()      # the solver's paintings of this build (paint_auto.py)
+            print('wrote', os.path.relpath(k.auto.cache_path, convert.REPO))
     for w in warnings:
         print('warning:', w)
     for f in written:

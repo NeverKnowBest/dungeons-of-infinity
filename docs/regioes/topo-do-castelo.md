@@ -3,6 +3,7 @@
 Piloto do plano de ferramentas: a primeira região feita pelo fluxo novo (spec, importação, ficha de fase, templates, inimigos, validador, teste). Reaproveita os inimigos do castelo, então o risco fica nas ferramentas e não em mecânicas novas.
 
 * **Estado:** em produção
+* **Repintado pela F12b-2 (out/2026):** todas as salas saem da moldura aprovada (borda creme contínua, passagens dos modelos A e B, portão na fatia da fachada, escada), conferidas pelas regras da ROM; a entrada e a saída vão para o portão ou para onde não há sala atrás. Falta o Guilherme jogar.
 * **Revisão em andamento:** a terceira rodada (out/2026) resolveu as quatro pendências da segunda (salas com seção pintadas, muretas que se encaixam, portão, clima conferido); falta o Guilherme jogar e aprovar
 * **Origem:** ALttP, Castelo de Hyrule na noite da chuva (abertura do jogo), parte de fora e alta do castelo
 * **Tipo:** telhado do castelo visto de cima (área 0x1B do overworld do ALttP), montado como uma dungeon (`Layout` Outdoor, layouts do castelo)

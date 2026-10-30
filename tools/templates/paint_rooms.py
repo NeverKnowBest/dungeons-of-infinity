@@ -39,6 +39,7 @@ import json
 import os
 
 import convert
+import paint_auto
 import paint_sections
 
 GRID = 8
@@ -46,7 +47,8 @@ SIZES = {'1x1': (256, 256, 0), '1x2': (256, 512, 1), '2x1': (512, 256, 2)}    # 
 ROOM_KEYS = {'name', 'size', 'doors', 'decor', 'transforms', 'props', 'comment', 'frame', 'nature', 'sections', 'fallback'}
 SPECIAL_KEYS = {'frame', 'comment'}
 SPECIAL_LAYERS = ('Water', 'FloorObjs', 'Objs')      # the objects of a special room that are copied into its painted copy
-KIT_KEYS = {'tiles', 'area', 'pieces', 'frame', 'frames', 'openings', 'gate', 'grass', 'nature', 'parapet', 'comment'}
+KIT_KEYS = {'tiles', 'area', 'pieces', 'frame', 'frames', 'openings', 'gate', 'grass', 'nature', 'parapet', 'auto',
+            'comment'}
 GRASS_KEYS = ('full', 'top', 'bottom', 'left', 'corner', 'inner')
 # Nature motifs (docs/design/direcao.md, "Natureza invadindo"): solid pieces on a patch of grass that spreads over the
 # floor. Trees: one in the middle of each half of a 2x1 or 1x2 room (a pair); bushes: a 2x2 clump on each side of the
@@ -78,6 +80,20 @@ class Kit:
         folder = os.path.dirname(os.path.normpath(os.path.join(TILESETS_DIR, tsj['image'])))
         tiles = json.load(open(os.path.join(folder, 'tiles.json'), encoding='utf-8'))
         self.blocks = [b['tiles'] for b in tiles['blocks']]
+        self.auto = None
+        if d.get('auto') is not None:
+            # rooms painted from the set's frame under the fitting rules (roadmap F12b-2, paint_auto.py)
+            set_dir = os.path.join(convert.TEMPLATE_DIR, 'sets', where.split()[0])
+            try:
+                self.auto = paint_auto.AutoKit(d['auto'], folder, set_dir, where)
+            except paint_auto.AutoError as e:
+                raise PaintError(str(e))
+            self.blocks = self.auto.rules.blocks
+            data = os.path.join(convert.REPO, 'game', 'datafiles', 'data', 'tiles', self.name + '.json')
+            self.solid = json.load(open(data, encoding='utf-8'))['solid']
+            self.frames, self.frame, self.openings, self.gate, self.grass = {'': {}}, {}, {}, {}, {}
+            self.parapet, self.nature, self.pieces = None, {}, {}
+            return
         # recolored copies of area cells (tiles/extra.json): (map16, recolor name) -> block
         self.recolored = {(b['map16'], b['recolor']): i for i, b in enumerate(tiles['blocks']) if b.get('recolor')}
         self.block_map16 = [b['map16'] for b in tiles['blocks']]
@@ -235,6 +251,8 @@ class Painted:
 
     def build(self):
         k, d, where = self.kit, self.d, self.where
+        if k.auto:
+            return self.build_auto()
         W, H = self.w, self.h
         if d.get('frame', '') not in k.frames:
             raise PaintError('%s: no frame "%s" in the kit (frames: %s)' % (where, d.get('frame'), ', '.join(sorted(k.frames))))
@@ -309,6 +327,158 @@ class Painted:
         else:
             self.furnish()
             self.sections()
+
+    def build_auto(self):
+        """The room from the set's frame (paint_auto.py): the shared border around the reference room's inside, the
+        decoration, the passage of each door and the gate of the level's entrance or exit, each checked against the
+        fitting rules and the approved joins."""
+        k, d, where = self.kit, self.d, self.where
+        A = k.auto
+        W, H, cw, ch = self.w, self.h, self.cw, self.ch
+        self.inner = (16, 16, W - 16, H - 16)
+        g = A.room(cw, ch)
+        self.decor_boxes = []
+        for dd in d.get('decor', []):
+            if not isinstance(dd, dict) or any(key not in DECOR_KEYS for key in dd):
+                raise PaintError('%s: decor is {"piece", "at": [x, y], "pair", "mirror"}' % where)
+            if dd.get('piece') not in A.pieces:
+                raise PaintError('%s: no piece "%s" in the kit\'s auto pieces' % (where, dd.get('piece')))
+            piece = A.pieces[dd['piece']]
+            x, y = dd.get('at', [0, 0])
+            if x % 16 or y % 16:
+                raise PaintError('%s: decor %s at %d,%d is off the 16 px grid of the blocks' % (where, dd['piece'], x, y))
+            pw, ph = len(piece[0]), len(piece)
+            spots = [(x // 16, y // 16, dd.get('mirror', False))]
+            if dd.get('pair'):
+                spots.append((cw - x // 16 - pw, y // 16, not dd.get('mirror', False)))
+            for sx, sy, m in spots:
+                for j in range(ph):
+                    for i in range(pw):
+                        b = piece[j][pw - 1 - i] if m else piece[j][i]
+                        if m:
+                            if b not in A.rules.mirror_of:
+                                raise PaintError('%s: decor %s mirrored needs the frame\'s "mirror"' % (where, dd['piece']))
+                            b = A.rules.mirror_of[b]
+                        g[sy + j][sx + i] = b
+                self.decor_boxes.append((sx * 16, sy * 16, pw * 16, ph * 16))
+        if cw > 16 or ch > 16:
+            # a room larger than the frame's: the solver paints its inside around the border and the decoration
+            fixed = {(x, y) for y in range(ch) for x in range(cw) if x in (0, cw - 1) or y in (0, ch - 1)}
+            fixed |= {(bx // 16 + i, by // 16 + j) for bx, by, bw, bh in self.decor_boxes
+                      for i in range(bw // 16) for j in range(bh // 16)}
+            try:
+                g = A.paint(g, fixed, cw, ch)
+            except paint_auto.AutoError as e:
+                raise PaintError('%s: %s' % (where, e))
+        coords = convert.DOOR_XY[self.size_index]
+        doors = d.get('doors')
+        self.all_doors = False
+        if not isinstance(doors, list) or not doors:
+            raise PaintError('%s: "doors" lists the door positions of the room (1 to 12)' % where)
+        self.doors, opens, owner, gates = {}, {}, {}, {}
+        for p in doors:
+            if not isinstance(p, int) or not 1 <= p <= 12:
+                raise PaintError('%s: door %s is not a position 1 to 12' % (where, p))
+            loc = convert.door_location(p)
+            x, y = coords[(p - 1) * 2], coords[(p - 1) * 2 + 1]
+            box = {'Top': (x, y, 32, 24), 'Bottom': (x, y, 32, 24), 'Left': (x, y, 24, 32), 'Right': (x, y, 24, 32)}[loc]
+            gid = {'Top': 'DoorT', 'Bottom': 'DoorB', 'Left': 'DoorL', 'Right': 'DoorR'}[loc]
+            self.doors[p] = (loc, box)
+            self.add('Doors', gid, box)
+            off = x if loc in ('Top', 'Bottom') else y
+            try:
+                cells = A.passage(loc, off, cw, ch)
+                gate = A.gate(loc, off, cw, ch)
+                if A.misfits(self.with_cells(g, cells)):
+                    cells = self.repaint_door(g, cells, loc, x, y)
+            except paint_auto.AutoError as e:
+                raise PaintError('%s: door %d: %s' % (where, p, e))
+            for c, b in cells.items():
+                if c in opens and opens[c] != b:
+                    raise PaintError('%s: doors %d and %d need different blocks at %d,%d (neighbouring doors share '
+                                     'the end of a passage: give the room one of them)' % (where, owner[c], p, c[0], c[1]))
+                opens[c], owner[c] = b, p
+            if gate and not any(convert.rect_overlap((gx * 16, gy * 16, gx * 16 + 15, gy * 16 + 15),
+                                                     (o[0], o[1], o[0] + o[2] - 1, o[1] + o[3] - 1))
+                                for gx, gy in gate for o in self.object_boxes + self.decor_boxes):
+                gates[p] = gate
+
+        def misfit(cells, what):
+            bad = A.misfits(self.with_cells(g, cells))
+            if bad:
+                x, y, kind = bad[0]
+                raise PaintError('%s: %s does not fit at block %d,%d (%s; %d misfits): blocks the maps never put '
+                                 'together and no approved join (incoming/<region>/tiles/joins.json)'
+                                 % (where, what, x, y, kind, len(bad)))
+        misfit({}, 'the room')
+        for p in self.doors:
+            misfit({c: b for c, b in opens.items() if owner[c] == p}, 'door %d open' % p)
+        for p, gate in gates.items():
+            misfit(gate, 'the gate of door %d' % p)
+        self.block_grid = g
+        self.open_cells = opens
+        self.gate_cells = gates
+
+        def put(grid, x, y, b):
+            for q, t in enumerate(A.tiles(b)):
+                grid[y * 2 + q // 2][x * 2 + q % 2] = (t[0], t[1]) if t[0] else None
+        for y in range(ch):
+            for x in range(cw):
+                put(self.base, x, y, g[y][x])
+        for (x, y), b in opens.items():
+            put(self.open, x, y, b)
+        # a top door's cell (16 to 48 px down) is below the border's cut: the floor under the cut goes on the open
+        # layer too, so the game's flood from the door cell reaches it (RegionRoom_OpenPassage); a passage painted
+        # again (repaint_door) keeps its own blocks there
+        for p, (loc, (x, y, w, h)) in self.doors.items():
+            if loc == 'Top':
+                for bx in range(x // 16, (x + 32 + 15) // 16):
+                    if (bx, 0) in opens:
+                        for by in (1, 2):
+                            put(self.open, bx, by, opens.get((bx, by), g[by][bx]))
+        self.gate_doors, self.gate_boxes = [], []
+        for p, gate in sorted(gates.items()):
+            for (x, y), b in gate.items():
+                put(self.gate, x, y, b)
+            xs = [c[0] for c in gate]
+            ys = [c[1] for c in gate]
+            self.gate_doors.append(p)
+            self.gate_boxes.append((min(xs) * 16, min(ys) * 16, (max(xs) - min(xs) + 1) * 16, (max(ys) - min(ys) + 1) * 16))
+        self.bare = [row[:] for row in self.base]
+        self.check_passages()
+        if self.special:
+            self.copy_objects()
+        else:
+            self.furnish()
+            self.sections()
+
+    @staticmethod
+    def with_cells(g, cells):
+        gg = [row[:] for row in g]
+        for (x, y), b in cells.items():
+            gg[y][x] = b
+        return gg
+
+    def repaint_door(self, g, cells, loc, x, y):
+        """The passage of a door whose frame cells do not fit the inside the solver painted: a box around it painted
+        again with the cells fixed and its lane walkable. Returns every cell the open door changes."""
+        A, cw, ch = self.kit.auto, self.cw, self.ch
+        if loc in ('Top', 'Bottom'):
+            c0, c1 = x // 16, (x + 32 + 15) // 16
+            ys = range(0, 7) if loc == 'Top' else range(ch - 7, ch)
+            box = {(bx, by) for bx in range(c0 - 3, c1 + 3) for by in ys}
+            lane = {(bx, by) for bx in range(c0, c1) for by in (range(0, 5) if loc == 'Top' else range(ch - 5, ch))}
+        else:
+            c0, c1 = y // 16, (y + 32 + 15) // 16
+            xs = range(0, 7) if loc == 'Left' else range(cw - 7, cw)
+            box = {(bx, by) for by in range(c0 - 3, c1 + 3) for bx in xs}
+            lane = {(bx, by) for by in range(c0, c1) for bx in (range(0, 5) if loc == 'Left' else range(cw - 5, cw))}
+        gg = self.with_cells(g, cells)
+        # the border stays the frame's (or the frame's passage), or the neighbouring room would not meet it
+        fixed = {(bx, by) for by in range(ch) for bx in range(cw)
+                 if (bx, by) not in box or bx in (0, cw - 1) or by in (0, ch - 1)} | set(cells)
+        new = A.paint(gg, fixed, cw, ch, lanes=lane - set(cells), what='the passage of a door at %d,%d' % (x, y))
+        return {(bx, by): new[by][bx] for by in range(ch) for bx in range(cw) if new[by][bx] != g[by][bx]}
 
     def copy_objects(self):
         """The special room's own objects (shop, rupees, chests, fountain...), refused where they would stand on the
@@ -569,7 +739,9 @@ class Painted:
         size = (self.w, self.h)
         try:
             shapes = paint_sections.shapes(size)
-            par = paint_sections.Parapet(self.kit, self.kit.frames[self.d.get('frame', '')], self.where)
+            # a room painted from a frame has no low wall yet: its section stays open (roadmap F12b-2)
+            par = None if self.kit.auto else paint_sections.Parapet(self.kit, self.kit.frames[self.d.get('frame', '')],
+                                                                    self.where)
         except paint_sections.SectionError as e:
             raise PaintError(str(e))
         cols, rows = paint_sections.BANDS[size]
@@ -584,11 +756,12 @@ class Painted:
             self.split_ids[g] = sid
             sec, wall = shapes[sid]
             missing = [p for p in paint_sections.doors_of(sec) if p not in self.doors]
-            if missing:
+            if missing and par is not None:
                 raise PaintError('%s: the section needs doors %s' % (where, missing))
             grid = [[None] * len(self.base[0]) for _ in self.base]
             try:
-                par.paint(grid, wall, cols, rows, self.w, self.h)
+                if par is not None:
+                    par.paint(grid, wall, cols, rows, self.w, self.h)
             except paint_sections.SectionError as e:
                 raise PaintError(str(e))
             self.section_grids[g] = grid
@@ -630,7 +803,8 @@ class Painted:
                         # a pot too: a chest wants 16 px free around it, more than a strip under the top wall has,
                         # and a key may go in a pot (SpawnPots)
                         self.add('Pots', 'Pot', spot + (16, 16), group=g)
-            self.check_section(sid, grid, (sx0, sy0, sx1, sy1), (mx0, my0, mx1, my1))
+            if par is not None:
+                self.check_section(sid, grid, (sx0, sy0, sx1, sy1), (mx0, my0, mx1, my1))
 
     def check_section(self, sid, grid, sbox, mbox):
         """With every door open and the section's wall up, its area and the main floor do not meet."""
@@ -664,8 +838,14 @@ class Painted:
         if self.special:
             p = dict(self.special['props'])
             p['Transforms'] = 'None'            # special rooms are picked untransformed (RoomTemplates_PickSpecial)
+            if self.kit.auto and self.gate_doors:
+                p['GateDY'] = self.kit.auto.gate_dy
             return p
-        p = {'Whole': 1, 'Transforms': self.d.get('transforms', ','.join(convert.DEFAULT_PAINTED_TRANSFORMS))}
+        # a room painted from a frame is never turned: a mirror would change its border, which every room shares
+        default = 'None' if self.kit.auto else ','.join(convert.DEFAULT_PAINTED_TRANSFORMS)
+        p = {'Whole': 1, 'Transforms': self.d.get('transforms', default)}
+        if self.kit.auto and self.gate_doors:
+            p['GateDY'] = self.kit.auto.gate_dy     # how far below the door cell the gate's doorway is (RegionRoom_Paint)
         if self.d.get('fallback', self.all_doors):
             p['Fallback'] = 1       # picked only when no other room of the set fits (RoomTemplates_Pick)
         p.update(self.d.get('props') or {})
@@ -728,13 +908,69 @@ def specials(d, kit, where):
                 q['x'], q['y'] = o['x'] - x0, o['y'] - y0
                 objects.setdefault(layer, []).append(q)
         props = {q['name']: q['value'] for q in r.get('properties', [])}
-        room = {'name': '%s%d' % (r['type'], r['id']), 'size': '1x1', 'doors': list(range(1, 13)), 'frame': spec.get('frame', '')}
-        try:
-            out.append(Painted(room, kit, '%s special %s' % (where, room['name']),
-                               {'type': r['type'], 'objects': objects, 'props': props}))
-        except PaintError:
-            skipped.setdefault(r['type'], []).append(r['id'])
+        sets = auto_variants(kit, '1x1', cover=True) if kit.auto else [list(range(1, 13))]
+        for v, doors in enumerate(sets):
+            room = {'name': '%s%d' % (r['type'], r['id']) + ('_%d' % (v + 1) if len(sets) > 1 else ''), 'size': '1x1',
+                    'doors': doors, 'frame': spec.get('frame', '')}
+            try:
+                out.append(Painted(room, kit, '%s special %s' % (where, room['name']),
+                                   {'type': r['type'], 'objects': objects, 'props': props}))
+            except PaintError:
+                skipped.setdefault(r['type'], []).append(r['id'])
     return out, skipped
+
+
+def auto_variants(kit, size, cover=False):
+    """Door sets for a room of a frame-painted set that would take every door: neighbouring doors whose passages end
+    in the same cell with different blocks cannot share a room, and the layouts never use two neighbours, so the
+    room comes in variants, the largest sets of doors that do not clash (cover: only as many as it takes for each
+    door to be in one, for rooms that use one door at a time)."""
+    w, h, si = SIZES[size]
+    cw, ch = w // 16, h // 16
+    coords = convert.DOOR_XY[si]
+    cells = {}
+    for p in range(1, 13):
+        loc = convert.door_location(p)
+        x, y = coords[(p - 1) * 2], coords[(p - 1) * 2 + 1]
+        cells[p] = kit.auto.passage(loc, x if loc in ('Top', 'Bottom') else y, cw, ch)
+    clash = {p: {q for q in cells if q != p and any(c in cells[q] and cells[q][c] != b for c, b in cells[p].items())}
+             for p in cells}
+    out = []
+
+    def grow(chosen, rest):
+        if not rest:
+            out.append(sorted(chosen))
+            return
+        p = rest[0]
+        if not (clash[p] & set(chosen)):
+            grow(chosen + [p], rest[1:])
+        grow(chosen, rest[1:])
+    grow([], list(range(1, 13)))
+    out = [v for v in out if not any(set(v) < set(o) for o in out)]
+    if cover:
+        picked, covered = [], set()
+        while covered != set(cells):
+            v = max(out, key=lambda v: (len(set(v) - covered), len(v)))
+            picked.append(v)
+            covered |= set(v)
+        out = picked
+    return out
+
+
+def expand_all(kit, rooms):
+    """The rooms of a frame-painted set with "doors": "all" as their variants (auto_variants), each a fallback."""
+    out = []
+    for r in rooms:
+        if r.get('doors') != 'all':
+            out.append(r)
+            continue
+        for v, doors in enumerate(auto_variants(kit, r.get('size', '1x1'))):
+            q = dict(r)
+            q['name'] = '%s_%d' % (r.get('name'), v + 1)
+            q['doors'] = doors
+            q['fallback'] = True
+            out.append(q)
+    return out
 
 
 def load(d, where):
@@ -747,6 +983,8 @@ def load(d, where):
     kit = Kit(d['kit'], where + ' kit')
     names = set()
     out = []
+    if kit.auto:
+        rooms = expand_all(kit, rooms)
     for i, r in enumerate(rooms):
         w = '%s painted %d (%s)' % (where, i, r.get('name', '?'))
         if r.get('name') in names:

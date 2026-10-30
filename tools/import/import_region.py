@@ -73,7 +73,8 @@ def source_files(d):
     for root, _, files in os.walk(d):
         for f in files:
             rel = os.path.relpath(os.path.join(root, f), d).replace(os.sep, '/')
-            if rel != 'imported.json' and not f.lower().endswith('.md'):
+            # tiles/rules.json (tile_rules.py) and tiles/joins.json (approved joins) are fitting rules, not imported
+            if rel not in ('imported.json', 'tiles/rules.json', 'tiles/joins.json') and not f.lower().endswith('.md'):
                 out.append(rel)
     return sorted(out)
 

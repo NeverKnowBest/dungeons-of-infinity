@@ -386,7 +386,10 @@ function RegionRoom_Paint(_RoomIndex){
 			if(_V != 0) _Gate[_Cell[1] * _RW + _Cell[0]] = (_V & 0xFFFF) | (RegionTiles_TransformFlags(_V >> 16, _Tr) << 16);
 		}
 	}
-	_R.RegionGrid = {W : _RW, H : _RH, Tiles : _Base, Open : _Open, Gate : _Gate, Section : _Sec, Gates : [], Walls : []};
+	//GateDY: how far below its door cell the gate's doorway is (16 for a gate under the door cell; the rooms painted
+	//from a frame put the 0x1B palace door in a slice of its facade, 64 px down: paint_auto.py, roadmap F12b-2)
+	_R.RegionGrid = {W : _RW, H : _RH, Tiles : _Base, Open : _Open, Gate : _Gate, Section : _Sec, Gates : [], Walls : [],
+		GateDY : _Reg[$ "gate_dy"] ?? 16};
 	var _TM = RegionTiles_Tilemap(UPPER);
 	for(var k = 0; k < _RW * _RH; k++){
 		tilemap_set_at_pixel(_TM, _Base[k] == 0 ? 0 : RegionTiles_TileData(_Base[k]), _R.x + (k mod _RW) * 8, _R.y + (k div _RW) * 8);
@@ -441,7 +444,9 @@ function RegionRoom_OpenPassage(_RoomIndex, _DX, _DY, _RemakeWalls = true, _Gate
 		if(!_Gate){
 			var _PX = (_K mod _G.W) * 8;
 			var _PY = (_K div _G.W) * 8;
-			if(_PX < _DX - 16 || _PX >= _DX + 48 || _PY < _DY - 16 || _PY >= _DY + 48) continue;
+			//24 px around the door cell: the ends of a passage of a room painted from a frame (paint_auto.py) stand
+			//a block beside its lane, which for the doors at 56 and 168 px reaches 24 px out
+			if(_PX < _DX - 24 || _PX >= _DX + 56 || _PY < _DY - 24 || _PY >= _DY + 56) continue;
 			//where the low wall of the room's section meets the frame, it stays: the passage opens only the lane Link
 			//walks through (the 32 px of the door cell across)
 			if(_G.Section[_K] != 0){
@@ -532,7 +537,7 @@ function RegionRoom_SolidAt(_G, _Solid, i, j){
 	if(_T == 0 || _Solid[_T & 0xFFFF] == 0) return false;
 	for(var g = 0; g < array_length(_G.Gates); g++){
 		var _Gt = _G.Gates[g];
-		if(_Gt.Open && _Gt.Location == "Top" && i >= _Gt.X div 8 && i < (_Gt.X + 32) div 8 && j < (_Gt.Y + 48) div 8) return false;
+		if(_Gt.Open && _Gt.Location == "Top" && i >= _Gt.X div 8 && i < (_Gt.X + 32) div 8 && j < (_Gt.Y + _G.GateDY + 32) div 8) return false;
 	}
 	return true;
 }
@@ -549,7 +554,7 @@ function RegionGate_Frame(_RoomIndex, _DX, _DY, _Frame){
 	var _TM = RegionTiles_Tilemap(UPPER);
 	for(var k = 0; k < 4; k++){
 		var _X = _DX + (k mod 2) * 16;
-		var _Y = _DY + 16 + (k div 2) * 16;
+		var _Y = _DY + _G.GateDY + (k div 2) * 16;
 		if(_Frame == 0 || _Blocks == undefined){
 			for(var t = 0; t < 4; t++){
 				var _K = ((_Y div 8) + (t div 2)) * _G.W + (_X div 8) + (t mod 2);

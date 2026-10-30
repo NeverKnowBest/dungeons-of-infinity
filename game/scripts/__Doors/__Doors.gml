@@ -90,15 +90,47 @@ function RegionGate_Push(_DoorInst){
 	if(!instance_exists(oLink) || global.Paused) return;
 	var _Gt = RegionGate_Get(_DoorInst.RoomIndex, _DoorInst.x - global.Level.Rooms[_DoorInst.RoomIndex].x, _DoorInst.y - global.Level.Rooms[_DoorInst.RoomIndex].y);
 	if(_Gt == undefined) return;
+	var _DY = RegionGate_DY(_DoorInst);
 	with(oLink){
 		if(Facing != UP || (State != LinkState.Standing && State != LinkState.Walking && State != LinkState.Pushing)) return;
-		if(abs(x - (_DoorInst.x + 16)) > 8 || y > _DoorInst.y + 74) return;
+		if(abs(x - (_DoorInst.x + 16)) > 8 || y > _DoorInst.y + _DY + 58) return;
 		if(!_Gt.Open){
-			if(y >= _DoorInst.y + 56) RegionGate_Open(_DoorInst);
-		}else if(y < _DoorInst.y + 60){
+			if(y >= _DoorInst.y + _DY + 40) RegionGate_Open(_DoorInst);
+		}else if(y < _DoorInst.y + _DY + 44){
 			Link_TakeExit(_DoorInst, TOP);
 		}
 	}
+}
+
+/// How far below a gate door's cell its doorway is (RegionGrid.GateDY; 16 where the room has no grid)
+function RegionGate_DY(_DoorInst){
+	var _G = global.Level.Rooms[_DoorInst.RoomIndex][$ "RegionGrid"];
+	return (_G == undefined) ? 16 : _G.GateDY;
+}
+
+/// Where a secret door of a painted room shows its crack: the block of the room's border in front of the door
+/// cell, only when all of it is wall ("rachadura só em mureta", roadmap F12b-2); undefined where it would be on
+/// the floor or on anything else (the door is then a blank wall). Px in the room.
+function RegionRoom_CrackSpot(_DoorInst){
+	var _R = global.Level.Rooms[_DoorInst.RoomIndex];
+	var _G = _R[$ "RegionGrid"];
+	if(_G == undefined) return undefined;
+	var _DX = _DoorInst.x - _R.x;
+	var _DY = _DoorInst.y - _R.y;
+	var _PX, _PY;
+	switch(_DoorInst.Location){
+		case "Top":		_PX = _DX + 8; _PY = 0; break;
+		case "Bottom":	_PX = _DX + 8; _PY = _G.H * 8 - 16; break;
+		case "Left":	_PX = 0; _PY = _DY + 8; break;
+		default:		_PX = _G.W * 8 - 16; _PY = _DY + 8; break;
+	}
+	_PX = _PX div 16 * 16;
+	_PY = _PY div 16 * 16;
+	var _Solid = RegionTiles_Get(LevelDef.RegionTiles).solid;
+	for(var t = 0; t < 4; t++){
+		if(!RegionRoom_SolidAt(_G, _Solid, _PX div 8 + (t mod 2), _PY div 8 + (t div 2))) return undefined;
+	}
+	return [_PX, _PY];
 }
 
 #macro GATE_SHUT_FRAMES 64	// a gate Link arrives through shuts this long after the level is built: his stair frames and 24 walking
@@ -450,7 +482,11 @@ function Door_DrawTiles(Inst){
 					_Painted = true;
 					ClearTileBlock(TMID_Decor, x, y, 4, 4);
 					ClearTileBlock(TMID_Beam, x, y, 4, 4);
-					if(SecretType == SecretDoor.Crack) DrawTileBlock(TMID_Decor, x + 8, y + (Location == "Top" ? 24 : 8), 94, TilesY + 4, 2, 2);
+					if(SecretType == SecretDoor.Crack){
+						//on the block of the border in front of the door, only where it is all wall
+						var _Spot = RegionRoom_CrackSpot(id);
+						if(_Spot != undefined) DrawTileBlock(TMID_Decor, global.Level.Rooms[RoomIndex].x + _Spot[0], global.Level.Rooms[RoomIndex].y + _Spot[1], 94, TilesY + 4, 2, 2);
+					}
 					exit;
 			}
 			if(_Painted){

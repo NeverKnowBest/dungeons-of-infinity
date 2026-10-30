@@ -191,6 +191,15 @@ function Dungeon_CreateStruct_Level(_LevelIndex) constructor{
 	}
 	
 	DungeonTemplate = global.Templates_Dungeon[Class][Transformation][DungeonTemplate_Index];
+	//rooms painted from one frame share their border (roadmap F12b-2): a layout with a seam the frame cannot paint is
+	//drawn again (Dungeon_LayoutSeamsOk), only in levels with a region tileset
+	for(var _Try = 0; _Try < 12 && Class != DungeonClass.Special && global.LevelDefs[_LevelIndex].RegionTiles != ""
+		&& !Dungeon_LayoutSeamsOk(DungeonTemplate, _LevelIndex); _Try++){
+		Test_Event("layout " + string(DungeonTemplate_Index) + " drawn again (a seam the painted rooms cannot meet)");
+		Transformation = Dungeon_PickTemplateTransformation(Index);
+		DungeonTemplate_Index = Dungeon_PickTemplateIndex(Index, Class, Transformation);
+		DungeonTemplate = global.Templates_Dungeon[Class][Transformation][DungeonTemplate_Index];
+	}
 	
 	RoomCount = array_length(DungeonTemplate.Rooms);
 	
@@ -1129,35 +1138,139 @@ function Dungeon_DropExtraExit(_RoomIndex){
 	_Exits.ExtraSecret = false;
 }
 
-/// ExitWall "Top" (the castle rooftops: their exit is a gate, which only fits a top wall): the main exit, a door of the
-/// layout in the bottom wall, moves to the middle of the top wall of the same 1x1 room when no room is above it and no
-/// door of the room is there or beside it. Otherwise it stays where it is (the stairs of OwnExitLooks.Bottom).
+/// ExitWall "Top" (the castle rooftops, painted rooms that share their border, roadmap F12b-2): the level's entrance and
+/// main exit are doors of the layout, and their passage (or the stairs) would meet the closed border of a room behind
+/// that wall. The main exit moves to the middle of the top wall of a room one column wide, where the frame has the gate,
+/// which leaves the border as it is (whatever is behind); a top entrance with a room behind it does the same. Where
+/// that is taken, an exit with a room behind takes a top or bottom position with nothing behind, and an entrance a
+/// position of its own wall with nothing behind. A bottom exit with nothing behind only moves to the gate.
+/// A new position takes no door beside a door in use (their passages would touch). Where no position is free the door
+/// stays (Test_CheckSeams then reports the seam).
 function Dungeon_ExitToTop(){
 	if(LevelDef.ExitWall != "Top") exit;
 	for(var _RoomIndex = 0; _RoomIndex < global.Level.RoomCount; _RoomIndex++){
-		if(Room.GridW != 1 || Room.GridH != 1) continue;
 		for(var d = 0; d < Room.DoorCount; d++){
 			var _Door = Room.Doors[d];
-			if(_Door.Status != DoorStatus.Exit || _Door.Location != "Bottom") continue;
-			var _Free = Room.GridY > 0 && global.Level.Map_RoomIndex[Room.GridY - 1][Room.GridX] == -1;
-			for(var e = 0; e < Room.DoorCount; e++){
-				var _P = Room.Doors[e].Position;
-				if(Room.Doors[e].Status != DoorStatus.Unused && (_P == 11 || _P == 12 || _P == 1)) _Free = false;
+			var _Exit = (_Door.Status == DoorStatus.Exit);
+			if(!_Exit && _Door.Status != DoorStatus.Entrance) continue;
+			var _Gate = (Room.GridW == 1);
+			var _Behind = Dungeon_DoorBehind(_RoomIndex, _Door.Position);
+			if(_Door.Location == "Top" && (_Gate ? _Door.Position == 12 : !_Behind)) continue;
+			if(!_Exit && !_Behind) continue;
+			//the positions to try, in order: the gate, then (where something is behind) the walls the door may take
+			var _Try = [];
+			if(_Gate && (_Exit || _Door.Location == "Top")) array_push(_Try, 12);
+			var _Walls = !_Behind ? [] : (_Exit ? ["Top", "Bottom"] : [_Door.Location]);
+			for(var w = 0; w < array_length(_Walls); w++){
+				var _Ps = (_Walls[w] == "Top") ? [12, 11, 1] : ((_Walls[w] == "Bottom") ? [6, 7, 5] : ((_Walls[w] == "Left") ? [9, 8, 10] : [3, 2, 4]));
+				for(var k = 0; k < 3; k++) array_push(_Try, _Ps[k]);
 			}
-			if(!_Free){
-				Test_Event("exits main stays in the bottom wall room=" + string(_RoomIndex));
+			var _To = -1;
+			for(var t = 0; t < array_length(_Try) && _To == -1; t++){
+				var _P = _Try[t];
+				if(_P == _Door.Position || (Dungeon_DoorBehind(_RoomIndex, _P) && !(_Gate && _P == 12))) continue;
+				var _Free = true;
+				for(var e = 0; e < Room.DoorCount; e++){
+					if(e == d || Room.Doors[e].Status == DoorStatus.Unused) continue;
+					var _Q = Room.Doors[e].Position;
+					if(_Q == _P || _Q == (_P mod 12) + 1 || _P == (_Q mod 12) + 1) _Free = false;
+				}
+				if(_Free) _To = _P;
+			}
+			if(_To == -1){
+				Test_Event((_Exit ? "exits main" : "entrance") + " stays in the " + string_lower(_Door.Location) + " wall room=" + string(_RoomIndex));
 				continue;
 			}
 			Room.DoorCode = Room.DoorCode & ~power(2, _Door.Position - 1);
-			_Door.Position = 12;
-			_Door.Location = "Top";
-			_Door.x = global.DoorCoordinates[Room.SizeIndex][12].x;
-			_Door.y = global.DoorCoordinates[Room.SizeIndex][12].y;
+			_Door.Position = _To;
+			_Door.Location = (_To == 11 || _To == 12 || _To == 1) ? "Top" : ((_To >= 5 && _To <= 7) ? "Bottom" : ((_To >= 2 && _To <= 4) ? "Right" : "Left"));
+			_Door.x = global.DoorCoordinates[Room.SizeIndex][_To].x;
+			_Door.y = global.DoorCoordinates[Room.SizeIndex][_To].y;
 			_Door.Level = RoomTemplates_GetDoorLevel(_Door.x, _Door.y);
-			Room.DoorCode = Room.DoorCode | power(2, 12 - 1);
-			Test_Event("exits main moved to the top wall room=" + string(_RoomIndex));
+			Room.DoorCode = Room.DoorCode | power(2, _To - 1);
+			Test_Event((_Exit ? "exits main" : "entrance") + " moved to the " + string_lower(_Door.Location) + " wall room=" + string(_RoomIndex) + " position=" + string(_To));
 		}
 	}
+}
+
+/// Whether a layout's seams can all be painted by a set of rooms that share a frame (roadmap F12b-2). Two rooms of two
+/// cells along the same long wall (2x1 above 2x1, 1x2 beside 1x2) would show where the frame's four corners meet,
+/// which no map shows and Guilherme refused as a join. With ExitWall "Top", the entrance must also find a place that
+/// meets nothing (Dungeon_ExitToTop): the gate (top wall of a room one column wide, positions 11 and 1 not in use) or
+/// a position of its own wall with nothing behind.
+function Dungeon_LayoutSeamsOk(_Template, _LevelIndex){
+	var _Rooms = _Template.Rooms;
+	var _N = array_length(_Rooms);
+	for(var a = 0; a < _N; a++){
+		var _A = _Rooms[a];
+		for(var b = 0; b < _N; b++){
+			var _B = _Rooms[b];
+			if(_A.GridW == 2 && _B.GridW == 2 && _A.GridX == _B.GridX && _B.GridY == _A.GridY + _A.GridH) return false;
+			if(_A.GridH == 2 && _B.GridH == 2 && _A.GridY == _B.GridY && _B.GridX == _A.GridX + _A.GridW) return false;
+		}
+	}
+	var _Def = global.LevelDefs[_LevelIndex];
+	if(_Def.ExitWall != "Top") return true;
+	var _Wall = (Dungeon_StartDir(_LevelIndex) == UP) ? "Bottom" : "Top";
+	var _Occupied = function(_Rooms, _X, _Y){
+		for(var r = 0; r < array_length(_Rooms); r++){
+			var _R = _Rooms[r];
+			if(_X >= _R.GridX && _X < _R.GridX + _R.GridW && _Y >= _R.GridY && _Y < _R.GridY + _R.GridH) return true;
+		}
+		return false;
+	};
+	for(var r = 0; r < _N; r++){
+		var _R = _Rooms[r];
+		for(var d = 0; d < array_length(_R.Doors); d++){
+			var _Door = _R.Doors[d];
+			if(_Door.Status != DoorStatus.Entrance || _Door.Location != _Wall) continue;
+			//the doors of the room in use: the other entrances go unused, and so do the exits not in the wall across
+			//from the entrance (Dungeon_InitLevel)
+			var _Used = [];
+			for(var e = 0; e < array_length(_R.Doors); e++){
+				var _St = _R.Doors[e].Status;
+				if(e == d || _St == DoorStatus.Unused || _St == DoorStatus.Entrance) continue;
+				if(_St == DoorStatus.Exit && _R.Doors[e].Location == _Wall) continue;
+				array_push(_Used, _R.Doors[e].Position);
+			}
+			var _Ps = (_Wall == "Top") ? [_Door.Position, 12, 11, 1] : [_Door.Position, 6, 7, 5];
+			for(var k = 0; k < array_length(_Ps); k++){
+				var _P = _Ps[k];
+				var _Free = true;
+				for(var u = 0; u < array_length(_Used); u++){
+					var _Q = _Used[u];
+					if(_Q == _P || _Q == (_P mod 12) + 1 || _P == (_Q mod 12) + 1) _Free = false;
+				}
+				if(!_Free) continue;
+				if(_Wall == "Top" && _R.GridW == 1 && _P == 12) return true;
+				var _X = global.DoorCoordinates[global.RoomSizeIndex[_R.GridW][_R.GridH]][_P].x;
+				var _Y = (_Wall == "Top") ? _R.GridY - 1 : _R.GridY + _R.GridH;
+				if(!_Occupied(_Rooms, _R.GridX + (_X div 256), _Y) && !_Occupied(_Rooms, _R.GridX + ((_X + 31) div 256), _Y)) return true;
+			}
+			return false;
+		}
+	}
+	return true;
+}
+
+/// Whether a room of the level is behind the wall of door position _Position (1 to 12) of the room: the grid cells its
+/// 32 px door spans, one step out of the room
+function Dungeon_DoorBehind(_RoomIndex, _Position){
+	var _X = global.DoorCoordinates[Room.SizeIndex][_Position].x;
+	var _Y = global.DoorCoordinates[Room.SizeIndex][_Position].y;
+	var _Cells = [];
+	switch(_Position){
+		case 11: case 12: case 1:	array_push(_Cells, [Room.GridX + (_X div 256), Room.GridY - 1], [Room.GridX + ((_X + 31) div 256), Room.GridY - 1]); break;
+		case 5: case 6: case 7:		array_push(_Cells, [Room.GridX + (_X div 256), Room.GridY + Room.GridH], [Room.GridX + ((_X + 31) div 256), Room.GridY + Room.GridH]); break;
+		case 8: case 9: case 10:	array_push(_Cells, [Room.GridX - 1, Room.GridY + (_Y div 256)], [Room.GridX - 1, Room.GridY + ((_Y + 31) div 256)]); break;
+		default:					array_push(_Cells, [Room.GridX + Room.GridW, Room.GridY + (_Y div 256)], [Room.GridX + Room.GridW, Room.GridY + ((_Y + 31) div 256)]); break;
+	}
+	for(var c = 0; c < 2; c++){
+		var _CX = _Cells[c][0], _CY = _Cells[c][1];
+		if(_CY >= 0 && _CY < array_length(global.Level.Map_RoomIndex) && _CX >= 0 && _CX < array_length(global.Level.Map_RoomIndex[_CY])
+			&& global.Level.Map_RoomIndex[_CY][_CX] != -1) return true;
+	}
+	return false;
 }
 
 /// Makes the only door of a special room, and the door on the other side, secret doors
