@@ -1,11 +1,10 @@
 {
- "comment": "Painted room (roadmap F12b-1): the castle rooftops (CastleTop: Layout Outdoor, room set CastleTop, region tileset ts_CastleTop) build with Castle layouts; rooms whose doors fit the set's painted terrace take it, the others the shared templates. The painted step goes to the first painted room and checks its walls tile by tile against the tile classes (log line painted ... walls=28 mismatch=0); it first makes the walls of that room again while the room sleeps, as a bombed secret door does, and the count must stay 28; Link walks into the walls and must not end inside one, then walks up through the top passage. The last step paints the top left corner of the area under the eight room transforms (None, FlipH, FlipV, FlipHV, RotateCW, RotateCCW, FlipHRotateCW, FlipHRotateCCW, left to right and top to bottom) for the shot transforms. Since F18 the level is the area in screens; this test keeps the pilot's painted rooms with doors (room set CastleTop, Layout Outdoor) through \"levels\".",
+ "comment": "Painted room (roadmap F12b-1): the castle rooftops (CastleTop: Layout Outdoor, room set CastleTop, region tileset ts_CastleTop) build with Castle layouts; rooms whose doors fit the set's painted terrace take it, the others the shared templates. The painted step goes to the first painted room and checks its walls tile by tile against the tile classes (log line painted ... walls=28 mismatch=0); it first makes the walls of that room again while the room sleeps, as a bombed secret door does, and the count must stay 28; Link walks into the walls and must not end inside one, then walks up through the top passage. The last step paints the top left corner of the area under the eight room transforms (None, FlipH, FlipV, FlipHV, RotateCW, RotateCCW, FlipHRotateCW, FlipHRotateCCW, left to right and top to bottom) for the shot transforms.",
  "name": "castle_top_room",
  "seed": 8,
  "level": "CastleTop",
  "cheats": ["Cheat_Inf_Health"],
  "max_frames": 20000,
- "levels": {"CastleTop": {"Layout": "LevelLayout.Outdoor", "RoomSet": "CastleTop", "StartDir": 2, "ExitWall": "Top", "ArriveLook": "Gate", "OwnExitLooks": {"Top": "Gate", "Bottom": "GateStairs"}}},
  "steps": [
   {"do": "wait", "frames": 60},
   {"do": "state"},

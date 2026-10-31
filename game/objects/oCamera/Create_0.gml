@@ -113,13 +113,6 @@ function Cam_InitTransitionRoom(_Dir, _Open = false){
 	TransitionEndX = X + (DirX * 256)
 	TransitionEndY = Y + (DirY * 240);
 	
-	//screens of an area (roadmap F18): the room beyond Link's own cell (a 2x2 screen's camera may stand on its other
-	//row, and the screen beside it is 1x1)
-	var _Screens = (_Open && LevelDef.Layout == LevelLayout.Screens);
-	if(_Screens){
-		DungeonGridX = floor(oLink.x / 256);
-		DungeonGridY = floor(oLink.y / 256);
-	}
 	DungeonGridX += DirX;
 	DungeonGridY += DirY;
 	
@@ -128,22 +121,12 @@ function Cam_InitTransitionRoom(_Dir, _Open = false){
 	
 	RoomTransition = _Dir;
 	
-	//off the level's grid (the closed edge of an area's screen, roadmap F18): no room there
-	if(DungeonGridX < 0 || DungeonGridY < 0 || DungeonGridX >= DungeonGridW || DungeonGridY >= DungeonGridW){
-		RoomTransition = NONE;
-		exit;
-	}
 	global.TransitionRoomIndex = global.Level.Map_RoomIndex[DungeonGridY][DungeonGridX];
 	if(global.TransitionRoomIndex == -1){
 		RoomTransition = NONE;
 		exit;
 	}
 	global.TransitionRoom = global.Level.DungeonTemplate.Rooms[global.TransitionRoomIndex];
-	if(_Screens && DirX != 0){
-		//into a screen of another height: the camera also scrolls to where that screen lets it stand (8 px steps)
-		var _Want = clamp(Y, global.TransitionRoom.y, global.TransitionRoom.y + global.TransitionRoom.height - CAM_H - 16);
-		TransitionEndY = Y + round((_Want - Y) / MoveSpeed) * MoveSpeed;
-	}
 	
 	with(oLink){
 		StopStar();

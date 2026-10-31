@@ -1,10 +1,11 @@
 {
- "comment": "Blocks of ts_CastleTop beyond area 0x1B, read by tools/alttp/owdump.py tiles. map16: the frames of the palace door animation (zelda3 kDoorAnimTiles, groups 3 and 4: a 'palace' door opens through them; the closed door is cells 31-32, 5-6 of the area), each 2x2 as top left, top right, bottom left, bottom right. recolor: copies of area cells with colors swapped: the grass edges of the dirt path at the bottom of the area, the dirt turned into the teal of the roof, so grass can spread over the terrace (docs/regioes/topo-do-castelo.md).",
+ "comment": "Blocks of ts_CastleTop beyond area 0x1B, read by tools/alttp/owdump.py tiles. map16: the frames of the palace door animation (zelda3 kDoorAnimTiles, groups 3 and 4: a 'palace' door opens through them; the closed door is cells 31-32, 5-6 of the area), each 2x2 as top left, top right, bottom left, bottom right. recolor: copies of area cells with colors swapped: the grass edges of the dirt path at the bottom of the area, the dirt turned into the teal of the roof, so grass can spread over the terrace (docs/regioes/topo-do-castelo.md). passage: the foot of the walls' corners with the roof's cream turned into the teal of the terrace, so a wall cut by a top door ends as a room's corner does (R1, sixth round).",
  "map16": {
   "GateHalf": {"area": "0x1B", "map16": ["0xdb6", "0xdb7", "0xdb8", "0xdb9"]},
   "GateOpen": {"area": "0x1B", "map16": ["0xdba", "0xdbb", "0xdbc", "0xdbd"]}
  },
  "recolor": {
+  "passage": {"area": "0x1B", "from": [[255, 255, 246], [230, 213, 197]], "to": [32, 106, 123], "cells": [[51, 3], [12, 3]]},
   "floor": {"area": "0x1B", "from": [[139, 123, 74], [123, 98, 57]], "to": [32, 106, 123],
             "cells": [[48, 57], [48, 58], [50, 59], [50, 58], [51, 57]]}
  }

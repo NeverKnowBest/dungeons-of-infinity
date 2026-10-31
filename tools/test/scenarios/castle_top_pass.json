@@ -1,0 +1,28 @@
+{
+ "name": "castle_top_pass",
+ "comment": "Side doors by the top corner of painted rooms (R1 sixth round): their passage runs under the top wall, whose face stays whole above it. Link walks through an open door at position 10 (left) and 2 (right) in seed 7, and at any of them in seeds 1 to 4 where there is one; he must reach the next room, out of the walls.",
+ "seed": 7,
+ "level": "CastleTop",
+ "cheats": ["Cheat_Inf_Health"],
+ "max_frames": 3000,
+ "steps": [
+  {"do": "wait", "frames": 30},
+  {"do": "pass", "positions": [10]},
+  {"do": "level", "level": "CastleTop", "seed": 7},
+  {"do": "wait", "frames": 30},
+  {"do": "pass", "positions": [2]},
+  {"do": "level", "level": "CastleTop", "seed": 1},
+  {"do": "wait", "frames": 30},
+  {"do": "pass", "positions": [2, 10], "optional": true},
+  {"do": "level", "level": "CastleTop", "seed": 2},
+  {"do": "wait", "frames": 30},
+  {"do": "pass", "positions": [2, 10], "optional": true},
+  {"do": "level", "level": "CastleTop", "seed": 3},
+  {"do": "wait", "frames": 30},
+  {"do": "pass", "positions": [2, 10], "optional": true},
+  {"do": "level", "level": "CastleTop", "seed": 4},
+  {"do": "wait", "frames": 30},
+  {"do": "pass", "positions": [2, 10], "optional": true},
+  {"do": "expect", "alive": true}
+ ]
+}

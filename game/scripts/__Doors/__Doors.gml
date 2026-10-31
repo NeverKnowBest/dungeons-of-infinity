@@ -53,23 +53,8 @@ function ExitLooks_Init(){
 		// he arrives by the usual stairway (ArriveAnim, Entrance)
 		Gate: {Draw: ExitLook_DrawPainted, Sound: Sound_DoorOpen, LinkAnim: "Walk", ArriveAnim: "Walk", ArriveSound: Sound_DoorOpen, Entrance: [58, 60], MapIcon: sLargeMap_Down, Leave: ExitLook_GateLeave, Arrive: ExitLook_GateArrive},
 		// the stairs down out of the castle's front gate, painted in a bottom wall passage (an exit that cannot be a gate)
-		GateStairs: {Draw: ExitLook_DrawPainted, Sound: Sound_StairsFloorDown, LinkAnim: "Descending", ArriveSound: Sound_StairsDown, Entrance: [58, 60], MapIcon: sLargeMap_Down},
-		// screens of an area (roadmap F18): Link walks in from the edge of the area (ArriveLook) and leaves walking
-		// into a doorway the area has (OwnExitLooks: the castle's front door); at the next level, the usual stairway
-		Edge: {Draw: ExitLook_DrawPainted, Sound: Sound_StairsUp, LinkAnim: "Walk", ArriveAnim: "Walk", Entrance: [58, 60], MapIcon: sLargeMap_Down, Arrive: ExitLook_EdgeArrive},
-		Doorway: {Draw: ExitLook_DrawPainted, Sound: Sound_StairsUp, LinkAnim: "Walk", ArriveAnim: "Walk", ArriveSound: Sound_StairsDown, Entrance: [58, 60], MapIcon: sLargeMap_Down}
+		GateStairs: {Draw: ExitLook_DrawPainted, Sound: Sound_StairsFloorDown, LinkAnim: "Descending", ArriveSound: Sound_StairsDown, Entrance: [58, 60], MapIcon: sLargeMap_Down}
 	};
-}
-
-/// Link arrives at a level of screens from the edge of its area (ExitLook Edge): he walks in, and the way back closes
-/// behind him like a dungeon entrance (its door blocker; nothing is drawn, the edge is the area's)
-function ExitLook_EdgeArrive(_DoorInst){
-	call_later(GATE_SHUT_FRAMES, time_source_units_frames, method({D : _DoorInst}, function(){
-		if(instance_exists(D) && D.Status == DoorStatus.Entrance){
-			D.Status = DoorStatus.Closed;
-			D.UpdateStatus = true;
-		}
-	}));
 }
 
 /// A look painted with the room (RegionGate): nothing to draw on the dungeon tile layers
@@ -123,24 +108,18 @@ function RegionGate_DY(_DoorInst){
 	return (_G == undefined) ? 16 : _G.GateDY;
 }
 
-/// Where a secret door of a painted room shows its crack: the block of the room's border in front of the door
-/// cell, only when all of it is wall ("rachadura só em mureta", roadmap F12b-2); undefined where it would be on
-/// the floor or on anything else (the door is then a blank wall). Px in the room.
+/// Where a secret door of a painted room shows its crack: the block of the face of the room's top wall in front of
+/// the door cell (40 px down: below the roof's cream and the rivets), only when all of it is wall ("rachadura só em mureta", roadmap
+/// F12b-2). The other walls of a painted room are a rim with the cream of the roof behind it, where a crack would lie
+/// on the roof (R1, sixth round): their secret doors, and a top one with no face there, are a blank wall (undefined).
+/// Px in the room.
 function RegionRoom_CrackSpot(_DoorInst){
 	var _R = global.Level.Rooms[_DoorInst.RoomIndex];
 	var _G = _R[$ "RegionGrid"];
-	if(_G == undefined) return undefined;
-	var _DX = _DoorInst.x - _R.x;
-	var _DY = _DoorInst.y - _R.y;
-	var _PX, _PY;
-	switch(_DoorInst.Location){
-		case "Top":		_PX = _DX + 8; _PY = 0; break;
-		case "Bottom":	_PX = _DX + 8; _PY = _G.H * 8 - 16; break;
-		case "Left":	_PX = 0; _PY = _DY + 8; break;
-		default:		_PX = _G.W * 8 - 16; _PY = _DY + 8; break;
-	}
+	if(_G == undefined || _DoorInst.Location != "Top") return undefined;
+	var _PX = _DoorInst.x - _R.x + 8;
+	var _PY = 40;
 	_PX = _PX div 16 * 16;
-	_PY = _PY div 16 * 16;
 	var _Solid = RegionTiles_Get(LevelDef.RegionTiles).solid;
 	for(var t = 0; t < 4; t++){
 		if(!RegionRoom_SolidAt(_G, _Solid, _PX div 8 + (t mod 2), _PY div 8 + (t div 2))) return undefined;
@@ -225,7 +204,7 @@ function Door_ExitDest(_DoorInst){
 /// Look of an exit door: the ExitLook of the level it leads to, or the level's own look for that wall where the room
 /// has it painted (OwnExitLooks: the gate out of the rooftops)
 function Door_ExitLook(_DoorInst){
-	if(LevelDef.OwnExitLooks != undefined && (Door_HasGate(_DoorInst) || LevelDef.Layout == LevelLayout.Screens)){
+	if(LevelDef.OwnExitLooks != undefined && Door_HasGate(_DoorInst)){
 		var _Own = global.ExitLooks[$ LevelDef.OwnExitLooks[$ _DoorInst.Location] ?? ""];
 		if(_Own != undefined) return _Own;
 	}
@@ -488,20 +467,6 @@ function Door_DrawTiles(Inst){
 		//since its walls are the dungeon's). An open door is the passage it leaves in the walls; a locked one is that
 		//passage with the key blocks in it (oDoor Draw); a secret one is the wall, cracked or not, until it is bombed;
 		//the entrance and the exit are the gate painted with the room (RegionGate)
-		//a screen of an area (roadmap F18): every door is the area's own picture (the road, the castle's doorway, the
-		//portcullis); unlocked, the lock opens to the area's path through it (the room's open tiles)
-		if(LevelDef.Layout == LevelLayout.Screens && RegionRoom_Is(RoomIndex)){
-			ClearTileBlock(TMID_Decor, x, y, 4, 4);
-			ClearTileBlock(TMID_Beam, x, y, 4, 4);
-			if(Status == DoorStatus.Open){
-				//WallObj_Create sets the caller's WallInst (no var): making the walls again from here would take this
-				//door's blocker away from it, and the blocker would stay shut
-				var _Blocker = WallInst;
-				RegionRoom_OpenPassage(RoomIndex, x - global.Level.Rooms[RoomIndex].x, y - global.Level.Rooms[RoomIndex].y);
-				WallInst = _Blocker;
-			}
-			exit;
-		}
 		if(LevelDef.Layout == LevelLayout.Outdoor && RegionRoom_Is(RoomIndex)){
 			var _Painted = false;
 			switch(Status){

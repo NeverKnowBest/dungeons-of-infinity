@@ -47,7 +47,7 @@ Os índices 10, 11 e 12 são dos chefes, o 13 é do Moldorm com a maldição e o
 | 11 | `MoldormsLair` | Moldorm's Lair | `BossesRuins` | `Dungeon2` | Moldorm |
 | 12 | `Aghanim1` | Agahnim's Fortress | `Aghanim` | `Dungeon3` | |
 | 13 | `Aghanim2` | Agahnim | Special 1 | `Boss_Final_Hallway` | Agahnim |
-| 14 | `CastleTop` | Castle Grounds (capítulo 2, variante do porão: cada saída do Hyrule Castle leva a ele em 1 de cada 3; a área 0x1B do ALttP em telas com borda aberta, conjunto `CastleTopArea`, `LevelLayout.Screens`; chuva e trovão do `oWeather`) | `Castle` | `Castle` | |
+| 14 | `CastleTop` | Castle Rooftops (capítulo 2, variante do porão: cada saída do Hyrule Castle leva a ele em 1 de cada 3; salas pintadas do conjunto `CastleTop`, chuva e trovão do `oWeather`) | `Castle` | `Castle` | |
 
 Tudo na ficha de fase, `game/scripts/__Levels/__Levels.gml` (`Name`, `Class`, `Song`, `Boss`; inimigos por nível em `Enemies`). No roadmap, "nível 2" é o castelo (o nível 1 é a entrada).
 

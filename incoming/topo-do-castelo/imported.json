@@ -15,8 +15,8 @@
   "manifest.json": "88211cd97fdeae9044027c97e5db3edc8d6b7951",
   "sounds/Thunder.wav": "308c1ae16c967fb1363964b8a0a9503182ed1aaa",
   "tiles/areas.json": "2938cbe6889d7d4648cec12d480b1f954663da73",
-  "tiles/extra.json": "780c890c7541611c4456b621543214bf641aa7e9",
-  "tiles/tiles.json": "567698cecb8fc7cc217b9c5554799b1a03d8ecb1",
-  "tiles/tiles.png": "f118977f4024e19a63ccae8f7b7967f1b7e19664"
+  "tiles/extra.json": "d0e1b2e30d407a1815b052bfec51b3fb6927aaf0",
+  "tiles/tiles.json": "ebeae3c12c12e5a0109a01d2ddcf2bb3b35b0e24",
+  "tiles/tiles.png": "87b95595d690520091dd06aeac5cba17e30068c2"
  }
 }

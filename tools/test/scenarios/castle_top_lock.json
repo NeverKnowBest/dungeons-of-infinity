@@ -1,5 +1,5 @@
 {
- "comment": "Locked doors of painted rooms (R1 fourth round): Link tries to walk round the key blocks of a locked door, 7 times per door (24, 16 and 8 px either side of its middle, and the middle), on a right door at 168 px (seed 1), a bottom one (seed 3), a top one (seed 8) and a left one (seed 4). Each try must end with Link in the same room, out of the walls and with no camera transition (lock held); before the fix the passage was 48 px walkable against a 16 px blocker, Link went round it into an open camera transition and was put to sleep with the room (crash in oDepthDrawObjs). Since F18 the level is the area in screens; this test keeps the pilot's painted rooms with doors (room set CastleTop, Layout Outdoor) through \"levels\".",
+ "comment": "Locked doors of painted rooms (R1 fourth round): Link tries to walk round the key blocks of a locked door, 7 times per door (24, 16 and 8 px either side of its middle, and the middle), on a right door at 168 px (seed 1), a bottom one (seed 3), a top one (seed 8) and a left one (seed 4). Each try must end with Link in the same room, out of the walls and with no camera transition (lock held); before the fix the passage was 48 px walkable against a 16 px blocker, Link went round it into an open camera transition and was put to sleep with the room (crash in oDepthDrawObjs).",
  "name": "castle_top_lock",
  "seed": 1,
  "level": "CastleTop",
@@ -7,7 +7,6 @@
   "Cheat_Inf_Health"
  ],
  "max_frames": 20000,
- "levels": {"CastleTop": {"Layout": "LevelLayout.Outdoor", "RoomSet": "CastleTop", "StartDir": 2, "ExitWall": "Top", "ArriveLook": "Gate", "OwnExitLooks": {"Top": "Gate", "Bottom": "GateStairs"}}},
  "steps": [
   {
    "do": "wait",

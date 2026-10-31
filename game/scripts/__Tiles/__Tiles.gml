@@ -394,8 +394,6 @@ function RegionRoom_Paint(_RoomIndex){
 	for(var d = 0; d < array_length(_R.Doors); d++){
 		if(_R.Doors[d].Status != DoorStatus.Unused) array_push(_R.RegionGrid.Lanes, {X : _R.Doors[d].x, Y : _R.Doors[d].y, Location : _R.Doors[d].Location});
 	}
-	//a screen of an area (roadmap F18): its edges are open where a room of the level is beyond them (Screens_Open)
-	if(LevelDef.Layout == LevelLayout.Screens) _R.RegionGrid.Screen = {GX : _R.GridX, GY : _R.GridY};
 	var _TM = RegionTiles_Tilemap(UPPER);
 	for(var k = 0; k < _RW * _RH; k++){
 		tilemap_set_at_pixel(_TM, _Base[k] == 0 ? 0 : RegionTiles_TileData(_Base[k]), _R.x + (k mod _RW) * 8, _R.y + (k div _RW) * 8);
@@ -405,8 +403,6 @@ function RegionRoom_Paint(_RoomIndex){
 	for(var d = 0; d < array_length(_R.Doors); d++){
 		var _Door = _R.Doors[d];
 		if(_Door.Status == DoorStatus.Unused || _Door.Status == DoorStatus.Secret_Closed) continue;
-		//a screen's lock is the area's own (the portcullis): it opens when unlocked (Door_DrawTiles)
-		if(LevelDef.Layout == LevelLayout.Screens && _Door.Status == DoorStatus.Locked) continue;
 		if((_Door.Status == DoorStatus.Entrance || _Door.Status == DoorStatus.Exit) && RegionRoom_OpenPassage(_RoomIndex, _Door.x, _Door.y, false, true) > 0){
 			//Open: Link walks through its doorway (the entrance until it shuts behind him; the exit once he has pushed it open)
 			array_push(_R.RegionGrid.Gates, {X : _Door.x, Y : _Door.y, Location : _Door.Location, Open : _Door.Status == DoorStatus.Entrance});
@@ -415,54 +411,7 @@ function RegionRoom_Paint(_RoomIndex){
 		RegionRoom_OpenPassage(_RoomIndex, _Door.x, _Door.y, false);
 	}
 	RegionRoom_Walls(_RoomIndex);
-	if(LevelDef.Layout == LevelLayout.Screens) Screens_EnemyEdges(_RoomIndex);
 	return true;
-}
-
-/// Whether the edge of a screen (roadmap F18) on side _Side ("Top", "Bottom", "Left", "Right") is open at tile _K
-/// along it: a room of the level is beyond it there (an optional screen the draw left out closes it)
-function Screens_Open(_G, _Side, _K){
-	var _C = _K div 32;		//the grid cell along the side
-	switch(_Side){
-		case "Top":		return Screens_HasRoom(_G.Screen.GX + _C, _G.Screen.GY - 1);
-		case "Bottom":	return Screens_HasRoom(_G.Screen.GX + _C, _G.Screen.GY + _G.H div 32);
-		case "Left":	return Screens_HasRoom(_G.Screen.GX - 1, _G.Screen.GY + _C);
-	}
-	return Screens_HasRoom(_G.Screen.GX + _G.W div 32, _G.Screen.GY + _C);
-}
-
-/// The open edges of a screen keep its enemies in (Link walks through): an 8 px strip along each open stretch of the
-/// edge that blocks enemies only, like the blocker of a door (Dungeon_CreateDoors). Enemies that left their screen
-/// would stay awake in the next one when the camera moves on.
-function Screens_EnemyEdges(_RoomIndex){
-	var _R = global.Level.Rooms[_RoomIndex];
-	var _G = _R.RegionGrid;
-	_G.EnemyEdges = [];
-	var _Sides = [["Top", _G.W], ["Bottom", _G.W], ["Left", _G.H], ["Right", _G.H]];
-	for(var s = 0; s < 4; s++){
-		var _Side = _Sides[s][0];
-		var k = 0;
-		while(k < _Sides[s][1]){
-			if(!Screens_Open(_G, _Side, k)){
-				k++;
-				continue;
-			}
-			var _K0 = k;
-			while(k < _Sides[s][1] && Screens_Open(_G, _Side, k)) k++;
-			var _Wall;
-			switch(_Side){
-				case "Top":		_Wall = WallObj_Create("Objs_Upper", _R.x + _K0 * 8, _R.y, k - _K0, 1); break;
-				case "Bottom":	_Wall = WallObj_Create("Objs_Upper", _R.x + _K0 * 8, _R.y + _G.H * 8 - 8, k - _K0, 1); break;
-				case "Left":	_Wall = WallObj_Create("Objs_Upper", _R.x, _R.y + _K0 * 8, 1, k - _K0); break;
-				default:		_Wall = WallObj_Create("Objs_Upper", _R.x + _G.W * 8 - 8, _R.y + _K0 * 8, 1, k - _K0); break;
-			}
-			_Wall.BlockLink = false;
-			_Wall.BlockLinkCarry = false;
-			_Wall.BlockProjectiles = false;
-			_Wall.BlockItems = false;
-			array_push(_G.EnemyEdges, _Wall);
-		}
-	}
 }
 
 /// The section group of a section id (Split_MainSectionIDs order): 1 corners, 2 middles, 3 wide, 4 strips
@@ -604,15 +553,6 @@ function RegionRoom_SolidAt(_G, _Solid, i, j){
 function RegionRoom_OffLane(_G, i, j){
 	var _Top = (j == 0), _Bottom = (j == _G.H - 1), _Left = (i == 0), _Right = (i == _G.W - 1);
 	if(!_Top && !_Bottom && !_Left && !_Right) return false;
-	//a screen of an area (roadmap F18) is left through every open edge: only its closed edges are walls (the end of
-	//the area, or a screen the draw left out), but for the lane of a door there (the entrance)
-	if(_G[$ "Screen"] != undefined){
-		_Top = _Top && !Screens_Open(_G, "Top", i);
-		_Bottom = _Bottom && !Screens_Open(_G, "Bottom", i);
-		_Left = _Left && !Screens_Open(_G, "Left", j);
-		_Right = _Right && !Screens_Open(_G, "Right", j);
-		if(!_Top && !_Bottom && !_Left && !_Right) return false;
-	}
 	var _Lanes = _G[$ "Lanes"];
 	if(_Lanes == undefined) return false;
 	for(var n = 0; n < array_length(_Lanes); n++){

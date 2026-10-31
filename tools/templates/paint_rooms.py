@@ -97,6 +97,7 @@ class Kit:
         # recolored copies of area cells (tiles/extra.json): (map16, recolor name) -> block
         self.recolored = {(b['map16'], b['recolor']): i for i, b in enumerate(tiles['blocks']) if b.get('recolor')}
         self.block_map16 = [b['map16'] for b in tiles['blocks']]
+        self.halves = {}    # (col, row, recolor) of an "h" cell -> its block, after the region's (half_block)
         data = os.path.join(convert.REPO, 'game', 'datafiles', 'data', 'tiles', self.name + '.json')
         self.solid = json.load(open(data, encoding='utf-8'))['solid']
         areas = json.load(open(os.path.join(folder, 'areas.json'), encoding='utf-8'))
@@ -144,11 +145,15 @@ class Kit:
         return f
 
     def cell(self, cell, where):
-        """(block, mirrored, flipped) of [col, row, flags...]: "m" mirrored, "v" flipped, any other word the copy of
-        that cell recolored by the region's tiles/extra.json."""
+        """(block, mirrored, flipped) of [col, row, flags...]: "m" mirrored, "v" flipped, "h" the right half of the
+        cell beside the left half of the next one (half_block), any other word the copy of that cell recolored by the
+        region's tiles/extra.json (with "h", of each half that has that copy)."""
         c, r = cell[0], cell[1]
         block = self.area[r][c]
         m = v = False
+        if 'h' in cell[2:]:
+            words = [f for f in cell[2:] if f not in ('m', 'v', 'h')]
+            return (self.half_block(c, r, words[0] if words else None, where), 'm' in cell[2:], 'v' in cell[2:])
         for f in cell[2:]:
             if f == 'm':
                 m = True
@@ -161,6 +166,24 @@ class Kit:
                                      'tiles/extra.json and run tools/alttp/owdump.py tiles)' % (where, c, r, f))
                 block = self.recolored[key]
         return (block, m, v)
+
+    def half_block(self, c, r, recolor, where):
+        """A block that no map has: the right half of cell c, r beside the left half of cell c + 1, r (each the copy
+        recolored by recolor where the region has one). A wall's end moved half a block, so a passage cut in a wall
+        ends with the wall's own corner and stays as wide as its door (R1, sixth round)."""
+        if c + 1 >= len(self.area[r]):
+            raise PaintError('%s: cell %d,%d "h" needs the cell to its right' % (where, c, r))
+        key = (c, r, recolor)
+        if key not in self.halves:
+            parts = []
+            for cc in (c, c + 1):
+                b = self.area[r][cc]
+                if recolor is not None:
+                    b = self.recolored.get((self.block_map16[b], recolor), b)
+                parts.append(self.blocks[b])
+            self.halves[key] = len(self.blocks)
+            self.blocks.append([parts[0][1], parts[1][0], parts[0][3], parts[1][2]])
+        return self.halves[key]
 
     def piece(self, v, where):
         """Rows of (block, mirrored, flipped)."""
@@ -218,8 +241,9 @@ class Painted:
 
     # ---------------------------------------------------------------- painting
 
-    def stamp(self, grid, piece, x, y, mirror=False, where=''):
-        """Paints a piece with its top left corner at x, y (px, 8 px grid); mirror turns the whole piece."""
+    def stamp(self, grid, piece, x, y, mirror=False, where='', clip_top=0):
+        """Paints a piece with its top left corner at x, y (px, 8 px grid); mirror turns the whole piece. Rows above
+        clip_top (px) are left as they are."""
         if x % GRID or y % GRID:
             raise PaintError('%s: %s,%s is off the 8 px grid' % (where, x, y))
         w = len(piece[0])
@@ -234,7 +258,7 @@ class Painted:
                     if v:
                         ty, fl = 1 - ty, fl ^ 2
                     gx, gy = x // GRID + i * 2 + tx, y // GRID + j * 2 + ty
-                    if 0 <= gy < len(grid) and 0 <= gx < len(grid[0]):
+                    if 0 <= gy < len(grid) and 0 <= gx < len(grid[0]) and gy * GRID >= clip_top:
                         grid[gy][gx] = (tile, fl) if tile else None
 
     def fill(self, grid, piece, x0, y0, x1, y1):
@@ -293,7 +317,9 @@ class Painted:
             piece = k.get(k.openings[loc], where)
             pw, ph = len(piece[0]) * 16, len(piece) * 16
             ox = {'Top': (x - 16, 0), 'Bottom': (x - 16, H - ph), 'Left': (0, y - 16), 'Right': (W - pw, y - 16)}[loc]
-            self.stamp(self.open, piece, ox[0], ox[1], where=where)
+            # a side door by the top corner (positions 2 and 10) runs under the top wall: its passage leaves the
+            # wall's face whole above it instead of cutting the corner away (R1, sixth round: "canto com aresta vazia")
+            self.stamp(self.open, piece, ox[0], ox[1], where=where, clip_top=th if loc in ('Left', 'Right') else 0)
             boxes.append((p, (ox[0], ox[1], pw, ph)))
         for i, (p, a) in enumerate([] if self.special or self.all_doors else boxes):
             for q, b in boxes[i + 1:]:
