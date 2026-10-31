@@ -327,7 +327,8 @@ function Link_SetStartingPos(){
 	
 	//determine entrance door position
 	var _EntranceDoorPos = 6;
-	for(var _DoorIndex = 0; _DoorIndex < array_length(EntranceRoom.Doors); _DoorIndex++){
+	var _DoorIndex = 0;
+	for(_DoorIndex = 0; _DoorIndex < array_length(EntranceRoom.Doors); _DoorIndex++){
 		var _RoomDoor = EntranceRoom.Doors[_DoorIndex];
 		if(_RoomDoor.Status == DoorStatus.Entrance){
 			_EntranceDoorPos = _RoomDoor.Position;

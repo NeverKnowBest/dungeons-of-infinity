@@ -239,6 +239,7 @@ Working notes on how the Dungeons of Infinity engine is put together, kept so th
 ## IDE messages (Feather)
 
 * The IDE's Feather panel ("Mensagens de Pena") shows analysis messages the Igor build ignores: a build can pass every scenario and the IDE still list "errors". Read them when the project opens. Two kinds seen (out/2026, F12b-1): `GM1020` (a call with fewer arguments than the function has; `Error` now defaults `_GameEnd` to false, since `if(undefined)` can stop the game right when it reports an error) and `GM2044` (the same `var` declared twice in one function, e.g. in two `case`s of one `switch`; the code has about 300 of them from before, mostly loop counters, so the validator does not check it: use a different name in new code).
+* A GML keyword as a struct field name breaks the IDE (out/2026, F18): `_S.exit` gave `GM1012 Malformed variable addressing expression` and `GM1100 Unexpected exit statement`. A JSON key that is a keyword (`exit`, `with`, `repeat`, `end`...) is read as `_S[$ "exit"]`; the validator now flags `.keyword`. Also `GM2043`: a `for(var i...)` counter read after the loop; declare it with `var` before the loop.
 
 ## Sound effects (roadmap F6b)
 

@@ -1744,7 +1744,7 @@ function Screens_Layout(_Def){
 			WarpDest_WarpRoomIndex : -1, Warp_DestGridPosition : -1, ScreenName : _R.name});
 	}
 	Screens_AddDoor(_S, _S.entrance, DoorStatus.Entrance, _Rooms, _Index, _Mirror);
-	Screens_AddDoor(_S, _S.exit, DoorStatus.Exit, _Rooms, _Index, _Mirror);
+	Screens_AddDoor(_S, _S[$ "exit"], DoorStatus.Exit, _Rooms, _Index, _Mirror);
 	if(_S[$ "lock"] != undefined){
 		Screens_AddDoor(_S, _S.lock, DoorStatus.Locked, _Rooms, _Index, _Mirror);
 		//the key: in a room wholly before the lock (its spots and enemy areas), never the entrance's

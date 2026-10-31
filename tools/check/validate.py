@@ -239,6 +239,12 @@ def check_gml(rep, registered, orphans, object_gml):
     sources = {f: open(f, encoding='utf-8-sig', errors='replace').read() for f in files}
     code = {f: strip_code(s) for f, s in sources.items()}
 
+    # a GML keyword as a field name (_S.exit) does not compile (GM1012); read it as _S[$ "exit"]
+    for f in files:
+        for m in re.finditer(r'\.\s*(exit|return|break|continue|repeat|with|until|switch|case|default|do|then|begin|end|var|globalvar)\b(?!\s*\()', code[f]):
+            line = code[f].count('\n', 0, m.start()) + 1
+            rep.error('%s:%d: field "%s" is a GML keyword; use [$ "%s"]' % (rel(f), line, m.group(1), m.group(1)))
+
     # global functions, macros, enums
     funcs = {}
     macros = {}
