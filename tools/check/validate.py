@@ -479,6 +479,22 @@ def check_room_sets(rep, convert):
                       % (n, n, convert.FIT))
         for msg in tile_rules.check_set(sd, os.path.join(convert.ROOMS_DIR, 'sets', n)):
             rep.error('room set %s: %s' % (n, msg))
+    # sets cut from an area (roadmap F18): the map and screens.json are what paint_screens.py writes now, and the game's
+    # copy of screens.json is current
+    import paint_screens
+    for n in sorted(os.listdir(convert.SETS_DIR)) if os.path.isdir(convert.SETS_DIR) else []:
+        if not os.path.exists(os.path.join(convert.SETS_DIR, n, 'area.json')):
+            continue
+        try:
+            for msg in paint_screens.check(paint_screens.Screens(n)):
+                rep.error('room set %s: %s' % (n, msg))
+        except paint_screens.ScreenError as e:
+            rep.error('room set %s: %s' % (n, e))
+            continue
+        gp = os.path.join(convert.ROOMS_DIR, 'sets', n, convert.SCREENS + '.json')
+        if not os.path.exists(gp) or open(gp, 'rb').read().decode('utf-8') != convert.screens_text(n):
+            rep.error('room set %s: rooms/sets/%s/%s.json is out of date (run python tools/templates/convert.py)'
+                      % (n, n, convert.SCREENS))
 
 
 def check_tiles(rep, registered):

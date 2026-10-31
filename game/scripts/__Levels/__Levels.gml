@@ -35,7 +35,8 @@ enum LevelSpecial{
 
 enum LevelLayout{
 	Dungeon,	// rooms joined by doors with frames in the walls
-	Outdoor		// rooms joined by open passages at the door positions, no frames (roadmap F12b)
+	Outdoor,	// rooms joined by open passages at the door positions, no frames (roadmap F12b)
+	Screens		// an overworld area in screens with open edges, as ALttP shows it (roadmap F18, Screens_Layout)
 }
 
 enum LevelDark{
@@ -114,7 +115,8 @@ function Level_Create(_Index, _Name) constructor{
 	Special = LevelSpecial.None;
 
 	// Layout
-	Layout = LevelLayout.Dungeon;		// Outdoor: an open door is a passage in the painted walls, drawn with no frame (roadmap F12b)
+	Layout = LevelLayout.Dungeon;		// Outdoor: an open door is a passage in the painted walls, drawn with no frame (roadmap F12b);
+										// Screens: the level is the area of the RoomSet's screens.json, in screens with open edges (F18)
 	Class = DungeonClass.Castle;		// dungeon template class (global.Templates_Dungeon)
 	Template = -1;						// for DungeonClass.Special: index of the fixed layout
 	Transform = true;					// dungeon template may be flipped and rotated
@@ -194,7 +196,7 @@ function Levels_Init(){
 	_L[DungeonLevel.MoldormsLair] = new Level_Create(DungeonLevel.MoldormsLair, "Moldorm's Lair");
 	_L[DungeonLevel.Aghanim1] = new Level_Create(DungeonLevel.Aghanim1, "Agahnim's Fortress");
 	_L[DungeonLevel.Aghanim2] = new Level_Create(DungeonLevel.Aghanim2, "Agahnim");
-	_L[DungeonLevel.CastleTop] = new Level_Create(DungeonLevel.CastleTop, "Castle Rooftops");
+	_L[DungeonLevel.CastleTop] = new Level_Create(DungeonLevel.CastleTop, "Castle Grounds");
 	global.LevelDefs = _L;
 	global.RunPath = {Next: -1};	// the level the exit Link took leads to (Level_NextIndex), kept through the rest stop
 
@@ -377,9 +379,11 @@ function Levels_Init(){
 		Dark = LevelDark.Never;
 	}
 
-	// Chapter 2 variant: the castle rooftops in the rain (docs/regioes/topo-do-castelo.md), seen from above like ALttP's
-	// overworld area 0x1B, its rooms painted with ts_CastleTop (room set CastleTop, roadmap F12b-1). Hyrule Castle's
-	// exits lead to it with weight 1 beside the basement's 2; it rains and thunders like the night of the run's start.
+	// Chapter 2 variant: the castle grounds in the rain (docs/regioes/topo-do-castelo.md), ALttP's overworld area 0x1B
+	// itself in screens with open edges (LevelLayout.Screens, room set CastleTopArea from tools/templates/paint_screens.py,
+	// roadmap F18): in by the road at the south edge, a key opens the portcullis, out by the castle's front door.
+	// Hyrule Castle's exits lead to it with weight 1 beside the basement's 2; it rains and thunders like the run's start.
+	// The pilot's painted rooms with doors (room set CastleTop, Layout Outdoor) stay for their tests.
 	with(_L[DungeonLevel.CastleTop]){
 		Depth = 2;
 		Next = DungeonLevel.CastleJails;
@@ -387,11 +391,11 @@ function Levels_Init(){
 		BaseTheme = DungeonLevel.Castle;
 		EnemyStats = DungeonLevel.Castle;
 		RegionTiles = "CastleTop";
-		Layout = LevelLayout.Outdoor;
-		RoomSet = "CastleTop";
+		Layout = LevelLayout.Screens;
+		RoomSet = "CastleTopArea";
 		Ceiling = false;
 		Class = DungeonClass.Castle;
-		StartDir = DOWN;
+		StartDir = UP;		// the road comes in at the area's south edge
 		Spikes = false;
 		Curses = false;
 		FairyRooms = false;
@@ -401,11 +405,9 @@ function Levels_Init(){
 		ObstacleRooms = false;
 		SecretDoorType = SecretDoor.Crack;
 		ExitLook = "StairsUp";
-		// in and out by the palace door of area 0x1B (the way to Agahnim's tower), which only fits the top wall; an
-		// exit that cannot go there leaves by the stairs out of the castle's front gate (Guilherme, oct/2026)
-		OwnExitLooks = {Top: "Gate", Bottom: "GateStairs"};
-		ArriveLook = "Gate";
-		ExitWall = "Top";
+		// in walking from the edge of the area, out walking into the castle's front door (Guilherme, oct/2026, F18)
+		OwnExitLooks = {Top: "Doorway"};
+		ArriveLook = "Edge";
 		Enemies = [[oEnemy_Soldier_Advanced, 2], [oEnemy_Soldier_Simple, 3], [oEnemy_Keese, 1]];
 	}
 

@@ -642,8 +642,9 @@ def parse_class(ci, warnings, set_name=None):
         if whole:
             if cls != 'Main_Upper':
                 raise ConvertError('%s: room %s: Whole rooms are only Main_Upper for now' % (where, gm_str(t['id'])))
-            if t['SizeIndex'] > 2:
-                raise ConvertError('%s: room %s: a Whole Main_Upper room is 1x1, 1x2 or 2x1' % (where, gm_str(t['id'])))
+            if t['SizeIndex'] > 2 and get_prop(t.get('properties'), 'Screen') != 1:
+                raise ConvertError('%s: room %s: a Whole Main_Upper room is 1x1, 1x2 or 2x1 (2x2 only for a screen of '
+                                   'an area, paint_screens.py)' % (where, gm_str(t['id'])))
             t['Whole'] = True
             t.setdefault('Split_MainSectionIDs', [0.0])
         elif 'Region' in t and cls in ('Main_Upper', 'Main_Lower'):
@@ -848,11 +849,16 @@ def save(data, out_dir, sets=None):
         if fit is not None:
             with open(os.path.join(d, FIT + '.json'), 'wb') as f:
                 f.write(fit.encode('utf-8'))
+        screens = screens_text(n)
+        if screens is not None:
+            with open(os.path.join(d, SCREENS + '.json'), 'wb') as f:
+                f.write(screens.encode('utf-8'))
     if os.path.isdir(sets_out):
         for n in os.listdir(sets_out):
             d = os.path.join(sets_out, n)
             for f in os.listdir(d):
-                if f[:-len('.json')] not in sets.get(n, {}) and not (f == FIT + '.json' and fit_text(n) is not None):
+                if (f[:-len('.json')] not in sets.get(n, {}) and not (f == FIT + '.json' and fit_text(n) is not None)
+                        and not (f == SCREENS + '.json' and screens_text(n) is not None)):
                     os.remove(os.path.join(d, f))
             if not os.listdir(d):
                 os.rmdir(d)
@@ -868,6 +874,17 @@ def fit_text(name):
     return tile_rules.fit_text(os.path.join(SETS_DIR, name))
 
 
+SCREENS = 'screens'     # sets/<Set>/screens.json: the screens of an area (roadmap F18, paint_screens.py), copied as is
+
+
+def screens_text(name):
+    """screens.json of a room set cut from an area (roadmap F18), with LF line ends, or None."""
+    p = os.path.join(SETS_DIR, name, SCREENS + '.json')
+    if not os.path.exists(p):
+        return None
+    return open(p, encoding='utf-8', newline='').read().replace('\r\n', '\n')
+
+
 def set_files(sets):
     """(filePath, name) of every included file that the room sets need in Zelda.yyp."""
     out = [('datafiles/data/rooms', 'sets.json')]
@@ -875,6 +892,8 @@ def set_files(sets):
         out += [('datafiles/data/rooms/sets/' + n, cls + '.json') for cls in classes]
         if fit_text(n) is not None:
             out.append(('datafiles/data/rooms/sets/' + n, FIT + '.json'))
+        if screens_text(n) is not None:
+            out.append(('datafiles/data/rooms/sets/' + n, SCREENS + '.json'))
     return out
 
 

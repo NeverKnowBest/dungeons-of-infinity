@@ -191,9 +191,17 @@ function Dungeon_CreateStruct_Level(_LevelIndex) constructor{
 	}
 	
 	DungeonTemplate = global.Templates_Dungeon[Class][Transformation][DungeonTemplate_Index];
+	if(global.LevelDefs[_LevelIndex].Layout == LevelLayout.Screens){
+		//an overworld area in screens (roadmap F18): the layout comes from the room set's screens.json, not from data_d.
+		//(fields only levels of screens have: the level dumps of the reference levels list every field)
+		Transformation = ObjTransformation.None;
+		DungeonTemplate = Screens_Layout(global.LevelDefs[_LevelIndex]);
+		ScreensMirror = DungeonTemplate.Mirror;
+	}
 	//rooms painted from one frame share their border (roadmap F12b-2): a layout with a seam the frame cannot paint is
 	//drawn again (Dungeon_LayoutSeamsOk), only in levels with a region tileset
 	for(var _Try = 0; _Try < 12 && Class != DungeonClass.Special && global.LevelDefs[_LevelIndex].RegionTiles != ""
+		&& global.LevelDefs[_LevelIndex].Layout != LevelLayout.Screens
 		&& !Dungeon_LayoutSeamsOk(DungeonTemplate, _LevelIndex); _Try++){
 		Test_Event("layout " + string(DungeonTemplate_Index) + " drawn again (a seam the painted rooms cannot meet)");
 		Transformation = Dungeon_PickTemplateTransformation(Index);
@@ -226,6 +234,7 @@ function Dungeon_CreateStruct_Level(_LevelIndex) constructor{
 	
 	StartDir = Dungeon_StartDir(Index);
 	IsBossLevel = Dungeon_IsBossLevel(Index);
+	if(variable_struct_exists(DungeonTemplate, "Screens")) StartDir = (DungeonTemplate.Screens.entrance.location == "Top") ? DOWN : UP;
 	
 	SwitchBlock_Colors = 2;
 	SwitchBlock_ActiveColor = SwitchBlockColor.Red; //color that the crystal is showing, SBs with this color are lowered/active
@@ -373,6 +382,7 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 		Doors[_DoorIndex].y = DungeonRoom.Doors[_DoorIndex].y;
 		
 		Doors[_DoorIndex].Level = RoomTemplates_GetDoorLevel(Doors[_DoorIndex].x, Doors[_DoorIndex].y);
+		if(LevelDef.Layout == LevelLayout.Screens) Doors[_DoorIndex].Level = UPPER;	//its doors stand anywhere in the screen (Screens_Layout)
 		if(Doors[_DoorIndex].Level == UPPER) UpperDoors = true;
 		if(Doors[_DoorIndex].Level == LOWER) LowerDoors = true;
 		
@@ -420,6 +430,14 @@ function Dungeon_CreateStruct_Room(_RoomIndex) constructor{
 
 	TemplateObjGrid = {WallsUpper : Array_Create2D(MapW, MapH, false), OutOfBounds : Array_Create2D(MapW, MapH, false), ExtraCeilings : Array_Create2D(MapW, MapH, false)};
 	
+	//a screen of an area (roadmap F18): its own template of the level's room set, by name (RoomTemplates_PickScreen)
+	if(LevelDef.Layout == LevelLayout.Screens){
+		TemplateClass = RoomTemplateClass.Main_Upper;
+		TemplateSubClass = min(SizeIndex, RoomSize._1x2);
+		TemplateName = DungeonRoom.ScreenName;
+		exit;
+	}
+
 	switch(LevelDef.Special){
 		case LevelSpecial.Intro:
 			TemplateClass = RoomTemplateClass.Other;
@@ -1684,4 +1702,94 @@ function Dungeon_IsSaveLevel(_LevelIndex){
 	var _Def = Level_Get(_LevelIndex);
 	return _Def != undefined && _Def.SaveBefore
 	
+}
+
+/// The screens of an area (roadmap F18): rooms/sets/<Set>/screens.json, written by tools/templates/paint_screens.py
+/// and copied by convert.py. Read once per set.
+function Screens_Load(_Set){
+	static _Cache = {};
+	if(_Cache[$ _Set] != undefined) return _Cache[$ _Set];
+	var _Buffer = buffer_load(GAMEDIR_ROOMTEMPLATES + "sets\\" + _Set + "\\screens.json");
+	if(_Buffer == -1){
+		Error("Screens not found for room set " + _Set + " (tools/templates/paint_screens.py " + _Set + ", then convert.py)", true);
+		return undefined;
+	}
+	var _S = json_parse(buffer_read(_Buffer, buffer_string));
+	buffer_delete(_Buffer);
+	_Cache[$ _Set] = _S;
+	return _S;
+}
+
+/// LevelLayout.Screens (roadmap F18): the layout the generator reads (DungeonTemplate.Rooms, like a layout of data_d)
+/// made from the level's screens.json: every room the draw keeps (the optional ones by their chance), the whole area
+/// mirrored when the draw says so, the entrance, the exit and the lock as doors anywhere in their screens, and the key
+/// of the lock in a room Link reaches before it. Neighbouring screens have no door between them: Link walks off the
+/// edge into the next one (CheckRoomTransition, the village's open transition).
+function Screens_Layout(_Def){
+	var _S = Screens_Load(_Def.RoomSet);
+	if(_S == undefined) return {Rooms : [], Mirror : false};
+	var _Mirror = _S.mirror && Prob(0.5);
+	var _Keep = [];
+	for(var i = 0; i < array_length(_S.rooms); i++) array_push(_Keep, _S.rooms[i].keep >= 1 || Prob(_S.rooms[i].keep));
+	var _Rooms = [];
+	var _Index = array_create(array_length(_S.rooms), -1);
+	for(var i = 0; i < array_length(_S.rooms); i++){
+		if(!_Keep[i]) continue;
+		var _R = _S.rooms[i];
+		var _GX = _Mirror ? _S.w - _R.x - _R.w : _R.x;
+		_Index[i] = array_length(_Rooms);
+		array_push(_Rooms, {x : _GX * 256, y : _R.y * 256, width : _R.w * 256, height : _R.h * 256, GridX : _GX, GridY : _R.y,
+			GridW : _R.w, GridH : _R.h, Doors : [], Template : -1, Lighting : 0, Section_ID : 0, Section_WallType : 0,
+			Section_Color : 0, SpecialObj : SpecialDungeonObj.None, SpecialObjSection : 0, Warp_DestRoomIndex : -1,
+			WarpDest_WarpRoomIndex : -1, Warp_DestGridPosition : -1, ScreenName : _R.name});
+	}
+	Screens_AddDoor(_S, _S.entrance, DoorStatus.Entrance, _Rooms, _Index, _Mirror);
+	Screens_AddDoor(_S, _S.exit, DoorStatus.Exit, _Rooms, _Index, _Mirror);
+	if(_S[$ "lock"] != undefined){
+		Screens_AddDoor(_S, _S.lock, DoorStatus.Locked, _Rooms, _Index, _Mirror);
+		//the key: in a room wholly before the lock (its spots and enemy areas), never the entrance's
+		var _KeyRooms = [];
+		for(var i = 0; i < array_length(_S.rooms); i++){
+			if(_Index[i] != -1 && _S.rooms[i].key && i != _S.entrance.room) array_push(_KeyRooms, _Index[i]);
+		}
+		if(array_length(_KeyRooms) == 0){
+			Error("Screens of " + _Def.RoomSet + ": no room for the key of the lock", true);
+		}else{
+			_Rooms[_KeyRooms[irandom(array_length(_KeyRooms) - 1)]].SpecialObj = SpecialDungeonObj.Key;
+		}
+	}
+	Test_Event("screens " + _Def.RoomSet + ": " + string(array_length(_Rooms)) + " of " + string(array_length(_S.rooms)) + " rooms" + (_Mirror ? ", mirrored" : ""));
+	return {Rooms : _Rooms, Mirror : _Mirror, Screens : _S};
+}
+
+/// Adds door _D of screens.json ({room, x, y, location}, px in its room) to its room in the layout, with status
+/// _Status. Its Position is the room's door position nearest to it on that wall (DoorCode, the map); x and y stay
+/// where the area has it (Dungeon_CreateDoors, Link_SetStartingPos).
+function Screens_AddDoor(_S, _D, _Status, _Rooms, _Index, _Mirror){
+	var _R = _Rooms[_Index[_D.room]];
+	var _Loc = _D.location;
+	var _X = _D.x;
+	if(_Mirror){
+		_X = _R.width - _X - 32;
+		if(_Loc == "Left") _Loc = "Right"; else if(_Loc == "Right") _Loc = "Left";
+	}
+	var _RSI = global.RoomSizeIndex[_R.GridW][_R.GridH];
+	var _Best = 12, _BestD = infinity;
+	for(var p = 1; p <= 12; p++){
+		var _C = global.DoorCoordinates[_RSI][p];
+		var _On = (_Loc == "Top" && _C.y == 16) || (_Loc == "Bottom" && _C.y == _R.height - 40) || (_Loc == "Left" && _C.x == 16) || (_Loc == "Right" && _C.x == _R.width - 40);
+		if(!_On) continue;
+		var _Dist = point_distance(_C.x, _C.y, _X, _D.y);
+		if(_Dist < _BestD){
+			_BestD = _Dist;
+			_Best = p;
+		}
+	}
+	array_push(_R.Doors, {Level : "Upper", x : _X, y : _D.y, Location : _Loc, Status : _Status, ConnectedRoomIndex : -1, ConnectedDoorPos : -1, Position : _Best});
+}
+
+/// Whether there is a room of the level in grid cell _GX, _GY (off the grid: none)
+function Screens_HasRoom(_GX, _GY){
+	if(_GX < 0 || _GY < 0 || _GX >= DungeonGridW || _GY >= DungeonGridW) return false;
+	return global.Level.Map_RoomIndex[_GY][_GX] != -1;
 }

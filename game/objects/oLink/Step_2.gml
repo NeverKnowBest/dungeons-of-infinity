@@ -26,7 +26,7 @@ if(InitNewDungeon){
 	var _Arrive = global.ExitLooks[$ LevelDef.ArriveLook];
 	if(_Arrive != undefined){
 		with(oDoor){
-			if(Entrance && Door_HasGate(id)) other.ExitLook = _Arrive;
+			if(Entrance && (Door_HasGate(id) || LevelDef.Layout == LevelLayout.Screens)) other.ExitLook = _Arrive;	//or the edge of an area (F18)
 		}
 	}
 	sprite_index = ExitLook_LinkSprite(ExitLook, 2, global.Level.StartDir == UP ? BOTTOM : TOP);
@@ -37,6 +37,12 @@ if(InitNewDungeon){
 		
 		//through a gate Link comes out of its doorway (RegionGate: the doorway is 32 to 64 px below the door cell)
 		var _LinkPosY = y + (other.ExitLook[$ "Arrive"] != undefined && Door_HasGate(id) ? RegionGate_DY(id) + 40 : (global.Level.StartDir == UP ? 15 : 23));
+		if(LevelDef.Layout == LevelLayout.Screens){
+			//from the edge of the area (roadmap F18): he walks in from the door cell, where the area shows its own way in
+			other.y = _LinkPosY;
+			if(other.ExitLook[$ "Arrive"] != undefined) other.ExitLook.Arrive(id);
+			continue;
+		}
 		other.y = _LinkPosY;
 		
 		if(other.ExitLook[$ "Arrive"] != undefined && Door_HasGate(id)){

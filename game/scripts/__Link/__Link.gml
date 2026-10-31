@@ -339,6 +339,11 @@ function Link_SetStartingPos(){
 	
 	var EntranceDoorX = RoomX + global.DoorCoordinates[_RSI][_EntranceDoorPos].x;
 	var EntranceDoorY = RoomY + global.DoorCoordinates[_RSI][_EntranceDoorPos].y;
+	//a screen of an area (roadmap F18): the entrance is where the area has it, not on a door position
+	if(LevelDef.Layout == LevelLayout.Screens && _DoorIndex < array_length(EntranceRoom.Doors)){
+		EntranceDoorX = RoomX + EntranceRoom.Doors[_DoorIndex].x;
+		EntranceDoorY = RoomY + EntranceRoom.Doors[_DoorIndex].y;
+	}
 		
 	oLink.x = EntranceDoorX + 16;
 	oLink.y = EntranceDoorY + 16;
@@ -1152,9 +1157,10 @@ function CheckRoomTransition(){
 			}
 		}else{
 			//if no door is detected it means we're walking off the edge of an open Room with no wall (village)
-			//a painted room is walled all round: it is left only through a door (RegionRoom_OffLane); this transition
-			//would put to sleep the room Link is still standing in
-			if(RegionRoom_Is(global.CurrentRoomIndex)) exit;
+			//a painted room of a level of doors is walled all round: it is left only through a door (RegionRoom_OffLane);
+			//this transition would put to sleep the room Link is still standing in. A screen of an area (roadmap F18) is
+			//left by its open edges, like the village's rooms (its closed edges are walls)
+			if(RegionRoom_Is(global.CurrentRoomIndex) && LevelDef.Layout != LevelLayout.Screens) exit;
 
 			
 			if(vx < 0 && x < global.CurrentRoom.x + 16){
@@ -1177,7 +1183,8 @@ function CheckRoomTransition(){
 
 	if(oCamera.RoomTransition != NONE){
 		
-		if(LastDoorID == noone) exit;
+		//(the last door may be of the level before: a level of screens has no door at its edges, roadmap F18)
+		if(LastDoorID == noone || !instance_exists(LastDoorID)) exit;
 		
 		if(LastDoorID.LinkedDoor == noone){
 			exit;

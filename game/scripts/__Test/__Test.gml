@@ -468,6 +468,95 @@ function Test_GotoExit(_Extra){
 }
 
 /// A spot just inside one of the room's doors: [x, y]
+/// The open edges of the level's screens (roadmap F18) Link can walk straight across: for every room and side, each run
+/// of walkable tiles on its outermost row whose tiles in the room beyond are walkable too, at least 24 px wide, with a
+/// straight walk of 48 px to the edge; one crossing ({From, To, X, Y, Verb, At}) per run and side (so every edge both ways)
+function Test_ScreenEdges(){
+	var _Out = [];
+	var _Solid = RegionTiles_Get(LevelDef.RegionTiles).solid;
+	for(var r = 0; r < global.Level.RoomCount; r++){
+		var _R = global.Level.Rooms[r];
+		var _G = _R[$ "RegionGrid"];
+		if(_G == undefined || _G[$ "Screen"] == undefined) continue;
+		var _Sides = [["right", 1, 0], ["left", -1, 0], ["down", 0, 1], ["up", 0, -1]];
+		for(var s = 0; s < 4; s++){
+			var _DX = _Sides[s][1], _DY = _Sides[s][2];
+			var _Len = (_DX != 0) ? _G.H : _G.W;
+			var k = 0;
+			while(k < _Len){
+				var _Run = Test_EdgeTile(_R, _G, _Solid, _DX, _DY, k);
+				if(_Run == -1){
+					k++;
+					continue;
+				}
+				var _K0 = k;
+				while(k < _Len && Test_EdgeTile(_R, _G, _Solid, _DX, _DY, k) == _Run) k++;
+				if((k - _K0) < 3) continue;
+				var _Mid = (_K0 + k) div 2;
+				if(!Test_EdgeListed(_R, _Sides[s][0], _Mid * 8 + 4)) continue;	//floor Link never reaches (the moat): not an edge
+				//a straight walk: the three tiles across the middle are walkable from 48 px inside (Link starts 32 to 40 px in) to the edge
+				var _Clear = true;
+				for(var d = 0; d < 6 && _Clear; d++){
+					for(var a = -1; a <= 1 && _Clear; a++){
+						var _I = (_DX != 0) ? (_DX > 0 ? _G.W - 1 - d : d) : _Mid + a;
+						var _J = (_DX != 0) ? _Mid + a : (_DY > 0 ? _G.H - 1 - d : d);
+						if(_I < 0 || _J < 0 || _I >= _G.W || _J >= _G.H || RegionRoom_SolidAt(_G, _Solid, _I, _J)) _Clear = false;
+					}
+				}
+				if(!_Clear) continue;
+				var _X, _Y;
+				if(_DX != 0){
+					_X = _R.x + (_DX > 0 ? _R.width - 32 : 32);
+					_Y = _R.y + _Mid * 8 + 4;
+				}else{
+					_X = _R.x + _Mid * 8 + 4;
+					_Y = _R.y + (_DY > 0 ? _R.height - 40 : 40);
+				}
+				array_push(_Out, {From : r, To : _Run, X : _X, Y : _Y, Verb : _Sides[s][0], At : _Mid * 8});
+			}
+		}
+	}
+	return _Out;
+}
+
+/// Whether px _At along side _Verb ("right", "left", "down", "up") of a screen is on an open edge that paint_screens.py
+/// measured (screens.json "edges": reachable floor on both sides), the area mirrored as the level is
+function Test_EdgeListed(_R, _Verb, _At){
+	var _S = global.Level.DungeonTemplate[$ "Screens"];
+	if(_S == undefined) return true;
+	var _Mirror = global.Level[$ "ScreensMirror"] ?? false;
+	var _Sides = {right : "Right", left : "Left", down : "Bottom", up : "Top"};
+	var _Side = _Sides[$ _Verb];
+	if(_Mirror){
+		if(_Side == "Left") _Side = "Right"; else if(_Side == "Right") _Side = "Left";
+		if(_Side == "Top" || _Side == "Bottom") _At = _R.width - _At;
+	}
+	for(var i = 0; i < array_length(_S.rooms); i++){
+		if(_S.rooms[i].name != _R.TemplateName) continue;
+		var _Runs = _S.rooms[i].edges[$ _Side] ?? [];
+		for(var n = 0; n < array_length(_Runs); n++) if(_At >= _Runs[n][1] && _At < _Runs[n][1] + _Runs[n][2]) return true;
+	}
+	return false;
+}
+
+/// The room beyond tile _K of a screen's side (_DX, _DY: the side's direction) when that tile is walkable in both rooms,
+/// else -1
+function Test_EdgeTile(_R, _G, _Solid, _DX, _DY, _K){
+	var _I = (_DX != 0) ? (_DX > 0 ? _G.W - 1 : 0) : _K;
+	var _J = (_DX != 0) ? _K : (_DY > 0 ? _G.H - 1 : 0);
+	if(RegionRoom_SolidAt(_G, _Solid, _I, _J)) return -1;
+	var _PX = _R.x + _I * 8 + 4 + _DX * 8;
+	var _PY = _R.y + _J * 8 + 4 + _DY * 8;
+	if(_PX < 0 || _PY < 0 || _PX >= DungeonW || _PY >= DungeonW) return -1;
+	var _N = global.Level.Map_RoomIndex[_PY div 256][_PX div 256];
+	if(_N == -1) return -1;
+	var _NR = global.Level.Rooms[_N];
+	var _NG = _NR[$ "RegionGrid"];
+	if(_NG == undefined) return -1;
+	if(RegionRoom_SolidAt(_NG, _Solid, (_PX - _NR.x) div 8, (_PY - _NR.y) div 8)) return -1;
+	return _N;
+}
+
 function Test_RoomEntryPoint(_RoomIndex){
 	var _R = global.Level.Rooms[_RoomIndex];
 	var _RSI = global.RoomSizeIndex[_R.GridW][_R.GridH];
@@ -702,7 +791,19 @@ function Test_DoStep(_S){
 			if(_Painted != _PW * _PH) Test_Fail("paint: " + string(_PW * _PH - _Painted) + " blocks not painted");
 			return true;
 
-		case "painted":	// painted room (roadmap F12b): Link to the first one of the level (or "index"), then its walls checked tile by tile; "remake" makes its walls again first
+		case "painted":	// painted room (roadmap F12b): Link to the first one of the level (or "index"), then its walls checked tile by tile; "remake" makes its walls again first; "all": every painted room in turn
+			if(_S[$ "all"] ?? false){
+				if(StepFrames == 1) PaintedRoom = -1;
+				if(PaintedRoom == -1 || (StepFrames - PaintedStart) >= 10){
+					if(PaintedRoom != -1) Test_CheckPainted(PaintedRoom);
+					do PaintedRoom++; until(PaintedRoom >= global.Level.RoomCount || RegionRoom_Is(PaintedRoom));
+					if(PaintedRoom >= global.Level.RoomCount) return true;
+					var _GotoAll = global.Level.Rooms[PaintedRoom];
+					Test_PlaceLink(PaintedRoom, [_GotoAll.x + 128, _GotoAll.y + 128]);
+					PaintedStart = StepFrames;
+				}
+				return false;
+			}
 			if(StepFrames == 1){
 				PaintedRoom = _S[$ "index"] ?? -1;
 				for(var i = 0; PaintedRoom == -1 && i < global.Level.RoomCount; i++) if(RegionRoom_Is(i)) PaintedRoom = i;
@@ -748,6 +849,64 @@ function Test_DoStep(_S){
 			}
 			Test_Log("grid " + string(_S[$ "name"] ?? "") + " blocks=" + string(_GPainted));
 			return true;
+
+		case "edges":	// screens of an area (roadmap F18): Link walks across every open edge of every room, both ways; he must reach the room beyond, out of the walls
+			if(StepFrames == 1){
+				EdgeList = Test_ScreenEdges();
+				EdgeAt = 0;
+				EdgePhase = 0;
+				EdgeFrames = 0;
+				EdgeOk = 0;
+				Test_Log("edges crossings=" + string(array_length(EdgeList)));
+				if(array_length(EdgeList) == 0){
+					Test_Fail("edges: no open edge in the level");
+					return true;
+				}
+			}
+			if(EdgeAt >= array_length(EdgeList)){
+				Test_Log("edges crossed=" + string(EdgeOk) + " of " + string(array_length(EdgeList)));
+				return true;
+			}
+			var _E = EdgeList[EdgeAt];
+			EdgeFrames++;
+			switch(EdgePhase){
+				case 0:
+					if(oCamera.RoomTransition != NONE) return false;
+					Test_PlaceLink(_E.From, [_E.X, _E.Y]);
+					EdgePhase = 1;
+					EdgeFrames = 0;
+					return false;
+				case 1:
+					if(EdgeFrames < 10) return false;	// the room wakes up
+					EdgePhase = 2;
+					EdgeFrames = 0;
+					return false;
+				case 2:
+					Test_HoldVerbs([_E.Verb]);
+					if((global.CurrentRoomIndex == _E.To && oCamera.RoomTransition == NONE) || EdgeFrames > 150){
+						EdgePhase = 3;
+						EdgeFrames = 0;
+					}
+					return false;
+			}
+			if(EdgeFrames < 20) return false;	// he walks in and stops
+			var _EBad = "";
+			if(!instance_exists(oLink)) _EBad += " no_link";
+			else{
+				if(Test_LinkInWall()) _EBad += " in_wall";
+				var _ER = global.Level.Rooms[_E.To];
+				if(oLink.x < _ER.x || oLink.x >= _ER.x + _ER.width || oLink.y < _ER.y || oLink.y >= _ER.y + _ER.height) _EBad += " outside(" + string(round(oLink.x)) + "," + string(round(oLink.y)) + ")";
+			}
+			if(global.CurrentRoomIndex != _E.To) _EBad += " room(" + string(global.CurrentRoomIndex) + ")";
+			var _EName = "edge " + string(global.Level.Rooms[_E.From].TemplateName) + " -> " + string(global.Level.Rooms[_E.To].TemplateName) + " " + _E.Verb + " at=" + string(_E.At);
+			if(_EBad == ""){
+				EdgeOk++;
+				Test_Log(_EName + " ok");
+			}else Test_Fail(_EName + ":" + _EBad);
+			EdgeAt++;
+			EdgePhase = 0;
+			EdgeFrames = 0;
+			return false;
 
 		case "lock":	// a locked door of a painted room (R1): Link "side" px across from its middle, 32 px inside, walks into it for "frames" (default 120); he must stay in the room, out of the walls, with no camera transition
 			if(StepFrames == 1){

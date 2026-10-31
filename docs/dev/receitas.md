@@ -94,6 +94,17 @@ As salas saem de regras aprendidas na ROM, não de peças recortadas: nenhuma em
 6. Costuras: copie `tools/test/scenarios/castle_top_seams.json` para a fase e rode (`misfits=0` nas 12 sementes). Na falha, as linhas `seams edge` e `seams doors` dizem se é a moldura (bloco diferente na borda) ou uma porta aberta de um lado só (entrada ou saída encostada numa sala).
 7. Folha de contato: `python tools/test/run.py --sheet <Fase> --seeds 5`.
 
+## Área do ALttP em telas (F18, ex.: arredores do castelo)
+
+O jeito de uma região externa que é uma área do ALttP como ela é: telas com borda aberta, nada cortado nem inventado.
+
+1. A área já está no tileset da região (`owdump.py tiles <área> --region <regiao>`, importação da F6b), com `tiles/areas.json`.
+2. Renderize a área com a grade de 256 px e veja onde caem a entrada, a tranca e a saída (`paint_screens.py --png` depois do passo 3 desenha alcance, áreas e portas). Se um eixo importante cair numa emenda de telas, junte as telas em salas 2x2 ou 2x1 (como o miolo do `CastleTopArea`).
+3. Escreva `data/room-templates/sets/<Set>/area.json` (formato no docstring do `tools/templates/paint_screens.py`): salas cobrindo a grade inteira, entrada, saída, tranca (`open` e `from`: blocos do caminho que passa por ela), telas opcionais e espelho. A célula de uma porta (32x32) fica onde o Link encosta: logo abaixo das barras da tranca, no vão da porta da saída.
+4. `python tools/templates/paint_screens.py <Set>` (ele recusa saída sem caminho, saída alcançada sem a tranca e opcionais que cortam o caminho) e `python tools/templates/convert.py`.
+5. Ficha da fase: `Layout = LevelLayout.Screens`, `RoomSet = "<Set>"`, `RegionTiles`, `StartDir` pela parede da entrada, `ArriveLook` "Edge" (chega pela borda) e `OwnExitLooks` com o visual da saída ("Doorway" para uma porta da área).
+6. Cenário como o `castle_top_screens`: `rooms`, `painted` com `all`, `edges`, `lock`, a chave (`give`) e a passagem, `exit` com `expect exit_level`, e as fotos combinadas antes, na luz da fase. Rode compilando (os templates são arquivos incluídos: `--no-build` roda os velhos).
+
 ## Clima de uma fase (chuva, folhas, relâmpago, trovão, noite)
 
 1. Na ficha, `Weather = {...}` com os campos que mudam do padrão (`Weather_Defaults` em `scripts/__Weather`: `Rain`, `Leaves`, `Lightning`, `Thunder`, `ThunderDelay`, `ThunderGain`, `Tint`, `Volume`). Ex.: o topo do castelo tem `{Thunder: true}`, a entrada `{Leaves: true}`.

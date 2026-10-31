@@ -469,6 +469,7 @@ function RoomTemplates_Pick(_RoomIndex, _UseSet = true){
 	gml_pragma("forceinline");
 	
 	var _TemplateArray, _TemplateIndex;
+	if(LevelDef.Layout == LevelLayout.Screens) return RoomTemplates_PickScreen(_RoomIndex);
 	switch(Room.TemplateClass){
 		
 		case RoomTemplateClass.Special: 				
@@ -582,6 +583,35 @@ function RoomTemplates_Pick(_RoomIndex, _UseSet = true){
 	}
 	return RoomTemplates_PickFrom(_RoomIndex, global.Templates_Room, global.Templates_Room_Count, global.UnusedRoomTemplatesList);
 
+}
+
+/// The template of a screen of an area (LevelLayout.Screens, roadmap F18): the one of the level's room set named like the
+/// screen (Room.TemplateName), mirrored with the area (FlipH: its tiles by RegionRoom_Paint, its objects here); -1 when
+/// the set has none
+function RoomTemplates_PickScreen(_RoomIndex){
+	var _Set = global.RoomSets[$ LevelDef.RoomSet];
+	if(_Set == undefined || _Set.Templates[RoomTemplateClass.Main_Upper] == undefined) return -1;
+	var _Subs = _Set.Templates[RoomTemplateClass.Main_Upper];
+	for(var s = 0; s < array_length(_Subs); s++){
+		for(var t = 0; t < array_length(_Subs[s]); t++){
+			if(_Subs[s][t][$ "name"] != Room.TemplateName) continue;
+			var _Template = StructCopy(_Subs[s][t]);
+			var _Tr = (global.Level[$ "ScreensMirror"] ?? false) ? ObjTransformation.FlipH : ObjTransformation.None;
+			_Template.Transform = _Tr;
+			if(_Tr == ObjTransformation.None) return _Template;
+			var _Types = global.RoomTemplateObjTypes[RoomTemplateClass.Main_Upper];
+			for(var k = 0; k < array_length(_Types); k++){
+				_Template[$ _Types[k]] = TransformObjArray(_Template[$ _Types[k]], _Tr, _Types[k], _Template.width, _Template.height);
+			}
+			var _Main = _Template.Sections[0];
+			_Types = global.RoomTemplateObjTypes_Section[RoomTemplateClass.Main_Upper];
+			for(var k = 0; k < array_length(_Types); k++){
+				_Main[$ _Types[k]] = TransformObjArray(_Main[$ _Types[k]], _Tr, _Types[k], _Template.width, _Template.height);
+			}
+			return _Template;
+		}
+	}
+	return -1;
 }
 
 /// The next template of a shuffled list per class and subclass that fits the room (doors, section, zones), transformed
